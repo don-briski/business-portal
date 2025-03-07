@@ -1,0 +1,140 @@
+
+app-sidebar {
+    width: 240px;   
+}
+
+@media screen and (max-width: 991px) { 
+    app-sidebar {
+        width: auto;   
+    }
+}
+
+.dt-content-wrapper {
+    margin-top: 74px;
+}
+
+.generate-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 6000;
+    display: none;
+    float: left;
+    min-width: 10rem;
+    padding: .5rem 0;
+    margin: .5rem 1.5rem 0;
+    font-size: 1.4rem;
+    color: #545454;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 0 solid transparent;
+    border-radius: .4rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175)
+}
+
+.generate-menu-right {
+    right: 150px;
+    left: auto;
+    top: -50px;
+}
+    
+.generate-menu {
+    width: 500px !important;
+}
+
+.generate-menu-header {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    font-size: 13px;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding: 1.2rem 1.8rem
+}
+    
+.generate-menu-header {
+    box-shadow: 0 2px 2px 0 rgba(84, 84, 84, 0.05)
+}
+    
+.generate-menu-header .title {
+    font-size: 15px;
+    margin-bottom: 0
+}
+
+.generate-menu-body {
+    padding: 1.5rem 1.8rem
+}
+    
+.generate-menu-footer {
+    box-shadow: 0 -2px 2px 0 rgba(84, 84, 84, 0.05);
+    justify-content: flex-end;
+}
+    
+.generate-menu-header, .generate-menu-footer {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    font-size: 13px;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding: 1.5rem 1.8rem
+}
+
+.download {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.grayed {
+    color: gray;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+  
+.logo {
+    max-width: 6rem;
+    max-height: 6rem;
+  
+}
+  
+.report-info {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    h5 {
+      margin-bottom: 1rem ;
+      font-weight: bold;
+    }
+}
+ 
+@media print {
+    .logo-container {
+        margin-bottom: 1rem !important;
+    }
+    
+    .logo {
+        max-width: 1rem !important; 
+        max-height: 1rem !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain !important;
+    }
+    
+    .report-info {
+        margin: 0.8rem 0;
+        
+        h5 {
+            font-size: 12px;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+    }
+}

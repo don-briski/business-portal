@@ -1,0 +1,149 @@
+<section>
+  <h1>Upload Payroll</h1>
+
+  <div class="card p-5">
+    <div class="row p-5">
+      <div class="col-md-5 form-section">
+        <p>
+          Upload relevant payroll sheet for more efficient loan decision making.
+        </p>
+
+        <form
+          [formGroup]="payrollUploadForm"
+          (ngSubmit)="onSubmit()"
+          *ngIf="!isClearingData"
+        >
+          <div class="mb-5">
+            <label for="institution"
+              >Select Your Institution <b class="text-danger">*</b></label
+            >
+            <slct-2
+              *ngIf="!isFetchingEmployers"
+              [data]="employers"
+              placeholder="Select Institution"
+              (selected)="onSelectOrDeselect($event.id, 'Institution')"
+              (removed)="onSelectOrDeselect('', 'Institution')"
+            ></slct-2>
+            <lnd-spinner
+              class="d-block"
+              *ngIf="isFetchingEmployers"
+            ></lnd-spinner>
+          </div>
+          <div class="mb-5">
+            <label for="institution"
+              >Select Payroll Month <b class="text-danger">*</b></label
+            >
+            <slct-2
+              [data]="months"
+              placeholder="Select Month"
+              (selected)="onSelectOrDeselect($event.id, 'Month')"
+              (removed)="onSelectOrDeselect('', 'Month')"
+            ></slct-2>
+          </div>
+          <div class="mb-5">
+            <label for="institution"
+              >Select Payroll Year <b class="text-danger">*</b></label
+            >
+            <slct-2
+              [data]="getYears(2020)"
+              placeholder="Select Year"
+              (selected)="onSelectOrDeselect($event.id, 'Year')"
+              (removed)="onSelectOrDeselect('', 'Year')"
+            ></slct-2>
+          </div>
+          <button
+            type="submit"
+            class="btn"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [disabled]="isLoading || payrollUploadForm.invalid"
+          >
+            {{ isLoading ? "Processing..." : "Submit" }}
+            <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+          </button>
+        </form>
+      </div>
+      <div class="col-md-6 offset-md-1">
+        <lnd-dragdrop
+          [showSummary]="showSummary"
+          [text]="uploadText"
+          [isLoading]="isLoading"
+          [progressValue]="progressValue"
+          [currentTheme]="currentTheme"
+          [file]="file"
+          resource="Payroll"
+          [stats]="uploadStats"
+          [allowPreview]="true"
+          [allowSubmit]="false"
+          (openPreviewModal)="openPreviewModal(previewModal)"
+          (deleteFile)="deleteFile()"
+          (downloadTemplate)="downloadTemplate()"
+          (handleFileInput)="handleFileInput($event)"
+        ></lnd-dragdrop>
+      </div>
+    </div>
+  </div>
+</section>
+
+<ng-template #previewModal>
+  <div id="preview">
+    <header class="d-flex justify-content-between align-items-center">
+      <h1>Payroll Preview</h1>
+      <span class="p-4" type="button" (click)="closeModal()">X</span>
+    </header>
+
+    <lnd-table-header
+      [pagination]="pagination"
+      [currentTheme]="currentTheme"
+      [isLoading]="isLoading"
+      (paginationChange)="fetchPayroll($event, originalPayrollData)"
+      placeholder="Email Or BVN"
+    ></lnd-table-header>
+
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Account Number</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>BVN</th>
+            <th>Bank</th>
+            <th>Date Of Birth</th>
+            <th>Email</th>
+            <th>Gender</th>
+            <th>Grade Level</th>
+            <th>Gross Salary</th>
+            <th>Ministry</th>
+            <th>Staff Number</th>
+            <th>Total Deductions</th>
+            <th>Total Loans</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let payroll of payrollData.items">
+            <td>{{ payroll["Account Number"] }}</td>
+            <td>{{ payroll["First Name"] }}</td>
+            <td>{{ payroll["Last Name"] }}</td>
+            <td>{{ payroll?.BVN }}</td>
+            <td>{{ payroll?.Bank }}</td>
+            <td>{{ payroll["Date Of Birth"] }}</td>
+            <td>{{ payroll?.Email }}</td>
+            <td>{{ payroll?.Gender }}</td>
+            <td>{{ payroll["Grade Level"] }}</td>
+            <td>{{ payroll["Gross Salary"] }}</td>
+            <td>{{ payroll?.Ministry }}</td>
+            <td>{{ payroll["Staff Number"] }}</td>
+            <td>{{ payroll["Total Deductions"] }}</td>
+            <td>{{ payroll["Total Loans"] }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <lnd-table-footer
+      [pagination]="pagination"
+      (paginationChange)="fetchPayroll($event, originalPayrollData)"
+    ></lnd-table-footer>
+  </div>
+</ng-template>

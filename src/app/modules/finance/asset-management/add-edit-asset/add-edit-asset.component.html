@@ -1,0 +1,463 @@
+<div class="row m-0">
+  <div class="col-md-8 offset-md-2">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="dt-page__title clearfix mb-0">
+        {{ isEditing ? "Edit" : "Create" }} Asset Card
+      </h1>
+      <a
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        class="btn btn-primary btn-sm mr-2 text-white"
+        [routerLink]="['/finance/assets/all']"
+        routerLinkActive="router-link-active"
+        href="javascript:void(0)"
+        >Cancel</a
+      >
+    </div>
+
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <form [formGroup]="assetForm" (ngSubmit)="attemptFormSubmit(approval)">
+          <div class="form-group">
+            <label>Asset Name<span class="text-danger">*</span></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="assetName"
+              placeholder="Type asset name"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="permission"
+                  >Asset Class<span class="text-danger">*</span></label
+                >
+                <slct-2
+                  [data]="assetClass"
+                  formControlName="assetclass"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Select Asset Class'"
+                ></slct-2>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="permission"
+                  >Asset Sub-class<span class="text-danger">*</span></label
+                >
+                <slct-2
+                  [data]="filteredAssetSubClass"
+                  formControlName="assetSubClass"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Select Asset Sub Class'"
+                ></slct-2>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div
+              [ngClass]="
+                assetForm.get('generateAssetCode').value === 'No'
+                  ? 'col-md-4'
+                  : 'col-md-12'
+              "
+            >
+              <div class="form-group">
+                <label
+                  >AutoGenerate Asset Code ?<span class="text-danger"
+                    >*</span
+                  ></label
+                >
+
+                <slct-2
+                  [data]="generateAssetCodeOpt"
+                  formControlName="generateassetcode"
+                  [customSearchEnabled]="true"
+                ></slct-2>
+              </div>
+            </div>
+            <div
+              class="col-md-8"
+              *ngIf="assetForm.get('generateAssetCode').value === 'No'"
+            >
+              <div class="form-group">
+                <ng-template #tipContent>
+                  (For a desired code {{ user?.branchCode | uppercase }}/{{
+                    assetSubClassPrefix
+                      ? assetSubClassPrefix
+                      : "Sub class code"
+                  }}/48934...enter only 48934 in the field below)
+                </ng-template>
+                <label
+                  >Asset Code
+                  <i
+                    class="icon icon-question-circle ml-1"
+                    placement="top"
+                    [ngbTooltip]="tipContent"
+                  >
+                  </i
+                  ><span class="text-danger">*</span></label
+                >
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span
+                      class="input-group-text"
+                      id="basic-addon1"
+                      style="font-size: 11px"
+                      >{{ currentBranch | uppercase }}/{{
+                        assetSubClassPrefix
+                          ? assetSubClassPrefix + "/"
+                          : "SUBCLASSCODE/"
+                      }}
+                    </span>
+                  </div>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="assetCode"
+                    placeholder="Type asset code"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Asset Description<span class="text-danger">*</span></label>
+            <textarea
+              class="form-control"
+              cols="3"
+              rows="3"
+              formControlName="descriptionOfAsset"
+            ></textarea>
+          </div>
+          <div class="form-row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Branch<span class="text-danger">*</span></label>
+                <slct-2
+                  [multiple]="false"
+                  [data]="branchList"
+                  (selected)="selectBranch($event)"
+                  formControlName="selectedBranches"
+                  placeholder="Select Branch"
+                ></slct-2>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Quantity<span class="text-danger">*</span></label>
+                <input
+                  type="number"
+                  class="form-control"
+                  min="0"
+                  placeholder="Quantity"
+                  formControlName="quantity"
+                  [readOnly]="disableQuantity"
+                />
+                <small *ngIf="quantityIsDecimal" class="text-danger"
+                  >Decimal Values are not allowed
+                </small>
+              </div>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="permission"
+                  >Depreciation Method<span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  [value]="selectedDepMtd"
+                  placeholder="Depreciation Method"
+                  class="form-control"
+                  readonly
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label
+                  >Date of Purchase/Acquisition<span class="text-danger"
+                    >*</span
+                  ></label
+                >
+                <input
+                lndInvalidDateChecker
+                  type="date"
+                  class="form-control"
+                  [value]="assetForm.get('dateOfPurchaseOrAcquisition').value"
+                  (blur)="setPurchaseDate($event)"
+                />
+              </div>
+            </div>
+          </div>
+          <div
+            class="form-group"
+            *ngIf="
+              assetForm.get('depreciationMethod').value === 'DecliningBalance'
+            "
+          >
+            <label
+              >Depreciation Rate (%) <span class="text-danger">*</span></label
+            >
+            <input
+              type="number"
+              class="form-control"
+              formControlName="depreciationRate"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Purchase Price<span class="text-danger">*</span></label>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">{{
+                      ownerInformation?.currency?.currencySymbol
+                    }}</span>
+                  </div>
+                  <input
+                    type="text"
+                    currencyMask
+                    [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                    class="form-control"
+                    formControlName="purchasePrice"
+                  />
+                </div>
+              </div>
+            </div>
+            <div
+              *ngIf="
+                assetForm.get('depreciationMethod').value !== 'DecliningBalance'
+              "
+              class="col-md-6"
+            >
+              <div class="form-group">
+                <label>Residual value<span class="text-danger">*</span></label>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">{{
+                      ownerInformation?.currency?.currencySymbol
+                    }}</span>
+                  </div>
+                  <input
+                    type="text"
+                    currencyMask
+                    [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                    class="form-control"
+                    formControlName="residualValue"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label
+                  >Effective life in Years<span class="text-danger"
+                    >*</span
+                  ></label
+                >
+                <input
+                  type="number"
+                  class="form-control"
+                  formControlName="effectiveLifeInYears"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="permission"
+                  >Activate Asset<span class="text-danger">*</span></label
+                >
+                <slct-2
+                  [data]="activateAssetOpt"
+                  formControlName="activateassetnow"
+                  [customSearchEnabled]="true"
+                ></slct-2>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Additional notes</label>
+            <textarea
+              class="form-control"
+              cols="3"
+              rows="3"
+              formControlName="location"
+              placeholder="You can add additional notes such as specific location and others to this asset"
+            ></textarea>
+          </div>
+
+          <div
+            class="form-row"
+            *ngIf="assetForm.get('activateAssetNow').value === 'Yes'"
+          >
+            <div class="col-md-6">
+              <div class="form-group">
+                <label
+                  >Asset Activation Date<span class="text-danger"
+                    >*</span
+                  ></label
+                >
+                <input
+                  *ngIf="!invalidDateError"
+                  type="date"
+                  class="form-control"
+                  (blur)="setActivationDate($event)"
+                  [min]="assetForm.get('dateOfPurchaseOrAcquisition').value"
+                />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Assigned Employee</label>
+                <slct-2
+                  [data]="employeeList"
+                  (selected)="selectEmployee($event)"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Select Employee'"
+                  [active]="
+                    isEditing && editingAssetCard.assignedEmployeeId
+                      ? [
+                          {
+                            id: editingAssetCard?.assignedEmployeeId,
+                            text: editingAssetCard?.assignedEmployeeName
+                          }
+                        ]
+                      : null
+                  "
+                ></slct-2>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="assetForm.get('activateAssetNow').value === 'Yes'"
+            class="row mb-5"
+          >
+            <div class="col-md-4">
+              <lnd-switch
+                text="Raise A Bill?"
+                [value]="assetForm.get('raiseBill').value"
+                (emittedValue)="setRaiseBill($event)"
+              ></lnd-switch>
+            </div>
+          </div>
+
+          <ng-container *ngIf="assetForm.get('raiseBill').value">
+            <div class="lnd-border-dashed pb-5">
+              <div class="row my-5">
+                <div class="col-md-6">
+                  <label for="vendor"
+                    >Vendor <b class="text-danger required">*</b></label
+                  >
+                  <slct-2
+                    [data]="vendors"
+                    formControlName="vendor"
+                    [customSearchEnabled]="true"
+                    placeholder="Select Vendor"
+                  ></slct-2>
+                </div>
+                <div class="col-md-6">
+                  <label for="bill-date"
+                    >Bill Date (mm/dd/yyyy)
+                    <b class="text-danger required">*</b></label
+                  >
+                  <input
+                  lndInvalidDateChecker
+                    type="date"
+                    class="form-control"
+                    formControlName="billDate"
+                  />
+                </div>
+              </div>
+              <div class="row mb-5">
+                <div class="col-md-6">
+                  <label for="payment-terms"
+                    >Payment Terms <b class="text-danger required">*</b></label
+                  >
+                  <slct-2
+                    [data]="paymentTerms"
+                    id="payment-terms"
+                    formControlName="paymentTerm"
+                    [customSearchEnabled]="true"
+                    placeholder="Select Payment Term"
+                  ></slct-2>
+                </div>
+                <div class="col-md-6">
+                  <label for="due-date"
+                    >Due Date (mm/dd/yyyy)
+                    <b class="text-danger required">*</b></label
+                  >
+                  <input
+                  lndInvalidDateChecker
+                    type="date"
+                    class="form-control"
+                    formControlName="billDueDate"
+                  />
+                </div>
+              </div>
+              <div class="row mb-5">
+                <div class="col-md-6">
+                  <label for="res-person">Responsible Person</label>
+                  <slct-2
+                    [data]="responsiblePersons"
+                    formControlName="responsiblePerson"
+                    [customSearchEnabled]="true"
+                    placeholder="Select User"
+                  ></slct-2>
+                </div>
+                <div class="col-md-6">
+                  <label for="reference">Reference</label>
+                  <input
+                    id="reference"
+                    class="form-control"
+                    placeholder="Enter reference"
+                    formControlName="reference"
+                  />
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+          <div class="form-group">
+            <button
+              type="submit"
+              class="btn btn-block btn-primary text-white"
+              [disabled]="assetForm.invalid || quantityIsDecimal"
+              *ngIf="!loader"
+            >
+              Proceed
+            </button>
+            <button
+              type="button"
+              class="btn btn-block btn-warning text-white"
+              *ngIf="loader"
+              [disabled]="true"
+            >
+              <i class="icon icon-spin icon-spin2"></i> Processing...
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [canApprove]="user?.permission?.includes('Approve Invoice')"
+    (sendPayload)="submitForm($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>

@@ -1,0 +1,32 @@
+section{
+  header{
+    margin-bottom: 60px;
+    #title{
+      max-width: 19%;
+      h1{
+        font-size: 18px;
+        font-weight: 400;
+        margin-bottom: 5px;
+      }
+    }
+
+    button{
+      background-color: var(--lenda-blue);
+      color: #fff;
+      padding: 12px 24px 12px 24px;
+      border: none;
+      border-radius: 8px;
+      img{
+        margin-left: 10px;
+        margin-bottom: 5px;
+      }
+    }
+
+    p{
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--lenda-grey);
+      margin-top: 40px;
+    }
+  }
+}

@@ -1,0 +1,15 @@
+button {
+  &.default {
+    background-color: var(--secondary-color);
+    color: #fff;
+  }
+}
+
+.skip-validation-btn {
+  padding: 0;
+  outline: none;
+  border: none;
+  text-decoration: underline;
+  background: transparent;
+  color: var(--secondary-color);
+}

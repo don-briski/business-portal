@@ -1,0 +1,56 @@
+<div class="filter-menu filter-menu-right">
+  <div class="filter-menu-header">
+    <h4 class="title"><i class="mr-2 icon icon-ckeditor"></i>Filter</h4>
+  </div>
+  <div class="filter-menu-body">
+    <div class="h-auto">
+      <div class="form-row">
+        <br />
+        <div class="mb-3 col-sm-12">
+          <label>Select Status</label>
+          <div>
+            <slct-2
+              *ngIf="filterOptions.length > 0"
+              [data]="filterOptions"
+              [multiple]="false"
+              placeholder="Select Status"
+              (selected)="selectFilterOption($event)"
+            >
+            </slct-2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-menu-footer">
+      <div class="footer-right">
+        <button
+          type="button"
+          (click)="filter()"
+          class="mr-2 btn btn-xs text-white"
+          *ngIf="!isLoading"
+          [disabled]="selectedFilterOption === ''"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+        >
+          Filter
+        </button>
+        <button
+          type="button"
+          class="mr-2 btn btn-primary btn-xs"
+          [disabled]="true"
+          *ngIf="isLoading"
+        >
+          <i class="icon icon-spin icon-spin2"></i> Filtering ...
+        </button>
+        <button
+          type="button"
+          (click)="closeFilterModal()"
+          class="btn btn-danger btn-xs"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,16 @@
+.field-set {
+  background: #f3f4f6;
+  border-radius: 6px;
+}
+
+.open {
+  transform: rotate(0);
+}
+
+.close {
+  transform: rotate(180deg);
+}
+
+.icon-lg {
+  font-size: 25px !important;
+}

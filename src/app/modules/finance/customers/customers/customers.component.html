@@ -1,0 +1,347 @@
+<ng-container
+  *ngIf="
+    !viewCustomerProp && user?.permission?.includes('View Finance Customers')
+  "
+>
+  <div class="row m-0">
+    <header
+      class="w-100 d-flex align-items-center justify-content-between mb-3"
+    >
+      <h1 class="dt-page__title">Customers</h1>
+      <span class="float-right role-add">
+        <div style="position: relative; right: -5px; bottom: 5px; float: right">
+          <button
+            type="button"
+            class="btn btn-success mr-2"
+            aria-expanded="false"
+            (click)="openModal(customerImport)"
+          >
+            {{ isImporting ? "Importing..." : "Import" }}
+            <i class="icon icon-upload"></i>
+            <i *ngIf="isImporting" class="icon icon-spin icon-spin2 ml-2"></i>
+          </button>
+          <a
+            *ngIf="user?.permission?.includes('Manage Finance Customers')"
+            class="btn btn-primary mr-2 text-white"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [routerLink]="['/finance/customers/create']"
+            routerLinkActive="router-link-active"
+            href="javascript:void(0)"
+          >
+            <i class="icon icon-add-circle mr-2"></i>Add New</a
+          >
+        </div>
+      </span>
+    </header>
+
+    <div class="dt-card w-100">
+      <div class="dt-card__body">
+        <!-- Pagination Top-->
+        <div class="row">
+          <div class="col-md-4">
+            <label style="display: inline-flex"
+              ><span style="padding: 8px 2px; font-size: 12px">Show </span
+              ><select
+                [(ngModel)]="pagination.pageSize"
+                aria-controls="data-table"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+                (change)="getCustomers()"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span style="padding: 8px 2px; font-size: 12px"
+                >entries</span
+              ></label
+            >
+          </div>
+
+          <div class="col-md-4">
+            <div
+              *ngIf="isLoading"
+              class="table-loader"
+              style="text-align: center; color: indianred"
+            >
+              <span>
+                <i class="icon icon-spin icon-spin2"></i> Retrieving
+                Customers...</span
+              >
+            </div>
+          </div>
+
+          <div class="form-group col-md-4">
+            <lnd-search-dropdown [searchColumns]="pagination.searchColumns" [currentTheme]="currentTheme" (searchParams)="getCustomers($event)"></lnd-search-dropdown>
+          </div>
+          <div
+            class="d-flex justify-content-between w-100 align-items-center"
+            style="padding: 0 18px"
+          >
+            <div
+              class=""
+              aria-live="polite"
+              style="font-size: 13px; margin-top: 8px"
+            >
+              Showing
+              {{
+                (pagination.pageNumber - 1) * pagination.pageSize + 1
+                  | number : "1.0-0"
+              }}
+              -
+              {{
+                (pagination.pageNumber - 1) * pagination.pageSize +
+                  pagination.count | number : "1.0-0"
+              }}
+              of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+            </div>
+          </div>
+        </div>
+        <!-- /pagination Top -->
+        <div class="table-responsive">
+          <table id="data-table" class="table mt-5 table-striped">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Phone Number</th>
+                <th>Email</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr
+                *ngFor="let customer of customers; let i = index"
+                class="cursor"
+                (click)="viewCustomer(customer, dropdownToggle)"
+              >
+                <td class="copy_icon_wrapper" [style.color]="currentTheme?.secondaryColor">
+                  {{ customer?.financePersonCode }}
+
+                  <img
+                    (mouseover)="copy_hover = true"
+                    (mouseleave)="copy_hover = false"
+                    class="copy_icon"
+                    src="assets/images/copy.png"
+                    alt="copy icon"
+                    width="15"
+                    height="15"
+                    (click)="copyCode(customer?.financePersonCode)"
+                    placement="right"
+                    ngbTooltip="Copy Customer Code"
+                  />
+                </td>
+                <td>{{ customer.fullName }}</td>
+                <td>{{ customer?.phoneNumber }}</td>
+                <td>{{ customer?.emailAddress }}</td>
+                <td>
+                  {{ customer.isOrganisation ? "Organization" : "Individual" }}
+                </td>
+                <td>
+                  <span
+                    class="badge badge-sm"
+                    [ngClass]="{
+                      'badge-success': customer.isActive,
+                      'badge-warning': !customer.isActive
+                    }"
+                  >
+                    <span>
+                      {{ customer.isActive ? "Active" : "Inactive" }}
+                    </span>
+                  </span>
+                </td>
+                <td>
+                  <div
+                    #dropdownToggle
+                    class="dropdown mr-2 mb-2 d-inline-block"
+                  >
+                    <button
+                      class="btn btn-warning btn-xs dropdown-toggle"
+                      type="button"
+                      data-toggle="dropdown"
+                    ></button>
+                    <div class="dropdown-menu" x-placement="auto">
+                      <a class="dropdown-item" href="javascript:void(0)">
+                        <i class="icon icon-forward icon-fw mr-2"></i>View
+                      </a>
+
+                      <a
+                        *ngIf="
+                          user?.permission?.includes('Manage Finance Customers')
+                        "
+                        class="dropdown-item"
+                        [routerLink]="'/finance/customers/edit/' + customer.id"
+                        routerLinkActive="router-link-active"
+                        href="javascript:void(0)"
+                      >
+                        <i class="icon icon-edit icon-fw mr-2"></i>Edit
+                      </a>
+
+                      <a
+                        *ngIf="
+                          user?.permission?.includes('Deactivate Customer')
+                        "
+                        class="dropdown-item"
+                        href="javascript:void(0)"
+                        (click)="deactivate(customer.id, i)"
+                      >
+                        <i class="icon icon-trash text-danger icon-fw mr-2"></i
+                        >Deactivate
+                      </a>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div
+            *ngIf="!isLoading && customers.length === 0"
+            class="d-flex flex-column align-items-center w-100"
+          >
+            <h1 class="display-4 text-center font-weight-light p-5">
+              No Data Available
+            </h1>
+
+            <a
+              *ngIf="user?.permission?.includes('Create Customers')"
+              class="btn btn-primary mr-2 w-25 text-white"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [routerLink]="['/finance/customers/create']"
+              routerLinkActive="router-link-active"
+              href="javascript:void(0)"
+            >
+              <i class="icon icon-add-circle mr-2"></i>Add New Customer</a
+            >
+          </div>
+        </div>
+
+        <footer>
+          <nav>
+            <ul class="pagination pagination-sm justify-content-end">
+              <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="
+                    getCustomers({
+                      pageSize: +pagination.pageSize,
+                      pageNumber: pagination.pageNumber - 1
+                    })
+                  "
+                  tabindex="-1"
+                  >Previous</a
+                >
+              </li>
+              <li class="page-item pagination-menu-wrapper">
+                <a
+                  class="page-link page-target"
+                  (click)="itemPaginatedJumpModal()"
+                  href="javascript:void(0)"
+                >
+                  {{ pagination.pageNumber }} of
+                  {{ pagination.totalPages }} page{{
+                    pagination.pageNumber > 1 ? "s" : ""
+                  }}
+                  <span class="sr-only">(current)</span>
+                </a>
+                <div
+                  class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                >
+                  <div class="pagination-menu-body">
+                    <div class="h-auto">
+                      <span>Jump to Page</span>
+                      <select
+                        aria-controls="data-table"
+                        [(ngModel)]="pagination.pageNumber"
+                        (change)="
+                          getCustomers({
+                            pageSize: +pagination.pageSize,
+                            pageNumber: pagination.pageNumber
+                          })
+                        "
+                        class="custom-select custom-select-xl form-control form-control-xl height"
+                      >
+                        <option
+                          *ngFor="let line of pagination.jumpArray"
+                          (click)="pagination.pageNumber = line"
+                        >
+                          {{ line }}
+                        </option>
+                      </select>
+                      <div class="text-center mt-3">
+                        <button
+                          type="button"
+                          class="btn btn-danger btn-xs"
+                          (click)="itemPaginatedJumpModal()"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="page-item" *ngIf="pagination.hasNextPage">
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="
+                    getCustomers({
+                      pageSize: +pagination.pageSize,
+                      pageNumber: pagination.pageNumber + 1
+                    })
+                  "
+                >
+                  Next
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </footer>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="viewCustomerProp">
+  <lnd-customer
+    [user]="user"
+    [customers]="customers"
+    [currentTheme]="currentTheme"
+    [selectedCustomer]="customer"
+    (onCloseView)="closeView()"
+  ></lnd-customer>
+</ng-container>
+
+<ng-template #customerImport>
+  <lnd-import-modal
+    title="Customer Import"
+    [currentTheme]="currentTheme"
+    (closeModal)="closeModal()"
+    (downloadTemplate)="downImportTemplate()"
+    (selectedFile)="importCustomers($event)"
+  >
+    <p><b>Requirements</b></p>
+    <ul>
+      <li>
+        Fill all required Fields (marked <span class="text-danger">RED</span> )
+      </li>
+      <li>Valid Values for isOrganization : true or false</li>
+    </ul>
+  </lnd-import-modal>
+</ng-template>
+
+<ng-template #importErrorsModal>
+  <header class="p-3 d-flex justify-content-between align-items-center">
+    <h3 class="mb-0 mt-4"><span class="text-danger">({{importErrors.length}})</span> Issue<span *ngIf="importErrors.length > 1">s</span> with this import</h3>
+
+    <img src="assets/images/close.svg" class="cursor" alt="close btn" (click)="closeModal()">
+  </header>
+
+  <lnd-table [config]="importErrorsConfig" [headers]="importErrorsHeaders" [data]="importErrorsData"></lnd-table>
+</ng-template>

@@ -1,0 +1,93 @@
+<form *ngIf="ShortTermPlacementApprovalForm && shortTermPlacement" [formGroup]="ShortTermPlacementApprovalForm" (submit)="updateShortTermPlacementApprovalForm(ShortTermPlacementApprovalForm.value)">
+  <!-- Form -->
+  <div class="form-row">
+    <div class="col form-group">
+      <label for="type">Type</label>
+      <input class="form-control" type="text" readonly value="{{camelPad(shortTermPlacement.type)}}">
+    </div>
+
+    <div class="col form-group" *ngIf="shortTermPlacement.financialInstitution != null">
+      <label for="type">Financial Insitution</label>
+      <input class="form-control" type="text" readonly value="{{ shortTermPlacement.financialInstitution.name }}">
+    </div>
+
+    <div class="col form-group">
+      <label for="TenorPeriod">Tenor Period</label>
+      <input class="form-control" type="text" disabled value="{{shortTermPlacement.tenorPeriod}}">
+    </div>
+
+    <div class="form-group col">
+      <label for="Tenor">Tenor</label>
+      <input class="form-control" type="text" disabled value="{{shortTermPlacement.tenor}}">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col">
+      <label for="InterestRate">Annual Interest Rate (%)</label>
+      <input type="text" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" disabled value="{{shortTermPlacement.interestRate}}" id="InterestRate" class="form-control" />
+    </div>
+
+    <div class="col form-group">
+      <label for="InterestType">Interest Type</label>
+      <input class="form-control" type="text" disabled value="{{shortTermPlacement.interestType}}">
+    </div>
+
+  </div>
+
+  <div class="form-row">
+
+    <div class="form-group col">
+      <label for="Principal">Principal</label>
+      <input type="text"  disabled value="{{shortTermPlacement.principal | currency: currencySymbol}}" id="Principal" class="form-control" />
+    </div>
+    <div class="col form-group">
+      <label for="MaturityAction">Maturity Action</label>
+      <input class="form-control" type="text" disabled value="{{camelPad(shortTermPlacement.maturityAction)}}">
+    </div>
+
+    <div class="form-group col">
+      <label for="PreLiquidationCharge">Pre Liquidation Charge</label>
+      <input type="text" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" value="{{shortTermPlacement.preLiquidationCharge}}" disabled class="form-control" />
+    </div>
+
+  </div>
+
+  <hr class="border-dashed mb-3">
+
+  <div class="form-row">
+    <div class="col form-group">
+      <label for="Status">Status</label>
+      <select class="custom-select custom-select-xl form-control form-control-xl height" formControlName="Status" >
+        <option disabled>Select Status</option>
+        <option *ngFor="let item of approvalStatuses" value="{{item}}">{{item}}</option>
+      </select>
+    </div>
+
+    <div class="form-group col">
+      <label for="Comment">Comment<b class="text-danger">*</b></label>
+      <textarea class="form-control" formControlName="Comment" cols="30" rows="5"></textarea>
+    </div>
+  </div>
+
+
+  <hr class="border-dashed mb-3">
+  <!-- /form -->
+  <div class="form-row">
+    <div class="form-group col"></div>
+    <div class="form-group clearfix">
+      <button type="submit" class="btn btn-secondary text-white float-right" *ngIf="!loader"
+        [disabled]="!ShortTermPlacementApprovalForm.valid">
+        Submit Application
+      </button>
+      <button type="button" class="btn btn-success float-right" *ngIf="loader" [disabled]="true">
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </div>
+
+</form>
+
+<div *ngIf="!shortTermPlacement">
+  <i class="icon icon-spin icon-spin2"></i> Processing...
+</div>

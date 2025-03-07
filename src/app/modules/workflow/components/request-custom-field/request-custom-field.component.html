@@ -1,0 +1,66 @@
+<div
+  class="form-group"
+  *ngIf="
+    customField.get('dataType').value !== 'Selection' &&
+    customField.get('dataType').value !== 'RadioGroup'
+  "
+>
+  <label
+    >{{ customField.get("name").value }}
+    <b *ngIf="customField.get('required')?.value" class="text-danger"
+      >*</b
+    ></label
+  >
+  <input
+    class="form-control"
+    [type]="getCustomFieldDataType(customField.get('dataType').value)"
+    [formControl]="customField.get('value')"
+  />
+</div>
+<ng-container *ngIf="customField.get('dataType').value === 'RadioGroup'">
+  <div class="radio d-flex flex-column justify-content-between">
+    <label class="m-0">
+      {{ customField.get("name").value }}
+      <b *ngIf="customField.get('required')?.value" class="text-danger">*</b>
+    </label>
+    <div>
+      <div
+        class="d-inline-block mr-2"
+        *ngFor="let selectn of customFieldSelections.controls"
+      >
+        <label
+          [for]="selectn.get('uniqueId').value"
+          class="d-flex align-items-center m-0"
+          ><input
+            [id]="selectn.get('uniqueId').value"
+            class="d-inline-block mr-2"
+            type="radio"
+            [name]="customField.get('name').value"
+            [value]="selectn.get('label').value"
+            [formControl]="customField.get('value')"
+          />
+          {{ selectn.get("label").value }}
+        </label>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<div
+  class="form-group"
+  *ngIf="customField.get('dataType').value === 'Selection'"
+>
+  <label
+    >{{ customField.get("name").value }}
+    <b *ngIf="customField.get('required')?.value" class="text-danger"
+      >*</b
+    ></label
+  >
+  <slct-2
+    id="reqType"
+    [data]="getCFieldTansformedSelections()"
+    [active]="getSelectedOption(customField.get('value')?.value)"
+    [placeholder]="'Select ' + customField.get('name').value"
+    (selected)="onCFieldSelect($event)"
+    (removed)="onCFieldDeselect()"
+  ></slct-2>
+</div>

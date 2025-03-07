@@ -1,0 +1,29 @@
+.form-section{
+  background-color: #F7F7F7;
+  border-radius: 5px;
+  padding: 30px;
+
+  form{
+    margin-top: 40px;
+
+    button{
+      color: #fff;
+      padding: 10px 25px;
+      margin-top: 20px;
+    }
+  }
+}
+
+#preview{
+  padding: 10px;
+  header{
+    color: #000;
+    span{
+      font-size: 18px;
+    }
+  }
+
+  th,td{
+    min-width: 130px;
+  }
+}

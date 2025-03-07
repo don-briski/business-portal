@@ -1,0 +1,62 @@
+<div class="card p-3">
+  <div class="main-content">
+    <lnd-spinner *ngIf="loading"></lnd-spinner>
+    <div *ngIf="!loading">
+      <p class="m-0 mb-3 title">{{ title.text }}</p>
+      <p class="m-0 mb-3 figure">
+        {{ title.type === "amount" ? currencySymbol : ""
+        }}{{ title.value | number : "1.2-2" }}
+      </p>
+      <p *ngIf="subtitle" class="m-0 mb-3 subtitle">
+        <span class="mr-1">{{ subtitle.value }}</span
+        >{{ subtitle.text }}
+      </p>
+    </div>
+    <div class="d-flex justify-content-end">
+      <div class="btn-group btn-group-xs mb-2 tabs-container" role="group">
+        <ul class="nav" role="tablist">
+          <li class="nav-item mr-1">
+            <button
+              type="button"
+              class="btn btn-xs gray-outline nav-link active f-9"
+              data-toggle="tab"
+              [attr.href]="'#recent_' + id"
+              role="tab"
+              aria-controls="recent"
+              aria-selected="true"
+              (click)="onGetMetrics('Today')"
+              [ngClass]="selectedRange === 'Today' ? 'white' : 'black'"
+              [ngStyle]="{
+                background:
+                  selectedRange === 'Today' ? currentTheme?.primaryColor : '',
+                'border-color': currentTheme?.primaryColor
+              }"
+            >
+              Today
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              type="button"
+              class="btn btn-xs gray-outline nav-link f-9"
+              data-toggle="tab"
+              [attr.href]="'#mtd_' + id"
+              role="tab"
+              aria-controls="mtd"
+              aria-selected="true"
+              (click)="onGetMetrics('MTD')"
+              [ngClass]="selectedRange === 'MTD' ? 'white' : 'black'"
+              [ngStyle]="{
+                background:
+                  selectedRange === 'MTD' ? currentTheme?.primaryColor : '',
+                'border-color': currentTheme?.primaryColor
+              }"
+            >
+              MTD
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

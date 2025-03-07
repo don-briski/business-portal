@@ -1,0 +1,44 @@
+.dashed {
+  border-bottom: 1px dashed #dcdcdc;
+}
+
+.add-btn {
+  border-radius: 6px;
+  background-color: var(--lenda-green);
+}
+
+.remove-btn {
+  border: 1px solid var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:checked {
+    appearance: none;
+    background-color: var(--secondary-color);
+
+    &::before {
+      content: "\2713";
+      color: #fff;
+      position: relative;
+      top: 0;
+      left: 2px;
+    }
+  }
+}
+
+button {
+  &.default {
+    background-color: var(--secondary-color);
+    color: #fff;
+  }
+}
+
+.error-text {
+  font-size: 12px;
+}

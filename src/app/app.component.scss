@@ -1,0 +1,35 @@
+.has-error {
+  label {
+    color: #f44336;
+  }
+  .form-control {
+    border: 1px solid #f44336;
+  }
+}
+
+.help-block {
+  color: #f44336;
+  font-size: 10px;
+}
+
+.center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.bg {
+  opacity: 0.8;
+  background-color: #fff;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 1000;
+  img {
+    width: 10%;
+  }
+}

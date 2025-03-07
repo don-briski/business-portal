@@ -1,0 +1,550 @@
+<div class="center" *ngIf="isInitializing">
+  <lnd-spinner></lnd-spinner>
+</div>
+<section class="card p-5" *ngIf="!isInitializing">
+  <header class="d-flex justify-content-between align-items-center">
+    <div>
+      <h1>Placement Type Setup</h1>
+      <p>
+        Kindly fill in all information correctly. All form fields with an
+        asterisk(*) are mandatory.
+      </p>
+    </div>
+    <a
+      class="btn btn-primary mr-2 text-white"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [routerLink]="['/configurations/placement-types']"
+      routerLinkActive="router-link-active"
+      href="javascript:void(0)"
+      >Back</a
+    >
+  </header>
+  <div class="d-flex align-items-center my-4">
+    <lnd-switch
+      [value]="form.get('status').value === 'Active'"
+      text="Placement Type is currently"
+      (emittedValue)="toggleSwitch($event, 'status')"
+    ></lnd-switch>
+    <span
+      class="ml-1"
+      [ngClass]="
+        form.get('status').value === 'Active' ? 'text-success' : 'text-danger'
+      "
+      >{{ form.get("status").value === "Active" ? "Active" : "Inactive" }}</span
+    >
+  </div>
+
+  <div class="my-6">
+    <lnd-stepper
+      [steps]="steps"
+      [currentStepStroke]="currentTheme.primaryColor"
+      (stepIndex)="switchStep($event)"
+    ></lnd-stepper>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 px-4">
+    <ng-container formGroupName="placementDetails">
+      <section [ngClass]="{ 'd-none': currentStepIndex !== 0 }">
+        <header>
+          <h1>Placement Details</h1>
+          <p>Set up basic details to control placement types and categories.</p>
+        </header>
+        <div class="form-row">
+          <div class="col-sm-8 mb-5">
+            <label for="placementName"
+              >Placement name <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="This will be used to
+                    identify the placement type."
+                ></i>
+              </span>
+            </label>
+            <input
+              id="placementName"
+              type="text"
+              formControlName="placementName"
+              class="form-control"
+              placeholder="Name of the Placement"
+            />
+            <span
+              class="help-block"
+              *ngIf="
+                form.get('placementDetails.placementName').errors &&
+                form.get('placementDetails.placementName').touched
+              "
+            >
+              What is the name of this placement?
+            </span>
+          </div>
+          <div class="col-sm-4">
+            <label
+              >Placement Type <b class="help-block">*</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="The type of this placement."
+                ></i>
+              </span>
+            </label>
+            <div>
+              <slct-2
+                [data]="placementTypes"
+                formControlName="placementTypeArray"
+                placeholder="Select Placement Type"
+              ></slct-2>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  form.get('placementDetails.placementTypeArray').errors &&
+                  form.get('placementDetails.placementTypeArray').touched
+                "
+              >
+                Select placement type
+              </span>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <label>Financial Institution <b class="help-block">*</b> </label>
+            <div>
+              <slct-2
+                [data]="institutions"
+                formControlName="financialInstitutionArray"
+                placeholder="Select Institution"
+              ></slct-2>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  form.get('placementDetails.financialInstitutionArray')
+                    .errors &&
+                  form.get('placementDetails.financialInstitutionArray').touched
+                "
+              >
+                Select institution
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+    <ng-container formGroupName="parameters">
+      <section [ngClass]="{ 'd-none': currentStepIndex !== 1 }">
+        <header>
+          <h1>Placement Parameters</h1>
+          <p>
+            Customise your rates, units and amounts to fit the placement type.
+          </p>
+        </header>
+
+        <div class="form-row">
+          <div class="col-sm-4 mb-6">
+            <label for="minAmount"
+              >Minimum Amount <b class="help-block">*</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Minimum amount for this placement type."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">&#x20a6;</span>
+              </div>
+              <input
+                type="text"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="minAmount"
+                class="form-control"
+                id="minAmount"
+                placeholder="Minimum placement amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                form.get('parameters.minAmount').errors &&
+                form.get('parameters.minAmount').touched
+              "
+            >
+              <span
+                *ngIf="form.get('parameters.minAmount').getError('required')"
+                >What is the minimum amount allowed for this placement?</span
+              >
+              {{ form.get("parameters.minAmount").getError("zeroValue") }}
+            </span>
+          </div>
+          <div class="col-sm-4 mb-6">
+            <label for="maxAmount"
+              >Maximum Amount <b class="help-block">*</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Maximum amount for this placement type."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">&#x20a6;</span>
+              </div>
+              <input
+                type="text"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="maxAmount"
+                class="form-control"
+                id="maxAmount"
+                placeholder="Maximum placement amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                form.get('parameters.maxAmount').errors &&
+                form.get('parameters.maxAmount').touched
+              "
+            >
+              <span
+                *ngIf="form.get('parameters.maxAmount').getError('required')"
+                >What is the maximum amount allowed for this placement?</span
+              >
+              {{ form.get("parameters.maxAmount").getError("zeroValue") }}
+            </span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col-sm-3 mb-6">
+            <label
+              >Interest Type <b class="help-block">*</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="How interests are accrued."
+                ></i>
+              </span>
+            </label>
+            <div>
+              <slct-2
+                [data]="interestTypes"
+                formControlName="interestTypeArray"
+                placeholder="Select Interest Type"
+              ></slct-2>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  form.get('parameters.interestTypeArray').errors &&
+                  form.get('parameters.interestTypeArray').touched
+                "
+              >
+                Select interest type
+              </span>
+            </div>
+          </div>
+          <div class="col-sm-3 mb-6">
+            <label>Interest Cycle <b class="help-block">*</b></label>
+            <div>
+              <slct-2
+                [data]="interestCycles"
+                formControlName="interestCycleArray"
+                placeholder="Select Interest Cycle"
+              ></slct-2>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  form.get('parameters.interestCycleArray').errors &&
+                  form.get('parameters.interestCycleArray').touched
+                "
+              >
+                Select interest cycle
+              </span>
+            </div>
+          </div>
+          <div class="col-sm-3 mb-6">
+            <label for="minInterestRate"
+              >Minimum Interest Rate<b class="help-block">*</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Minimum interest rate that can be applied when creating investment accounts for this short term placement type."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="minInterestRate"
+                class="form-control"
+                id="minInterestRate"
+                placeholder="Min Interest Rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                form.get('parameters.minInterestRate').errors &&
+                form.get('parameters.minInterestRate').touched
+              "
+            >
+              <span
+                *ngIf="
+                  form.get('parameters.minInterestRate').getError('required')
+                "
+                >Provide minimum interest rate</span
+              >
+              {{
+                form
+                  .get("parameters.minInterestRate")
+                  .getError("LesserThanZero")
+              }}
+            </span>
+          </div>
+          <div class="col-sm-3">
+            <label for="maxInterestRate"
+              >Maximum Interest Rate<b class="help-block">*</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Maximum interest rate that can be applied when creating investment accounts for this short term placement type."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="maxInterestRate"
+                class="form-control"
+                id="maxInterestRate"
+                placeholder="Maximum Net interest rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                form.get('parameters.maxInterestRate').errors &&
+                form.get('parameters.maxInterestRate').touched
+              "
+            >
+              <span
+                *ngIf="
+                  form.get('parameters.maxInterestRate').getError('required')
+                "
+                >Provide maximum interest rate
+              </span>
+              {{ form.get("parameters.maxInterestRate").getError("zeroValue") }}
+            </span>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="col-sm-4 mb-6">
+            <label>Tenor Type <b class="help-block">*</b> </label>
+            <div>
+              <slct-2
+                [data]="tenorTypes"
+                formControlName="tenorTypeArray"
+                placeholder="Select Tenor Type"
+              ></slct-2>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  form.get('parameters.tenorTypeArray').errors &&
+                  form.get('parameters.tenorTypeArray').touched
+                "
+              >
+                Select tenor type
+              </span>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <label for="minTenor"
+              >Minimum Placement Tenor
+              <span *ngIf="form.get('parameters.tenorType')?.value"
+                >({{ form.get("parameters.tenorType")?.value }})</span
+              ><b class="help-block">*</b>
+            </label>
+            <input
+              type="number"
+              formControlName="minTenor"
+              class="form-control"
+              id="minTenor"
+              placeholder="Enter Minimum Placement Tenor"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                form.get('parameters.minTenor').errors &&
+                form.get('parameters.minTenor').touched
+              "
+            >
+              <span *ngIf="form.get('parameters.minTenor').getError('required')"
+                >Provide minimum placement tenor
+              </span>
+              {{ form.get("parameters.minTenor").getError("zeroValue") }}
+            </span>
+          </div>
+          <div class="col-sm-4">
+            <label for="maxTenor"
+              >Maximum Placement Tenor
+              <span *ngIf="form.get('parameters.tenorType')?.value"
+                >({{ form.get("parameters.tenorType")?.value }})</span
+              ><b class="help-block">*</b>
+            </label>
+            <input
+              type="number"
+              formControlName="maxTenor"
+              class="form-control"
+              id="maxTenor"
+              placeholder="Enter Maximum Placement Tenor"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                form.get('parameters.maxTenor').errors &&
+                form.get('parameters.maxTenor').touched
+              "
+            >
+              <span *ngIf="form.get('parameters.maxTenor').getError('required')"
+                >What is the maximum placement tenor?</span
+              >
+              {{ form.get("parameters.maxTenor").getError("zeroValue") }}
+            </span>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+    <ng-container formGroupName="fees">
+      <section [ngClass]="{ 'd-none': currentStepIndex !== 2 }">
+        <header>
+          <h1>Investment Fees</h1>
+          <p>Set up extra fees where necessary</p>
+        </header>
+
+        <div class="form-row">
+          <div class="col-sm-6">
+            <label for="wht"
+              >Withholding Tax Value <b class="help-block">*</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Set an amount to be deducted from the interest"
+                ></i>
+              </span>
+            </label>
+            <input
+              type="number"
+              formControlName="whtRate"
+              class="form-control"
+              id="wht"
+              placeholder="Enter withholding tax value"
+            />
+            <div class="input-group-append">
+              <span class="input-group-text">%</span>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                form.get('fees.whtRate').errors &&
+                form.get('fees.whtRate').touched
+              "
+            >
+              <span *ngIf="form.get('fees.whtRate').getError('required')"
+                >What is the with holding tax value of this investment?</span
+              >
+              {{ form.get("fees.whtRate").getError("LesserThanZero") }}
+            </span>
+          </div>
+
+          <div class="col-sm-6">
+            <label for="penalcharge"
+              >Penal Charge <b class="help-block">*</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="This charge are applied when investments are liquidated before their maturity date."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="penalCharge"
+                class="form-control"
+                id="penalcharge"
+                placeholder="Enter penal charge"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                form.get('fees.penalCharge').errors &&
+                form.get('fees.penalCharge').touched
+              "
+            >
+              <span *ngIf="form.get('fees.penalCharge').getError('required')"
+                >What is the penal charge?</span
+              >
+              {{ form.get("fees.penalCharge").getError("LesserThanZero") }}
+            </span>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+    <div class="d-flex align-items-center my-4">
+      <lnd-switch
+        [value]="form.get('requireApproval').value ? true : false"
+        text="Requires Approval?"
+        (emittedValue)="toggleSwitch($event, 'approval')"
+      ></lnd-switch>
+      <span>
+        <i
+          class="icon icon-question-circle icon-fw icon-xl"
+          placement="top"
+          ngbTooltip="If a short term placement created using this placement type should require approval or not."
+        ></i>
+      </span>
+    </div>
+    <lnd-step-footer
+      [formValid]="form.valid"
+      [isLoading]="isLoading"
+      [currentTheme]="currentTheme"
+      [currentStepIndex]="currentStepIndex"
+      [steps]="steps"
+      [currentStepIsValid]="form.get(steps[currentStepIndex].id)?.valid"
+      (previous)="previous()"
+      (next)="next()"
+    ></lnd-step-footer>
+  </form>
+</section>

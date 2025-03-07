@@ -1,0 +1,3726 @@
+<section *ngIf="!loanType">
+  <div class="dt-page__header">
+    <h1 class="dt-page__title clearfix">
+      Loan Types
+      <span class="float-right role-add">
+        <div
+          style="position: relative; right: -5px; bottom: 5px; float: right"
+          *ngIf="
+            this.currentview == 1 &&
+            currentuser?.permission?.includes('Create Loan Types')
+          "
+        >
+          <a
+            class="btn btn-primary mr-2 text-white"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [routerLink]="['/configurations/loantypes/create']"
+            routerLinkActive="router-link-active"
+            href="javascript:void(0)"
+          >
+            <i class="icon icon-add-circle mr-2"></i>Add New</a
+          >
+        </div>
+      </span>
+    </h1>
+  </div>
+
+  <!-- test comment -->
+
+  <!-- Grid -->
+  <div class="row">
+    <!-- Grid Item -->
+    <div class="col-xl-12">
+      <!-- Card -->
+      <div class="dt-card">
+        <!-- Card Body -->
+        <div class="dt-card__body">
+          <div
+            *ngIf="requestLoader"
+            class="table-loader"
+            style="text-align: center; color: indianred"
+          >
+            <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+          </div>
+
+          <div
+            *ngIf="
+              this.currentview == 1 &&
+              currentuser?.permission?.includes('View Loan Types')
+            "
+            class="tab-pane"
+          >
+            <!-- Pagination Top-->
+            <div class="row">
+              <div class="col-md-8">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                  ><select
+                    [(ngModel)]="pagination.pageSize"
+                    aria-controls="data-table"
+                    (change)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        1
+                      )
+                    "
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px"
+                    >entries</span
+                  ></label
+                >
+              </div>
+
+              <div class="form-group col-md-4">
+                <label style="display: inline-flex; float: right"
+                  ><span style="padding: 10px 2px; font-size: 12px"></span
+                  ><input
+                    type="search"
+                    [(ngModel)]="pagination.searchTerm"
+                    (keydown.enter)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        1
+                      )
+                    "
+                    class="form-control form-control-sm"
+                    placeholder="Code Or Name"
+                    aria-controls="data-table"
+                  />
+                  <button
+                    class="btn btn-xs text-white ml-3"
+                    [style.background]="currentTheme.secondaryColor"
+                    (click)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        1
+                      )
+                    "
+                  >
+                    <i class="icon icon-search"></i>
+                  </button>
+                </label>
+              </div>
+              <div
+                class=""
+                aria-live="polite"
+                style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+              >
+                Showing
+                {{ (pagination.pageNum - 1) * pagination.pageSize + 1 }} -
+                {{
+                  (pagination.pageNum - 1) * pagination.pageSize +
+                    pagination.count
+                }}
+                of {{ pagination.totalRecords }} record(s)
+              </div>
+            </div>
+            <!-- /pagination Top -->
+
+            <!-- Tables -->
+            <div class="table-responsive">
+              <table
+                id="loantypestable"
+                class="table table-striped table-hover"
+              >
+                <thead>
+                  <tr>
+                    <th><small>Loan Code</small></th>
+                    <th><small>Name</small></th>
+                    <th><small>Amount Range</small></th>
+                    <th><small>Repayment Type</small></th>
+                    <th><small>Status</small></th>
+                    <th><small>Actions</small></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="gradeX cursor"
+                    *ngFor="let row of loanTypes; let i = index"
+                    (click)="viewLoanType(row,dropdownToggle)"
+                  >
+                    <td>{{ row?.loanTypeCode }}</td>
+                    <td>{{ row?.loanName }}</td>
+                    <td>
+                      {{ row?.minAmount | number : "1.2-2" }} -
+                      {{ row?.maxAmount | number : "1.2-2" }}
+                    </td>
+                    <td>{{ row?.repaymentType }}</td>
+                    <td>
+                      <span
+                        *ngIf="row?.status == 'Active'"
+                        class="badge badge-success mb-1 mr-1"
+                      >
+                        {{ row?.status }}</span
+                      >
+                      <span
+                        *ngIf="row?.status == 'NonActive'"
+                        class="badge badge-warning mb-1 mr-1"
+                      >
+                        {{ row?.status }}</span
+                      >
+                    </td>
+                    <td>
+                      <div
+                        #dropdownToggle
+                        class="dropdown mr-2 mb-2 d-inline-block"
+                      >
+                        <button
+                          class="btn btn-warning btn-xs dropdown-toggle"
+                          type="button"
+                          data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                        ></button>
+
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="javascript:void(0)"
+                            ><i class="icon icon-forward icon-fw mr-2"></i>View
+                          </a>
+
+                          <a
+                            class="dropdown-item"
+                            *ngIf="
+                              currentuser?.permission?.includes(
+                                'Update Loan Types'
+                              )
+                            "
+                            href="javascript:void(0)"
+                            [routerLink]="
+                              '/configurations/loantypes/edit/' +
+                              row?.loanTypeId
+                            "
+                          >
+                            <i class="icon icon-xs icon-setting"></i> Manage
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- /tables -->
+
+            <!-- Pagination Bottom -->
+            <div>
+              <br />
+              <nav>
+                <ul class="pagination pagination-sm justify-content-end">
+                  <li
+                    class="page-item"
+                    *ngIf="
+                      (pagination.pageNum - 1) * pagination.pageSize + 1 > 10
+                    "
+                  >
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        getItemsPaginatedSearch(
+                          this.pagination.searchTerm,
+                          this.pagination.pageSize,
+                          pagination.pageNum - 1
+                        )
+                      "
+                      tabindex="-1"
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item pagination-menu-wrapper">
+                    <a
+                      class="page-link page-target"
+                      (click)="paginationPopover()"
+                      href="javascript:void(0)"
+                      >{{ pagination.pageNum }} of
+                      {{ this.pagination.maxPage }} page<span
+                        *ngIf="pagination.pageNum > 1"
+                        >s</span
+                      ><span class="sr-only">(current)</span></a
+                    >
+
+                    <div class="pagination-menu pagination-menu-right">
+                      <div class="pagination-menu-body">
+                        <div class="h-auto">
+                          <small>Jump to Page:</small>
+                          <select
+                            aria-controls="data-table"
+                            [(ngModel)]="pagination.pageNum"
+                            (change)="getLoanTypes(pagination.pageNum)"
+                            class="custom-select custom-select-xl form-control form-control-xl height"
+                          >
+                            <option *ngFor="let line of pagination.jumpArray">
+                              {{ line }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <!-- <li class="page-item">
+                                                    <a class="page-link" href="javascript:void(0)">{{pagination.pageNum}} of {{this.pagination.maxPage}} page<span *ngIf="pagination.pageNum > 1">s</span><span class="sr-only">(current)</span></a>
+                                                  </li> -->
+                  <li
+                    class="page-item"
+                    *ngIf="this.pagination.pageNum < this.pagination.maxPage"
+                  >
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        getItemsPaginatedSearch(
+                          this.pagination.searchTerm,
+                          this.pagination.pageSize,
+                          pagination.pageNum + 1
+                        )
+                      "
+                      >Next</a
+                    >
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            <!-- /pagination Bottom -->
+          </div>
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+    </div>
+  </div>
+</section>
+
+<section *ngIf="loanType" class="card loan_type">
+  <div header class="d-flex justify-content-between align-items-center mb-6">
+    <h1 class="mb-0">
+      {{ loanType?.loanName }}
+      <span
+        class="badge"
+        [ngClass]="{
+          'badge-success': loanType?.status === 'Active',
+          'badge-warning': loanType?.status === 'NonActive'
+        }"
+        >{{
+          loanType?.status === "Active" ? loanType?.status : "Inactive"
+        }}</span
+      >
+    </h1>
+
+    <div>
+      <button
+        [routerLink]="'/configurations/loantypes/edit/' + loanType?.loanTypeId"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        class="btn btn-sm px-6 text-white mr-1"
+      >
+        Edit
+      </button>
+      <button
+        class="btn btn-sm px-6 text-dark ml-1 btn-outline-light"
+        (click)="loanType = null"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loanType">
+    <lnd-accordion accordionId="loanDetails" accordionClass="accordion-border" title="Loan Details" subTitle="Review loan type information" [open]="true">
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.loanDetails">
+          <lnd-accordion-item
+            [bgColor]="lightenColor(currentTheme?.primaryColor, lightenAmount)"
+            [primaryColor]="currentTheme?.primaryColor"
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+            [tooltip]="item?.tooltip"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+
+    <lnd-accordion
+      accordionId="loanParams"
+      accordionClass="accordion-border"
+      title="Loan Terms and Parameters"
+      subTitle="Review loan term specifics"
+      [open]="true"
+    >
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.params">
+          <lnd-accordion-item
+            [primaryColor]="currentTheme?.primaryColor"
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+            [tooltip]="item?.tooltip"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+
+    <lnd-accordion
+      accordionId="repayment"
+      accordionClass="accordion-border"
+      title="Repayment Structure"
+      subTitle="Overview of repayment"
+      [open]="true"
+    >
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.repayment">
+          <lnd-accordion-item
+            [bgColor]="lightenColor(currentTheme?.primaryColor, lightenAmount)"
+            [primaryColor]="currentTheme?.primaryColor"
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+            [tooltip]="item?.tooltip"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+
+    <lnd-accordion accordionId="fees" accordionClass="accordion-border" title="Application Fees" [open]="true" subTitle="Review fee terms">
+      <div *ngFor="let fees of accordionItems?.fees" class="d-flex flex-wrap border-bottom">
+        <div *ngFor="let fee of fees" style="min-width: 230px">
+          <lnd-accordion-item
+            [bgColor]="lightenColor(currentTheme?.primaryColor, lightenAmount)"
+            [primaryColor]="currentTheme?.primaryColor"
+            [title]="fee?.title"
+            [value]="fee?.value"
+            [type]="fee?.type"
+            [showValueAsPill]="fee?.showValueAsPill"
+            [tooltip]="fee?.tooltip"
+          ></lnd-accordion-item>
+        </div>
+      </div>
+    </lnd-accordion>
+
+    <lnd-accordion 
+    accordionId="topup" 
+    accordionClass="accordion-border"
+    title="Topup Constraints" 
+    [trailing]="loanType?.topUpConstraints?.isTopUpActive ? 'Active' : 'Inactive'"
+    [trailingClass]="loanType?.topUpConstraints?.isTopUpActive ? 'badge badge-pill badge-success' : 'badge badge-pill badge-warning'"
+    subTitle="Review terms for Top-Up constraints" 
+    [open]="true"
+    >
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.topup">
+          <lnd-accordion-item
+            [bgColor]="lightenColor(currentTheme?.primaryColor, lightenAmount)"
+            [primaryColor]="currentTheme?.primaryColor"
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+            [trailing]="item?.trailing"
+            [trailingClass]="item?.trailing === 'Active' ? 'badge badge-pill badge-success' : 'badge badge-pill badge-warning'"
+            [tooltip]="item?.tooltip"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+  </div>
+</section>
+
+<!--Modals Section-->
+
+<ng-template #addLoanTypeModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Loan Type Setup
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="AddLoanTypeForm"
+    (ngSubmit)="submitLoanTypeForm(AddLoanTypeForm.value)"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div class="form-row mt-3">
+          <div class="col-sm-5 mb-3">
+            <label for="validationDefault01">Loan name</label
+            ><b class="help-block"> *</b>
+            <input
+              type="text"
+              formControlName="LoanName"
+              class="form-control"
+              placeholder="Name of the loan"
+            />
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('LoanName').errors &&
+                AddLoanTypeForm.get('LoanName').touched
+              "
+            >
+              What is name of the Loan?
+            </span>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label>Loan Type Code</label><b class="help-block"> *</b>
+            <input
+              type="text"
+              formControlName="LoanTypeCode"
+              class="form-control"
+              id="validationDefault02"
+              placeholder="E.g LND00123"
+            />
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('LoanTypeCode').errors &&
+                AddLoanTypeForm.get('LoanTypeCode').touched
+              "
+            >
+              What code should be tied to this Loan?
+            </span>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label for="permission"
+              >Repayment Type <b class="help-block"> *</b></label
+            >
+            <slct-2
+              [allowClear]="true"
+              [data]="repaymentTypeArray"
+              (selected)="selected('RepaymentType', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+            <!-- <ng-select [allowClear]="true" [items]="repaymentTypeArray" (selected)="selected('RepaymentType',$event)"
+              placeholder="Select One"> </ng-select> -->
+          </div>
+
+          <div class="col-sm-3 mb-3">
+            <label>Base Tenor Limit</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                formControlName="LoanTypeTenor"
+                placeholder="Enter Value"
+                min="1"
+              />
+              <!-- <div class="input-group-append">
+                <span class="input-group-text">{{ selectedRepaymentType }}</span>
+              </div> -->
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('LoanTypeTenor').errors &&
+                AddLoanTypeForm.get('LoanTypeTenor').touched
+              "
+            >
+              How long should loans last?
+            </span>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label>Max Interest Rate</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="InterestRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Interest rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('InterestRate').errors &&
+                AddLoanTypeForm.get('InterestRate').touched
+              "
+            >
+              What is the maximum Interest Rate?
+            </span>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label for="permission"
+              >Interest Rate Unit <b class="help-block"> *</b></label
+            >
+            <slct-2
+              [allowClear]="true"
+              [data]="interestRateUnitArray"
+              (selected)="selected('InterestRateUnit', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label><small>Debt Service Ratio (DSR)</small></label
+            ><!-- <b class="help-block" > *</b>-->
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="DsrRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="DSR rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('DsrRate').errors &&
+                AddLoanTypeForm.get('DsrRate').touched
+              "
+            >
+              What is the Base DSR Rate?
+            </span>
+          </div>
+
+          <div class="col-sm-3 mb-3 mb-5">
+            <label>Min Loan Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <!-- <span class="input-group-text">{{ currency_code }}</span> -->
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="MinAmount"
+                placeholder="Minimum Loan Amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('MinAmount').errors &&
+                AddLoanTypeForm.get('MinAmount').touched
+              "
+            >
+              What is the Minimum Amount allowed?
+            </span>
+          </div>
+
+          <div class="col-sm-3 mb-3 mb-5">
+            <label>Max Loan Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <!-- <span class="input-group-text">{{ currency_code }}</span> -->
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="MaxAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Maximum loan amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('MaxAmount').errors &&
+                AddLoanTypeForm.get('MaxAmount').touched
+              "
+            >
+              What is the Maximum Amount allowed?
+            </span>
+          </div>
+
+          <!-- <div class="col-sm-3 mb-3">
+                    <label >Minumum Credit Score</label><b class="help-block" > *</b>
+                        <div class="input-group">
+                          <input type="text" class="form-control" formControlName="MinimumCreditScore" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="DSR rate">
+
+                        </div>
+                        <span class="help-block" *ngIf="AddLoanTypeForm.get('DsrRate').errors && AddLoanTypeForm.get('DsrRate').touched">
+                            What is the Minimum Credit Score DSR Rate?
+                          </span>
+                  </div> -->
+
+          <!-- <div class="col-sm-6 mb-3">
+                        <label >Possible Rejection Reason(s)</label>
+                        <div>
+                            <ng-select  [multiple]="true"
+                            [items]="rejectionReasonsArray"
+                            (selected)="selected('Rejection',$event)"
+                            (removed)="removed('Rejection',$event)"
+                            placeholder="None selected"></ng-select>
+                        </div>
+                      </div> -->
+
+          <!-- <div class="col-sm-6 mb-3">
+                        <label>Applicable Recovery Measure(s)</label>
+                        <div>
+                            <ng-select  [multiple]="true"
+                            [items]="recoveryMeasuresArray"
+                            (selected)= "selected('Recovery',$event)"
+                            (removed)="removed('Recovery',$event)"
+                            placeholder="None selected"></ng-select>
+                        </div>
+                    </div> -->
+
+          <div class="col-sm-5 mb-3">
+            <label
+              >Applicable Repayment Methods <b class="help-block"> *</b></label
+            >
+            <div>
+              <slct-2
+                [allowSelectAll]="true"
+                [customSearchEnabled]="true"
+                [multiple]="true"
+                [data]="repaymentMethodsArray"
+                (selected)="selected('Repayment', $event)"
+                (selectedAll)="selectAll('Repayment', $event)"
+                (deselectedAll)="deSelectAll('Repayment', $event)"
+                (removed)="removed('Repayment', $event)"
+                placeholder="Select repayment methods"
+              ></slct-2>
+              <!-- <ng-select [multiple]="true" [items]="repaymentMethodsArray" (selected)="selected('Repayment',$event)"
+                (removed)="removed('Repayment',$event)" placeholder="Select repayment methods"></ng-select> -->
+              <!-- <ng-select  [allowClear]="true"  [items]="accessArray" (selected)="selected('Access',$event,i)" placeholder="Select One">  </ng-select> -->
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Applicable Branches <b class="help-block"> *</b></label>
+            <div>
+              <slct-2
+                [multiple]="true"
+                [data]="branchesArray"
+                [allowSelectAll]="true"
+                [customSearchEnabled]="true"
+                [hideSelectedItems]="true"
+                (selected)="selected('Branch', $event)"
+                (removed)="removed('Branch', $event)"
+                (selectedAll)="selectAll('Branch', $event)"
+                (deselectedAll)="deSelectAll('Branch', $event)"
+                placeholder="Select branches"
+              ></slct-2>
+              <!-- <ng-select [multiple]="true" [items]="branchesArray" (selected)="selected('Branch',$event)"
+                (removed)="removed('Branch',$event)" placeholder="Select branches"></ng-select> -->
+            </div>
+          </div>
+          <div class="col-sm-3 mb-3">
+            <label>Applicable Platforms <b class="help-block"> *</b></label>
+            <div>
+              <slct-2
+                [multiple]="true"
+                [data]="applicablePlatformsArray"
+                [allowSelectAll]="true"
+                [customSearchEnabled]="true"
+                (selected)="selected('ApplicablePlatform', $event)"
+                (removed)="removed('ApplicablePlatform', $event)"
+                (selectedAll)="selectAll('ApplicablePlatform', $event)"
+                (deselectedAll)="deSelectAll('ApplicablePlatform', $event)"
+                placeholder="Select Platforms"
+                [active]="selectedPlatforms"
+              ></slct-2>
+              <!-- <ng-select [multiple]="true" [items]="applicablePlatformsArray" (selected)="selected('ApplicablePlatform',$event)"
+                (removed)="removed('ApplicablePlatform',$event)" placeholder="Select Platforms" [active]="selectedPlatforms"></ng-select> -->
+            </div>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label for="permission"
+              >Days In a Year <b class="help-block"> *</b></label
+            >
+            <slct-2
+              [allowClear]="true"
+              [data]="daysInAYearArray"
+              (selected)="selected('DaysInAYear', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-3 mb-3">
+            <label for="permission">Settlement Threshold</label>
+            <slct-2
+              [allowClear]="true"
+              [data]="thresholdparametersArray"
+              (selected)="selected('Threshold', $event)"
+              (removed)="removed('Threshold', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+            <!-- <ng-select [allowClear]="true" [items]="thresholdparametersArray" (selected)="selected('Threshold',$event)"
+              placeholder="Select One"> </ng-select> -->
+          </div>
+
+          <div class="col-sm-3 mb-3 mb-5">
+            <label>Account Closure Value </label>
+            <span
+              ><i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="Loan accounts under this product whose loan balance falls between 0 and Value entered here will be automatically closed(settled)"
+              ></i
+            ></span>
+
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <!-- <span class="input-group-text">{{ currency_code }}</span> -->
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="AccountClosureValue"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Enter Value"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('AccountClosureValue').errors &&
+                AddLoanTypeForm.get('AccountClosureValue').touched
+              "
+            >
+              What is the account closure value allowed?
+            </span>
+          </div>
+
+          <div
+            class="col-sm-2 mb-3 form-group"
+            [ngClass]="{
+              'has-error':
+                AddLoanTypeForm.get('Status').errors &&
+                AddLoanTypeForm.get('Status').touched
+            }"
+          >
+            <label for="permission">Status <b class="help-block"> *</b></label>
+
+            <select
+              formControlName="Status"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height"
+            >
+              <option value="Active">Active</option>
+              <option value="NonActive">Inactive</option>
+            </select>
+
+            <span
+              class="help-block"
+              *ngIf="
+                AddLoanTypeForm.get('Status').errors &&
+                AddLoanTypeForm.get('Status').touched
+              "
+            >
+              Select Status
+            </span>
+          </div>
+          <div class="col-sm-3 mb-3">
+            <label for="permission"
+              >Repayment Balance Type <b class="help-block"> *</b></label
+            >
+            <slct-2
+              [allowClear]="true"
+              [data]="repaymentBalanceTypes"
+              (selected)="selected('RepaymentBalanceType', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-12 mb-3">
+            <label>Loan Type Terms & Conditions</label>
+            <div>
+              <textarea
+                class="form-control"
+                formControlName="TermsAndConditions"
+                rows="3"
+                placeholder="Enter Terms & Conditons"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="col-sm-12">
+            <div class="card">
+              <div class="dt-card__header">
+                <div class="text-center col-sm-12 mt-3">
+                  <br /><br />
+                  <ul
+                    class="nav nav-underline flex-row border-bottom nav-card-tabs"
+                    role="tablist"
+                  >
+                    <li class="nav-item">
+                      <a
+                        class="nav-link active"
+                        data-toggle="tab"
+                        href="#tab-loanfees"
+                        role="tab"
+                        aria-controls="tab-pane3"
+                        aria-selected="true"
+                        >Applicable Fees</a
+                      >
+                    </li>
+                    <li class="nav-item">
+                      <a
+                        class="nav-link"
+                        data-toggle="tab"
+                        href="#tab-loancategories"
+                        role="tab"
+                        aria-controls="tab-pane2"
+                        aria-selected="true"
+                        >Loan Type Categories</a
+                      >
+                    </li>
+                    <li class="nav-item">
+                      <a
+                        class="nav-link"
+                        data-toggle="tab"
+                        href="#tab-topup"
+                        role="tab"
+                        aria-controls="tab-pane2"
+                        aria-selected="true"
+                        >Top-Up Contraints</a
+                      >
+                    </li>
+                    <li class="nav-item">
+                      <a
+                        class="nav-link"
+                        data-toggle="tab"
+                        href="#tab-buyover"
+                        role="tab"
+                        aria-controls="tab-pane2"
+                        aria-selected="true"
+                        >Buy-Over Contraints</a
+                      >
+                    </li>
+                    <!-- <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#tab-creditscore" role="tab" aria-controls="tab-pane1"
+                                      aria-selected="true">Credit Scoring Rules</a>
+                                  </li>-->
+                  </ul>
+                </div>
+              </div>
+              <div class="dt-card__body">
+                <div class="col-sm-12 tab-content">
+                  <div class="tab-pane active" id="tab-loanfees">
+                    <table class="table table-striped" id="table">
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th
+                            style="text-align: center"
+                            class="important-field"
+                          >
+                            Fee <b class="help-block"> *</b>
+                            &nbsp;
+                            <i class="icon icon-ckeditor"></i>
+                          </th>
+                          <th style="text-align: center">
+                            Fee Calculation&nbsp;
+                            <span
+                              ><i
+                                class="icon icon-question-circle icon-fw icon-xl"
+                                placement="top"
+                                ngbTooltip="1.DEDUCTED UPFRONT: Deducted from the approved principal amount at disbursement, meaning the client receives less money as actual disbursement, but still has to repay full loan amount by the end of the loan term.  2.CAPITALIZED: Added to the approved principal amount at disbursement, meaning the client receives the approved amount as actual disbursement, but has to repay a higher amount, including the loan fees, by the end of the loan term"
+                              ></i
+                            ></span>
+                          </th>
+                          <th
+                            style="text-align: center"
+                            class="important-field"
+                          >
+                            Application &nbsp;
+                            <span
+                              ><i
+                                class="icon icon-question-circle icon-fw icon-xl"
+                                placement="top"
+                                ngbTooltip="Percentage: % of Loan amount."
+                              ></i
+                            ></span>
+                          </th>
+
+                          <th style="text-align: center">
+                            Amount&nbsp;
+                            <i class="icon icon-ckeditor"></i>
+                          </th>
+                          <th style="text-align: center">
+                            Is Mandatory&nbsp;
+                            <span
+                              ><i
+                                class="icon icon-question-circle icon-fw icon-xl"
+                                placement="top"
+                                ngbTooltip="When a fee is set as mandatory (YES), it will be automatically applied to any loan created. If NO is selected, the user creating the loan has the ability to add or remove this fee during loan origination"
+                              ></i
+                            ></span>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="tbody">
+                        <tr *ngFor="let line of feelines; let i = index">
+                          <td style="width: 5%">
+                            <button
+                              *ngIf="i == 0"
+                              type="button"
+                              style="border-radius: 15px"
+                              class="btn btn-floating btn-warning btn-xs"
+                              (click)="removeFeeRow(i)"
+                            >
+                              <i class="icon icon-close icon-lg"></i>
+                            </button>
+                            <button
+                              *ngIf="i > 0"
+                              type="button"
+                              style="border-radius: 15px"
+                              class="btn btn-floating btn-warning btn-xs"
+                              (click)="removeFeeRow(i)"
+                            >
+                              <i class="icon icon-close icon-lg"></i>
+                            </button>
+                          </td>
+
+                          <td>
+                            <slct-2
+                              [allowClear]="true"
+                              [data]="feesArray"
+                              (selected)="selected('Fee', $event, i)"
+                              placeholder="Select One"
+                            >
+                            </slct-2>
+                            <!-- <ng-select [allowClear]="true" [items]="feesArray" (selected)="selected('Fee',$event,i)"
+                              placeholder="Select One"> </ng-select> -->
+                          </td>
+                          <td>
+                            <slct-2
+                              [allowClear]="true"
+                              [data]="feeApplicationArray"
+                              (selected)="selected('FeeApplication', $event, i)"
+                              placeholder="Select One"
+                            >
+                            </slct-2>
+                          </td>
+                          <td>
+                            <slct-2
+                              [allowClear]="true"
+                              [data]="feeTypeArray"
+                              (selected)="selected('FeeType', $event, i)"
+                              placeholder="Select One"
+                            >
+                            </slct-2>
+                            <!-- <ng-select [allowClear]="true" [items]="feeTypeArray"
+                              (selected)="selected('FeeType',$event,i)" placeholder="Select One"> </ng-select> -->
+                          </td>
+
+                          <td>
+                            <input
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                              [(ngModel)]="line.FeeAmount"
+                              [ngModelOptions]="{ standalone: true }"
+                              placeholder="Value"
+                            />
+                          </td>
+                          <td>
+                            <slct-2
+                              [allowClear]="true"
+                              [data]="feeMandatoryOptionArray"
+                              (selected)="selected('FeeIsMandatory', $event, i)"
+                              placeholder="Select One"
+                            >
+                            </slct-2>
+                          </td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <td colspan="3">
+                          <button
+                            type="button"
+                            style="border-radius: 15px"
+                            class="btn btn-floating btn-success btn-xs"
+                            (click)="addFeeRow()"
+                          >
+                            <i class="icon icon-add"></i> Add new fee
+                          </button>
+                        </td>
+                        <td></td>
+                      </tfoot>
+                    </table>
+                  </div>
+                  <div class="tab-pane" id="tab-loancategories">
+                    <table class="table table-striped" id="table">
+                      <thead>
+                        <tr>
+                          <th></th>
+
+                          <th
+                            style="text-align: center"
+                            class="important-field"
+                          >
+                            <small>Name of Category</small>
+                            <b class="help-block"> *</b> &nbsp;
+                            <i class="icon icon-ckeditor"></i>
+                          </th>
+
+                          <th style="text-align: center">
+                            <small>Loan Amount&nbsp;</small>
+                            <i class="icon icon-ckeditor"></i>
+                          </th>
+
+                          <th style="text-align: center">
+                            <small>Rate (%)&nbsp;</small>
+                            <i class="icon icon-ckeditor"></i>
+                          </th>
+
+                          <th style="text-align: center">
+                            <small
+                              >Tenor &nbsp; <i class="icon icon-ckeditor"></i>
+                            </small>
+                          </th>
+                          <th style="text-align: center">
+                            <small>DSR(%) &nbsp;</small>
+                            <i class="icon icon-ckeditor"></i>
+                          </th>
+                          <!-- <th style="text-align: center">
+                            <small>Applicable Fees &nbsp;</small>
+                            <i class="icon icon-ckeditor"></i>
+                          </th> -->
+                        </tr>
+                      </thead>
+                      <tbody id="tbody">
+                        <tr *ngFor="let line of categorieslines; let i = index">
+                          <td style="width: 5%">
+                            <button
+                              *ngIf="i == 0"
+                              type="button"
+                              style="border-radius: 15px"
+                              class="btn btn-floating btn-warning btn-xs"
+                              (click)="removeCategoryRow(i)"
+                            >
+                              <i class="icon icon-close icon-lg"></i>
+                            </button>
+                            <button
+                              *ngIf="i > 0"
+                              type="button"
+                              style="border-radius: 15px"
+                              class="btn btn-floating btn-warning btn-xs"
+                              (click)="removeCategoryRow(i)"
+                            >
+                              <i class="icon icon-close icon-lg"></i>
+                            </button>
+                          </td>
+
+                          <td style="width: 30%">
+                            <input
+                              class="form-control"
+                              type="hidden"
+                              value="{{ categorieslines[i].CategoryId }}"
+                              readonly
+                            />
+                            <input
+                              class="form-control"
+                              type="text"
+                              value="{{ categorieslines[i].CategoryName }}"
+                              (change)="setCategory($event.target.value, i)"
+                              placeholder="e.g Midi"
+                            />
+                          </td>
+                          <td style="width: 20%">
+                            <input
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                              [(ngModel)]="line.MinCategoryLoanAmount"
+                              [ngModelOptions]="{ standalone: true }"
+                              placeholder="Min"
+                            />
+                            <input
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                              [(ngModel)]="line.MaxCategoryLoanAmount"
+                              [ngModelOptions]="{ standalone: true }"
+                              placeholder="Max"
+                            />
+                          </td>
+                          <td style="width: 15%">
+                            <input
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                              [(ngModel)]="line.MaxCategoryInterestRate"
+                              [ngModelOptions]="{ standalone: true }"
+                              placeholder="Max"
+                            />
+                          </td>
+                          <td style="width: 15%">
+                            <input
+                              type="number"
+                              class="form-control"
+                              [(ngModel)]="line.MaxCategoryTenor"
+                              [ngModelOptions]="{ standalone: true }"
+                              placeholder="Max"
+                            />
+                          </td>
+                          <td style="width: 15%">
+                            <input
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                              [(ngModel)]="line.MaxCategoryDsr"
+                              [ngModelOptions]="{ standalone: true }"
+                              min="1"
+                              placeholder="Max"
+                            />
+                          </td>
+                          <!--    <td style="width: 20%">
+                           <ng-select [multiple]="true" [items]="categoryApplicableFeesArray"
+                              (selected)="selected('CategoryFees', $event, i, categorieslines[i].CategoryId)"
+                              (removed)="removed('CategoryFees', $event, i, categorieslines[i].CategoryId)"
+                              placeholder="Select concerned"
+                              [(ngModel)]="activeCatFees[i]" [ngModelOptions]="{standalone: true}"
+                              >
+                            </ng-select> -->
+                          <!-- <slct-2
+                              [multiple]="true"
+                              [data]="categoryApplicableFeesArray"
+                              (selected)="
+                                selected(
+                                  'CategoryFees',
+                                  $event,
+                                  i,
+                                  categorieslines[i].CategoryId
+                                )
+                              "
+                              (removed)="
+                                removed(
+                                  'CategoryFees',
+                                  $event,
+                                  i,
+                                  categorieslines[i].CategoryId
+                                )
+                              "
+                              placeholder="Select concerned"
+                              [(ngModel)]="activeCatFees[i]"
+                              [ngModelOptions]="{ standalone: true }"
+                            >
+                            -- [active]="setSelected('CategoryFees', categoriesapplicablefeeslines, i, categorieslines[i].CategoryId)"
+                            </slct-2>
+                          </td>-->
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <td colspan="3">
+                          <button
+                            type="button"
+                            style="border-radius: 15px"
+                            class="btn btn-floating btn-success btn-xs"
+                            (click)="addCategoryRow()"
+                          >
+                            <i class="icon icon-add"></i> Add New Category
+                          </button>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tfoot>
+                    </table>
+                  </div>
+
+                  <!-- Not implemented Yet - DO not delete
+                                      <div class="tab-pane" id="tab-creditscore">
+
+                                          <div class="form-row mt-3">
+                                              <div class="col-sm-6 mb-3">
+                                                  <label >Minumum Credit Score</label>
+                                                      <div class="input-group">
+                                                        <input type="text" class="form-control" formControlName="MinimumCreditScore" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="Credit Score"  >
+
+                                                      </div>
+                                                </div>
+
+                                                <div class="col-sm-6 mb-3">
+                                                    <label >Maximum Credit Score</label>
+                                                        <div class="input-group">
+                                                          <input type="text" class="form-control" formControlName="MaximumCreditScore" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="Credit Score" >
+
+                                                        </div>
+                                                  </div>
+                                          </div>
+
+                                            <table class="table table-striped" id="table">
+                                            <thead>
+                                              <tr>
+
+                                              <th>
+
+                                                </th>
+                                                <th style="text-align: center;">Description &nbsp;
+                                                  <i class="icon icon-ckeditor"></i>
+                                                </th>
+
+                                                <th style="text-align: center;">Score &nbsp;
+                                                    <i class="icon icon-ckeditor"></i>
+                                                  </th>
+
+                                                  <th style="text-align: center;">Tag &nbsp;
+                                                      <i class="icon icon-ckeditor"></i>
+                                                    </th>
+
+
+                                              </tr>
+                                            </thead>
+                                            <tbody id="tbody">
+                                              <tr *ngFor="let line of creditlines; let i = index">
+                                                <td  style="width: 5%">
+
+                                                  <button *ngIf="i == 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeCreditRow(i)">
+                                                      <i class="icon icon-close icon-lg"></i>
+                                                    </button>
+                                                  <button *ngIf="i > 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeCreditRow(i)">
+                                                    <i class="icon icon-close icon-lg"></i>
+                                                  </button>
+                                                </td>
+
+                                                <td  style="width: 50%">
+                                                    <textarea class="form-control" value="{{creditlines[i].Description}}" (change)="setDescription($event.target.value, i)" id="text-area-1" rows="2" placeholder="Enter Condition"></textarea>
+                                                </td>
+                                                <td  style="width: 30%">
+                                                    <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MinCreditScore" [ngModelOptions]="{standalone: true}" placeholder="Min">
+                                                    <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MaxCreditScore" [ngModelOptions]="{standalone: true}" placeholder="Max">
+
+                                                  </td>
+                                                <td style="width: 15%">
+                                                    <input class="form-control " type="text" value="{{creditlines[i].Tag}}" (change)="setTag($event.target.value, i)" >
+                                                  </td>
+
+
+
+                                              </tr>
+                                            </tbody>
+                                            <tfoot>
+                                              <td colspan="3"> <button type="button" style="border-radius: 15px;"class="btn btn-floating btn-success btn-xs" (click)="addCreditRow()">
+                                                  <i class="icon icon-add"></i> Add new line
+                                                </button>
+                                              </td>
+                                              <td></td>
+
+
+
+                                              </tfoot>
+
+                                          </table>
+
+                                          <div class="form-row mt-3">
+                                              <div class="col-sm-12 mb-3">
+                                                  <label>Alternative Scoring Pattern</label>
+                                                  <div>
+                                                      <textarea class="form-control"  formControlName="AlternativeScoringPattern" id="text-area-1" rows="3" placeholder="Enter Here"></textarea>
+                                                  </div>
+                                                </div>
+                                          </div>
+
+                                      </div>
+                                    -->
+
+                  <div class="tab-pane" id="tab-topup">
+                    <div class="form-row mt-3">
+                      <form [formGroup]="topupConstraintForm" class="w-100">
+                        <section class="form-row constraint">
+                          <div class="col-md-12">
+                            <label>
+                              <span>
+                                <small
+                                  >Volume of Repayments Made (%). (Percentage of
+                                  Total Repayments Expected) </small
+                                >&nbsp;
+                                <i class="icon icon-ckeditor"></i>
+                              </span>
+                              <span>
+                                <lnd-switch
+                                  class="switch"
+                                  [value]="
+                                    topupConstraintForm.get(
+                                      'volumeOfRepaymentsIsActive'
+                                    ).value
+                                  "
+                                  (emittedValue)="
+                                    toggleSwitch(
+                                      $event,
+                                      'volumeOfRepaymentsIsActive'
+                                    )
+                                  "
+                                ></lnd-switch>
+                                <span
+                                  [ngClass]="
+                                    topupConstraintForm.get(
+                                      'volumeOfRepaymentsIsActive'
+                                    ).value
+                                      ? 'badge-success'
+                                      : 'badge-warning text-white'
+                                  "
+                                  class="badge badge-sm badge-pill"
+                                  >{{
+                                    topupConstraintForm.get(
+                                      "volumeOfRepaymentsIsActive"
+                                    ).value
+                                      ? "Active"
+                                      : "Inactive"
+                                  }}</span
+                                >
+                              </span>
+                            </label>
+
+                            <div
+                              *ngIf="
+                                topupConstraintForm.get(
+                                  'volumeOfRepaymentsIsActive'
+                                ).value
+                              "
+                            >
+                              <input
+                                formControlName="volumeOfRepayments"
+                                type="text"
+                                class="form-control"
+                                currencyMask
+                                [options]="{
+                                  prefix: '',
+                                  thousands: ',',
+                                  decimal: '.'
+                                }"
+                              />
+                            </div>
+                          </div>
+                        </section>
+
+                        <section class="form-row constraint">
+                          <div class="col-md-12">
+                            <label>
+                              <span>
+                                <small
+                                  >Number of Late Repayments Allowable
+                                  &nbsp;</small
+                                >
+                                <i class="icon icon-ckeditor"></i>
+                              </span>
+                              <span>
+                                <lnd-switch
+                                  class="switch"
+                                  [value]="
+                                    topupConstraintForm.get(
+                                      'lateRepaymentsAllowableIsActive'
+                                    ).value
+                                  "
+                                  (emittedValue)="
+                                    toggleSwitch(
+                                      $event,
+                                      'lateRepaymentsAllowableIsActive'
+                                    )
+                                  "
+                                ></lnd-switch>
+                                <span
+                                  [ngClass]="
+                                    topupConstraintForm.get(
+                                      'lateRepaymentsAllowableIsActive'
+                                    ).value
+                                      ? 'badge-success'
+                                      : 'badge-warning text-white'
+                                  "
+                                  class="badge badge-sm badge-pill"
+                                  >{{
+                                    topupConstraintForm.get(
+                                      "lateRepaymentsAllowableIsActive"
+                                    ).value
+                                      ? "Active"
+                                      : "Inactive"
+                                  }}</span
+                                >
+                              </span>
+                            </label>
+
+                            <div
+                              *ngIf="
+                                topupConstraintForm.get(
+                                  'lateRepaymentsAllowableIsActive'
+                                ).value
+                              "
+                            >
+                              <input
+                                formControlName="lateRepaymentsAllowable"
+                                type="number"
+                                class="form-control"
+                                style="text-align: right"
+                              />
+                            </div>
+                          </div>
+                        </section>
+
+                        <section class="form-row constraint">
+                          <div class="col-md-12">
+                            <label>
+                              <span>
+                                <small>Dsr Threshold (%) &nbsp;</small>
+                                <i class="icon icon-ckeditor"></i>
+                              </span>
+                              <span>
+                                <lnd-switch
+                                  class="switch"
+                                  [value]="
+                                    topupConstraintForm.get('topUpDsrIsActive')
+                                      .value
+                                  "
+                                  (emittedValue)="
+                                    toggleSwitch($event, 'topUpDsrIsActive')
+                                  "
+                                ></lnd-switch>
+                                <span
+                                  [ngClass]="
+                                    topupConstraintForm.get('topUpDsrIsActive')
+                                      .value
+                                      ? 'badge-success'
+                                      : 'badge-warning text-white'
+                                  "
+                                  class="badge badge-sm badge-pill"
+                                  >{{
+                                    topupConstraintForm.get("topUpDsrIsActive")
+                                      .value
+                                      ? "Active"
+                                      : "Inactive"
+                                  }}</span
+                                >
+                              </span>
+                            </label>
+
+                            <div
+                              *ngIf="
+                                topupConstraintForm.get('topUpDsrIsActive')
+                                  .value
+                              "
+                            >
+                              <input
+                                formControlName="topUpDsr"
+                                type="text"
+                                class="form-control"
+                                currencyMask
+                                [options]="{
+                                  prefix: '',
+                                  thousands: ',',
+                                  decimal: '.'
+                                }"
+                              />
+                            </div>
+                          </div>
+                        </section>
+
+                        <section class="form-row constraint">
+                          <div class="col-md-12">
+                            <label>
+                              <span>
+                                <small>Number of Repayments&nbsp;</small>
+                                <i class="icon icon-ckeditor"></i>
+                              </span>
+                              <span>
+                                <lnd-switch
+                                  class="switch"
+                                  [value]="
+                                    topupConstraintForm.get(
+                                      'numberOfRepaymentsIsActive'
+                                    ).value
+                                  "
+                                  (emittedValue)="
+                                    toggleSwitch(
+                                      $event,
+                                      'numberOfRepaymentsIsActive'
+                                    )
+                                  "
+                                ></lnd-switch>
+                                <span
+                                  [ngClass]="
+                                    topupConstraintForm.get(
+                                      'numberOfRepaymentsIsActive'
+                                    ).value
+                                      ? 'badge-success'
+                                      : 'badge-warning text-white'
+                                  "
+                                  class="badge badge-sm badge-pill"
+                                  >{{
+                                    topupConstraintForm.get(
+                                      "numberOfRepaymentsIsActive"
+                                    ).value
+                                      ? "Active"
+                                      : "Inactive"
+                                  }}</span
+                                >
+                              </span>
+                            </label>
+
+                            <div
+                              *ngIf="
+                                topupConstraintForm.get(
+                                  'numberOfRepaymentsIsActive'
+                                ).value
+                              "
+                            >
+                              <input
+                                formControlName="numberOfRepayments"
+                                type="number"
+                                class="form-control"
+                                style="text-align: right"
+                              />
+                            </div>
+                          </div>
+                        </section>
+
+                        <section class="form-row constraint">
+                          <div class="col-md-12">
+                            <label>
+                              <span>
+                                <small>Min Loan Tenor&nbsp;</small>
+                                <i class="icon icon-ckeditor"></i>
+                              </span>
+                              <span>
+                                <lnd-switch
+                                  class="switch"
+                                  [value]="
+                                    topupConstraintForm.get(
+                                      'minLoanTenorIsActive'
+                                    ).value
+                                  "
+                                  (emittedValue)="
+                                    toggleSwitch($event, 'minLoanTenorIsActive')
+                                  "
+                                ></lnd-switch>
+                                <span
+                                  [ngClass]="
+                                    topupConstraintForm.get(
+                                      'minLoanTenorIsActive'
+                                    ).value
+                                      ? 'badge-success'
+                                      : 'badge-warning text-white'
+                                  "
+                                  class="badge badge-sm badge-pill"
+                                  >{{
+                                    topupConstraintForm.get(
+                                      "minLoanTenorIsActive"
+                                    ).value
+                                      ? "Active"
+                                      : "Inactive"
+                                  }}</span
+                                >
+                              </span>
+                            </label>
+
+                            <div
+                              *ngIf="
+                                topupConstraintForm.get('minLoanTenorIsActive')
+                                  .value
+                              "
+                            >
+                              <input
+                                formControlName="minLoanTenor"
+                                type="number"
+                                class="form-control"
+                                style="text-align: right"
+                              />
+                            </div>
+                          </div>
+                        </section>
+                      </form>
+                    </div>
+                  </div>
+
+                  <div class="tab-pane" id="tab-buyover">
+                    <div class="form-row mt-3">
+                      <table class="table table-striped" id="table">
+                        <thead>
+                          <tr>
+                            <!-- <th style="text-align: center;">Minimum Transferrable Amount.  <small>(Difference betweeen the requested Loan Amount and Amount to be transferred to the concerned Third Party)</small>&nbsp;
+                                                    <i class="icon icon-ckeditor"></i>
+                                                  </th> -->
+                          </tr>
+                        </thead>
+                        <tbody id="tbody">
+                          <tr *ngFor="let line of buyoverlines; let i = index">
+                            <td width="70%">
+                              Minimum Transferrable Amount.
+                              <small
+                                >(Difference betweeen the requested Loan Amount
+                                and Amount to be transferred to the concerned
+                                Third Party)</small
+                              >&nbsp;
+                            </td>
+                            <td width="7=30%">
+                              <input
+                                type="text"
+                                class="form-control"
+                                currencyMask
+                                [options]="{
+                                  prefix: '',
+                                  thousands: ',',
+                                  decimal: '.'
+                                }"
+                                [(ngModel)]="line.MinimumTransferrableAmount"
+                                [ngModelOptions]="{ standalone: true }"
+                                placeholder="Value"
+                              />
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+
+                  <!-- Not implemented Yet - DO not delete
+                                     <div class="tab-pane" id="tab-loanoptions">
+
+                                        <table class="table table-striped" id="table">
+                                            <thead>
+                                              <tr>
+
+                                              <th>
+
+                                                </th>
+                                                <th style="text-align: center;" class="important-field"> Trigger <b class="help-block" > *</b> &nbsp;
+                                                  <i class="icon icon-ckeditor"></i>
+                                                </th>
+
+
+                                                <th style="text-align: center;">Loan Amount&nbsp;
+                                                  <i class="icon icon-ckeditor"></i>
+                                                </th>
+
+                                                <th style="text-align: center;">Rate (%)&nbsp;
+                                                    <i class="icon icon-ckeditor"></i>
+                                                  </th>
+
+                                                    <th style="text-align: center;">Tenor (Months) &nbsp;
+                                                      <i class="icon icon-ckeditor"></i>
+                                                    </th>
+                                                    <th style="text-align: center;">DSR(%) &nbsp;
+                                                      <i class="icon icon-ckeditor"></i>
+                                                    </th>
+                                                    <th style="text-align: center;">Access &nbsp;
+                                                      <i class="icon icon-ckeditor"></i>
+                                                    </th>
+
+                                              </tr>
+                                            </thead>
+                                            <tbody id="tbody">
+                                              <tr *ngFor="let line of lines; let i = index">
+                                                <td  style="width: 5%">
+
+                                                  <button *ngIf="i == 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeRow(i)">
+                                                      <i class="icon icon-close icon-lg"></i>
+                                                    </button>
+                                                  <button *ngIf="i > 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeRow(i)">
+                                                    <i class="icon icon-close icon-lg"></i>
+                                                  </button>
+                                                </td>
+
+                                                <td  style="width: 15%">
+                                                  <ng-select  [allowClear]="true" [items]="triggerArray" (selected)="selected('Trigger',$event,i)" placeholder="Select One">  </ng-select>
+                                                </td>
+                                                <td  style="width: 20%">
+                                                    <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MinConditionLoanAmount" [ngModelOptions]="{standalone: true}" placeholder="Min">
+                                                    <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MaxConditionLoanAmount" [ngModelOptions]="{standalone: true}" placeholder="Max">
+
+                                                  </td>
+                                                <td style="width: 15%">
+
+                                                  <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" [(ngModel)]="line.MinConditionInterestRate"  [ngModelOptions]="{standalone: true}"  placeholder="Min">
+                                                    <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" [(ngModel)]="line.MaxConditionInterestRate" [ngModelOptions]="{standalone: true}"  placeholder="Max">
+
+                                                    </td>
+                                                <td style="width: 15%">
+
+                                                    <input type="number" class="form-control"   [(ngModel)]="line.MinConditionRange" [ngModelOptions]="{standalone: true}" placeholder="Min" >
+                                                    <input type="number" class="form-control"    [(ngModel)]="line.MaxConditionRange" [ngModelOptions]="{standalone: true}" placeholder="Max">
+
+                                                  </td>
+                                                  <td style="width: 15%">
+                                                    <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MinConditionDSR" [ngModelOptions]="{standalone: true}" min="1"  placeholder="Min">
+                                                    <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MaxConditionDSR" [ngModelOptions]="{standalone: true}" min="1"  placeholder="Max">
+
+                                                  </td>
+                                                  <td style="width: 15%">
+                                                    <ng-select  [allowClear]="true"  [items]="accessArray" (selected)="selected('Access',$event,i)" placeholder="Select One">  </ng-select>
+                                                  </td>
+
+
+                                              </tr>
+                                            </tbody>
+                                            <tfoot>
+                                              <td colspan="3"> <button type="button" style="border-radius: 15px;"class="btn btn-floating btn-success btn-xs" (click)="addRow()">
+                                                  <i class="icon icon-add"></i> Add new condition
+                                                </button>
+                                              </td>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+
+
+                                              </tfoot>
+
+                                          </table>
+
+                                    </div>-->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="AddLoanTypeForm.invalid"
+      >
+        Save Settings
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<ng-template #editLoanTypeModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Edit Loan Type Setup
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="EditLoanTypeForm"
+    (ngSubmit)="submitEditLoanTypeForm(EditLoanTypeForm.value)"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div class="form-row mt-3">
+          <div class="col-sm-5 mb-3">
+            <label for="validationDefault01">Loan name</label
+            ><b class="help-block"> *</b>
+            <input
+              type="text"
+              formControlName="LoanName"
+              class="form-control"
+              placeholder="Name of the loan"
+            />
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('LoanName').errors &&
+                EditLoanTypeForm.get('LoanName').touched
+              "
+            >
+              What is name of the Loan?
+            </span>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label>Loan Type Code</label><b class="help-block"> *</b>
+            <input
+              type="text"
+              formControlName="LoanTypeCode"
+              class="form-control"
+              id="validationDefault02"
+              placeholder="E.g LND00123"
+            />
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('LoanTypeCode').errors &&
+                EditLoanTypeForm.get('LoanTypeCode').touched
+              "
+            >
+              What code should be tied to this Loan?
+            </span>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label for="permission"
+              >Repayment Type <b class="help-block"> *</b></label
+            >
+            <slct-2
+              [allowClear]="true"
+              [data]="repaymentTypeArray"
+              (selected)="selected('RepaymentType', $event)"
+              placeholder="Select One"
+              [active]="selectedRepaymentTypeArray"
+            >
+            </slct-2>
+            <!-- <ng-select [allowClear]="true" [items]="repaymentTypeArray" (selected)="selected('RepaymentType',$event)"
+              placeholder="Select One" [active]="selectedRepaymentTypeArray"> </ng-select> -->
+          </div>
+
+          <div class="col-sm-3 mb-3">
+            <label>Base Tenor Limit</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                formControlName="LoanTypeTenor"
+                placeholder="Enter Value"
+                min="1"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">{{
+                  selectedRepaymentType
+                }}</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('LoanTypeTenor').errors &&
+                EditLoanTypeForm.get('LoanTypeTenor').touched
+              "
+            >
+              How long should loans last?
+            </span>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label>Max Interest Rate</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="InterestRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Interest rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('InterestRate').errors &&
+                EditLoanTypeForm.get('InterestRate').touched
+              "
+            >
+              What is the maximum Interest Rate?
+            </span>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label for="permission"
+              >Interest Rate Unit <b class="help-block"> *</b></label
+            >
+            <slct-2
+              [allowClear]="true"
+              [data]="interestRateUnitArray"
+              (selected)="selected('InterestRateUnit', $event)"
+              placeholder="Select One"
+              [active]="selectedInterestRateUnitArray"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label><small>Debt Service Ratio (DSR)</small></label
+            ><!-- <b class="help-block" > *</b>-->
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="DsrRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="DSR rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('DsrRate').errors &&
+                EditLoanTypeForm.get('DsrRate').touched
+              "
+            >
+              What is the Base DSR Rate?
+            </span>
+          </div>
+
+          <div class="col-sm-3 mb-3 mb-5">
+            <label>Min Loan Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <!-- <span class="input-group-text">{{ currency_code }}</span> -->
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="MinAmount"
+                placeholder="Minimum Loan Amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('MinAmount').errors &&
+                EditLoanTypeForm.get('MinAmount').touched
+              "
+            >
+              What is the Minimum Amount allowed?
+            </span>
+          </div>
+
+          <div class="col-sm-3 mb-3 mb-5">
+            <label>Max Loan Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <!-- <span class="input-group-text">{{ currency_code }}</span> -->
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="MaxAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Maximum loan amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('MaxAmount').errors &&
+                EditLoanTypeForm.get('MaxAmount').touched
+              "
+            >
+              What is the Maximum Amount allowed?
+            </span>
+          </div>
+
+          <!-- <div class="col-sm-3 mb-3">
+                   <label >Minumum Credit Score</label><b class="help-block" > *</b>
+                       <div class="input-group">
+                         <input type="text" class="form-control" formControlName="MinimumCreditScore" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="DSR rate">
+
+                       </div>
+                       <span class="help-block" *ngIf="EditLoanTypeForm.get('DsrRate').errors && EditLoanTypeForm.get('DsrRate').touched">
+                           What is the Minimum Credit Score DSR Rate?
+                         </span>
+                 </div> -->
+
+          <!-- <div class="col-sm-6 mb-3">
+                       <label >Possible Rejection Reason(s)</label>
+                       <div>
+                           <ng-select  [multiple]="true"
+                           [items]="rejectionReasonsArray"
+                           (selected)="selected('Rejection',$event)"
+                           (removed)="removed('Rejection',$event)"
+                           placeholder="None selected"></ng-select>
+                       </div>
+                     </div> -->
+
+          <!-- <div class="col-sm-6 mb-3">
+                       <label>Applicable Recovery Measure(s)</label>
+                       <div>
+                           <ng-select  [multiple]="true"
+                           [items]="recoveryMeasuresArray"
+                           (selected)= "selected('Recovery',$event)"
+                           (removed)="removed('Recovery',$event)"
+                           placeholder="None selected"></ng-select>
+                       </div>
+                   </div> -->
+
+          <div class="col-sm-5 mb-3">
+            <label
+              >Applicable Repayment Methods <b class="help-block"> *</b></label
+            >
+            <slct-2
+              [multiple]="true"
+              [allowSelectAll]="true"
+              [customSearchEnabled]="true"
+              (selectedAll)="selectAll('Repayment', $event)"
+              (deselectedAll)="deSelectAll('Repayment', $event)"
+              [data]="repaymentMethodsArray"
+              (selected)="selected('Repayment', $event)"
+              (removed)="removed('Repayment', $event)"
+              placeholder="None selected"
+              [active]="selectedRepaymentMethodsArray"
+            ></slct-2>
+            <lnd-spinner
+              class="d-block"
+              *ngIf="isFetchingPaymentOfficers"
+            ></lnd-spinner>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Applicable Branches <b class="help-block"> *</b></label>
+            <slct-2
+              *ngIf="!gettingRepaymentMethods"
+              [multiple]="true"
+              [allowSelectAll]="true"
+              [customSearchEnabled]="true"
+              (selectedAll)="selectAll('Branch', $event)"
+              (deselectedAll)="deSelectAll('Branch', $event)"
+              [data]="branchesArray"
+              (selected)="selected('Branch', $event)"
+              (removed)="removed('Branch', $event)"
+              placeholder="Select branches"
+              [active]="selectedBranches"
+            >
+            </slct-2>
+            <lnd-spinner
+              class="d-block"
+              *ngIf="gettingRepaymentMethods"
+            ></lnd-spinner>
+          </div>
+
+          <div class="col-sm-3 mb-3">
+            <label>Applicable Platforms <b class="help-block"> *</b></label>
+            <div>
+              <slct-2
+                [multiple]="true"
+                [allowSelectAll]="true"
+                [customSearchEnabled]="true"
+                (selectedAll)="selectAll('ApplicablePlatform', $event)"
+                (deselectedAll)="deSelectAll('ApplicablePlatform', $event)"
+                [data]="applicablePlatformsArray"
+                (selected)="selected('ApplicablePlatform', $event)"
+                (removed)="removed('ApplicablePlatform', $event)"
+                placeholder="Select Platforms"
+                [active]="selectedPlatforms"
+              ></slct-2>
+            </div>
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label for="permission"
+              >Days In a Year <b class="help-block"> *</b></label
+            >
+            <slct-2
+              [allowClear]="true"
+              [data]="daysInAYearArray"
+              (selected)="selected('DaysInAYear', $event)"
+              placeholder="Select One"
+              [active]="selectedDaysInAYearArray"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-3 mb-3">
+            <label for="permission">Settlement Threshold</label>
+            <slct-2
+              [allowClear]="true"
+              [data]="thresholdparametersArray"
+              (selected)="selected('Threshold', $event)"
+              (removed)="removed('Threshold', $event)"
+              placeholder="Select One"
+              [active]="selectedSettlementThresholdArray"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-3 mb-3 mb-5">
+            <label>Account Closure Value</label>
+            <span
+              ><i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="Loan accounts under this product whose loan balance falls between 0 and Value entered here will be automatically closed(settled)"
+              ></i
+            ></span>
+
+            <div class="input-group">
+              <div class="input-group-prepend"></div>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="AccountClosureValue"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Enter Value"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('AccountClosureValue').errors &&
+                EditLoanTypeForm.get('AccountClosureValue').touched
+              "
+            >
+              What is the account closure value allowed?
+            </span>
+          </div>
+
+          <div
+            class="col-sm-2 mb-3 form-group"
+            [ngClass]="{
+              'has-error':
+                EditLoanTypeForm.get('Status').errors &&
+                EditLoanTypeForm.get('Status').touched
+            }"
+          >
+            <label for="permission">Status</label>
+
+            <select
+              formControlName="Status"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height"
+            >
+              <option selected disabled>Select Status</option>
+
+              <option value="Active">Active</option>
+              <option value="NonActive">Inactive</option>
+            </select>
+
+            <span
+              class="help-block"
+              *ngIf="
+                EditLoanTypeForm.get('Status').errors &&
+                EditLoanTypeForm.get('Status').touched
+              "
+            >
+              Select Status
+            </span>
+          </div>
+          <div class="col-sm-3 mb-3">
+            <label for="permission">Repayment Balance Type</label>
+            <slct-2
+              [allowClear]="true"
+              [data]="repaymentBalanceTypes"
+              (selected)="selected('RepaymentBalanceType', $event)"
+              [active]="selectedRepaymentBalanceType"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-12 mb-3">
+            <label>Loan Type Terms & Conditions</label>
+            <div>
+              <textarea
+                class="form-control"
+                formControlName="TermsAndConditions"
+                rows="3"
+                placeholder="Enter Terms & Conditons"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="card w-100">
+            <div class="dt-card__header">
+              <div class="text-center col-sm-12 mt-3">
+                <br /><br />
+                <ul
+                  class="nav nav-underline flex-row border-bottom nav-card-tabs"
+                  role="tablist"
+                >
+                  <li class="nav-item">
+                    <a
+                      class="nav-link active"
+                      data-toggle="tab"
+                      href="#tab-loanfees"
+                      role="tab"
+                      aria-controls="tab-pane3"
+                      aria-selected="true"
+                    >
+                      Applicable Fees</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      data-toggle="tab"
+                      href="#tab-loancategories"
+                      role="tab"
+                      aria-controls="tab-pane2"
+                      aria-selected="true"
+                      >Loan Type Categories</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      data-toggle="tab"
+                      href="#tab-topup"
+                      role="tab"
+                      aria-controls="tab-pane2"
+                      aria-selected="true"
+                      >Top-Up Contraints</a
+                    >
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link"
+                      data-toggle="tab"
+                      href="#tab-buyover"
+                      role="tab"
+                      aria-controls="tab-pane2"
+                      aria-selected="true"
+                      >Buy-Over Contraints</a
+                    >
+                  </li>
+                  <!-- <li class="nav-item">
+                                   <a class="nav-link" data-toggle="tab" href="#tab-creditscore" role="tab" aria-controls="tab-pane1"
+                                     aria-selected="true">Credit Scoring Rules</a>
+                                 </li>
+
+                                 <li class="nav-item">
+                                   <a class="nav-link" data-toggle="tab" href="#tab-loanoptions" role="tab" aria-controls="tab-pane2"
+                                     aria-selected="true">Loan Options</a>
+                                 </li> -->
+                </ul>
+                <!-- <button class="btn btn-sm styled" (click) = "controlCondtionView()" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample" type="button"><i class="icon icon-dropdown icon-sm mr-2 align-self-center text-primary"></i>Loan Options? </button> -->
+                <!-- <button class="btn btn-sm styled" (click) = "controlCondtionView()" data-toggle="collapse" href="#collapseExample" aria-expanded="false" aria-controls="collapseExample" type="button"><i class="icon icon-dropdown icon-sm mr-2 align-self-center text-primary"></i>Credit Scoring Ranges? </button> -->
+              </div>
+            </div>
+            <div class="dt-card__body">
+              <div class="col-sm-12 tab-content">
+                <div class="tab-pane active" id="tab-loanfees">
+                  <table class="table table-striped" id="table">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th style="text-align: center" class="important-field">
+                          Fee &nbsp;
+                          <i class="icon icon-ckeditor"></i>
+                        </th>
+                        <th style="text-align: center">
+                          Fee Calculation&nbsp;
+                          <span
+                            ><i
+                              class="icon icon-question-circle icon-fw icon-xl"
+                              placement="top"
+                              ngbTooltip="1.DEDUCTED UPFRONT: Deducted from the approved principal amount at disbursement, meaning the client receives less money as actual disbursement, but still has to repay full loan amount by the end of the loan term.  2.CAPITALIZED: Added to the approved principal amount at disbursement, meaning the client receives the approved amount as actual disbursement, but has to repay a higher amount, including the loan fees, by the end of the loan term"
+                            ></i
+                          ></span>
+                        </th>
+                        <th style="text-align: center" class="important-field">
+                          Application &nbsp;
+                          <span
+                            ><i
+                              class="icon icon-question-circle icon-fw icon-xl"
+                              placement="top"
+                              ngbTooltip="Percentage: % of Loan amount."
+                            ></i
+                          ></span>
+                        </th>
+
+                        <th style="text-align: center">
+                          Amount&nbsp;
+                          <i class="icon icon-ckeditor"></i>
+                        </th>
+
+                        <th style="text-align: center">
+                          Is Mandatory&nbsp;
+                          <span
+                            ><i
+                              class="icon icon-question-circle icon-fw icon-xl"
+                              placement="top"
+                              ngbTooltip="When a fee is set as mandatory (YES), it will be automatically applied to any loan created. If NO is selected, the user creating the loan has the ability to add or remove this fee during loan origination"
+                            ></i
+                          ></span>
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody">
+                      <tr *ngFor="let line of editFeeLines; let i = index">
+                        <td style="width: 5%">
+                          <button
+                            *ngIf="i == 0"
+                            type="button"
+                            style="border-radius: 15px"
+                            class="btn btn-floating btn-warning btn-xs"
+                            (click)="removeEditFeeRow(i)"
+                          >
+                            <i class="icon icon-close icon-lg"></i>
+                          </button>
+                          <button
+                            *ngIf="i > 0"
+                            type="button"
+                            style="border-radius: 15px"
+                            class="btn btn-floating btn-warning btn-xs"
+                            (click)="removeEditFeeRow(i)"
+                          >
+                            <i class="icon icon-close icon-lg"></i>
+                          </button>
+                        </td>
+
+                        <td>
+                          <slct-2
+                            [allowClear]="true"
+                            [data]="feesArray"
+                            (selected)="selectedEdit('Fee', $event, i)"
+                            placeholder="Select One"
+                            [active]="setSelected('FeeName', editFeeLines, i)"
+                          >
+                          </slct-2>
+                          <!-- <ng-select [allowClear]="true" [items]="feesArray" (selected)="selectedEdit('Fee',$event,i)"
+                            placeholder="Select One" [active]="setSelected('FeeName', editFeeLines ,i)"> </ng-select> -->
+                        </td>
+                        <td>
+                          <slct-2
+                            [allowClear]="true"
+                            [data]="feeApplicationArray"
+                            (selected)="
+                              selectedEdit('FeeApplication', $event, i)
+                            "
+                            placeholder="Select One"
+                            [active]="
+                              setSelected('FeeApplication', editFeeLines, i)
+                            "
+                          >
+                          </slct-2>
+                        </td>
+
+                        <td>
+                          <slct-2
+                            [allowClear]="true"
+                            [data]="feeTypeArray"
+                            (selected)="selectedEdit('FeeType', $event, i)"
+                            placeholder="Select One"
+                            [active]="setSelected('FeeType', editFeeLines, i)"
+                          >
+                          </slct-2>
+                        </td>
+
+                        <td>
+                          <input
+                            type="text"
+                            class="form-control"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                            [(ngModel)]="line.FeeAmount"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="Value"
+                          />
+                        </td>
+                        <td>
+                          <slct-2
+                            [allowClear]="true"
+                            [data]="feeMandatoryOptionArray"
+                            (selected)="
+                              selectedEdit('FeeIsMandatory', $event, i)
+                            "
+                            placeholder="Select One"
+                            [active]="
+                              setSelected('FeeIsMandatory', editFeeLines, i)
+                            "
+                          >
+                          </slct-2>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <td colspan="3">
+                        <button
+                          type="button"
+                          style="border-radius: 15px"
+                          class="btn btn-floating btn-success btn-xs"
+                          (click)="addEditFeeRow()"
+                        >
+                          <i class="icon icon-add"></i> Add new fee
+                        </button>
+                      </td>
+                      <td></td>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <div class="tab-pane" id="tab-loancategories">
+                  <table class="table table-striped" id="table">
+                    <thead>
+                      <tr>
+                        <th></th>
+
+                        <th style="text-align: center" class="important-field">
+                          Name of Category <b class="help-block"> *</b> &nbsp;
+                          <i class="icon icon-ckeditor"></i>
+                        </th>
+
+                        <th style="text-align: center">
+                          Loan Amount&nbsp;
+                          <i class="icon icon-ckeditor"></i>
+                        </th>
+
+                        <th style="text-align: center">
+                          Rate (%)&nbsp;
+                          <i class="icon icon-ckeditor"></i>
+                        </th>
+
+                        <th style="text-align: center">
+                          Tenor &nbsp;
+                          <i class="icon icon-ckeditor"></i>
+                        </th>
+                        <th style="text-align: center">
+                          DSR(%) &nbsp;
+                          <i class="icon icon-ckeditor"></i>
+                        </th>
+                        <!-- <th style="text-align: center">
+                          Applicable Fees &nbsp;
+                          <i class="icon icon-ckeditor"></i>
+                        </th> -->
+                      </tr>
+                    </thead>
+                    <tbody id="tbody">
+                      <tr *ngFor="let line of editCategoryLines; let i = index">
+                        <td style="width: 5%">
+                          <button
+                            *ngIf="i == 0"
+                            type="button"
+                            style="border-radius: 15px"
+                            class="btn btn-floating btn-warning btn-xs"
+                            (click)="removeEditCategoryRow(i)"
+                          >
+                            <i class="icon icon-close icon-lg"></i>
+                          </button>
+                          <button
+                            *ngIf="i > 0"
+                            type="button"
+                            style="border-radius: 15px"
+                            class="btn btn-floating btn-warning btn-xs"
+                            (click)="removeEditCategoryRow(i)"
+                          >
+                            <i class="icon icon-close icon-lg"></i>
+                          </button>
+                        </td>
+
+                        <td style="width: 30%">
+                          <input
+                            class="form-control"
+                            type="hidden"
+                            value="{{ editCategoryLines[i].CategoryId }}"
+                            readonly
+                          />
+                          <input
+                            class="form-control"
+                            type="hidden"
+                            value="{{ editCategoryLines[i].Id }}"
+                            readonly
+                          />
+                          <input
+                            class="form-control"
+                            type="text"
+                            value="{{ editCategoryLines[i].CategoryName }}"
+                            (change)="setEditCategory($event.target.value, i)"
+                          />
+                        </td>
+                        <td style="width: 20%">
+                          <input
+                            type="text"
+                            class="form-control"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                            [(ngModel)]="line.MinCategoryLoanAmount"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="Min"
+                          />
+                          <input
+                            type="text"
+                            class="form-control"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                            [(ngModel)]="line.MaxCategoryLoanAmount"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="Max"
+                          />
+                        </td>
+                        <td style="width: 15%">
+                          <input
+                            type="text"
+                            class="form-control"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                            [(ngModel)]="line.MaxCategoryInterestRate"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="Max"
+                          />
+                        </td>
+                        <td style="width: 15%">
+                          <input
+                            type="number"
+                            class="form-control"
+                            [(ngModel)]="line.MaxCategoryTenor"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="Max"
+                          />
+                        </td>
+                        <td style="width: 15%">
+                          <input
+                            type="text"
+                            class="form-control"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                            [(ngModel)]="line.MaxCategoryDsr"
+                            [ngModelOptions]="{ standalone: true }"
+                            min="1"
+                            placeholder="Max"
+                          />
+                        </td>
+                        <!-- <td style="width: 15%">
+                          <slct-2
+                            [multiple]="true"
+                            [data]="editcategoryApplicableFeesArray"
+                            (selected)="
+                              selectedEdit(
+                                'CategoryFees',
+                                $event,
+                                i,
+                                editCategoryLines[i].CategoryId,
+                                editCategoryLines[i].Id
+                              )
+                            "
+                            (removed)="
+                              removed(
+                                'EditCategoryFees',
+                                $event,
+                                i,
+                                editCategoryLines[i].Id,
+                                editCategoryLines[i].CategoryId
+                              )
+                            "
+                            placeholder="Select concerned"
+                            [(ngModel)]="activeEditCatFees[i]"
+                            [ngModelOptions]="{ standalone: true }"
+                          >
+                          -- [active]="setSelected('EditCategoryFees', editCategoryApplicableFeesLines, i, editCategoryLines[i].CategoryId, editCategoryLines[i].Id)"
+                          </slct-2>
+                        </td> -->
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <td colspan="3">
+                        <button
+                          type="button"
+                          style="border-radius: 15px"
+                          class="btn btn-floating btn-success btn-xs"
+                          (click)="addEditCategoryRow()"
+                        >
+                          <i class="icon icon-add"></i> Add New Category
+                        </button>
+                      </td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tfoot>
+                  </table>
+                </div>
+
+                <div class="tab-pane" id="tab-topup">
+                  <div *ngIf="editMode" class="form-row mt-3">
+                    <form [formGroup]="EditTopupConstraintForm" class="w-100">
+                      <section class="form-row constraint">
+                        <div class="col-md-12">
+                          <label>
+                            <span>
+                              <small
+                                >Volume of Repayments Made (%). (Percentage of
+                                Total Repayments Expected) </small
+                              >&nbsp;
+                              <i class="icon icon-ckeditor"></i>
+                            </span>
+                            <span>
+                              <lnd-switch
+                                class="switch"
+                                [value]="
+                                  EditTopupConstraintForm.get(
+                                    'volumeOfRepaymentsIsActive'
+                                  ).value
+                                "
+                                (emittedValue)="
+                                  toggleSwitch(
+                                    $event,
+                                    'volumeOfRepaymentsIsActive',
+                                    true
+                                  )
+                                "
+                              ></lnd-switch>
+                              <span
+                                [ngClass]="
+                                  EditTopupConstraintForm.get(
+                                    'volumeOfRepaymentsIsActive'
+                                  ).value
+                                    ? 'badge-success'
+                                    : 'badge-warning text-white'
+                                "
+                                class="badge badge-sm badge-pill"
+                                >{{
+                                  EditTopupConstraintForm.get(
+                                    "volumeOfRepaymentsIsActive"
+                                  ).value
+                                    ? "Active"
+                                    : "Inactive"
+                                }}</span
+                              >
+                            </span>
+                          </label>
+
+                          <div
+                            *ngIf="
+                              EditTopupConstraintForm.get(
+                                'volumeOfRepaymentsIsActive'
+                              ).value
+                            "
+                          >
+                            <input
+                              formControlName="volumeOfRepayments"
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+                          </div>
+                        </div>
+                      </section>
+
+                      <section class="form-row constraint">
+                        <div class="col-md-12">
+                          <label>
+                            <span>
+                              <small
+                                >Number of Late Repayments Allowable
+                                &nbsp;</small
+                              >
+                              <i class="icon icon-ckeditor"></i>
+                            </span>
+                            <span>
+                              <lnd-switch
+                                class="switch"
+                                [value]="
+                                  EditTopupConstraintForm.get(
+                                    'lateRepaymentsAllowableIsActive'
+                                  ).value
+                                "
+                                (emittedValue)="
+                                  toggleSwitch(
+                                    $event,
+                                    'lateRepaymentsAllowableIsActive',
+                                    true
+                                  )
+                                "
+                              ></lnd-switch>
+                              <span
+                                [ngClass]="
+                                  EditTopupConstraintForm.get(
+                                    'lateRepaymentsAllowableIsActive'
+                                  ).value
+                                    ? 'badge-success'
+                                    : 'badge-warning text-white'
+                                "
+                                class="badge badge-sm badge-pill"
+                                >{{
+                                  EditTopupConstraintForm.get(
+                                    "lateRepaymentsAllowableIsActive"
+                                  ).value
+                                    ? "Active"
+                                    : "Inactive"
+                                }}</span
+                              >
+                            </span>
+                          </label>
+
+                          <div
+                            *ngIf="
+                              EditTopupConstraintForm.get(
+                                'lateRepaymentsAllowableIsActive'
+                              ).value
+                            "
+                          >
+                            <input
+                              formControlName="lateRepaymentsAllowable"
+                              type="number"
+                              class="form-control"
+                              style="text-align: right"
+                            />
+                          </div>
+                        </div>
+                      </section>
+
+                      <section class="form-row constraint">
+                        <div class="col-md-12">
+                          <label>
+                            <span>
+                              <small>Dsr Threshold (%) &nbsp;</small>
+                              <i class="icon icon-ckeditor"></i>
+                            </span>
+                            <span>
+                              <lnd-switch
+                                class="switch"
+                                [value]="
+                                  EditTopupConstraintForm.get(
+                                    'topUpDsrIsActive'
+                                  ).value
+                                "
+                                (emittedValue)="
+                                  toggleSwitch($event, 'topUpDsrIsActive', true)
+                                "
+                              ></lnd-switch>
+                              <span
+                                [ngClass]="
+                                  EditTopupConstraintForm.get(
+                                    'topUpDsrIsActive'
+                                  ).value
+                                    ? 'badge-success'
+                                    : 'badge-warning text-white'
+                                "
+                                class="badge badge-sm badge-pill"
+                                >{{
+                                  EditTopupConstraintForm.get(
+                                    "topUpDsrIsActive"
+                                  ).value
+                                    ? "Active"
+                                    : "Inactive"
+                                }}</span
+                              >
+                            </span>
+                          </label>
+
+                          <div
+                            *ngIf="
+                              EditTopupConstraintForm.get('topUpDsrIsActive')
+                                .value
+                            "
+                          >
+                            <input
+                              formControlName="topUpDsr"
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+                          </div>
+                        </div>
+                      </section>
+
+                      <section class="form-row constraint">
+                        <div class="col-md-12">
+                          <label>
+                            <span>
+                              <small>Number of Repayments&nbsp;</small>
+                              <i class="icon icon-ckeditor"></i>
+                            </span>
+                            <span>
+                              <lnd-switch
+                                class="switch"
+                                [value]="
+                                  EditTopupConstraintForm.get(
+                                    'numberOfRepaymentsIsActive'
+                                  ).value
+                                "
+                                (emittedValue)="
+                                  toggleSwitch(
+                                    $event,
+                                    'numberOfRepaymentsIsActive',
+                                    true
+                                  )
+                                "
+                              ></lnd-switch>
+                              <span
+                                [ngClass]="
+                                  EditTopupConstraintForm.get(
+                                    'numberOfRepaymentsIsActive'
+                                  ).value
+                                    ? 'badge-success'
+                                    : 'badge-warning text-white'
+                                "
+                                class="badge badge-sm badge-pill"
+                                >{{
+                                  EditTopupConstraintForm.get(
+                                    "numberOfRepaymentsIsActive"
+                                  ).value
+                                    ? "Active"
+                                    : "Inactive"
+                                }}</span
+                              >
+                            </span>
+                          </label>
+
+                          <div
+                            *ngIf="
+                              EditTopupConstraintForm.get(
+                                'numberOfRepaymentsIsActive'
+                              ).value
+                            "
+                          >
+                            <input
+                              formControlName="numberOfRepayments"
+                              type="number"
+                              class="form-control"
+                              style="text-align: right"
+                            />
+                          </div>
+                        </div>
+                      </section>
+
+                      <section class="form-row constraint">
+                        <div class="col-md-12">
+                          <label>
+                            <span>
+                              <small>Min Loan Tenor&nbsp;</small>
+                              <i class="icon icon-ckeditor"></i>
+                            </span>
+                            <span>
+                              <lnd-switch
+                                class="switch"
+                                [value]="
+                                  EditTopupConstraintForm.get(
+                                    'minLoanTenorIsActive'
+                                  ).value
+                                "
+                                (emittedValue)="
+                                  toggleSwitch(
+                                    $event,
+                                    'minLoanTenorIsActive',
+                                    true
+                                  )
+                                "
+                              ></lnd-switch>
+                              <span
+                                [ngClass]="
+                                  EditTopupConstraintForm.get(
+                                    'minLoanTenorIsActive'
+                                  ).value
+                                    ? 'badge-success'
+                                    : 'badge-warning text-white'
+                                "
+                                class="badge badge-sm badge-pill"
+                                >{{
+                                  EditTopupConstraintForm.get(
+                                    "minLoanTenorIsActive"
+                                  ).value
+                                    ? "Active"
+                                    : "Inactive"
+                                }}</span
+                              >
+                            </span>
+                          </label>
+
+                          <div
+                            *ngIf="
+                              EditTopupConstraintForm.get(
+                                'minLoanTenorIsActive'
+                              ).value
+                            "
+                          >
+                            <input
+                              formControlName="minLoanTenor"
+                              type="number"
+                              class="form-control"
+                              style="text-align: right"
+                            />
+                          </div>
+                        </div>
+                      </section>
+                    </form>
+                  </div>
+                </div>
+
+                <div class="tab-pane" id="tab-buyover">
+                  <div class="form-row mt-3">
+                    <table class="table table-striped" id="table">
+                      <thead>
+                        <tr>
+                          <th style="text-align: center">
+                            Minimum Transferrable Amount.
+                            <!--<b class="help-block" > *</b>-->
+                            <small
+                              >(Difference betweeen the requested Loan Amount
+                              and Amount to be transferred to the concerned
+                              Third Party)</small
+                            >&nbsp;
+                            <i class="icon icon-ckeditor"></i>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="tbody">
+                        <tr
+                          *ngFor="let line of editBuyOverlines; let i = index"
+                        >
+                          <td>
+                            <input
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                              [(ngModel)]="line.MinimumTransferrableAmount"
+                              [ngModelOptions]="{ standalone: true }"
+                              placeholder="Value"
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <!-- DO Not Delete - future implementation
+                                  <div class="tab-pane" id="tab-creditscore">
+
+                                      <div class="form-row mt-3">
+                                          <div class="col-sm-6 mb-3">
+                                              <label >Minumum Credit Score</label>// <b class="help-block" > *</b> //
+                                                  <div class="input-group">
+                                                    <input type="text" class="form-control" formControlName="MinimumCreditScore" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="Credit Score"  >
+
+                                                  </div>
+                                            </div>
+
+                                            <div class="col-sm-6 mb-3">
+                                                <label >Maximum Credit Score</label>// <b class="help-block" > *</b> //
+                                                    <div class="input-group">
+                                                      <input type="text" class="form-control" formControlName="MaximumCreditScore" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="Credit Score" >
+
+                                                    </div>
+                                              </div>
+                                      </div>
+
+                                        <table class="table table-striped" id="table">
+                                        <thead>
+                                          <tr>
+
+                                          <th>
+
+                                            </th>
+                                            <th style="text-align: center;">Description // <b class="help-block" > *</b>// &nbsp;
+                                              <i class="icon icon-ckeditor"></i>
+                                            </th>
+
+                                            <th style="text-align: center;">Score &nbsp;
+                                                <i class="icon icon-ckeditor"></i>
+                                              </th>
+
+                                              <th style="text-align: center;">Tag &nbsp;
+                                                  <i class="icon icon-ckeditor"></i>
+                                                </th>
+
+
+                                          </tr>
+                                        </thead>
+                                        <tbody id="tbody">
+                                          <tr *ngFor="let line of editCreditLines; let i = index">
+                                            <td  style="width: 5%">
+
+                                              <button *ngIf="i == 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeEditCreditRow(i)">
+                                                  <i class="icon icon-close icon-lg"></i>
+                                                </button>
+                                              <button *ngIf="i > 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeEditCreditRow(i)">
+                                                <i class="icon icon-close icon-lg"></i>
+                                              </button>
+                                            </td>
+
+                                            <td  style="width: 50%">
+                                                <textarea class="form-control" value="{{editCreditLines[i].Description}}" (change)="setEditDescription($event.target.value, i)" id="text-area-1" rows="2" placeholder="Enter Condition"></textarea>
+                                            </td>
+                                            <td  style="width: 30%">
+                                                <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MinCreditScore" [ngModelOptions]="{standalone: true}" placeholder="Min">
+                                                <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MaxCreditScore" [ngModelOptions]="{standalone: true}" placeholder="Max">
+
+                                              </td>
+                                            <td style="width: 15%">
+                                                <input class="form-control " type="text" value="{{editCreditLines[i].Tag}}" (change)="setEditTag($event.target.value, i)" >
+                                              </td>
+
+
+
+                                          </tr>
+                                        </tbody>
+                                        <tfoot>
+                                          <td colspan="3"> <button type="button" style="border-radius: 15px;"class="btn btn-floating btn-success btn-xs" (click)="addEditCreditRow()">
+                                              <i class="icon icon-add"></i> Add new line
+                                            </button>
+                                          </td>
+                                          <td></td>
+
+
+
+                                          </tfoot>
+
+                                      </table>
+
+                                      <div class="form-row mt-3">
+                                          <div class="col-sm-12 mb-3">
+                                              <label>Alternative Scoring Pattern</label>
+                                              <div>
+                                                  <textarea class="form-control"  formControlName="AlternativeScoringPattern" id="text-area-1" rows="3" placeholder="Enter Here"></textarea>
+                                              </div>
+                                            </div>
+                                      </div>
+
+                                  </div>
+
+                                  <div class="tab-pane" id="tab-loanoptions">
+
+                                      <table class="table table-striped" id="table">
+                                          <thead>
+                                            <tr>
+
+                                            <th>
+
+                                              </th>
+                                              <th style="text-align: center;" class="important-field"> Trigger <b class="help-block" > *</b> &nbsp;
+                                                <i class="icon icon-ckeditor"></i>
+                                              </th>
+
+                                              <th style="text-align: center;">Loan Amount&nbsp;
+                                                <i class="icon icon-ckeditor"></i>
+                                              </th>
+
+                                              <th style="text-align: center;">Rate (%)&nbsp;
+                                                  <i class="icon icon-ckeditor"></i>
+                                                </th>
+
+                                                <th style="text-align: center;">Tenor (Months) &nbsp;
+                                                    <i class="icon icon-ckeditor"></i>
+                                                  </th>
+                                                  <th style="text-align: center;">DSR(%) &nbsp;
+                                                    <i class="icon icon-ckeditor"></i>
+                                                  </th>
+                                                  <th style="text-align: center;">Access &nbsp;
+                                                    <i class="icon icon-ckeditor"></i>
+                                                  </th>
+
+                                            </tr>
+                                          </thead>
+                                          <tbody id="tbody">
+                                            <tr *ngFor="let line of editLines; let i = index">
+                                              <td  style="width: 5%">
+
+                                                <button *ngIf="i == 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeEditRow(i)">
+                                                    <i class="icon icon-close icon-lg"></i>
+                                                  </button>
+                                                <button *ngIf="i > 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeEditRow(i)">
+                                                  <i class="icon icon-close icon-lg"></i>
+                                                </button>
+                                              </td>
+
+                                              <td  style="width: 15%">
+                                                <ng-select  [allowClear]="true" [items]="triggerArray" (selected)="selectedEdit('Trigger',$event,i)"   placeholder="Select One" [active]="setSelected('Trigger', editLines ,i)">  </ng-select>
+                                              </td>
+                                              <td  style="width: 20%">
+                                                  <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MinConditionLoanAmount" [ngModelOptions]="{standalone: true}" placeholder="Min">
+                                                  <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MaxConditionLoanAmount" [ngModelOptions]="{standalone: true}" placeholder="Max">
+
+                                                </td>
+                                              <td style="width: 15%">
+
+                                                <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" [(ngModel)]="line.MinConditionInterestRate"  [ngModelOptions]="{standalone: true}"  placeholder="Min">
+                                                  <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" [(ngModel)]="line.MaxConditionInterestRate" [ngModelOptions]="{standalone: true}"  placeholder="Max">
+
+                                                  </td>
+                                              <td style="width: 15%">
+
+                                                  <input type="number" class="form-control"   [(ngModel)]="line.MinConditionRange" [ngModelOptions]="{standalone: true}" placeholder="Min" >
+                                                  <input type="number" class="form-control"    [(ngModel)]="line.MaxConditionRange" [ngModelOptions]="{standalone: true}" placeholder="Max">
+
+                                                </td>
+                                                <td style="width: 15%">
+                                                  <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MinConditionDSR" [ngModelOptions]="{standalone: true}" min="1"  placeholder="Min">
+                                                  <input type="text" class="form-control" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  [(ngModel)]="line.MaxConditionDSR" [ngModelOptions]="{standalone: true}" min="1"  placeholder="Max">
+
+                                                </td>
+                                                <td style="width: 15%">
+                                                  <ng-select  [allowClear]="true"  [items]="accessArray" (selected)="selectedEdit('Access',$event,i)"  placeholder="Select One" [active]="setSelected('Access', editLines ,i)">  </ng-select>
+                                                </td>
+
+
+                                            </tr>
+                                          </tbody>
+                                          <tfoot>
+                                            <td colspan="3"> <button type="button" style="border-radius: 15px;"class="btn btn-floating btn-success btn-xs" (click)="addEditRow()">
+                                                <i class="icon icon-add"></i> Add new condition
+                                              </button>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+
+
+                                            </tfoot>
+
+                                        </table>
+
+                                  </div> -->
+              </div>
+            </div>
+          </div>
+
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="EditLoanTypeForm.invalid"
+      >
+        Save Settings
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<ng-template #viewLoanTypeModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">View Loan Type</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <form [formGroup]="ViewLoanTypeForm">
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="form-row mt-3">
+          <div class="col-sm-5 mb-3">
+            <label for="validationDefault01">Loan name</label
+            ><b class="help-block"> *</b>
+            <input
+              type="text"
+              formControlName="LoanName"
+              class="form-control"
+              placeholder="Name of the loan"
+              [readOnly]="true"
+            />
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label>Loan Type Code</label><b class="help-block"> *</b>
+            <input
+              type="text"
+              formControlName="LoanTypeCode"
+              class="form-control"
+              id="validationDefault02"
+              placeholder="E.g LND00123"
+              [readOnly]="true"
+            />
+          </div>
+
+          <div class="col-sm-2 mb-3">
+            <label>Max Interest Rate </label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="InterestRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Interest rate"
+                [readOnly]="true"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-3 mb-3">
+            <label>Tenor</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                formControlName="LoanTypeTenor"
+                placeholder="Enter Value"
+                min="1"
+                [readOnly]="true"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">{{
+                  selectedRepaymentType
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3 mb-5">
+            <label>Min Loan Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <div class="input-group-prepend"></div>
+              <input
+                type="text"
+                class="form-control"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="MinAmount"
+                placeholder="Minimum Loan Amount"
+                [readOnly]="true"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3 mb-5">
+            <label>Max Loan Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <!-- <span class="input-group-text">{{ currency_code }}</span> -->
+              </div>
+              <!-- <input type="text" formControlName="MaxAmount" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" [(ngModel)]="MaxAmount"  placeholder="Maximum loan amount"> -->
+              <input
+                type="text"
+                class="form-control"
+                formControlName="MaxAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Maximum Loan Amount"
+                [readOnly]="true"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Debt Service Ratio (DSR)</label>
+            <!--<b class="help-block" > *</b>-->
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="DsrRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="DSR rate"
+                [readOnly]="true"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- <div class="col-sm-3 mb-3">
+                        <label >Minumum Credit Score</label><b class="help-block" > *</b>
+                            <div class="input-group">
+                              <input type="text" class="form-control" formControlName="MinimumCreditScore" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="Crdit Score"  [readOnly]="true">
+
+                            </div>
+                      </div> -->
+
+          <div class="col-sm-6 mb-3">
+            <label for="validationDefault03"
+              >Possible Rejection Reason(s)</label
+            >
+            <div>
+              <slct-2
+                [multiple]="true"
+                [disabled]="true"
+                [data]="rejectionReasonsArray"
+                [active]="selectedRejectionReasonsIDs"
+                (selected)="selected('Rejection', $event)"
+                (removed)="removed('Rejection', $event)"
+                placeholder="None selected"
+              ></slct-2>
+              <!-- <ng-select [multiple]="true" [disabled]="true" [items]="rejectionReasonsArray"
+                [active]="selectedRejectionReasonsIDs" (selected)="selected('Rejection',$event)"
+                (removed)="removed('Rejection',$event)" placeholder="None selected"></ng-select> -->
+            </div>
+          </div>
+
+          <div class="col-sm-6 mb-3">
+            <label>Applicable Recovery Measure(s)</label>
+            <div>
+              <slct-2
+                [multiple]="true"
+                [disabled]="true"
+                [data]="recoveryMeasuresArray"
+                [active]="viewRecoveryMeasures"
+                (selected)="selected('Recovery', $event)"
+                (removed)="removed('Recovery', $event)"
+                placeholder="None selected"
+              ></slct-2>
+              <!-- <ng-select [multiple]="true" [disabled]="true" [items]="recoveryMeasuresArray"
+                [active]="viewRecoveryMeasures" (selected)="selected('Recovery',$event)"
+                (removed)="removed('Recovery',$event)" placeholder="None selected"></ng-select> -->
+            </div>
+          </div>
+
+          <div class="col-sm-6 mb-3">
+            <label>Alternative Scoring Pattern</label>
+            <div>
+              <textarea
+                class="form-control"
+                formControlName="AlternativeScoringPattern"
+                id="text-area-1"
+                rows="3"
+                placeholder="Enter Here"
+                [readOnly]="true"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="col-sm-6 mb-3">
+            <label>Terms & Conditions</label>
+            <div>
+              <textarea
+                class="form-control"
+                formControlName="TermsAndConditions"
+                rows="3"
+                placeholder="Enter Terms & Conditons"
+                [readOnly]="true"
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="text-center col-sm-12 mt-3 mb-5">
+            <button
+              class="btn btn-sm styled"
+              (click)="controlCondtionView()"
+              data-toggle="collapse"
+              href="#collapseExample"
+              aria-expanded="false"
+              aria-controls="collapseExample"
+              type="button"
+            >
+              <i
+                class="icon icon-dropdown icon-sm mr-2 align-self-center text-primary"
+              ></i
+              >Show Conditions?
+              <span class="btn-warning badge">
+                {{ editLines?.length || "0" }}</span
+              >
+            </button>
+          </div>
+
+          <div class="form-row collapse" id="collapseExample">
+            <table class="table table-striped" id="table">
+              <thead>
+                <tr>
+                  <th style="text-align: center" class="important-field">
+                    Trigger <b class="help-block"> *</b> &nbsp;
+                    <i class="icon icon-ckeditor"></i>
+                  </th>
+
+                  <th style="text-align: center">
+                    Loan Amount&nbsp;
+                    <i class="icon icon-ckeditor"></i>
+                  </th>
+
+                  <th style="text-align: center">
+                    Rate (%)&nbsp;
+                    <i class="icon icon-ckeditor"></i>
+                  </th>
+
+                  <th style="text-align: center">
+                    Tenor &nbsp;
+                    <i class="icon icon-ckeditor"></i>
+                  </th>
+                  <th style="text-align: center">
+                    DSR(%) &nbsp;
+                    <i class="icon icon-ckeditor"></i>
+                  </th>
+                  <th style="text-align: center">
+                    Access &nbsp;
+                    <i class="icon icon-ckeditor"></i>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="tbody">
+                <tr *ngFor="let line of editLines; let i = index">
+                  <td style="width: 15%">
+                    <input
+                      type="text"
+                      value="{{ editLines[i].Trigger }}"
+                      class="form-control"
+                      placeholder="Min"
+                      [readOnly]="true"
+                    />
+                  </td>
+                  <td style="width: 20%">
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="{{ editLines[i].MinConditionLoanAmount }}"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      [(ngModel)]="line.MinConditionLoanAmount"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Min"
+                      [readOnly]="true"
+                    />
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="{{ editLines[i].MaxConditionLoanAmount }}"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      [(ngModel)]="line.MaxConditionLoanAmount"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Max"
+                      [readOnly]="true"
+                    />
+                  </td>
+                  <td style="width: 15%">
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="{{ editLines[i].MinConditionInterestRate }}"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      [(ngModel)]="line.MinConditionInterestRate"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Min"
+                      [readOnly]="true"
+                    />
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="{{ editLines[i].MaxConditionInterestRate }}"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      [(ngModel)]="line.MaxConditionInterestRate"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Max"
+                      [readOnly]="true"
+                    />
+                  </td>
+                  <td style="width: 15%">
+                    <input
+                      type="number"
+                      class="form-control"
+                      value="{{ editLines[i].MinConditionRange }}"
+                      [(ngModel)]="line.MinConditionRange"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Min"
+                      [readOnly]="true"
+                    />
+                    <input
+                      type="number"
+                      class="form-control"
+                      value="{{ editLines[i].MaxConditionRange }}"
+                      [(ngModel)]="line.MaxConditionRange"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Max"
+                      [readOnly]="true"
+                    />
+                  </td>
+                  <td style="width: 15%">
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="{{ editLines[i].MinConditionDSR }}"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      [(ngModel)]="line.MinConditionDSR"
+                      [ngModelOptions]="{ standalone: true }"
+                      min="1"
+                      placeholder="Min"
+                      [readOnly]="true"
+                    />
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="{{ editLines[i].MaxConditionDSR }}"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      [(ngModel)]="line.MaxConditionDSR"
+                      [ngModelOptions]="{ standalone: true }"
+                      min="1"
+                      placeholder="Max"
+                      [readOnly]="true"
+                    />
+                  </td>
+                  <td style="width: 15%">
+                    <input
+                      type="text"
+                      class="form-control"
+                      value="{{ editLines[i].ViewAccess }}"
+                      placeholder="Min"
+                      [readOnly]="true"
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+
+          <div class="form-row"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+    </div>
+  </form>
+
+  <!-- /modal footer -->
+</ng-template>

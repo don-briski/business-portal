@@ -1,0 +1,79 @@
+<div class="dt-page__header">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">
+
+      {{ !isEditing ? 'Create Deposit Product' : 'Edit ' + depositProduct?.depositProductName }}
+    </h1>
+  <button class="btn btn-primary orange-bg text-white" [routerLink]="['/deposits/products']">
+      Back
+  </button>
+</div>
+  </div>
+
+  <!-- Grid -->
+  <div class="row">
+    <div class="boxed">
+
+      <div class="dt-card__body tabs-container tabs-vertical">
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs flex-column" role="tablist">
+          <li class="nav-item">
+            <a class="nav-link active pool-nav" data-toggle="tab" href="#tab-pane-1" role="tab" aria-controls="tab-pane-3"
+              aria-selected="true">Product Details
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link pool-nav" #step2 data-toggle="tab" href="#tab-pane-2" role="tab" aria-controls="tab-pane-4"
+              aria-selected="true">Interest Details
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link pool-nav" #step3 data-toggle="tab" href="#tab-pane-3" role="tab" aria-controls="tab-pane-4"
+              aria-selected="true">Balance Details
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link pool-nav" #step4 data-toggle="tab" href="#tab-pane-4" role="tab" aria-controls="tab-pane-4"
+              aria-selected="true">Fees Details
+            </a>
+          </li>
+        </ul>
+        <!-- /tab navigation -->
+
+        <!-- Tab Content -->
+        <div class="tab-content shadow border-0">
+          <!-- Tab Pane -->
+          <div id="tab-pane-1" class="tab-pane active">
+            <div class="card-body bg-white shadow">
+              <product-details [isEditing]="isEditing" (nextStep)="step2.click()" (productDetails)="setProductDetails($event)"></product-details>
+            </div>
+          </div>
+          <!-- /tab pane-->
+
+          <!-- Tab Pane -->
+          <div id="tab-pane-2" class="tab-pane">
+            <div class="card-body bg-white shadow">
+              <interest-details (nextStep)="step3.click()" [isEditing]="isEditing" [currentDepositProduct]="productDetails" (interestDetails)="setInterestDetails($event)"></interest-details>
+            </div>
+          </div>
+          <!-- /tab pane-->
+          <!-- Tab Pane -->
+          <div id="tab-pane-3" class="tab-pane">
+            <div class="card-body bg-white shadow">
+              <balance-details (nextStep)="step4.click()" [currentDepositProduct]="productDetails" (balanceDetails)="setBalanceDetails($event)"></balance-details>
+            </div>
+          </div>
+          <!-- /tab pane-->
+          <!-- Tab Pane -->
+          <div id="tab-pane-4" class="tab-pane">
+            <div class="card-body bg-white shadow">
+              <fees-details [isloading]="loader" [isEditing]="isEditing" [currentDepositProduct]="productDetails" (feeDetails)="setFeeDetails($event)" (saveProduct)="save()"></fees-details>
+            </div>
+          </div>
+          <!-- /tab pane-->
+        </div>
+        <!-- /tab content -->
+      </div>
+    </div>
+
+  </div>

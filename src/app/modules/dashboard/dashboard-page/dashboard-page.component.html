@@ -1,0 +1,750 @@
+<ng-container *ngIf="!useNewLoanDashboard">
+  <!-- Grid -->
+  <div class="row">
+    <!-- Grid Item -->
+    <!-- Grid Item -->
+    <div class="col-md-3 col-6">
+      <!-- Card -->
+      <div class="dt-card dt-card__full-height">
+        <!-- Card Body -->
+        <div
+          class="dt-card__body p-4"
+          [style.background]="
+            currentTheme.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+          "
+        >
+          <!-- Media -->
+          <div class="media">
+            <i
+              class="icon icon-company icon-2x mr-2 align-self-center text-warning"
+            ></i>
+
+            <!-- Media Body -->
+            <div class="media-body">
+              <h2
+                class="mb-1 h1"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ countMetricsData?.ActiveBranches || "0" }}
+              </h2>
+              <p
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{
+                  countMetricsData?.ActiveBranches == 1
+                    ? "Active Branch"
+                    : "Active Branches"
+                }}
+              </p>
+            </div>
+            <!-- /media body -->
+          </div>
+          <!-- /media -->
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+    </div>
+    <!-- /grid item -->
+
+    <!-- Grid Item -->
+    <div class="col-md-3 col-6">
+      <!-- Card -->
+      <div class="dt-card dt-card__full-height">
+        <!-- Card Body -->
+        <div
+          class="dt-card__body p-4"
+          [style.background]="
+            currentTheme.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+          "
+        >
+          <!-- Media -->
+          <div class="media">
+            <i class="icon icon-company icon-2x mr-2 align-self-center"></i>
+
+            <!-- Media Body -->
+            <div class="media-body">
+              <h2
+                class="mb-1 h1"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ countMetricsData?.InactiveBranches || "0" }}
+              </h2>
+              <p
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{
+                  countMetricsData?.InactiveBranches == 1
+                    ? "Inactive Branch"
+                    : "Inactive Branches"
+                }}
+              </p>
+            </div>
+            <!-- /media body -->
+          </div>
+          <!-- /media -->
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+    </div>
+    <!-- /grid item -->
+    <!-- Grid Item -->
+    <div class="col-md-3 col-6">
+      <!-- Card -->
+      <div class="dt-card dt-card__full-height">
+        <!-- Card Body -->
+        <div
+          class="dt-card__body p-4"
+          [style.background]="
+            currentTheme.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+          "
+        >
+          <!-- Media -->
+          <div class="media">
+            <i
+              class="icon icon-diamond icon-2x mr-2 align-self-center text-warning"
+            ></i>
+
+            <!-- Media Body -->
+            <div class="media-body">
+              <h2
+                class="mb-1 h1"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ countMetricsData?.ActiveLoanTypes || "0" }}
+              </h2>
+              <p
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{
+                  countMetricsData?.ActiveLoanTypes == 1
+                    ? "Active Loan Type"
+                    : "Active Loan Types"
+                }}
+              </p>
+            </div>
+            <!-- /media body -->
+          </div>
+          <!-- /media -->
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+    </div>
+    <!-- /grid item -->
+
+    <!-- Grid Item -->
+    <div class="col-md-3 col-6">
+      <!-- Card -->
+      <div class="dt-card dt-card__full-height">
+        <!-- Card Body -->
+        <div
+          class="dt-card__body p-4"
+          [style.background]="
+            currentTheme.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+          "
+        >
+          <!-- Media -->
+          <div class="media">
+            <i class="icon icon-diamond icon-2x mr-2 align-self-center"></i>
+
+            <!-- Media Body -->
+            <div class="media-body">
+              <h2
+                class="mb-1 h1"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ countMetricsData?.InactiveLoanTypes || "0" }}
+              </h2>
+              <p
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{
+                  countMetricsData?.InactiveLoanTypes == 1
+                    ? "Inactive Loan Type"
+                    : "Inactive Loan Types"
+                }}
+              </p>
+            </div>
+            <!-- /media body -->
+          </div>
+          <!-- /media -->
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+    </div>
+    <!-- /grid item -->
+  </div>
+  <!-- /grid -->
+
+  <div class="row" *ngIf="applicationdata.data && showMetrics">
+    <!-- <div class="col-xl-4"> -->
+    <!-- Grid Item -->
+    <div
+      class="col-xl-4"
+      *ngFor="let row of applicationdata.data; let i = index"
+    >
+      <!-- Card -->
+      <div
+        class="dt-card dt-card__full-height"
+        *ngIf="
+          currentuser?.permission?.includes(row?.permission) && row != null
+        "
+        [style.background]="
+          currentTheme.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+        "
+      >
+        <!-- Card Header -->
+        <div class="dt-card__header">
+          <!-- Card Heading -->
+          <div class="dt-card__heading">
+            <h3
+              class="dt-card__title orange"
+              [style.color]="
+                currentTheme.theme === 'Dark'
+                  ? currentTheme?.dark?.textColor
+                  : currentTheme?.primaryColor
+              "
+            >
+              <i *ngIf="row?.tag == 'Pool'" class="icon icon-apps mr-2"></i>
+              <i
+                *ngIf="row?.tag == 'Verification'"
+                class="icon icon-circle-check mr-2"
+              ></i>
+              <i
+                *ngIf="row?.tag == 'Disbursement'"
+                class="icon icon-revenue-new mr-2"
+              ></i>
+              <i *ngIf="row?.tag == 'Review'" class="icon icon-tasks mr-2"></i>
+              <i
+                *ngIf="row?.tag == 'batchedLoans'"
+                class="icon icon-tasks mr-2"
+              ></i>
+              {{ row?.tag }}
+            </h3>
+          </div>
+          <!-- /card heading -->
+
+          <!-- Card Tools -->
+          <div class="dt-card__tools">
+            <div
+              class="btn-group btn-group-xs mb-2 tabs-container"
+              role="group"
+              aria-label="Basic example"
+            >
+              <ul class="nav" role="tablist">
+                <li class="nav-item">
+                  <button
+                    type="button"
+                    class="btn btn-xs gray-outline nav-link active f-9"
+                    data-toggle="tab"
+                    [attr.href]="'#recent_' + i"
+                    role="tab"
+                    aria-controls="recent"
+                    aria-selected="true"
+                  >
+                    Today
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button
+                    type="button"
+                    class="btn btn-xs gray-outline nav-link f-9"
+                    data-toggle="tab"
+                    [attr.href]="'#mtd_' + i"
+                    role="tab"
+                    aria-controls="mtd"
+                    aria-selected="true"
+                  >
+                    MTD2
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button
+                    type="button"
+                    class="btn btn-xs gray-outline nav-link f-9"
+                    data-toggle="tab"
+                    [attr.href]="'#ytd_' + i"
+                    role="tab"
+                    aria-controls="ytd"
+                    aria-selected="true"
+                  >
+                    YTD
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- /card tools -->
+        </div>
+        <!-- /card header -->
+
+        <!-- Card Body -->
+        <div class="dt-card__body">
+          <!-- Grid -->
+
+          <!-- Tab Content -->
+          <div class="tab-content">
+            <!-- Tab Pane -->
+            <div attr.id="recent_{{ i }}" class="tab-pane active">
+              <div class="row no-gutters">
+                <!-- Grid Item -->
+                <div class="col-sm-12 pr-sm-2 mb-6 mb-sm-0">
+                  <h3
+                    class="dt-card__title mb-2 text-light-gray f-12"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ row?.description }}
+                  </h3>
+                  <h2
+                    class="display-2 f-24 font-weight-medium mb-3 f-18"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ row?.todayValue | number : "1.2-2" }}
+                  </h2>
+                  <a
+                    href="javascript:void(0)"
+                    class="d-inline-block text-black-50 f-10"
+                    style="float: right"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    <span class="f-20 font-weight-semibold">{{
+                      row?.todayCount
+                    }}</span
+                    >&nbsp; {{ row?.name
+                    }}<span *ngIf="row?.todayCount != 1">s</span>
+                  </a>
+                </div>
+                <!-- /grid item -->
+              </div>
+              <!-- /grid -->
+            </div>
+
+            <!-- Tab Pane -->
+            <div attr.id="mtd_{{ i }}" class="tab-pane">
+              <div class="row no-gutters">
+                <!-- Grid Item -->
+                <div class="col-sm-12 pr-sm-2 mb-6 mb-sm-0">
+                  <h3 class="dt-card__title mb-2 text-light-gray f-12">
+                    {{ row?.description }}
+                  </h3>
+                  <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ row?.monthValue | number : "1.2-2" }}
+                  </h2>
+
+                  <a
+                    href="javascript:void(0)"
+                    class="d-inline-block text-black-50 f-10"
+                    style="float: right"
+                  >
+                    <span class="f-20 font-weight-semibold"
+                      >{{ row?.monthCount }}&nbsp;</span
+                    >{{ row?.name }}<span *ngIf="row?.monthCount != 1">s</span>
+                  </a>
+                </div>
+                <!-- /grid item -->
+              </div>
+              <!-- /grid -->
+            </div>
+
+            <!-- Tab Pane -->
+            <div attr.id="ytd_{{ i }}" class="tab-pane">
+              <div class="row no-gutters">
+                <!-- Grid Item -->
+                <div class="col-sm-12 pr-sm-2 mb-6 mb-sm-0">
+                  <h3 class="dt-card__title mb-2 text-light-gray f-12">
+                    {{ row?.description }}
+                  </h3>
+                  <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ row?.yearValue | number : "1.2-2" }}
+                  </h2>
+
+                  <a
+                    href="javascript:void(0)"
+                    class="d-inline-block text-black-50 f-10"
+                    style="float: right"
+                  >
+                    <span class="f-20 font-weight-semibold"
+                      >{{ row?.yearCount }}&nbsp;</span
+                    >{{ row?.name }}<span *ngIf="row?.yearCount != 1">s</span>
+                  </a>
+                </div>
+                <!-- /grid item -->
+              </div>
+              <!-- /grid -->
+            </div>
+          </div>
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+
+      <!-- </div> -->
+    </div>
+    <!-- /grid item -->
+  </div>
+
+  <!-- <div class="row"> -->
+  <div class="row">
+    <!-- <div class="col-xl-4"> -->
+    <!-- Grid Item -->
+    <div class="col-xl-4">
+      <lnd-loan-dash-card
+        [appOwnerInfo]="ownerInformation"
+        [colorTheme]="currentTheme"
+        [id]="awaitingDisbConfirmationMetrics?.tag"
+        [data]="awaitingDisbConfirmationMetrics"
+        [isLoading]="isFetchingAwaitingDisbConfirmation"
+        (getMetrics)="onGetMetrics($event, 'disbursement')"
+      ></lnd-loan-dash-card>
+    </div>
+    <div
+      class="col-xl-4"
+      *ngIf="currentuser?.permission?.includes('View All Loan Applications')"
+    >
+      <lnd-loan-dash-card
+        [appOwnerInfo]="ownerInformation"
+        [colorTheme]="currentTheme"
+        [id]="allLoanApplicationMetrics?.tag"
+        [data]="allLoanApplicationMetrics"
+        [isLoading]="isFetchingallLoanApplication"
+        (getMetrics)="onGetMetrics($event, 'application')"
+      ></lnd-loan-dash-card>
+    </div>
+    <div
+      class="col-xl-4"
+      *ngIf="currentuser?.permission?.includes('View Loans')"
+    >
+      <lnd-loan-dash-card
+        [appOwnerInfo]="ownerInformation"
+        [colorTheme]="currentTheme"
+        [id]="allPaidLoansMetrics?.tag"
+        [data]="allPaidLoansMetrics"
+        [isLoading]="isFetchingallPaidLoans"
+        (getMetrics)="onGetMetrics($event, 'paidLoans')"
+      ></lnd-loan-dash-card>
+    </div>
+    <div class="col-xl-4" *ngFor="let row of loanMetricsData; let i = index">
+      <!-- Card -->
+      <div
+        class="dt-card dt-card__full-height"
+        *ngIf="row != null"
+        [style.background]="
+          currentTheme.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+        "
+      >
+        <!-- Card Header -->
+        <div class="dt-card__header">
+          <!-- Card Heading -->
+          <div class="dt-card__heading">
+            <h3
+              class="dt-card__title orange"
+              [style.color]="
+                currentTheme.theme === 'Dark'
+                  ? currentTheme?.dark?.textColor
+                  : currentTheme?.primaryColor
+              "
+            >
+              <i *ngIf="row?.tag == 'Pool'" class="icon icon-apps mr-2"></i>
+              <i
+                *ngIf="row?.tag == 'Verification'"
+                class="icon icon-circle-check mr-2"
+              ></i>
+              <i
+                *ngIf="row?.tag == 'Disbursement'"
+                class="icon icon-revenue-new mr-2"
+              ></i>
+              <i *ngIf="row?.tag == 'Review'" class="icon icon-tasks mr-2"></i>
+              <i
+                *ngIf="row?.tag === 'BatchedLoans'"
+                class="icon icon-tasks mr-2"
+              ></i>
+
+              {{ row?.tag | humanify }}
+            </h3>
+          </div>
+          <!-- /card heading -->
+
+          <!-- Card Tools -->
+          <div class="dt-card__tools">
+            <div
+              class="btn-group btn-group-xs mb-2 tabs-container"
+              role="group"
+              aria-label="Basic example"
+            >
+              <ul class="nav" role="tablist">
+                <li class="nav-item">
+                  <button
+                    #recent
+                    type="button"
+                    class="btn btn-xs gray-outline nav-link active f-9"
+                    data-toggle="tab"
+                    [attr.href]="'#recent_' + i"
+                    role="tab"
+                    aria-controls="recent"
+                    aria-selected="true"
+                    (click)="setColor(recent, mtd, ytd)"
+                    [ngStyle]="{
+                      background: currentTheme?.primaryColor,
+                      color: '#fff',
+                      'border-color': currentTheme?.primaryColor
+                    }"
+                  >
+                    Today
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button
+                    #mtd
+                    type="button"
+                    class="btn btn-xs gray-outline nav-link f-9"
+                    data-toggle="tab"
+                    [attr.href]="'#mtd_' + i"
+                    role="tab"
+                    aria-controls="mtd"
+                    aria-selected="true"
+                    (click)="setColor(mtd, recent, ytd)"
+                    [ngStyle]="{
+                      'border-color': currentTheme?.primaryColor
+                    }"
+                  >
+                    MTD
+                  </button>
+                </li>
+                <li class="nav-item">
+                  <button
+                    #ytd
+                    type="button"
+                    class="btn btn-xs gray-outline nav-link f-9"
+                    data-toggle="tab"
+                    [attr.href]="'#ytd_' + i"
+                    role="tab"
+                    aria-controls="ytd"
+                    aria-selected="true"
+                    (click)="setColor(ytd, mtd, recent)"
+                    [ngStyle]="{
+                      'border-color': currentTheme?.primaryColor
+                    }"
+                  >
+                    YTD
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <!-- /card tools -->
+        </div>
+        <!-- /card header -->
+
+        <!-- Card Body -->
+        <div class="dt-card__body">
+          <!-- Grid -->
+
+          <!-- Tab Content -->
+          <div class="tab-content">
+            <!-- Tab Pane -->
+            <div attr.id="recent_{{ i }}" class="tab-pane active">
+              <div class="row no-gutters">
+                <!-- Grid Item -->
+                <div class="col-sm-12 pr-sm-2 mb-6 mb-sm-0">
+                  <h3
+                    class="dt-card__title mb-2 text-light-gray f-12"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ row?.description }}
+                  </h3>
+                  <h2
+                    class="display-2 f-24 font-weight-medium mb-3 f-18"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ row?.todayValue | number : "1.2-2" }}
+                  </h2>
+
+                  <a
+                    href="javascript:void(0)"
+                    class="d-inline-block text-black-50 f-10"
+                    style="float: right"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor + ' !important'
+                        : ''
+                    "
+                  >
+                    <span class="f-20 font-weight-semibold">{{
+                      row?.todayCount
+                    }}</span
+                    >&nbsp; {{ row?.name
+                    }}<span *ngIf="row?.todayCount != 1">s</span>
+                  </a>
+                </div>
+                <!-- /grid item -->
+              </div>
+              <!-- /grid -->
+            </div>
+
+            <!-- Tab Pane -->
+            <div attr.id="mtd_{{ i }}" class="tab-pane">
+              <div class="row no-gutters">
+                <!-- Grid Item -->
+                <div class="col-sm-12 pr-sm-2 mb-6 mb-sm-0">
+                  <h3
+                    class="dt-card__title mb-2 text-light-gray f-12"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ row?.description }}
+                  </h3>
+                  <h2
+                    class="display-2 f-24 font-weight-medium mb-3 f-18"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ row?.monthValue | number : "1.2-2" }}
+                  </h2>
+
+                  <a
+                    href="javascript:void(0)"
+                    class="d-inline-block text-black-50 f-10"
+                    style="float: right"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    <span class="f-20 font-weight-semibold"
+                      >{{ row?.monthCount }}&nbsp;</span
+                    >{{ row?.name }}<span *ngIf="row?.monthCount != 1">s</span>
+                  </a>
+                </div>
+                <!-- /grid item -->
+              </div>
+              <!-- /grid -->
+            </div>
+
+            <!-- Tab Pane -->
+            <div attr.id="ytd_{{ i }}" class="tab-pane">
+              <div class="row no-gutters">
+                <!-- Grid Item -->
+                <div class="col-sm-12 pr-sm-2 mb-6 mb-sm-0">
+                  <h3
+                    class="dt-card__title mb-2 text-light-gray f-12"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ row?.description }}
+                  </h3>
+                  <h2
+                    class="display-2 f-24 font-weight-medium mb-3 f-18"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ row?.yearValue | number : "1.2-2" }}
+                  </h2>
+
+                  <a
+                    href="javascript:void(0)"
+                    class="d-inline-block text-black-50 f-10"
+                    style="float: right"
+                    [style.color]="
+                      currentTheme.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    <span class="f-20 font-weight-semibold"
+                      >{{ row?.yearCount }}&nbsp;</span
+                    >{{ row?.name }}<span *ngIf="row?.yearCount != 1">s</span>
+                  </a>
+                </div>
+                <!-- /grid item -->
+              </div>
+              <!-- /grid -->
+            </div>
+          </div>
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+
+      <!-- </div> -->
+    </div>
+    <!-- /grid item -->
+  </div>
+</ng-container>
+<lnd-new-loan-dashboard
+  *ngIf="useNewLoanDashboard"
+  (switchDashboard)="onSwitchDashboard()"
+></lnd-new-loan-dashboard>

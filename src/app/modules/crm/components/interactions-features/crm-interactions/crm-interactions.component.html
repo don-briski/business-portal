@@ -1,0 +1,120 @@
+<div *ngIf="isLoading" class="d-flex flex justify-content-center">
+  <lnd-spinner text="Retrieving Interactions" />
+</div>
+
+<ng-container *ngIf="!isLoading">
+  <main class="py-5">
+    <header class="d-flex justify-content-between align-items-center">
+      <h3 class="mb-0">Customer Interactions</h3>
+
+      <button
+        *ngIf="permissions.includes('Manage Prospect Case')"
+        class="btn btn-xs text-white"
+        [style.backgroundColor]="colorTheme.secondaryColor"
+        (click)="raiseCase()"
+      >
+        Raise Case
+      </button>
+    </header>
+
+    <section class="mt-5">
+      <lnd-table
+        [config]="tableConfig"
+        [headers]="tableHeaders"
+        [data]="tableData"
+        (retrieveRowDetails)="viewCase($event)"
+      />
+    </section>
+  </main>
+</ng-container>
+
+<lnd-popup
+  [title]="popupTitle"
+  [togglePopup]="showPopup"
+  type="default"
+  size="medium"
+  (closePopup)="togglePopup()"
+>
+  <form class="pop-content" [formGroup]="form">
+    <div class="form-row">
+      <div class="col-md-6">
+        <label>Case Type <b class="text-danger">*</b></label>
+        <slct-2
+          [data]="caseTypes"
+          placeholder="Select Case"
+          formControlName="caseTypeId"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label>Stage <b class="text-danger">*</b></label>
+        <slct-2
+          [data]="caseStages"
+          placeholder="Select Stage"
+          formControlName="stage"
+          [disabled]="this.selectedCase ? true : false"
+        />
+      </div>
+    </div>
+
+    <div class="form-row my-5">
+      <div class="col-md-12">
+        <label>Title <b class="text-danger">*</b></label>
+        <input
+          type="text"
+          placeholder="Enter Title"
+          class="form-control"
+          formControlName="title"
+        />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="col-md-12">
+        <lnd-text-area-with-char-limit label="Description" placeholder="Enter Description" charLimit="250" [isRequired]="true" [inputValue]="form.value?.description" (value)="setDescription($event)"/>
+      </div>
+    </div>
+  </form>
+
+  <footer class="pop-footer">
+    <ng-container *ngIf="!isProcessing">
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="togglePopup()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn text-white"
+        [style.backgroundColor]="colorTheme?.secondaryColor"
+        [disabled]="form.invalid"
+        (click)="submit()"
+      >
+        Submit
+      </button>
+    </ng-container>
+    <button *ngIf="isProcessing" class="btn btn-xs btn-warning mx-1" disabled>
+      <i class="icon icon-spin icon-spin2"></i> Processing..
+    </button>
+  </footer>
+</lnd-popup>
+
+<lnd-aside
+  [isOpen]="showAside"
+  [shrinkWidth]="true"
+  [usesCustomHeader]="true"
+  (closeAside)="showAside = false"
+>
+  <lnd-case
+    *ngIf="showAside"
+    [secondaryColor]="colorTheme?.secondaryColor"
+    [showAside]="showAside"
+    [selectedCase]="selectedCase"
+    [permissions]="permissions"
+    (editCase)="editCase($event)"
+    (stageUpdated)="updateStage($event)"
+    (closeAside)="showAside = false"
+  />
+</lnd-aside>

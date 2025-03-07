@@ -1,0 +1,39 @@
+<div class="card">
+  <table *ngIf="activities.length" class="table mb-0 table-striped">
+    <thead class="thead-light">
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Description</th>
+        <th scope="col">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let atvy of activities">
+        <td [style.color]="colorTheme.secondaryColor">
+          {{ atvy.appActivityId }}
+        </td>
+        <td>{{ atvy.activityDescription }}</td>
+        <td>
+          {{ atvy.activityDate | customDatePipe }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div
+    *ngIf="!activities.length"
+    class="d-flex flex-column align-items-center w-100 py-3"
+  >
+    <p class="text-center font-weight-light mb-0">
+      <lnd-spinner *ngIf="fetching"></lnd-spinner>
+      <span *ngIf="!fetching">No Activities Available</span>
+    </p>
+    <img
+      *ngIf="!fetching"
+      src="assets/images/no data.svg"
+      alt="no-data-svg"
+      width="200px"
+      class="py-5"
+    />
+  </div>
+</div>

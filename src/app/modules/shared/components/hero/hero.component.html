@@ -1,0 +1,43 @@
+<section class="dt-content">
+  <div
+    class="profile__banner"
+    [style.background]="
+      currentTheme?.theme === 'dark'
+        ? currentTheme?.dark?.primaryColor
+        : bgColor
+    "
+  >
+    <div class="profile__banner-top">
+      <div class="dt-avatar-wrapper">
+        <div class="dt-avatar-info">
+          <span class="mb-2 dt-avatar-name display-4 font-weight-light">{{
+            title
+          }}</span>
+          <span class="f-16">{{ subTitle }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile__banner-bottom mb-5">
+      <ul class="card-header-pills nav nav-pills" role="tablist">
+        <li
+          *ngFor="let tab of tabs; let i = index"
+          (click)="switchTab(i)"
+          class="nav-item cursor"
+          [ngClass]="{ active: currentTabIndex === i }"
+        >
+          <a
+            [style.background]="
+              currentTabIndex === i ? currentTheme.primaryColor : ''
+            "
+            class="nav-link"
+            [ngClass]="{ 'active show': currentTabIndex === i }"
+            data-toggle="tab"
+            role="tab"
+            >{{ tab }}</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

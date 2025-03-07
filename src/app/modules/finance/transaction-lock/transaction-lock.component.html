@@ -1,0 +1,578 @@
+<div class="row">
+  <div class="col-xl-10 offset-md-1">
+    <div class="card">
+      <section class="container-fluid">
+        <nav
+          class="shadow p-3 mb-5 bg-white rounded d-flex justify-content-between align-items-center mb-5"
+        >
+          <h4 class="mb-0">
+            You can {{ lockAllTransaction ? "unlock" : "also lock " }} all
+            transactions (Accountant, Purchases, Sales) at once
+          </h4>
+          <button
+            *ngIf="!lockAllTransaction"
+            class="btn btn-primary btn-sm"
+            [style.borderColor]="colorTheme.secondaryColor"
+            [style.backgroundColor]="colorTheme.secondaryColor"
+            type="button"
+            (click)="triggerLockAllPopup(lockAllTransactions)"
+          >
+            Lock All Transactions
+          </button>
+
+          <div *ngIf="lockAllTransaction">
+            <button
+              class="btn btn-info btn-sm mr-1"
+              type="button"
+              (click)="triggerLockAllPopup(lockAllTransactions)"
+            >
+              Partial Unlock
+            </button>
+          </div>
+        </nav>
+
+        <div class="row">
+          <div
+            *ngFor="let item of transactionLocks | keyvalue"
+            class="col-md-4"
+          >
+            <div class="card p-3">
+              <header
+                class="d-flex justify-content-between align-items-center py-3"
+              >
+                <h1 class="mb-0">{{ item.key }}</h1>
+                <span>
+                  <img
+                    *ngIf="item.value.status === 'Complete'"
+                    src="assets/images/icons8-lock-100.png"
+                    alt="lock-icon"
+                    width="30"
+                    height="30"
+                  />
+
+                  <img
+                    *ngIf="
+                      item.value.status === 'Unset' ||
+                      item.value.status === 'Partial'
+                    "
+                    src="assets/images/icons8-unlock-100.png"
+                    alt="lock-icon"
+                    width="30"
+                    height="30"
+                  />
+                </span>
+              </header>
+
+              <div class="card-header">
+                <p
+                  *ngIf="item.value.status === 'Unset'"
+                  class="mb-0 text-center"
+                >
+                  No Transaction Lock Yet
+                </p>
+                <p
+                  *ngIf="item.value.status === 'Complete'"
+                  class="mb-0 text-center"
+                >
+                  Transactions created on or before
+                  <b>{{ item.value.date | customDatePipe }}</b> have been locked
+                </p>
+                <p
+                  *ngIf="item.value.status === 'Partial'"
+                  class="mb-0 text-center"
+                >
+                  Partial unlock enabled from
+                  <b>{{
+                    item.value.unlockIntervalStartDate | customDatePipe
+                  }}</b>
+                  to
+                  <b>{{ item.value.unlockIntervalEndDate | customDatePipe }}</b>
+                </p>
+              </div>
+
+              <div class="card-body text-center">
+                <p class="font-italic"><b>Applies to</b></p>
+                <p>{{ item.value.typeInfo }}</p>
+              </div>
+
+              <button
+                *ngIf="item.value.status === 'Unset'"
+                class="btn btn-block btn-sm btn-primary"
+                [style.borderColor]="colorTheme.secondaryColor"
+                [style.backgroundColor]="colorTheme.secondaryColor"
+                type="button"
+                (click)="openModal(addLock, item, 'lock')"
+              >
+                Lock Transaction <i class="ml-2 icon icon-lock-screen"></i>
+              </button>
+
+              <div
+                *ngIf="item.value.status !== 'Unset'"
+                class="d-flex align-items-center"
+              >
+                <button
+                  class="btn btn-block btn-sm btn-primary mr-1"
+                  [style.borderColor]="colorTheme.secondaryColor"
+                  [style.backgroundColor]="colorTheme.secondaryColor"
+                  type="button"
+                  (click)="openModal(viewLock, item)"
+                >
+                  View Transaction <i class="ml-2 icon icon-lock-screen"></i>
+                </button>
+
+                <div ngbDropdown class="d-inline-block ml-1">
+                  <button
+                    type="button"
+                    class="btn btn-warning"
+                    id="dropdownBasic1"
+                    ngbDropdownToggle
+                  ></button>
+                  <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                    <button
+                      *ngIf="!item.value?.unlockReason"
+                      ngbDropdownItem
+                      type="button"
+                      (click)="openModal(partialLock, item, 'partialUnlock')"
+                    >
+                      Unlock Partially
+                    </button>
+
+                    <button
+                      *ngIf="item.value?.unlockReason"
+                      ngbDropdownItem
+                      type="button"
+                      (click)="triggerPartialUnlockPopup(item)"
+                    >
+                      Disable Partial Unlock
+                    </button>
+
+                    <button
+                      ngbDropdownItem
+                      (click)="openModal(unlock, item, 'unlock')"
+                    >
+                      Unlock Completely
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<ng-template #addLock>
+  <div class="p-3">
+    <header class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">Lock - {{ selectedTransaction.key }}</h1>
+      <span
+        aria-hidden="true"
+        class="cursor"
+        (click)="closeModal()"
+        style="font-size: 30px"
+        >&times;</span
+      >
+    </header>
+
+    <form
+      [formGroup]="lockForm"
+      (ngSubmit)="submitLockForm('lock')"
+      class="mt-5"
+    >
+      <div class="col-md-12">
+        <div class="form-group">
+          <ng-template #dateInfo>
+            Transactions recorded before this date would be locked
+          </ng-template>
+          <label
+            >Date
+            <i
+              class="icon icon-question-circle ml-1"
+              placement="right"
+              [ngbTooltip]="dateInfo"
+            >
+            </i
+            ><span class="text-danger">*</span></label
+          >
+
+          <input
+          lndInvalidDateChecker
+            type="date"
+            [max]="maxDate"
+            class="form-control"
+            formControlName="date"
+          />
+          <lnd-input-errors
+            label="Date"
+            [control]="lockForm.get('date')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="form-group">
+          <ng-template #reasonInfo> Reason for lock </ng-template>
+          <label
+            >Reason
+            <i
+              class="icon icon-question-circle ml-1"
+              placement="right"
+              [ngbTooltip]="reasonInfo"
+            >
+            </i
+            ><span class="text-danger">*</span></label
+          >
+          <textarea
+            formControlName="lockReason"
+            class="form-control"
+          ></textarea>
+          <lnd-input-errors
+            label="Reason"
+            [control]="lockForm.get('lockReason')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <button
+          *ngIf="!isLoading; else processing"
+          class="btn btn-sm btn-primary"
+          [style.borderColor]="colorTheme.secondaryColor"
+          [style.backgroundColor]="colorTheme.secondaryColor"
+          type="submit"
+          [disabled]="lockForm.invalid"
+        >
+          Lock Transaction
+        </button>
+
+        <ng-template #processing>
+          <button class="btn btn-xs btn-warning mx-1" disabled>
+            <i class="icon icon-spin icon-spin2"></i> Processing..
+          </button>
+        </ng-template>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #viewLock>
+  <div class="p-3">
+    <header
+      class="d-flex justify-content-between align-items-center"
+      style="border-bottom: 1px solid gainsboro"
+    >
+      <div class="d-flex align-items-center">
+        <h1 class="mb-0 mr-4">{{ selectedTransaction.key }}</h1>
+        <span>
+          <img
+            *ngIf="selectedTransaction.value.status !== 'Unset'"
+            src="assets/images/icons8-lock-100.png"
+            alt="lock-icon"
+            width="30"
+            height="30"
+          />
+
+          <img
+            *ngIf="selectedTransaction.value.status === 'Unset'"
+            src="assets/images/icons8-unlock-100.png"
+            alt="lock-icon"
+            width="30"
+            height="30"
+          />
+        </span>
+      </div>
+
+      <span
+        aria-hidden="true"
+        class="cursor"
+        (click)="closeModal()"
+        style="font-size: 30px"
+        >&times;</span
+      >
+    </header>
+
+    <div class="mt-5">
+      <div class="reason mb-4" *ngIf="selectedTransaction.value?.lockReason">
+        <div class="mb-2 text-danger">
+          <span
+            ><i class="icon icon-datepicker mr-2"></i>
+            {{ selectedTransaction.value.date | customDatePipe }}</span
+          >
+        </div>
+        <p>
+          Transactions created before
+          <b>{{ selectedTransaction.value.date | customDatePipe }}</b> have been
+          locked
+        </p>
+        <p class="mb-0">
+          <b>Reason : </b>{{ selectedTransaction.value?.lockReason }}
+        </p>
+      </div>
+      <div class="reason" *ngIf="selectedTransaction.value?.unlockReason">
+        <div class="mb-2 text-success">
+          <span
+            ><i class="icon icon-datepicker mr-2"></i>
+            {{
+              selectedTransaction.value.unlockIntervalStartDate | customDatePipe
+            }}
+            -
+            {{
+              selectedTransaction.value.unlockIntervalEndDate | customDatePipe
+            }}</span
+          >
+        </div>
+        <p>
+          Partial unlock enabled from
+          <b>{{
+            selectedTransaction.value.unlockIntervalStartDate | customDatePipe
+          }}</b>
+          to
+          <b>{{
+            selectedTransaction.value.unlockIntervalEndDate | customDatePipe
+          }}</b>
+        </p>
+        <p class="mb-0">
+          <b>Reason : </b>{{ selectedTransaction.value?.unlockReason }}
+        </p>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #partialLock>
+  <div class="p-3">
+    <header class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">Unlock Partially - {{ selectedTransaction.key }}</h1>
+      <span
+        aria-hidden="true"
+        class="cursor"
+        (click)="closeModal('partialUnlock')"
+        style="font-size: 30px"
+        >&times;</span
+      >
+    </header>
+
+    <form
+      [formGroup]="partialUnlockForm"
+      (ngSubmit)="submitLockForm('unlock')"
+      class="mt-5"
+    >
+      <div class="col-md-12">
+        <div class="form-group">
+          <p>Transactions can be created/recorded during this period</p>
+
+          <div class="form-row">
+            <div class="col-md-6">
+              <label>Start Date <span class="text-danger">*</span></label>
+
+              <input
+              lndInvalidDateChecker
+                [max]="partialUnlockEndDate"
+                type="date"
+                class="form-control"
+                formControlName="unlockIntervalStartDate"
+              />
+              <lnd-input-errors
+                label="Start Date"
+                [control]="partialUnlockForm.get('unlockIntervalStartDate')"
+              ></lnd-input-errors>
+            </div>
+            <div class="col-md-6">
+              <label>End Date <span class="text-danger">*</span></label>
+
+              <input
+              lndInvalidDateChecker
+                type="date"
+                [min]="partialUnlockStartDate"
+                [max]="partialUnlockEndDate"
+                class="form-control"
+                formControlName="unlockIntervalEndDate"
+              />
+              <lnd-input-errors
+                label="End Date"
+                [control]="partialUnlockForm.get('unlockIntervalEndDate')"
+              ></lnd-input-errors>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="form-group">
+          <label>Reason <span class="text-danger">*</span></label>
+          <textarea
+            formControlName="unlockReason"
+            class="form-control"
+          ></textarea>
+          <lnd-input-errors
+            label="Reason"
+            [control]="partialUnlockForm.get('unlockReason')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <button
+          *ngIf="!isLoading; else processing"
+          class="btn btn-sm btn-primary"
+          [style.borderColor]="colorTheme.secondaryColor"
+          [style.backgroundColor]="colorTheme.secondaryColor"
+          type="submit"
+          [disabled]="partialUnlockForm.invalid"
+        >
+          Unlock Transaction
+        </button>
+
+        <ng-template #processing>
+          <button class="btn btn-xs btn-warning mx-1" disabled>
+            <i class="icon icon-spin icon-spin2"></i> Processing..
+          </button>
+        </ng-template>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #lockAllTransactions>
+  <div class="p-3">
+    <header class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">Lock - All Transactions</h1>
+      <span
+        aria-hidden="true"
+        class="cursor"
+        (click)="closeModal()"
+        style="font-size: 30px"
+        >&times;</span
+      >
+    </header>
+
+    <form
+      [formGroup]="lockForm"
+      (ngSubmit)="submitLockForm('lockall')"
+      class="mt-5"
+    >
+      <div class="col-md-12">
+        <div class="form-group">
+          <ng-template #dateInfo>
+            All Transactions recorded before this date would be locked
+          </ng-template>
+          <label
+            >Date
+            <i
+              class="icon icon-question-circle ml-1"
+              placement="right"
+              [ngbTooltip]="dateInfo"
+            >
+            </i
+            ><span class="text-danger">*</span></label
+          >
+
+          <input lndInvalidDateChecker type="date" class="form-control" formControlName="date" />
+          <lnd-input-errors
+            label="Date"
+            [control]="lockForm.get('date')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <div class="form-group">
+          <ng-template #reasonInfo> Reason for lock </ng-template>
+          <label
+            >Reason
+            <i
+              class="icon icon-question-circle ml-1"
+              placement="right"
+              [ngbTooltip]="reasonInfo"
+            >
+            </i
+            ><span class="text-danger">*</span></label
+          >
+          <textarea
+            formControlName="lockReason"
+            class="form-control"
+          ></textarea>
+          <lnd-input-errors
+            label="Reason"
+            [control]="lockForm.get('lockReason')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <button
+          *ngIf="!isLoading; else processing"
+          class="btn btn-sm btn-primary"
+          [style.borderColor]="colorTheme.secondaryColor"
+          [style.backgroundColor]="colorTheme.secondaryColor"
+          type="submit"
+          [disabled]="lockForm.invalid"
+        >
+          Lock All Transactions
+        </button>
+
+        <ng-template #processing>
+          <button class="btn btn-xs btn-warning mx-1" disabled>
+            <i class="icon icon-spin icon-spin2"></i> Processing..
+          </button>
+        </ng-template>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #unlock>
+  <div class="p-3">
+    <header class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">Unlock - {{ selectedTransaction.key }}</h1>
+      <span
+        aria-hidden="true"
+        class="cursor"
+        (click)="closeModal('unlock')"
+        style="font-size: 30px"
+        >&times;</span
+      >
+    </header>
+
+    <form
+      [formGroup]="unlockForm"
+      (ngSubmit)="submitUnlockForm('unlock')"
+      class="mt-5"
+    >
+      <div class="col-md-12">
+        <div class="form-group">
+          <label>Reason <span class="text-danger">*</span></label>
+          <textarea
+            formControlName="unlockReason"
+            class="form-control"
+          ></textarea>
+          <lnd-input-errors
+            label="Reason"
+            [control]="unlockForm.get('unlockReason')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+
+      <div class="col-md-12">
+        <button
+          *ngIf="!isLoading; else processing"
+          class="btn btn-sm btn-primary"
+          [style.borderColor]="colorTheme.secondaryColor"
+          [style.backgroundColor]="colorTheme.secondaryColor"
+          type="submit"
+          [disabled]="unlockForm.invalid"
+        >
+          Unlock Transaction
+        </button>
+
+        <ng-template #processing>
+          <button class="btn btn-xs btn-warning mx-1" disabled>
+            <i class="icon icon-spin icon-spin2"></i> Processing..
+          </button>
+        </ng-template>
+      </div>
+    </form>
+  </div>
+</ng-template>

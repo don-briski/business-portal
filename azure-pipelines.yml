@@ -1,0 +1,44 @@
+# Node.js with Angular
+# Build a Node.js project that uses Angular.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+      
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: 18.x
+    displayName: Install Node.js
+
+  - task: Cache@2
+    displayName: load npm cache
+    inputs:
+      key: npm | $(Agent.OS) | $(Build.SourcesDirectory)/package.json
+      restoreKeys: |
+        npm | "$(Agent.OS)"
+      path: $(Build.SourcesDirectory)/node_modules
+      cacheHitVar: CACHE_HIT
+      
+  - script: |
+      npm install --legacy-peer-deps
+      npm run build-prod 
+    displayName: npm install and build
+
+  - "${{ if and(not(eq(variables['Build.Reason'], 'PullRequest')), not(startsWith(variables['Build.SourceBranch'], 'refs/heads/release/'))) }}":
+    - task: PublishBuildArtifacts@1
+      displayName: Packaging for Dev
+      inputs:
+        PathtoPublish: diss
+        ArtifactName: lenda-business-portal-artifact
+
+  - "${{ if and(not(eq(variables['Build.Reason'], 'PullRequest')), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')) }}":
+    - task: PublishBuildArtifacts@1
+      displayName: Packaging for Prod
+      inputs:
+        PathtoPublish: diss
+        ArtifactName: lenda-business-portal-artifact-prod

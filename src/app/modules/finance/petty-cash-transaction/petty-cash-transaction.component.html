@@ -1,0 +1,1878 @@
+<div class="dt-page__header">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Petty Cash Transactions</h1>
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <a
+          class="btn btn-primary mr-2 text-white"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [routerLink]="['/finance/pettycash/transaction/create']"
+          routerLinkActive="router-link-active"
+          href="javascript:void(0)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New</a
+        >
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xl-12">
+    <ul
+      id="active-div"
+      class="card-header-pills nav nav-pill justify-content-center"
+      role="tablist"
+    >
+      <li class="nav-item">
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{ 'active-tab': currentview == ResultExpectedType_Open }"
+          href="javascript:void(0)"
+          (click)="switchViews(ResultExpectedType_Open)"
+        >
+          Open
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{ 'active-tab': currentview == ResultExpectedType_All }"
+          href="javascript:void(0)"
+          (click)="switchViews(ResultExpectedType_All)"
+        >
+          All Transactions
+        </a>
+      </li>
+    </ul>
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <!-- Tables -->
+
+        <div>
+          <!-- Tables -->
+          <div class="table-responsive">
+            <div class="row m-0">
+              <div class="col-md-4">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                  ><select
+                    [(ngModel)]="transactionPagination.pageSize"
+                    aria-controls="data-table"
+                    (change)="fetchTransactions()"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px"
+                    >entries</span
+                  ></label
+                >
+              </div>
+
+              <div class="col-md-4">
+                <div
+                  *ngIf="transactionsRequestLoader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+              </div>
+
+              <div class="form-group col-md-4">
+                <label style="display: inline-flex; float: right">
+                  <input
+                    type="search"
+                    [(ngModel)]="transactionFetchModel.search"
+                    (keydown.enter)="fetchTransactions()"
+                    placeholder="Enter code or name"
+                    class="form-control form-control-sm mr-3"
+                    aria-controls="data-table"
+                  />
+                  <button
+                    class="btn btn-xs text-white"
+                    [style.background]="currentTheme.secondaryColor"
+                    (click)="fetchTransactions()"
+                  >
+                    <i class="icon icon-search"></i>
+                  </button>
+                </label>
+              </div>
+              <div
+                *ngIf="!transactionsRequestLoader"
+                class="mb-3"
+                aria-live="polite"
+                style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+              >
+                Showing
+                {{
+                  (transactionPagination.pageNumber - 1) *
+                    transactionPagination.pageSize +
+                    1 | number : "1.0-0"
+                }}
+                -
+                {{
+                  (transactionPagination.pageNumber - 1) *
+                    transactionPagination.pageSize +
+                    transactionPagination.count | number : "1.0-0"
+                }}
+                of
+                {{ transactionPagination.totalRecords | number : "1.0-0" }}
+                record(s)
+              </div>
+            </div>
+
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Recipient</th>
+                  <th>Amount</th>
+                  <th>Date Created</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="!transactionsRequestLoader">
+                <tr
+                  *ngFor="let row of transactions"
+                  class="cursor"
+                  (click)="viewTransaction(row, dropdownToggle)"
+                >
+                  <td
+                    class="copy_icon_wrapper"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    <span>{{ row.transactionCode }}</span>
+                    <img
+                      (mouseover)="copy_hover = true"
+                      (mouseleave)="copy_hover = false"
+                      class="copy_icon"
+                      src="assets/images/copy.png"
+                      alt="copy icon"
+                      width="15"
+                      height="15"
+                      (click)="copyCode(row.transactionCode)"
+                      placement="right"
+                      ngbTooltip="Copy Petty Cash Code"
+                    />
+                  </td>
+                  <td>
+                    <span>{{
+                      row.recipient !== "Staff"
+                        ? row?.paymentInformation?.accountName
+                        : row?.createdBy
+                    }}</span>
+                  </td>
+                  <td>
+                    <span>{{ row.amount | number : "1.2-2" }}</span>
+                  </td>
+                  <td>
+                    <span>{{ row.createdAt | date }}</span>
+                  </td>
+                  <td>
+                    <span
+                      class="badge btn-xs mb-1 mr-1"
+                      [ngClass]="{
+                        'badge-warning':
+                          row?.status === PettyCashTransactionStatus_Draft,
+                        'badge-approval':
+                          row?.status ===
+                            PettyCashTransactionStatus_SentForApproval ||
+                          row?.status ===
+                            PettyCashTransactionStatus_AwaitingReconciliationApproval,
+                        'badge-primary':
+                          row?.status ===
+                            PettyCashTransactionStatus_AwaitingReconciliation ||
+                          row?.status ===
+                            PettyCashTransactionStatus_PartialReconciliation,
+                        'badge-success':
+                          row?.status === PettyCashTransactionStatus_Posted ||
+                          row?.status === PettyCashTransactionStatus_Reconciled,
+                        'badge-redraft':
+                          row?.status === PettyCashTransactionStatus_ReDraft,
+                        'badge-danger':
+                          row?.status === PettyCashTransactionStatus_Rejected
+                      }"
+                      >{{
+                        row.status === "SentForApproval"
+                          ? "Awaiting Approval"
+                          : (row.status | humanify)
+                      }}</span
+                    >
+                  </td>
+                  <td>
+                    <div
+                      #dropdownToggle
+                      class="dropdown mr-2 mb-2 d-inline-block"
+                    >
+                      <button
+                        class="btn btn-warning btn-xs dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                      ></button>
+                      <div class="dropdown-menu" x-placement="auto">
+                        <a
+                          *ngIf="
+                            currentuser?.permission?.includes(
+                              'View Petty Cash Transaction'
+                            )
+                          "
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                        >
+                          <i class="icon icon-forward icon-fw mr-2"></i>View</a
+                        >
+                        <a
+                          class="dropdown-item"
+                          *ngIf="
+                            currentuser?.permission?.includes(
+                              'Edit Petty Cash Transaction'
+                            ) &&
+                            (row.status == PettyCashTransactionStatus_Draft ||
+                              row.status == PettyCashTransactionStatus_ReDraft)
+                          "
+                          [routerLink]="[
+                            '/finance/pettycash/transaction/edit/' +
+                              row.pettyCashTransactionId
+                          ]"
+                          routerLinkActive="router-link-active"
+                          href="javascript:void(0)"
+                        >
+                          <i class="icon icon-edit icon-fw mr-2"></i>Edit
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="transactionPagination.hasPreviousPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      fetchTransactions(transactionPagination.pageNumber - 1)
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="transactionsPaginatedJumpModal()"
+                    href="javascript:void(0)"
+                  >
+                    {{ transactionPagination.pageNumber }} of
+                    {{ transactionPagination.maxPage }}
+                    {{ transactionPagination.maxPage > 1 ? "pages" : "page" }}
+                    <span class="sr-only">(current)</span>
+                  </a>
+                  <div
+                    class="transactionsPaginatedJumpModal pagination-menu pagination-menu-right"
+                  >
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="transactionPagination.pageNumber"
+                          (change)="
+                            fetchTransactions(transactionPagination.pageNumber)
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option
+                            *ngFor="let line of transactionPagination.jumpArray"
+                          >
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="transactionsPaginatedJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="page-item" *ngIf="transactionPagination.hasNextPage">
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      fetchTransactions(transactionPagination.pageNumber + 1)
+                    "
+                  >
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+        <!-- /tables -->
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+<!-- Modals -->
+
+<!-- View Transaction -->
+<ng-template #viewTransactionModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      View Petty Cash Transaction Details
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <!-- Modal Body -->
+  <div class="modal-body" style="background-color: #f5f5f5">
+    <div class="container-fluid">
+      <div
+        *ngIf="requestLoader || transaction == null"
+        class="table-loader"
+        style="text-align: center; color: indianred"
+      >
+        <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+      </div>
+
+      <div *ngIf="!requestLoader && transaction != null" class="form-row mt-3">
+        <div class="col-sm-4 mb-3">
+          <label class="label">Code</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ transaction.transactionCode }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label>Recipient Type</label>
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ transaction.recipient }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label>Recipient Information</label>
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ transaction.recipientInformation }}
+          </span>
+        </div>
+
+        <div
+          *ngIf="transaction.recipient == PettyCashPaymentRecipient_ThirdParty"
+        >
+          <div class="col-sm-4 mb-3">
+            <label>Bank Name</label>
+            <span [style.color]="currentTheme?.secondaryColor">
+              {{ transaction.paymentInformation?.bankName }}
+            </span>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Account Number</label>
+            <span [style.color]="currentTheme?.secondaryColor">
+              {{ transaction.paymentInformation?.bankAccountNumber }}
+            </span>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Account Name</label>
+            <span [style.color]="currentTheme?.secondaryColor">
+              {{ transaction.paymentInformation?.accountName }}
+            </span>
+          </div>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Amount</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            transaction.amount | number : "1.2-2"
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Created At</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ transaction.createdAt | date }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3" *ngIf="transaction.createdBy != null">
+          <label class="label">Created By</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ transaction.createdBy?.displayName }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3" *ngIf="transaction.approvedBy != null">
+          <label class="label">Approved By</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ transaction.approvedBy?.displayName }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Status</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            transaction.status | humanify
+          }}</span>
+        </div>
+
+        <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+
+        <div
+          *ngIf="
+            transaction.comments != null && transaction.comments.length != 0
+          "
+          class="col-sm-12"
+          style="overflow: auto"
+        >
+          <h4>Comments</h4>
+          <div *ngFor="let comment of transaction.comments">
+            <span style="font-style: italic">{{ comment.comment }}</span>
+            <br />
+            - {{ comment.name }}, {{ comment.createdAt | date }}
+          </div>
+        </div>
+
+        <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+
+        <div
+          class="col-sm-12 mb-3"
+          *ngIf="
+            transaction.status == PettyCashTransactionStatus_SentForApproval
+          "
+        >
+          <form
+            *ngIf="TransactionApprovalForm"
+            [formGroup]="TransactionApprovalForm"
+            (ngSubmit)="submitApproval()"
+          >
+            <div class="col-sm-4 mb-3">
+              <label>Comment<b class="help-block">*</b></label>
+              <textarea
+                class="form-control"
+                formControlName="comment"
+                rows="3"
+                placeholder="description"
+              >
+              </textarea>
+            </div>
+            <div class="col-sm-4 mb-3">
+              <label>Action<b class="help-block">*</b></label>
+              <select
+                class="custom-select custom-select-xl form-control form-control-xl height"
+                formControlName="activationOption"
+              >
+                <option
+                  *ngFor="let row of pettyCashTransactionActivationOptions"
+                  value="{{ row }}"
+                >
+                  {{ row }}
+                </option>
+              </select>
+            </div>
+            <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+            <div class="col-sm-4">
+              <button
+                type="submit"
+                class="btn btn-primary btn-sm"
+                *ngIf="!loader"
+                [disabled]="TransactionApprovalForm.invalid"
+              >
+                Save
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm"
+                *ngIf="loader"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Processing...
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer" style="background-color: #f5f5f5">
+    <button
+      type="button"
+      class="btn btn-warning btn-sm"
+      (click)="closeModal()"
+      style="color: #fff"
+    >
+      Close
+    </button>
+  </div>
+  <!-- /modal footer -->
+  <!-- /modal body -->
+  <!-- /form -->
+</ng-template>
+
+<!-- Confirmation modal-->
+<div class="modal fade" id="add-new-fd" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="container">
+          <div class="d-flex justify-content-end" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </div>
+          <section style="min-height: 200px" class="d-flex flex-column">
+            <h3 style="text-align: center" class="mt-5">
+              Does Customer Have an Existing <br />Account?
+            </h3>
+            <div
+              class="d-flex justify-content-around align-items-center mt-auto"
+            >
+              <a
+                href="#"
+                class="btn btn-primary text-white"
+                data-target="#add-customer-email-fd"
+                data-toggle="modal"
+                data-dismiss="modal"
+                >Existing Account</a
+              >
+              <a
+                [routerLink]="['/deposits/accounts/new-customer']"
+                class="btn btn-primary mr-2 text-white"
+                data-dismiss="modal"
+                >New Account</a
+              >
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- /Modals -->
+
+<!-- Customizer Sidebar -->
+<aside
+  style="display: block"
+  class="dt-customizer dt-drawer position-right"
+  [ngClass]="{ open: openAside }"
+>
+  <div class="dt-customizer__inner">
+    <!-- Customizer Header -->
+    <div class="dt-customizer__header">
+      <!-- Avatar Wrapper -->
+      <div class="dt-avatar-wrapper">
+        <!-- Avatar -->
+        <img
+          class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+          src="assets/images/male-default-profile.png"
+          alt=""
+        />
+        <!-- /avatar -->
+
+        <!-- Info -->
+        <div class="dt-avatar-info">
+          <span class="dt-avatar-name display-5 mb-2 font-weight-light black"
+            >{{ pettyCashTransaction?.recipientInformation }}
+            &nbsp;
+            <span
+              class="badge mb-1 mr-1"
+              [ngClass]="{
+                'badge-warning':
+                  pettyCashTransaction?.status ===
+                  PettyCashTransactionStatus_Draft,
+                'badge-approval':
+                  pettyCashTransaction?.status ===
+                    PettyCashTransactionStatus_SentForApproval ||
+                  pettyCashTransaction?.status ===
+                    PettyCashTransactionStatus_AwaitingReconciliationApproval,
+                'badge-primary':
+                  pettyCashTransaction?.status ===
+                    PettyCashTransactionStatus_AwaitingReconciliation ||
+                  pettyCashTransaction?.status ===
+                    PettyCashTransactionStatus_PartialReconciliation,
+                'badge-success':
+                  pettyCashTransaction?.status ===
+                    PettyCashTransactionStatus_Posted ||
+                  pettyCashTransaction?.status ===
+                    PettyCashTransactionStatus_Reconciled,
+                'badge-redraft':
+                  pettyCashTransaction?.status ===
+                  PettyCashTransactionStatus_ReDraft,
+                'badge-danger':
+                  pettyCashTransaction?.status ===
+                  PettyCashTransactionStatus_Rejected,
+                'badge-secondary':
+                  pettyCashTransaction?.status === 'Awaiting Approval'
+              }"
+            >
+              <i class="icon icon-folder-o"></i>
+              {{ pettyCashTransaction?.status | humanify }}
+            </span>
+          </span>
+          <span class="f-12"
+            ><span style="color: #1e5a8a">{{
+              pettyCashTransaction?.transactionCode
+            }}</span> </span
+          ><br />
+          <a
+            class="btn btn-xs btn-primary"
+            [routerLink]="[
+              '/finance/pettycash/transaction/edit/' +
+                pettyCashTransaction?.pettyCashTransactionId
+            ]"
+            *ngIf="
+              pettyCashTransaction?.status ==
+                PettyCashTransactionStatus_Draft ||
+              pettyCashTransaction?.status == PettyCashTransactionStatus_ReDraft
+            "
+            >Edit Transaction
+          </a>
+        </div>
+        <!-- /info -->
+      </div>
+      <!-- /avatar wrapper -->
+
+      <!-- Close Button -->
+      <button type="button" class="close" (click)="toggleAside()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <!-- /close button -->
+    </div>
+    <!-- /customizer header -->
+    <!-- Customizer Body -->
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <div class="row">
+        <div class="col-md-12" style="padding: 20px">
+          <!-- List -->
+          <ul class="dt-list dt-list-one-second padded-left">
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Petty Cash Amount</span
+                  >
+                  <h5 class="mb-0">
+                    <b>{{ pettyCashTransaction?.amount | currency : currencySymbol }}</b>
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Petty Cash Balance</span
+                  >
+                  <h5 class="mb-0">
+                    <b>{{ pettyCashTransaction?.balance | currency : currencySymbol }}</b>
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Created by</span
+                  >
+                  <h5 class="mb-0">
+                    {{ pettyCashTransaction?.createdBy }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-datepicker icon-2x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1">Created</span>
+                  <h5 class="mb-0">
+                    {{ pettyCashTransaction?.createdAt | date : "dd-MM-yyyy" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li
+              class="dt-list__item"
+              *ngIf="pettyCashTransaction?.approvedBy != null"
+            >
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Approved by</span
+                  >
+                  <h5 class="mb-0">
+                    {{ pettyCashTransaction?.approvedBy?.displayName }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Recipient</span
+                  >
+                  <h5 class="mb-0">
+                    {{ pettyCashTransaction?.recipient }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Account Paid Through</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      getAccountNumber(
+                        pettyCashTransaction?.paidThroughAccountId
+                      )
+                    }}
+                    -
+                    {{
+                      getAccountName(pettyCashTransaction?.paidThroughAccountId)
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Source Account</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      getAccountNumber(pettyCashTransaction?.sourceAccountId)
+                    }}
+                    - {{ pettyCashTransaction?.sourceAccount }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-datepicker icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Transaction Date</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      pettyCashTransaction?.transactionDate
+                        | customDatePipe : "DD-MM-YYYY"
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+          </ul>
+          <!-- /list -->
+        </div>
+      </div>
+      <!-- Customizer Body Inner  -->
+      <div class="">
+        <br />
+        <!-- Section -->
+        <div class="dt-card__body">
+          <ul
+            class="nav nav-underline flex-row border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li
+              *ngIf="pettyCashTransaction?.paymentInformation"
+              class="nav-item"
+            >
+              <a
+                class="nav-link"
+                data-toggle="tab"
+                href="#paymentInfoTab"
+                role="tab"
+                aria-controls="tab-pane2"
+                aria-selected="true"
+                >Payment Information</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                (click)="
+                  fetchPettyCashTransactionActivities(
+                    pettyCashTransaction?.pettyCashTransactionId
+                  )
+                "
+                data-toggle="tab"
+                href="#commentsAndActivitiesTab"
+                role="tab"
+                aria-controls="tab-pane3"
+                aria-selected="true"
+                >Activities</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-toggle="tab"
+                href="#approvalTab"
+                role="tab"
+                aria-controls="tab-pane3"
+                aria-selected="true"
+                >Approval Comments</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                (click)="
+                  fetchPettyCashFiles(
+                    pettyCashTransaction?.pettyCashTransactionId
+                  )
+                "
+                data-toggle="tab"
+                href="#filesTab"
+                role="tab"
+                aria-controls="tab-pane3"
+                aria-selected="true"
+                >Files</a
+              >
+            </li>
+            <li
+              class="nav-item"
+              *ngIf="
+                pettyCashTransaction?.status ===
+                  PettyCashTransactionStatus_Posted ||
+                pettyCashTransaction?.status ===
+                  PettyCashTransactionStatus_Reconciled ||
+                pettyCashTransaction?.status ===
+                  PettyCashTransactionStatus_AwaitingReconciliation ||
+                pettyCashTransaction?.status ===
+                  PettyCashTransactionStatus_PartialReconciliation ||
+                pettyCashTransaction?.status ===
+                  PettyCashTransactionStatus_AwaitingReconciliationApproval
+              "
+            >
+              <a
+                class="nav-link"
+                data-toggle="tab"
+                href="#reconciliationTab"
+                role="tab"
+                aria-controls="tab-pane3"
+                aria-selected="true"
+                (click)="
+                  fetchPettyCashReconciliationLog(
+                    pettyCashTransaction?.pettyCashTransactionId
+                  )
+                "
+                >Reconciliation Log</a
+              >
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- tab 1-->
+            <div
+              *ngIf="pettyCashTransaction?.paymentInformation"
+              id="paymentInfoTab"
+              class="tab-pane"
+            >
+              <div class="row">
+                <!-- Grid Item -->
+                <div class="col-xl-12">
+                  <!-- Card -->
+                  <div class="card">
+                    <!-- Card Header -->
+                    <div
+                      class="card-header card-nav bg-transparent d-flex justify-content-between"
+                    >
+                      <!-- <h4 class="mb--20 text-uppercase">Account Information</h4> -->
+                      <ul
+                        class="card-header-links nav nav-underline"
+                        role="tablist"
+                      >
+                        <li class="nav-item">
+                          <a
+                            class="nav-link active"
+                            data-toggle="tab"
+                            href="#account-tab"
+                            role="tab"
+                            aria-controls="account-tab"
+                            aria-selected="true"
+                            >Payment Information</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                    <!-- /card header -->
+                    <!-- Card Body -->
+                    <div class="card-body pb-2">
+                      <!-- Tab Content-->
+                      <div class="tab-content mt-5">
+                        <!-- Tab panel -->
+                        <div id="account-tab" class="tab-pane active">
+                          <!-- List -->
+                          <ul class="dt-list">
+                            <!-- List Item -->
+                            <li
+                              *ngIf="
+                                pettyCashTransaction?.paymentInformation
+                                  ?.accountName
+                              "
+                              class="dt-list__item"
+                            >
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="icon icon-user-o icon-4x mr-5 align-self-center text-warning"
+                                ></i>
+                                <!-- Media Body -->
+                                <div class="media-body">
+                                  <span
+                                    class="d-block text-light-gray f-12 mb-1"
+                                    >Account Name</span
+                                  >
+                                  <h5
+                                    class="mb-0"
+                                    style="word-break: break-all"
+                                  >
+                                    {{
+                                      pettyCashTransaction?.paymentInformation
+                                        ?.accountName
+                                    }}
+                                  </h5>
+                                </div>
+                                <!-- /media body -->
+                              </div>
+                              <!-- /media -->
+                            </li>
+                            <!-- /list item -->
+                            <!-- List Item -->
+                            <li
+                              *ngIf="
+                                pettyCashTransaction?.paymentInformation
+                                  ?.bankAccountNumber
+                              "
+                              class="dt-list__item"
+                            >
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="icon icon-company icon-4x mr-5 align-self-center text-warning"
+                                ></i>
+
+                                <!-- Media Body -->
+                                <div class="media-body">
+                                  <span
+                                    class="d-block text-light-gray f-12 mb-1"
+                                    >Account Number</span
+                                  >
+                                  <h5
+                                    class="mb-0"
+                                    style="word-break: break-all"
+                                  >
+                                    {{
+                                      pettyCashTransaction?.paymentInformation
+                                        ?.bankAccountNumber
+                                    }}
+                                  </h5>
+                                </div>
+                                <!-- /media body -->
+                              </div>
+                              <!-- /media -->
+                            </li>
+                            <!-- /list item -->
+
+                            <!-- List Item -->
+                            <li
+                              *ngIf="
+                                pettyCashTransaction?.paymentInformation
+                                  ?.bankName
+                              "
+                              class="dt-list__item"
+                            >
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="icon icon-company icon-4x mr-5 align-self-center text-warning"
+                                ></i>
+
+                                <!-- Media Body -->
+                                <div class="media-body">
+                                  <span
+                                    class="d-block text-light-gray f-12 mb-1"
+                                    >Bank</span
+                                  >
+                                  <h5
+                                    class="mb-0"
+                                    style="word-break: break-all"
+                                  >
+                                    {{
+                                      pettyCashTransaction?.paymentInformation
+                                        ?.bankName
+                                    }}
+                                  </h5>
+                                </div>
+                                <!-- /media body -->
+                              </div>
+                              <!-- /media -->
+                            </li>
+                            <!-- /list item -->
+                          </ul>
+                          <!-- /list -->
+                        </div>
+                        <!-- /tab panel -->
+                      </div>
+                      <!-- /tab content-->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- /grid item -->
+              </div>
+            </div>
+
+            <div id="commentsAndActivitiesTab" class="tab-pane active">
+              <div class="row">
+                <div class="col-xl-8">
+                  <!-- Card -->
+                  <div class="pb-4 dt-card">
+                    <!-- Card Header -->
+                    <div class="mb-3 dt-card__header">
+                      <!-- Card Heading -->
+                      <div class="dt-card__heading">
+                        <!-- <h3 class="dt-card__title">Activities</h3> -->
+                      </div>
+                      <!-- /card heading -->
+
+                      <!-- Card Tools -->
+                      <div class="dt-card__tools">
+                        <a
+                          href="javascript:void(0)"
+                          (click)="
+                            fetchPettyCashTransactionActivities(
+                              pettyCashTransaction?.pettyCashTransactionId
+                            )
+                          "
+                          class="dt-card__more"
+                          >Refresh Activities
+                          <i class="ml-2 icon icon-ripple icon-xl"></i
+                        ></a>
+                      </div>
+                      <!-- /card tools -->
+                    </div>
+                    <!-- /card header -->
+
+                    <!-- Card Body -->
+                    <div class="p-0 dt-card__body">
+                      <div
+                        *ngIf="this.requestLoader"
+                        class="table-loader"
+                        style="text-align: center; color: indianred"
+                      >
+                        <span>
+                          <i class="icon icon-spin icon-spin2"></i>
+                          Loading...</span
+                        >
+                      </div>
+
+                      <!-- Tables -->
+                      <div class="table-responsive">
+                        <table
+                          class="table mb-0 table-striped"
+                          style="font-size: 11px"
+                        >
+                          <thead class="thead-light">
+                            <tr>
+                              <!-- <th class="text-center" scope="col">Activity</th> -->
+                              <th scope="col">Description</th>
+                              <th class="text-center" scope="col">Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let row of transactionActivities">
+                              <!-- <td class="text-center code">
+                                {{ row?.relatedObjectInitiatorCode }}
+                              </td> -->
+                              <td>{{ row?.activityDescription }}</td>
+                              <td class="text-center code">
+                                {{ row?.activityDate | date : "dd/MMM/YYYY" }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <!-- /tables -->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                  <!-- /card -->
+                </div>
+              </div>
+            </div>
+
+            <div id="approvalTab" class="tab-pane">
+              <div class="row">
+                <div
+                  class="col-6"
+                  *ngIf="
+                    TransactionApprovalForm &&
+                    pettyCashTransaction?.status ==
+                      PettyCashTransactionStatus_SentForApproval &&
+                    currentuser?.permission?.includes(
+                      'Approve Petty Cash Transaction'
+                    )
+                  "
+                >
+                  <form [formGroup]="TransactionApprovalForm">
+                    <div class="row mb-6">
+                      <!-- /grid item -->
+                      <div class="col-md-8">
+                        <label>Comment<b class="help-block">*</b></label>
+                        <textarea
+                          formControlName="comment"
+                          class="form-control"
+                          rows="4"
+                          cols="10"
+                          placeholder="Write approval comment here."
+                        ></textarea>
+                        <br />
+                        <div class="form-group w-50">
+                          <label class="input-group-text"
+                            ><small>Enter Transaction Pin</small></label
+                          >
+                          <br />
+                          <input
+                            type="password"
+                            class="form-control"
+                            formControlName="transactionPin"
+                            placeholder="************"
+                            autocomplete="off"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="form-group">
+                          <button
+                            (click)="
+                              submitApproval(
+                                PettyCashTransactionActivationOptions_Approve
+                              )
+                            "
+                            type="button"
+                            class="btn btn-success text-uppercase success-alert"
+                            *ngIf="!loader"
+                            [disabled]="TransactionApprovalForm.invalid"
+                          >
+                            Approve
+                          </button>
+                          &nbsp;
+                          <button
+                            (click)="
+                              submitApproval(
+                                PettyCashTransactionActivationOptions_ReDraft
+                              )
+                            "
+                            type="button"
+                            class="btn btn-warning text-uppercase success-alert"
+                            *ngIf="!loader"
+                            [disabled]="TransactionApprovalForm.invalid"
+                          >
+                            Redraft
+                          </button>
+                          &nbsp;
+                          <button
+                            (click)="
+                              submitApproval(
+                                PettyCashTransactionActivationOptions_Reject
+                              )
+                            "
+                            type="button"
+                            class="btn btn-danger text-uppercase success-alert"
+                            *ngIf="!loader"
+                            [disabled]="TransactionApprovalForm.invalid"
+                          >
+                            Reject
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-primary btn-sm"
+                            *ngIf="loader"
+                            [disabled]="true"
+                          >
+                            <i class="icon icon-spin icon-spin2"></i>
+                            Processing...
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-6">
+                  <!-- Tables -->
+                  <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                      <thead class="thead-light">
+                        <tr>
+                          <th scope="col">User</th>
+                          <th scope="col">Comment</th>
+                          <th scope="col">Date Created</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="
+                            let item of pettyCashTransaction?.reviewComments
+                          "
+                        >
+                          <td>
+                            {{ pettyCashTransaction?.approvedBy?.displayName }}
+                          </td>
+                          <td>{{ item?.comment }}</td>
+                          <td>
+                            {{ item?.createdAt | date : "dd/MMM/YYYY" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- /tables -->
+                </div>
+              </div>
+            </div>
+
+            <div id="filesTab" class="tab-pane">
+              <lnd-uploaded-files
+                [files]="transactionFiles"
+              ></lnd-uploaded-files>
+            </div>
+
+            <div id="reconciliationTab" class="tab-pane">
+              <div class="row">
+                <div class="col-md-10">
+                  <!-- Card -->
+                  <div class="pb-4 dt-card">
+                    <!-- Card Header -->
+                    <div class="mb-3 dt-card__header">
+                      <!-- Card Heading -->
+                      <div class="dt-card__heading">
+                        <button
+                          class="btn btn-xs btn-info mr-4"
+                          (click)="newReconciliationLog(logReconciliationModal)"
+                          *ngIf="
+                            pettyCashTransaction?.status !==
+                              PettyCashTransactionStatus_Reconciled &&
+                            currentuser?.permission?.includes(
+                              'Reconcile Petty Cash'
+                            )
+                          "
+                        >
+                          Add New
+                        </button>
+                        <span
+                          class="approval-buttons ml-3"
+                          *ngIf="reconciliationSelection?.selected?.length > 0"
+                        >
+                          <button
+                            class="btn btn-xs btn-success mr-4"
+                            (click)="
+                              initLogApprovalForm(
+                                true,
+                                false,
+                                false,
+                                logReconciliationApprovalModal
+                              )
+                            "
+                          >
+                            Approve
+                          </button>
+                          <button
+                            class="btn btn-xs btn-warning mr-4"
+                            (click)="
+                              initLogApprovalForm(
+                                false,
+                                false,
+                                true,
+                                logReconciliationApprovalModal
+                              )
+                            "
+                          >
+                            Redraft
+                          </button>
+                          <button
+                            class="btn btn-xs btn-danger mr-4"
+                            (click)="
+                              initLogApprovalForm(
+                                false,
+                                true,
+                                false,
+                                logReconciliationApprovalModal
+                              )
+                            "
+                          >
+                            Reject
+                          </button>
+                        </span>
+                      </div>
+                      <!-- /card heading -->
+
+                      <!-- Card Tools -->
+                      <div class="dt-card__tools">
+                        <a
+                          href="javascript:void(0)"
+                          (click)="
+                            fetchPettyCashReconciliationLog(
+                              pettyCashTransaction?.pettyCashTransactionId
+                            )
+                          "
+                          class="dt-card__more"
+                          >Refresh Logs
+                          <i class="ml-2 icon icon-ripple icon-xl"></i
+                        ></a>
+                      </div>
+                      <!-- /card tools -->
+                    </div>
+                    <!-- /card header -->
+
+                    <!-- Card Body -->
+                    <div class="p-0 dt-card__body">
+                      <div
+                        *ngIf="this.logLoader"
+                        class="table-loader"
+                        style="text-align: center; color: indianred"
+                      >
+                        <span>
+                          <i class="icon icon-spin icon-spin2"></i>
+                          Loading...</span
+                        >
+                      </div>
+
+                      <!-- Tables -->
+                      <div class="table-responsive" *ngIf="!logLoader">
+                        <table
+                          class="table mb-0 table-striped"
+                          style="font-size: 11px"
+                        >
+                          <thead class="thead-light">
+                            <tr>
+                              <th
+                                class="text-center"
+                                *ngIf="
+                                  currentuser?.permission?.includes(
+                                    'Approve Petty Cash Reconciliation'
+                                  )
+                                "
+                              >
+                                <input
+                                  type="checkbox"
+                                  [checked]="isAllLogsSelected()"
+                                  (change)="masterToggle()"
+                                  [indeterminate]="isAllLogsIndeterminate()"
+                                />
+                              </th>
+                              <th class="text-center" scope="col">
+                                Transaction Date
+                              </th>
+                              <th class="text-center" scope="col">
+                                Description
+                              </th>
+                              <th class="text-center" scope="col">Files</th>
+                              <th class="text-center" scope="col">
+                                Expense Account
+                              </th>
+                              <th class="text-right" scope="col">Amount</th>
+                              <th class="text-center" scope="col">Status</th>
+                              <th class="text-center" scope="col">Comment</th>
+                              <th
+                                class="text-center"
+                                scope="col"
+                                *ngIf="
+                                  currentuser?.permission?.includes(
+                                    'Reconcile Petty Cash'
+                                  )
+                                "
+                              >
+                                Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              *ngFor="
+                                let row of pettyCashTransaction?.reconciliationLogs
+                              "
+                            >
+                              <td
+                                class="text-center"
+                                *ngIf="
+                                  currentuser?.permission?.includes(
+                                    'Approve Petty Cash Reconciliation'
+                                  )
+                                "
+                              >
+                                <span
+                                  *ngIf="
+                                    row?.status.toLowerCase() !== 'approved' &&
+                                    row?.status.toLowerCase() !== 'rejected'
+                                  "
+                                >
+                                  <input
+                                    type="checkbox"
+                                    [value]="row?.id"
+                                    (change)="
+                                      toggleReconciliationSelection(row)
+                                    "
+                                    [checked]="
+                                      reconciliationSelection.isSelected(row)
+                                    "
+                                  />
+                                </span>
+                              </td>
+                              <td class="text-center">
+                                {{
+                                  row?.transactionDate | date : "dd/MMM/YYYY"
+                                }}
+                              </td>
+                              <td class="text-center">
+                                {{ row?.description }}
+                              </td>
+                              <td class="text-center">
+                                <i
+                                  class="icon icon-editor icon-xl icon-fw mr-2 pointer"
+                                  *ngIf="row?.fileDirectory"
+                                  (click)="
+                                    showReconciliationLogFile(
+                                      row?.fileDirectory?.appFiles,
+                                      logFileModal
+                                    )
+                                  "
+                                ></i>
+                              </td>
+                              <td class="text-center">
+                                {{ getAccountName(row?.expenseAccountId) }}
+                              </td>
+                              <td class="text-right">
+                                {{ row?.amount | number : "1.2-2" }}
+                              </td>
+                              <td class="text-center">
+                                <span
+                                  class="badge btn-xs mb-1 mr-1"
+                                  [ngClass]="{
+                                    'badge-approval':
+                                      row?.status?.toLowerCase() ===
+                                      'awaitingapproval',
+                                    'badge-success':
+                                      row?.status?.toLowerCase() === 'approved',
+                                    'badge-redraft':
+                                      row?.status?.toLowerCase() ===
+                                      'redrafted',
+                                    'badge-danger':
+                                      row?.status?.toLowerCase() === 'rejected'
+                                  }"
+                                  >{{ row?.status | humanify }}</span
+                                >
+                              </td>
+                              <td class="text-center">{{ row?.comments }}</td>
+                              <td
+                                class="text-center"
+                                *ngIf="
+                                  currentuser?.permission?.includes(
+                                    'Reconcile Petty Cash'
+                                  )
+                                "
+                              >
+                                <i
+                                  class="icon icon-edit icon-fw mr-2 pointer"
+                                  *ngIf="
+                                    row?.status.toLowerCase() !== 'approved' &&
+                                    row?.status.toLowerCase() !== 'rejected'
+                                  "
+                                  (click)="
+                                    editReconciliationLog(
+                                      row,
+                                      logReconciliationModal
+                                    )
+                                  "
+                                ></i>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <!-- /tables -->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                  <!-- /card -->
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /tab content -->
+        </div>
+      </div>
+      <!-- /section -->
+    </div>
+    <!-- /customizer body inner -->
+  </div>
+</aside>
+
+<div *ngIf="openAside" class="dt-backdrop" (click)="toggleAside()"></div>
+<!-- /customizer sidebar -->
+
+<ng-template #logReconciliationModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">Log Petty Cash Transaction</h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <!-- Modal Body -->
+
+  <form [formGroup]="reconciliationLogForm" (ngSubmit)="submitReconciliation()">
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="form-group mb-3">
+        <label>Expense Account<b class="help-block"> *</b></label>
+        <slct-2
+          formControlName="expenseAccount"
+          [data]="expenseAccount"
+          placeholder="Select Expense Account"
+        ></slct-2>
+      </div>
+      <div class="form-row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label>Amount <b class="help-block"> *</b></label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="Amount"
+              currencyMask
+              [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+            />
+            <small class="form-text text-danger mt-0"
+              >Petty cash balance:
+              {{ pettyCashTransaction?.balance | number : "1.2-2" }}</small
+            >
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label>Transaction Date<b class="help-block"> *</b></label>
+            <input
+            lndInvalidDateChecker
+              type="date"
+              class="form-control"
+              formControlName="TransactionDate"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="form-group mb-3">
+        <label>Description<b class="help-block"> *</b></label>
+        <textarea
+          cols="30"
+          rows="10"
+          class="form-control"
+          formControlName="Description"
+        ></textarea>
+      </div>
+      <div class="col-md-12">
+        <div>
+          <span
+            *ngFor="let file of reconciliationLogFiles; let fileIndex = index"
+            class="badge badge-pill badge-outline mr-2 px-3 mb-1"
+            >{{ file.name || file.originalName }}
+            <i
+              class="icon icon-trash ml-2 cursor text-danger"
+              (click)="onRemoveFile(fileIndex)"
+            ></i>
+          </span>
+        </div>
+
+        <div class="my-5">
+          <div class="d-flex mb-1">
+            <small>Attach relevant files </small>
+          </div>
+          <button
+            type="button"
+            class="btn btn-xs btn-secondary text-white"
+            (click)="files.click()"
+          >
+            <i class="icon icon-upload"></i>
+            Attach File(s)
+          </button>
+        </div>
+        <input
+          #files
+          type="file"
+          multiple
+          (change)="handleFileInput($event.target.files)"
+          style="display: none"
+        />
+      </div>
+
+      <div class="d-flex justify-content-end align-items-center">
+        <button
+          class="btn btn-secondary text-white btn-sm"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-sm btn-success mx-1"
+          [disabled]="reconciliationLogForm.invalid || logging"
+        >
+          <i class="icon icon-spin icon-spin2" *ngIf="logging"></i>
+          {{ logging ? "Processing..." : "Submit" }}
+        </button>
+      </div>
+    </div>
+  </form>
+  <!-- /modal body -->
+  <!-- /form -->
+</ng-template>
+<ng-template #logReconciliationApprovalModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      {{
+        logApprovalForm.get("isApproved").value
+          ? "Approve"
+          : logApprovalForm.get("isRedrafted").value
+          ? "Redraft"
+          : "Reject"
+      }}
+      selected logs
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <!-- Modal Body -->
+
+  <form
+    [formGroup]="logApprovalForm"
+    (ngSubmit)="submitReconciliationApproval()"
+  >
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="form-group mb-3">
+        <label>Comment<b class="help-block">*</b></label>
+        <textarea
+          formControlName="comment"
+          class="form-control"
+          rows="4"
+          cols="10"
+          placeholder="Write your comment here."
+        ></textarea>
+        <br />
+        <div class="form-group">
+          <label>Enter Transaction Pin</label>
+          <br />
+          <input
+            type="password"
+            class="form-control"
+            formControlName="transactionPin"
+            placeholder="************"
+            autocomplete="off"
+          />
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end align-items-center">
+        <button
+          class="btn btn-secondary text-white btn-sm"
+          (click)="closeModal()"
+          *ngIf="!approving"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-sm btn-success mx-1"
+          [disabled]="logApprovalForm.invalid || approving"
+        >
+          <i class="icon icon-spin icon-spin2" *ngIf="approving"></i>
+          {{ approving ? "Processing..." : "Submit" }}
+        </button>
+      </div>
+    </div>
+  </form>
+  <!-- /modal body -->
+  <!-- /form -->
+</ng-template>
+<ng-template #logFileModal>
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <lnd-uploaded-files [files]="reconciliationLogFilePopup"></lnd-uploaded-files>
+</ng-template>

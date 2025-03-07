@@ -1,0 +1,64 @@
+$current:#000;
+$complete:#2E8B57;
+section {
+  max-height: 60px;
+  .step-wrapper {
+    position: relative;
+    z-index: 1;
+    stroke-width: 1;
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    top: -108px;
+    padding: 0 22px;
+
+    .text {
+      p {
+        font-size: 14px;
+      }
+
+      small {
+        font-weight: 300;
+      }
+    }
+
+    i {
+      font-size: 20px;
+      font-weight: 900;
+    }
+  }
+
+  .edge-stepper{
+    top: -108px;
+    padding-left: 10px;
+    padding-right: 20px;
+  }
+
+  .edge-stepper-last{
+    padding-left: 22px;
+  }
+
+
+  .complete{
+    color: $complete;
+  }
+
+  .current{
+    color: $current;
+  }
+
+
+  .pending{
+    color: #697386;
+  }
+
+  .stroke-invalid{
+    stroke: red;
+  }
+
+  .invalid{
+    color: red;
+  }
+}

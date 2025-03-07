@@ -1,0 +1,368 @@
+<section [ngClass]="{ hide: previewMode }">
+  <form
+    id="req-config-form"
+    [formGroup]="reqConfigForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <header class="px-5 py-3 d-flex justify-content-between align-items-center">
+      <h1>
+        {{ editMode ? "Edit" : "" }}
+        {{ editMode ? reqConfig.requestName : "Configure a Request" }}
+      </h1>
+      <button
+        type="button"
+        class="close-btn"
+        aria-label="Close"
+        (click)="onCloseForm()"
+      >
+        <i class="icon icon-close"></i>
+      </button>
+    </header>
+    <hr class="divider" />
+    <div *ngIf="editMode" class="edit-info mx-5 mt-2 p-2">
+      <p class="m-0">
+        Please note that your modifications will only apply to future requests
+        and not existing ones.
+      </p>
+    </div>
+    <section class="px-5 pt-4">
+      <div class="row">
+        <div class="col-md-4">
+          <label>Type <b class="text-danger">*</b></label>
+          <slct-2
+            [data]="requestTypes"
+            [customSearchEnabled]="true"
+            placeholder="Select Configuration Type"
+            (selected)="onSelect('requestType', $event)"
+            (removed)="onDeselect('requestType')"
+            [active]="editMode || viewMode ? selectedRequestType : null"
+            [disabled]="viewMode"
+          ></slct-2>
+        </div>
+      </div>
+      <div
+        class="my-5"
+        *ngIf="reqConfigForm.get('requestType').value === 'Payments'"
+      >
+        <div class="row">
+          <div class="col-md-8">
+            <div class="items-card p-2">
+              <header>
+                <h5>
+                  Config type Payments comes with the compulsory fields below
+                  when creating requests:
+                </h5>
+                <ul>
+                  <li>Vendor's Name</li>
+                  <li>Request Payment Date</li>
+                  <li>Request Total Amount</li>
+                </ul>
+              </header>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-5">
+        <div class="col-md-4">
+          <label for="configName">Name <b class="text-danger">*</b></label>
+          <input
+            id="configName"
+            placeholder="Configuration Name"
+            class="form-control"
+            aria-controls="data-table"
+            formControlName="name"
+            [readonly]="viewMode"
+          />
+        </div>
+        <div class="col-md-4">
+          <label for="configId"
+            >ID <b class="text-danger">*</b>
+            <i
+              class="icon icon-question-circle icon-fw icon-xl"
+              placement="top"
+              ngbTooltip="A unique ID that identifies this request configuration"
+            ></i>
+          </label>
+          <input
+            id="configId"
+            class="form-control"
+            aria-controls="data-table"
+            formControlName="requestIdentifier"
+            placeholder="Enter a unique ID"
+            [readonly]="viewMode"
+          />
+        </div>
+      </div>
+      <div class="row my-5">
+        <div class="col-md-4">
+          <div>
+            <label
+              >Applicable Branches <b class="text-danger">*</b>
+              <i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="The branches that can make use of this request configuration"
+              ></i
+            ></label>
+            <slct-2
+              [data]="branches"
+              [active]="
+                editMode || viewMode
+                  ? reqConfigForm.get('branches').value
+                  : null
+              "
+              [customSearchEnabled]="true"
+              [placeholder]="
+                fetchingBranches ? 'Loading Branches...' : 'Select Branch'
+              "
+              [multiple]="true"
+              (selected)="onSelectMany('branches', $event)"
+              (removed)="onDeselectMany('branches', $event)"
+              [allowSelectAll]="true"
+              (selectedAll)="onSelectAll('branches')"
+              (deselectedAll)="onDeselectAll('branches')"
+              [disabled]="viewMode"
+            ></slct-2>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <label
+            >Initiator Type <b class="text-danger">*</b>
+            <i
+              class="icon icon-question-circle icon-fw icon-xl"
+              placement="top"
+              ngbTooltip="The class of users that can create requests using this request configuration"
+            ></i
+          ></label>
+          <slct-2
+            [data]="initiatorTypes"
+            [customSearchEnabled]="true"
+            placeholder="Select Initiator Type"
+            (selected)="onSelect('initiatorType', $event)"
+            (removed)="onDeselect('initiatorType')"
+            [active]="editMode || viewMode ? selectedInitiatorType : null"
+            [disabled]="viewMode"
+          ></slct-2>
+        </div>
+        <div class="col-md-4">
+          <div *ngIf="!fetchingInitiators && initiators.length">
+            <label
+              >Initiators <b class="text-danger">*</b>
+              <i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="Those who can create a request of this configuration"
+              ></i
+            ></label>
+            <slct-2
+              [data]="initiators"
+              [active]="
+                editMode || viewMode
+                  ? reqConfigForm.get('initiators').value
+                  : null
+              "
+              [customSearchEnabled]="true"
+              placeholder="Select Initiators"
+              [multiple]="true"
+              (selected)="onSelectMany('initiators', $event)"
+              (removed)="onDeselectMany('initiators', $event)"
+              [allowSelectAll]="true"
+              (selectedAll)="onSelectAll('initiators')"
+              (deselectedAll)="onDeselectAll('initiators')"
+              [disabled]="viewMode"
+            ></slct-2>
+          </div>
+          <div class="mt-3">
+            <lnd-spinner
+              *ngIf="fetchingInitiators"
+              text="Fetching initiators..."
+            ></lnd-spinner>
+          </div>
+        </div>
+      </div>
+      <h4 class="sub-header">Approval Path</h4>
+      <div class="row">
+        <div class="col-md-4">
+          <label
+            >Approval Type <b class="text-danger">*</b>
+            <i
+              class="icon icon-question-circle icon-fw icon-xl"
+              placement="top"
+              ngbTooltip="The class of users that can approve a request of this configuration"
+            ></i
+          ></label>
+          <slct-2
+            id="approvalType"
+            [data]="approvalTypes"
+            [customSearchEnabled]="true"
+            placeholder="Select Approval Type"
+            (selected)="onSelect('approvalType', $event)"
+            (removed)="onDeselect('approvalType')"
+            [active]="editMode || viewMode ? selectedApprovalType : null"
+            [disabled]="viewMode"
+          ></slct-2>
+        </div>
+        <div class="col-md-8">
+          <div *ngIf="!fetchingApprovers && approvers.length">
+            <label for="approvers"
+              >Approvers <b class="text-danger">*</b>
+              <i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="Those who can approve a request of this configuration"
+              ></i
+            ></label>
+            <slct-2
+              id="approvers"
+              [data]="approvers"
+              [active]="editMode || viewMode ? approversInForm.value : null"
+              [customSearchEnabled]="true"
+              placeholder="Select Approvers"
+              [multiple]="true"
+              (selected)="onSelectMany('approvers', $event)"
+              (removed)="onDeselectMany('approvers', $event)"
+              [customSearchEnabled]="true"
+              [allowSelectAll]="true"
+              (selectedAll)="onSelectAll('approvers')"
+              (deselectedAll)="onDeselectAll('approvers')"
+              [disabled]="viewMode"
+            ></slct-2>
+            <h5 class="mt-3" *ngIf="approversInForm.value?.length > 1">
+              <span
+                class="d-inline-block mr-2 mt-3"
+                *ngFor="
+                  let approver of approversInForm.value;
+                  let apprvIndex = index
+                "
+                >{{ approver.text }}
+                <i
+                  *ngIf="apprvIndex !== approversInForm.value?.length - 1"
+                  class="icon icon-arrow-right"
+                ></i
+              ></span>
+            </h5>
+          </div>
+          <div class="mt-3">
+            <lnd-spinner
+              *ngIf="fetchingApprovers"
+              text="Fetching approvers..."
+            ></lnd-spinner>
+          </div>
+        </div>
+      </div>
+      <div
+        *ngIf="
+          (editMode && customForm) || (viewMode && customForm) || !editMode
+        "
+        class="mt-5"
+      >
+        <lnd-custom-field-set
+          [colorTheme]="colorTheme"
+          [customFieldSets]="customFieldSets"
+          [customFormKey]="customForm?.customFormKey"
+          [viewMode]="viewMode"
+        ></lnd-custom-field-set>
+      </div>
+      <div class="mt-5 d-flex">
+        <div class="mr-5">
+          <lnd-switch
+            [text]="
+              reqConfigForm.get('isActive').value ? 'Activated' : 'Activate'
+            "
+            [value]="reqConfigForm.get('isActive').value"
+            (emittedValue)="onSetIsActive($event)"
+            [disabled]="viewMode"
+          ></lnd-switch>
+        </div>
+        <div>
+          <lnd-switch
+            [text]="
+              reqConfigForm.get('requireSupportingDocument').value
+                ? 'File Upload Required'
+                : 'Require File Upload'
+            "
+            [value]="reqConfigForm.get('requireSupportingDocument').value"
+            (emittedValue)="
+              this.reqConfigForm
+                .get('requireSupportingDocument')
+                .setValue($event)
+            "
+            [disabled]="viewMode"
+          ></lnd-switch>
+        </div>
+      </div>
+    </section>
+    <hr class="divider my-5" />
+    <footer class="px-5 mb-5">
+      <div *ngIf="!submitting">
+        <button
+          type="button"
+          class="btn mr-4 close-form-btn"
+          (click)="onCloseForm()"
+          [disabled]="submitting ? true : false"
+        >
+          Close
+        </button>
+        <button
+          *ngIf="!viewMode"
+          type="button"
+          class="btn btn-primary mr-4"
+          (click)="previewMode = true"
+        >
+          Preview
+        </button>
+        <button
+          *ngIf="!viewMode"
+          class="btn btn-primary"
+          [style.borderColor]="colorTheme.secondaryColor"
+          [style.backgroundColor]="colorTheme.secondaryColor"
+          [disabled]="reqConfigForm.invalid"
+        >
+          Submit
+        </button>
+      </div>
+      <button
+        *ngIf="submitting"
+        class="btn text-white"
+        [style.borderColor]="colorTheme.secondaryColor"
+        [style.backgroundColor]="colorTheme.secondaryColor"
+        disabled
+      >
+        <i class="icon icon-spin icon-spin2"></i> Loading...
+      </button>
+    </footer>
+  </form>
+</section>
+<section *ngIf="previewMode">
+  <header class="px-5 py-3">
+    <h1>
+      <i
+        class="icon icon-arrow-left mr-3 cursor"
+        (click)="previewMode = false"
+      ></i>
+      {{ reqConfigForm.get("name").value }} (Preview)
+    </h1>
+  </header>
+  <hr class="divider" />
+  <lnd-request-preview
+    *ngIf="
+      reqConfigForm.get('customForm').value.customFieldSets.length > 0 ||
+        reqConfigForm.get('requestType').value === 'Payments';
+      else noInfo
+    "
+    [configName]="reqConfigForm.get('name').value"
+    [configType]="reqConfigForm.get('requestType').value"
+    [requireSupportingDocument]="
+      reqConfigForm.get('requireSupportingDocument').value
+    "
+    [customForm]="reqConfigForm.get('customForm').value"
+  ></lnd-request-preview>
+  <ng-template #noInfo
+    ><h1 class="mt-5 text-center">Nothing to see yet...</h1></ng-template
+  >
+  <div class="px-5 py-5">
+    <button class="btn mr-4 close-form-btn" (click)="previewMode = false">
+      Back
+    </button>
+  </div>
+</section>

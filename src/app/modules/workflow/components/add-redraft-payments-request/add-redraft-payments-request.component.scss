@@ -1,0 +1,76 @@
+header h1 {
+  margin: 0;
+}
+
+.sub-header {
+  margin-top: 40px;
+}
+
+.close-btn {
+  background: none;
+  outline: none;
+  border: none;
+  padding: 0;
+}
+
+.icon-close {
+  font-size: 34px;
+}
+
+label[for="isActive"] {
+  margin: 0;
+}
+
+.divider {
+  margin: 0;
+}
+
+.close-form-btn {
+  border: 1px solid #8692a6;
+}
+
+.table th,
+.table td,
+.table tbody {
+  border: none;
+}
+
+.c-width {
+  flex: 1;
+}
+
+.table-row,
+.total-amt-container {
+  background: #f3f4f6;
+  border-radius: 6px;
+}
+
+.table-row td {
+  padding: 8px;
+}
+
+.spacer {
+  height: 8px;
+}
+
+.add-btn {
+  border-radius: 6px;
+}
+
+.remove-btn {
+  margin: 5px 4px 5px 12px;
+  color: red;
+  padding: 5px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.amt-err-text {
+  font-size: 12px;
+}
+
+.approver-comment {
+  background: #f3f4f6;
+  border-radius: 6px;
+  box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.25);
+}

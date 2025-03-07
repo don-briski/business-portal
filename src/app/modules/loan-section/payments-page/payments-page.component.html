@@ -1,0 +1,1881 @@
+<div class="dt-content">
+  <div class="dt-page__header">
+    <h1 class="dt-page__title clearfix">
+      <span (click)="switchviews(1)">Payments</span>
+
+      <span class="float-right role-add">
+        <!-- <div
+          *ngIf="currentuser?.permission?.includes('Create Payments')"
+          style="position: relative; right: -5px; bottom: 5px; float: right"
+        >
+          <button
+            [style.borderColor]="currentTheme?.secondaryColor"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            type="button"
+            class="btn btn-primary mr-2 mb-2 orange-bg"
+            (click)="openPaymentModal(addPaymentModal)"
+          >
+            <i class="icon icon-add-circle mr-2"></i>Add New Payment
+          </button>
+        </div> -->
+        <div
+          *ngIf="currentuser?.permission?.includes('Create Payments')"
+          class="dropdown"
+        >
+          <button
+            type="button"
+            class="btn btn-info orange-bg dropdown-toggle dropdown-toggle-split"
+            [style.background]="currentTheme?.secondaryColor"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Add New Payment&nbsp;
+          </button>
+          <div
+            class="dropdown-menu"
+            x-placement="left-start"
+            style="
+              position: absolute;
+              will-change: transform;
+              top: 0px;
+              left: 0px;
+              transform: translate3d(-5px, 0px, 0px);
+            "
+          >
+            <a
+              class="dropdown-item"
+              href="javascript:void(0)"
+              aria-controls="tab-pane3"
+              (click)="
+                openPaymentModal(addPaymentModal); onTabChange('manual-entry')
+              "
+              >Manual Entry</a
+            >
+            <a
+              class="dropdown-item"
+              href="javascript:void(0)"
+              aria-controls="tab-pane1"
+              (click)="
+                openPaymentModal(addPaymentModal, 'lg');
+                onTabChange('bulk-upload')
+              "
+              >Bulk Upload</a
+            >
+          </div>
+        </div>
+      </span>
+    </h1>
+  </div>
+  <div class="row">
+    <div class="col-xl-12">
+      <ul id="active-div" class="nav justify-content-center">
+        <li
+          class="nav-item"
+          *ngIf="currentuser?.permission?.includes('View Repayments Due')"
+        >
+          <a
+            (mouseover)="hover_rd = true"
+            (mouseleave)="hover_rd = false"
+            [ngStyle]="hover_rd ? { color: currentTheme?.secondaryColor } : {}"
+            class="nav-link pool-nav active-tab"
+            href="javascript:void(0)"
+            (click)="switchviews(2)"
+          >
+            Repayments Due
+          </a>
+        </li>
+        <li
+          class="nav-item"
+          *ngIf="currentuser?.permission?.includes('View Payments')"
+        >
+          <a
+            (mouseover)="hover_pr = true"
+            (mouseleave)="hover_pr = false"
+            [ngStyle]="hover_pr ? { color: currentTheme?.secondaryColor } : {}"
+            class="nav-link pool-nav"
+            href="javascript:void(0)"
+            (click)="switchviews(1)"
+            >Payments Recorded
+          </a>
+        </li>
+      </ul>
+      <div class="dt-card">
+        <div
+          style="text-align: center"
+          *ngIf="
+            this.currentview != 1 &&
+            this.currentview != 2 &&
+            this.currentview != 3
+          "
+        >
+          <br />
+          <p
+            style="text-align: center; color: indianred"
+            *ngIf="!requestLoader"
+          >
+            Click on the payment indicator above to view content
+          </p>
+          <a
+            *ngIf="!requestLoader"
+            class="btn btn-refresh btn-xs mb-3 mt-1"
+            type="button"
+            href="javascript:location.reload(true)"
+            >Refresh Page</a
+          >
+        </div>
+        <div class="dt-card__body">
+          <div
+            *ngIf="this.requestLoader"
+            class="table-loader"
+            style="text-align: center; color: indianred"
+          >
+            <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+          </div>
+          <div
+            *ngIf="this.currentview == 2"
+            class="btn-group mr-2 mb-2"
+            role="group"
+            aria-label="Basic example"
+            style="float: right"
+          >
+            <div class="mr-3">
+              <lnd-filter-btn
+                (filterModalOpen)="filtermodal()"
+              ></lnd-filter-btn>
+            </div>
+            <div class="generate-menu generate-menu-right">
+              <div class="generate-menu-header">
+                <h4 class="title">
+                  <i class="icon icon-ckeditor mr-2"></i> Period Selection
+                </h4>
+              </div>
+              <form
+                *ngIf="searchForm"
+                [formGroup]="searchForm"
+                (ngSubmit)="filterReport()"
+              >
+                <div class="generate-menu-body">
+                  <div class="h-auto">
+                    <div class="form-row">
+                      <div class="col-sm-12 mb-3">
+                        <slct-2
+                          [allowClear]="true"
+                          [data]="filterTypeArray"
+                          (selected)="selected('Filter', $event)"
+                          placeholder="Select Filter Type"
+                        >
+                        </slct-2>
+                      </div>
+                    </div>
+                    <div
+                      id="filterdiv"
+                      *ngIf="
+                        reportInputDateType == 1 || reportInputDateType == 2
+                      "
+                    >
+                      <div class="form-row">
+                        <div
+                          *ngIf="reportInputDateType != 1"
+                          class="col-sm-6 mb-3"
+                        >
+                          <label for="validationDefault02"
+                            >Select Preferred Start Date</label
+                          >
+                          <div
+                            class="input-group date"
+                            id="date-time-picker-1"
+                            data-target-input="nearest"
+                          >
+                            <input
+                              lndInvalidDateChecker
+                              type="date"
+                              [(ngModel)]="StartDate"
+                              formControlName="StartDate"
+                              class="form-control"
+                            />
+                            <div class="input-group-append">
+                              <div class="input-group-text">
+                                <i class="icon icon-calendar"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-sm-6 mb-3">
+                          <label
+                            *ngIf="reportInputDateType == 1"
+                            for="validationDefault02"
+                            >Select Preferred Date</label
+                          >
+                          <label
+                            *ngIf="reportInputDateType != 1"
+                            for="validationDefault02"
+                            >Select Preferred End Date</label
+                          >
+                          <div
+                            class="input-group date"
+                            id="date-time-picker-1"
+                            data-target-input="nearest"
+                          >
+                            <input
+                              lndInvalidDateChecker
+                              type="date"
+                              [(ngModel)]="EndDate"
+                              formControlName="EndDate"
+                              class="form-control"
+                            />
+                            <div class="input-group-append">
+                              <div class="input-group-text">
+                                <i class="icon icon-calendar"></i>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="text-center">
+                        <small style="text-align: center; color: indianred">
+                          <i class="icon icon-exclamation"></i> Leave
+                          selection(s) empty to spool all applicable in drop
+                          downs below.</small
+                        >
+                      </div>
+                      <br />
+
+                      <div class="form-row">
+                        <div class="col-sm-12 mb-3">
+                          <label>Select Preferred Loan Type(s) </label>
+                          <div>
+                            <slct-2
+                              [multiple]="true"
+                              [allowSelectAll]="true"
+                              [customSearchEnabled]="true"
+                              [data]="loantypesArray"
+                              (selected)="selected('LoanTypes', $event)"
+                              (removed)="removed('LoanTypes', $event)"
+                              placeholder="Select Loan Types "
+                              (selectedAll)="toggleSelectAll('loanTypes')"
+                              (deselectedAll)="deSelectAll('loanTypes')"
+                            ></slct-2>
+                          </div>
+                        </div>
+
+                        <div class="col-sm-12 mb-3">
+                          <label>Select Preferred Branch(es) </label>
+                          <div>
+                            <slct-2
+                              [allowSelectAll]="true"
+                              [multiple]="true"
+                              [data]="branchesAccessibleArray"
+                              (selected)="selected('AccessibleBranch', $event)"
+                              (removed)="removed('AccessibleBranch', $event)"
+                              placeholder="Select Branches "
+                              (selectedAll)="toggleSelectAll('branches')"
+                              (deselectedAll)="deSelectAll('branches')"
+                              [customSearchEnabled]="true"
+                            ></slct-2>
+                          </div>
+                        </div>
+
+                        <div class="col-sm-12 mb-3">
+                          <label for="validationDefault02" class="left-aligned"
+                            >Search Employer &nbsp;
+                            <span>
+                              <button
+                                type="button"
+                                style="border-radius: 15px"
+                                class="btn btn-floating btn-success btn-xs"
+                                (click)="onLoanSearch(employerSearch, '2')"
+                              >
+                                Search
+                              </button>
+                            </span></label
+                          >
+                          <input
+                            formControlName="EmployerSearch"
+                            placeholder="Enter Search Parameter"
+                            class="form-control"
+                          />
+                          <div
+                            *ngIf="searchrequestLoader"
+                            class="table-loader"
+                            style="text-align: center; color: indianred"
+                          >
+                            <span>
+                              <i class="icon icon-spin icon-spin2"></i>
+                              Searching...Please wait</span
+                            >
+                          </div>
+                          <br />
+                          <span
+                            *ngIf="
+                              selectedEmployer != '' && selectedEmployer != null
+                            "
+                          >
+                            <button
+                              type="button"
+                              style="border-radius: 15px"
+                              class="btn btn-floating btn-warning btn-xs"
+                              (click)="clearInput(2)"
+                            >
+                              Clear Selection
+                            </button>
+                            Filter by: <b>{{ selectedEmployer }}</b>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    class="generate-menu-footer"
+                    *ngIf="reportInputDateType == 1 || reportInputDateType == 2"
+                  >
+                    <div class="footer-right">
+                      <button
+                        type="submit"
+                        class="btn btn-primary btn-xs mr-2"
+                        *ngIf="!loader"
+                        [disabled]="searchForm.invalid"
+                      >
+                        Generate Result
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-xs mr-2"
+                        [disabled]="true"
+                        *ngIf="loader"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Generating ...
+                      </button>
+                      <button
+                        type="button"
+                        (click)="filtermodal()"
+                        class="btn btn-danger btn-xs targeted-close"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div
+            *ngIf="
+              this.currentview == 1 &&
+              currentuser?.permission?.includes('View Payments')
+            "
+            class="tab-pane"
+          >
+            <!-- Pagination Top-->
+            <div class="row">
+              <div class="col-md-8">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                  ><select
+                    [(ngModel)]="pagination.pageSize"
+                    aria-controls="data-table"
+                    (change)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        1
+                      )
+                    "
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px"
+                    >entries</span
+                  ></label
+                >
+              </div>
+
+              <div class="form-group col-md-4">
+                <label style="display: inline-flex; float: right"
+                  ><span style="padding: 10px 2px; font-size: 12px"></span
+                  ><input
+                    type="search"
+                    [(ngModel)]="pagination.searchTerm"
+                    (keydown.enter)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        1
+                      )
+                    "
+                    class="form-control form-control-sm"
+                    placeholder="Code Or Name"
+                    aria-controls="data-table"
+                  />
+                  <button
+                    class="btn btn-xs text-white ml-3"
+                    [style.background]="currentTheme.secondaryColor"
+                    (click)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        1
+                      )
+                    "
+                  >
+                    <i class="icon icon-search"></i>
+                  </button>
+                </label>
+              </div>
+
+              <div
+                class=""
+                aria-live="polite"
+                style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+              >
+                Showing
+                {{ (pagination.pageNum - 1) * pagination.pageSize + 1 }} -
+                {{
+                  (pagination.pageNum - 1) * pagination.pageSize +
+                    pagination.count
+                }}
+                of {{ pagination.totalRecords }} record(s)
+              </div>
+            </div>
+            <!-- /pagination Top -->
+
+            <!-- Tables -->
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>
+                      Code
+                      <span
+                        ><i
+                          class="icon icon-question-circle icon-fw icon-xl"
+                          placement="top"
+                          ngbTooltip="Payments with no payment code are assigned hourly"
+                        ></i
+                      ></span>
+                    </th>
+                    <th>Customer</th>
+                    <th>Payment Date</th>
+                    <th>Transaction Type</th>
+                    <th class="amount-field">
+                      Payment Amount ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </th>
+                    <th class="amount-field">
+                      Amount Unused ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="gradeX cursor"
+                    *ngFor="let row of payments; let i = index"
+                    (click)="onViewPaymentDetails(row)"
+                  >
+                    <td
+                      class="copy_icon_wrapper"
+                      [style.color]="currentTheme?.secondaryColor"
+                      [style.color]="currentTheme?.secondaryColor"
+                    >
+                      {{ row?.paymentCode }}
+                      <img
+                        (mouseover)="copy_hover = true"
+                        (mouseleave)="copy_hover = false"
+                        class="copy_icon"
+                        src="assets/images/copy.png"
+                        alt="copy icon"
+                        width="15"
+                        height="15"
+                        (click)="copyCode(row?.paymentCode)"
+                        placement="right"
+                        ngbTooltip="Copy Payment Code"
+                      />
+                    </td>
+                    <td>{{ row?.person?.displayName | titlecase }}</td>
+                    <td>{{ row?.paymentDate | date : "dd/MM/yyyy" }}</td>
+                    <td>{{ row?.paymentTypeString }}</td>
+                    <td class="amount-field">
+                      {{ row?.paymentAmount | number : "1.2-2" }}
+                    </td>
+                    <td class="amount-field">
+                      {{ row?.paymentAmountLeft | number : "1.2-2" }}
+                    </td>
+
+                    <td>
+                      <a
+                        [style.color]="currentTheme?.secondaryColor"
+                        class="d-inline-block"
+                        href="javascript:void(0)"
+                      >
+                        <i class="icon icon-forward icon-fw mr-2"></i> View
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <!-- /tables -->
+
+            <!-- Pagination Bottom -->
+            <div>
+              <br />
+              <nav>
+                <ul class="pagination pagination-sm justify-content-end">
+                  <li
+                    class="page-item"
+                    *ngIf="
+                      (pagination.pageNum - 1) * pagination.pageSize + 1 > 10
+                    "
+                  >
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        getItemsPaginatedSearch(
+                          this.pagination.searchTerm,
+                          this.pagination.pageSize,
+                          pagination.pageNum - 1
+                        )
+                      "
+                      tabindex="-1"
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item pagination-menu-wrapper">
+                    <a
+                      class="page-link page-target"
+                      (click)="getItemsPaginatedPageJumpModal()"
+                      href="javascript:void(0)"
+                      >{{ pagination.pageNum }} of
+                      {{ this.pagination.maxPage }} page<span
+                        *ngIf="pagination.pageNum > 1"
+                        >s</span
+                      ><span class="sr-only">(current)</span></a
+                    >
+
+                    <div class="pagination-menu pagination-menu-right">
+                      <div class="pagination-menu-body">
+                        <div class="h-auto">
+                          <small>Jump to Page:</small>
+                          <select
+                            aria-controls="data-table"
+                            [(ngModel)]="pagination.pageNum"
+                            (change)="getPayments(pagination.pageNum)"
+                            class="custom-select custom-select-xl form-control form-control-xl height"
+                          >
+                            <option *ngFor="let line of pagination.jumpArray">
+                              {{ line }}
+                            </option>
+                          </select>
+                          <div class="text-center mt-3">
+                            <button
+                              type="button"
+                              (click)="getItemsPaginatedPageJumpModal()"
+                              class="btn btn-danger btn-xs"
+                            >
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li
+                    class="page-item"
+                    *ngIf="this.pagination.pageNum < this.pagination.maxPage"
+                  >
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        getItemsPaginatedSearch(
+                          this.pagination.searchTerm,
+                          this.pagination.pageSize,
+                          pagination.pageNum + 1
+                        )
+                      "
+                      >Next</a
+                    >
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              this.currentview == 2 &&
+              currentuser?.permission?.includes('View Repayments Due')
+            "
+            class="tab-pane"
+          >
+            <div class="row">
+              <div class="col-md-4">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                  ><select
+                    [(ngModel)]="pagination2.pageSize"
+                    aria-controls="data-table"
+                    (change)="
+                      getItemsPaginatedSearch2(
+                        this.pagination2.searchTerm,
+                        this.pagination2.pageSize,
+                        1
+                      )
+                    "
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px"
+                    >entries</span
+                  ></label
+                >
+              </div>
+              <div class="col-md-4 text-center">
+                <span *ngIf="reportInputDateType != 1">
+                  &nbsp;
+                  <span
+                    >From:<span style="color: indianred">
+                      {{ StartDate | date : "dd/MM/yyyy" }}
+                    </span></span
+                  >
+                  &nbsp;
+                  <span
+                    >To:<span style="color: indianred">
+                      {{ EndDate | date : "dd/MM/yyyy" }}</span
+                    ></span
+                  ></span
+                >
+                <span
+                  *ngIf="
+                    reportInputDateType == 1 &&
+                    (endDate != '' || endDate != null)
+                  "
+                >
+                  &nbsp;
+                  <small>
+                    As at Date:<span style="color: indianred">
+                      {{ EndDate | date : "dd/MM/yyyy" }}</span
+                    ></small
+                  >
+                </span>
+              </div>
+              <div class="col-md-12 mb-3">
+                <lnd-selected-filters
+                  [useFilterModel]="false"
+                ></lnd-selected-filters>
+              </div>
+              <div
+                class="col-md-4"
+                aria-live="polite"
+                style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+              >
+                <br />
+                Showing
+                {{ (pagination2.pageNum - 1) * pagination2.pageSize + 1 }} -
+                {{
+                  (pagination2.pageNum - 1) * pagination2.pageSize +
+                    pagination2.count
+                }}
+              </div>
+              <div class="col-md-6" *ngIf="repaymentsdue?.length > 0">
+                <div class="text-center">
+                  <button
+                    type="button"
+                    class="btn btn-warning btn-xs mr-1"
+                    (click)="popupmodal()"
+                  >
+                    Download Result
+                  </button>
+                </div>
+                <div class="popped-menu popped-menu-right">
+                  <div class="popped-menu-header">
+                    <h4 class="title">
+                      <i class="icon icon-ckeditor mr-2"></i> Download Section
+                    </h4>
+                  </div>
+                  <div class="popped-menu-body">
+                    <div class="h-auto">
+                      <small>
+                        <i>
+                          <b class="help-block"> *</b>Do not tamper with
+                          <b>sheet Headers </b>, as well as <b>Loan Codes</b> on
+                          any row.</i
+                        ></small
+                      ><br />
+                      <small>
+                        <i>
+                          <b class="help-block"> *</b>Payment Methods: include
+                          (<b>Cash</b> or <b>Cheque</b>)
+                        </i></small
+                      ><br />
+                      <small>
+                        <i>
+                          <b class="help-block"> *</b>Payment Types: include
+                          (<b>Repayment</b>, <b>Reversal</b> or <b>Refund</b>)
+                        </i></small
+                      ><br />
+                      <small>
+                        <i>
+                          <b class="help-block"> *</b
+                          ><b
+                            >Payment Date (must be uploaded in dd/mm/yyyy
+                            format) </b
+                          >, <b>Payment Method</b> and <b>Payment Amount</b> can
+                          be altered based on the right information .</i
+                        ></small
+                      ><br /><br />
+                      <button
+                        class="btn btn-query btn-xs mr-3"
+                        type="button"
+                        (click)="generateCsvTemplate('limitedfilteredresult')"
+                      >
+                        Download Result ({{
+                          repaymentsdue?.length || "0"
+                        }}
+                        Record<span *ngIf="repaymentsdue?.length > 1">s</span>)
+                      </button>
+                    </div>
+                    <br />
+                    <div class="popped-menu-footer">
+                      <div class="footer-right">
+                        <button
+                          type="button"
+                          (click)="popupmodal()"
+                          class="btn btn-danger btn-xs targeted-close"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="text-align: center" *ngIf="repaymentsdue.length < 1">
+              <img width="200px" src="assets/images/nodata.gif" />
+              <p
+                *ngIf="repaymentsdue.length < 1 && !this.requestLoader"
+                style="text-align: center; color: indianred"
+              >
+                Repayment List is Empty
+              </p>
+              <button
+                class="btn btn-refresh btn-xs mb-3 mt-1"
+                type="button"
+                (click)="switchviews(2)"
+              >
+                Refresh
+              </button>
+            </div>
+            <div class="table-responsive" *ngIf="repaymentsdue?.length > 0">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>
+                      <small
+                        ><i class="icon icon-search icon-fw mr-2"></i>Code
+                      </small>
+                    </th>
+                    <th class="text-center"><small>Branch </small></th>
+                    <th>
+                      <small
+                        ><i class="icon icon-search icon-fw mr-2"></i>Customer
+                      </small>
+                    </th>
+                    <th class="text-center"><small>Loan Type</small></th>
+                    <th class="amount-field">
+                      <small
+                        ><i class="icon icon-search icon-fw mr-2"></i> ({{
+                          ownerInformation?.currency?.currencySymbol
+                        }})Loan Amt.
+                      </small>
+                    </th>
+                    <th class="text-center"><small>Last Payment </small></th>
+                    <th class="amount-field">
+                      <small
+                        >({{
+                          ownerInformation?.currency?.currencySymbol
+                        }})Period Outstanding
+                      </small>
+                    </th>
+                    <th class="amount-field">
+                      <small
+                        >({{ ownerInformation?.currency?.currencySymbol }})Accum
+                        Outstanding
+                      </small>
+                    </th>
+                    <th class="text-center"><small> Actions </small></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    class="gradeX"
+                    *ngFor="let row of repaymentsdue; let i = index"
+                  >
+                    <td
+                      [style.color]="currentTheme?.secondaryColor"
+                      [style.color]="currentTheme?.secondaryColor"
+                    >
+                      {{ row?.loanCode }}
+                    </td>
+                    <td>{{ row?.branchName | titlecase }}</td>
+                    <td>{{ row?.customer | titlecase }}</td>
+                    <td>{{ row?.loanType | titlecase }}</td>
+                    <td class="amount-field">
+                      {{ row?.loanAmount | number : "1.2-2" }}
+                    </td>
+                    <td class="text-center">
+                      <span *ngIf="row?.lastPaymentDate != 'Nil'">
+                        {{ row?.lastPaymentDate | date : "dd/MM/yyyy" }}
+                      </span>
+                      <span *ngIf="row?.lastPaymentDate == 'Nil'">
+                        {{ row?.lastPaymentDate }}
+                      </span>
+                      <span *ngIf="row?.lastPaymentDate == ''"> Nil </span>
+                    </td>
+                    <td class="amount-field">
+                      {{ row?.periodRepaymentOutstanding | number : "1.2-2" }}
+                    </td>
+                    <td class="amount-field">
+                      {{ row?.totalRepaymentOutstanding | number : "1.2-2" }}
+                    </td>
+                    <td class="text-center">
+                      <a
+                        class="d-inline-block"
+                        href="javascript:void(0)"
+                        (click)="PayNow(addPaymentModal, row)"
+                      >
+                        <i class="icon icon-forward icon-fw mr-2"></i> Pay Now
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <br />
+              <nav>
+                <ul class="pagination pagination-sm justify-content-end">
+                  <li
+                    class="page-item"
+                    *ngIf="
+                      (pagination2.pageNum - 1) * pagination2.pageSize + 1 > 10
+                    "
+                  >
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        getItemsPaginatedSearch2(
+                          this.pagination2.searchTerm,
+                          this.pagination2.pageSize,
+                          pagination2.pageNum - 1
+                        )
+                      "
+                      tabindex="-1"
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item pagination-menu-wrapper">
+                    <a
+                      class="page-link page-target"
+                      (click)="getItemsPaginatedPageJumpModal()"
+                      href="javascript:void(0)"
+                      >{{ pagination2.pageNum }} of
+                      {{ this.pagination2.maxPage }} page<span
+                        *ngIf="pagination2.pageNum > 1"
+                        >s</span
+                      ><span class="sr-only">(current)</span></a
+                    >
+                    <div class="pagination-menu pagination-menu-right">
+                      <div class="pagination-menu-body">
+                        <div class="h-auto">
+                          <small>Jump to Page:</small>
+                          <select
+                            aria-controls="data-table"
+                            [(ngModel)]="pagination2.pageNum"
+                            (change)="getRepaymentsDue(pagination2.pageNum)"
+                            class="custom-select custom-select-xl form-control form-control-xl height"
+                          >
+                            <option *ngFor="let line of pagination2.jumpArray">
+                              {{ line }}
+                            </option>
+                          </select>
+                          <div class="text-center mt-3">
+                            <button
+                              type="button"
+                              (click)="getItemsPaginatedPageJumpModal()"
+                              class="btn btn-danger btn-xs"
+                            >
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li
+                    class="page-item"
+                    *ngIf="this.pagination2.pageNum < this.pagination2.maxPage"
+                  >
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        getItemsPaginatedSearch2(
+                          this.pagination2.searchTerm,
+                          this.pagination2.pageSize,
+                          pagination2.pageNum + 1
+                        )
+                      "
+                      >Next</a
+                    >
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <lnd-aside [isOpen]="viewDetails" (closeAside)="viewDetails = false">
+    <div class="ml-3" header>
+      <div class="dt-avatar-wrapper">
+        <img
+          class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+          [src]="paymentInfo?.loan?.customerImageUrl || 'assets/images/male-default-profile.png'"
+          alt="Default"
+        />
+        <div class="dt-avatar-info">
+          <span class="display-5 mb-2 font-weight-light">
+            {{ paymentInfo?.person?.displayName }} &nbsp;
+            <span
+              *ngIf="
+                paymentInfo?.paymentAmountLeft == paymentInfo?.paymentAmount
+              "
+            >
+              <span class="badge badge-warning btn-xs mb-1 mr-1"
+                >Not-Applied</span
+              >
+            </span>
+            <span
+              *ngIf="
+                paymentInfo?.paymentAmountLeft != paymentInfo?.paymentAmount
+              "
+            >
+              <span
+                *ngIf="paymentInfo?.paymentAmountLeft == 0"
+                class="badge badge-success btn-xs mb-1 mr-1"
+                >Applied</span
+              >
+              <span
+                *ngIf="paymentInfo?.paymentAmountLeft > 0"
+                class="badge badge-warning btn-xs mb-1 mr-1"
+                >Partial</span
+              >
+            </span>
+          </span>
+          <span class="f-12"
+            ><span
+              [style.color]="currentTheme?.secondaryColor"
+              [style.color]="currentTheme?.secondaryColor"
+              >{{ paymentInfo?.paymentCode }} :
+              {{ paymentInfo?.branch?.branchName }}</span
+            >
+          </span>
+          <br />
+          <span
+            ><span *ngIf="paymentInfo?.person?.emailAddress != null">
+              <i class="icon icon-email icon-xl mr-5"></i>&nbsp;
+              {{ paymentInfo?.person?.emailAddress }}</span
+            >
+            &nbsp;&nbsp;<span *ngIf="paymentInfo?.person?.phoneNumber != null">
+              <i class="icon icon-phone icon-xl mr-5"></i> &nbsp;{{
+                paymentInfo?.person?.phoneNumber
+              }}
+            </span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12" style="padding: 20px">
+        <ul class="dt-list dt-list-one-second padded-left">
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Payment Amount</span
+                >
+                <h5 class="mb-0">
+                  <b
+                    >{{ ownerInformation?.currency?.currencySymbol
+                    }}{{ paymentInfo?.paymentAmount | number : "1.2-2" }}</b
+                  >
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="icon icon-data-entry icon-3x mr-5 align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Transaction Type</span
+                >
+                <h5 class="mb-0">
+                  {{ paymentInfo?.paymentTypeString }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="icon icon-data-entry icon-3x mr-5 align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Payment Mode</span
+                >
+                <h5 class="mb-0">
+                  {{ paymentInfo?.paymentModeString }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Amount Applied</span
+                >
+                <h5 class="mb-0">
+                  {{ ownerInformation?.currency?.currencySymbol
+                  }}{{ paymentInfo?.paymentAmountUsed | number : "1.2-2" }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Usable Amount Left</span
+                >
+                <h5 class="mb-0">
+                  {{ ownerInformation?.currency?.currencySymbol
+                  }}{{ paymentInfo?.paymentAmountLeft | number : "1.2-2" }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="icon icon-editor icon-3x mr-5 align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Narration</span
+                >
+                <h5 class="mb-0">
+                  {{ paymentInfo?.narration }}
+                </h5>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="">
+      <br />
+      <div class="dt-card__body">
+        <ul
+          class="nav nav-underline flex-row border-bottom nav-card-tabs"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              class="nav-link active"
+              data-toggle="tab"
+              href="#tab-pane0"
+              role="tab"
+              aria-controls="tab-pane0"
+              aria-selected="true"
+              >Reconciliations</a
+            >
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div id="tab-pane0" class="tab-pane active">
+            <div class="row">
+              <div class="col-xl-8">
+                <div class="dt-entry__header">
+                  <div class="dt-entry__heading">
+                    <h3 class="dt-entry__title px-3 pt-5">
+                      Payment Applied to Repayment Schedule
+                    </h3>
+                  </div>
+                </div>
+                <div class="dt-card overflow-hidden">
+                  <div class="dt-card__body p-0">
+                    <div class="table-responsive">
+                      <table
+                        class="table table-striped mb-0"
+                        style="font-size: 11px"
+                      >
+                        <thead class="thead-light">
+                          <tr>
+                            <th class="text-center" scope="col">
+                              Date Applied
+                            </th>
+                            <th class="text-right" scope="col">
+                              Loan Repayment Amount ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})
+                            </th>
+                            <th class="text-center" scope="col">
+                              Repayment Period
+                            </th>
+                            <th class="text-right" scope="col">
+                              Amt Expected ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})
+                            </th>
+                            <th class="text-right" scope="col">
+                              Amt Applied ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            *ngFor="
+                              let row of paymentInfo?.paymentLine;
+                              let i = index
+                            "
+                          >
+                            <td class="text-center">
+                              {{ row?.createdAt | date : "mediumDate" }}
+                            </td>
+                            <td class="amount-field">
+                              {{
+                                row?.repaymentSchedule?.paymentAmount
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                            <td class="text-center">
+                              {{ row?.repaymentSchedule?.paymentNumber }}
+                            </td>
+                            <td class="amount-field">
+                              {{ row?.amountExpected | number : "1.2-2" }}
+                            </td>
+                            <td class="amount-field">
+                              {{ row?.amountUsed | number : "1.2-2" }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xl-4 col-md-6 col-12 order-xl-1">
+                <div class="dt-card">
+                  <div class="dt-card__header">
+                    <div class="dt-card__heading"></div>
+                  </div>
+                  <div class="dt-card__body">
+                    <div class="media mb-5">
+                      <i
+                        [style.color]="currentTheme?.secondaryColor"
+                        class="icon icon-user icon-xl mr-5 orange"
+                      ></i>
+                      <div class="media-body">
+                        <span class="d-block text-light-gray f-12 mb-1"
+                          >Payment Record Created By</span
+                        >
+                        <span class="h5"
+                          >{{ paymentInfo?.user?.person?.displayName }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="media mb-5">
+                      <i
+                        [style.color]="currentTheme?.secondaryColor"
+                        class="icon icon-datepicker icon-xl mr-5 orange"
+                      ></i>
+                      <div class="media-body">
+                        <span class="d-block text-light-gray f-12 mb-1"
+                          >Payment Record Created Date</span
+                        >
+                        <span class="h5">
+                          {{
+                            paymentInfo?.createdAt | date : "dd/MM/yyyy"
+                          }}</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </lnd-aside>
+  <ng-template #addPaymentModal let-modal>
+    <div class="container-fluid pb-5">
+      <div class="d-flex justify-content-end">
+        <button
+          type="button"
+          class="close pt-2"
+          aria-label="Close"
+          (click)="closeModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div
+        *ngIf="this.requestLoader"
+        class="table-loader"
+        style="text-align: center; color: indianred"
+      >
+        <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+      </div>
+      <div>
+        <div class="text-center mt-3">
+          <ul
+            class="nav nav-underline flex-row border-bottom nav-card-tabs m-0"
+            role="tablist"
+          >
+            <li class="nav-item" *ngIf="currentTab === 'manual-entry'">
+              <a
+                (mouseover)="hover_men = true"
+                (mouseleave)="hover_men = false"
+                [ngStyle]="
+                  hover_men ? { color: currentTheme?.secondaryColor } : {}
+                "
+                class="nav-link active"
+                data-toggle="tab"
+                href="#tab-manual"
+                role="tab"
+                aria-controls="tab-pane3"
+                aria-selected="true"
+                (click)="onTabChange('manual-entry')"
+                >Manual Entry</a
+              >
+            </li>
+            <li class="nav-item" *ngIf="currentTab === 'bulk-upload'">
+              <a
+                (mouseover)="hover_bup = true"
+                (mouseleave)="hover_bup = false"
+                [ngStyle]="
+                  hover_bup ? { color: currentTheme?.secondaryColor } : {}
+                "
+                class="nav-link"
+                data-toggle="tab"
+                href="#tab-bulk"
+                role="tab"
+                aria-controls="tab-pane1"
+                aria-selected="true"
+                (click)="onTabChange('bulk-upload')"
+                >Bulk Upload</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="tab-content">
+          <div
+            *ngIf="currentTab === 'manual-entry'"
+            class="tab-pane active"
+            id="tab-manual"
+          >
+            <form
+              [formGroup]="AddPaymentForm"
+              (ngSubmit)="submitPaymentForm(AddPaymentForm.value)"
+            >
+              <div
+                class="search-dropdown-container mt-5"
+                [ngClass]="{
+                  'search-dropdown-width': paymentLineControls().controls.length
+                }"
+              >
+                <p *ngIf="!searchedLoanResult" class="mb-3">
+                  Enter the parameter you wish to search by below.
+                </p>
+                <lnd-search-dropdown
+                  [showSearchIconInInput]="false"
+                  [searchColumns]="searchByCol"
+                  [currentTheme]="currentTheme"
+                  (searchParams)="onSearchParams($event)"
+                  [containerStyle]="{ position: 'relative', 'z-index': 0 }"
+                  [showBtnSearchLabel]="true"
+                  (valueChange)="onDropownInputValueChange()"
+                ></lnd-search-dropdown>
+              </div>
+              <div
+                *ngIf="
+                  (!searchedLoanResult || searchedLoanResult?.length < 1) &&
+                  !gettingLoans
+                "
+                class="no-data-container text-center"
+              >
+                <p *ngIf="searchedLoanResult && searchedLoanResult.length < 1">
+                  No result(s) found for your search
+                </p>
+              </div>
+              <div
+                class="spinner-container text-center mt-5"
+                *ngIf="gettingLoans"
+              >
+                <lnd-spinner></lnd-spinner>
+              </div>
+              <div
+                *ngIf="searchedLoanResult?.length"
+                class="searched-result-container mt-5"
+              >
+                <p class="mt-0">Search Result(s):</p>
+                <div
+                  class="d-flex justify-content-between align-items-center p-2 search-result"
+                  [ngClass]="{
+                    'search-dropdown-width':
+                      paymentLineControls().controls.length
+                  }"
+                  *ngFor="let loan of searchedLoanResult"
+                >
+                  <p
+                    ngxTextHighlight
+                    [content]="loan?.combinedLoanInfo"
+                    [searchTerm]="loanReasonSearchTerm"
+                    class="m-0"
+                  ></p>
+                  <button
+                    type="button"
+                    class="btn btn-xs btn-success ml-3 py-1"
+                    (click)="addToSelectedLoans(loan, double, 'loan')"
+                  >
+                    <i class="icon icon-add mr-2"></i>Add to Line
+                  </button>
+                </div>
+              </div>
+              <div class="row" *ngIf="paymentLineControls().controls.length">
+                <div class="col-md-12 d-flex justify-content-center">
+                  <div class="w-100">
+                    <table
+                      id="data-table"
+                      class="payments-table table table-sm bg-white"
+                    >
+                      <thead [lndStuck]="'bg-white'">
+                        <tr>
+                          <th>
+                            Payment Type
+                            <lnd-tooltip text="Transaction Type"></lnd-tooltip>
+                          </th>
+                          <th class="th-w-10">
+                            Date
+                            <lnd-tooltip text="Payment Date"></lnd-tooltip>
+                          </th>
+                          <th>
+                            Payment Method
+                            <lnd-tooltip text="Payment Method"></lnd-tooltip>
+                          </th>
+                          <th
+                            *ngIf="
+                              appOwner?.financeInteractionData?.paymentIsActive
+                            "
+                            class="th-w-15"
+                          >
+                            Account
+                            <lnd-tooltip text="Finance Account"></lnd-tooltip>
+                          </th>
+                          <th class="th-w-13">
+                            PR Amount
+                            <lnd-tooltip
+                              text="Periodic Repayment Amount"
+                            ></lnd-tooltip>
+                          </th>
+                          <th class="th-w-13">
+                            TR Due
+                            <lnd-tooltip
+                              text="Total Repayment Due"
+                            ></lnd-tooltip>
+                          </th>
+                          <th class="th-w-13">
+                            Amount
+                            <lnd-tooltip text="Payment Amount"></lnd-tooltip>
+                          </th>
+                          <th
+                            *ngIf="paymentLineControls().controls.length > 1"
+                          ></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <ng-container
+                          class="form-row my-5"
+                          formArrayName="lines"
+                        >
+                          <ng-container
+                            *ngFor="
+                              let control of paymentLineControls().controls;
+                              let i = index
+                            "
+                            [formGroup]="control"
+                          >
+                            <tr>
+                              <td>
+                                <span class="code-name"
+                                  >{{ control.value.LoanCode }} -
+                                  {{ control.value.CustomerName }}</span
+                                >
+                              </td>
+                            </tr>
+                            <tr [formGroup]="control">
+                              <td class="slct-2">
+                                <slct-2
+                                  [allowClear]="true"
+                                  [data]="transactionTypeArray"
+                                  formControlName="PaymentType"
+                                  placeholder="Select"
+                                  (selected)="
+                                    onSelectTransactionType($event, i)
+                                  "
+                                />
+                                <div class="mt-2">
+                                  <label
+                                    class="narration-label"
+                                    [for]="'narration' + i"
+                                    >Narration (Optional)</label
+                                  >
+                                  <textarea
+                                    [id]="'narration' + i"
+                                    class="form-control"
+                                    formControlName="narration"
+                                    placeholder="Enter narration"
+                                    rows="2"
+                                  ></textarea>
+                                  <lnd-input-errors
+                                    label="Narration"
+                                    [control]="control.get('narration')"
+                                  ></lnd-input-errors>
+                                </div>
+                              </td>
+                              <td class="slct-2">
+                                <input
+                                  lndInvalidDateChecker
+                                  class="form-control"
+                                  type="date"
+                                  min="{{ minimumDate }}"
+                                  formControlName="PaymentDate"
+                                  (change)="
+                                    onPaymentDateChange($event.target.value, i)
+                                  "
+                                />
+                              </td>
+                              <td class="slct-2">
+                                <slct-2
+                                  [allowClear]="true"
+                                  [data]="paymentMethodArray"
+                                  formControlName="PaymentMode"
+                                  placeholder="Select"
+                                ></slct-2>
+                              </td>
+                              <td
+                                class="slct-2"
+                                *ngIf="
+                                  appOwner.financeInteractionData
+                                    .paymentIsActive
+                                "
+                              >
+                                <slct-2
+                                  [allowClear]="true"
+                                  [data]="accounts"
+                                  placeholder="Select"
+                                  formControlName="FinanceAccountId"
+                                ></slct-2>
+                              </td>
+                              <td class="slct-2">
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  currencyMask
+                                  [options]="{
+                                    prefix: '',
+                                    thousands: ',',
+                                    decimal: '.'
+                                  }"
+                                  [value]="
+                                    control.value.PeriodicRepaymentAmount
+                                  "
+                                  readonly
+                                />
+                              </td>
+                              <td class="slct-2">
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  currencyMask
+                                  [options]="{
+                                    prefix: '',
+                                    thousands: ',',
+                                    decimal: '.'
+                                  }"
+                                  [value]="control.value.AmountDue"
+                                  placeholder="Enter Amount"
+                                  readonly
+                                />
+                              </td>
+                              <td class="slct-2">
+                                <input
+                                  type="text"
+                                  class="form-control"
+                                  [readonly]="control.value.paymentAmtReadOnly"
+                                  currencyMask
+                                  [options]="{
+                                    prefix: '',
+                                    thousands: ',',
+                                    decimal: '.'
+                                  }"
+                                  formControlName="PaymentAmount"
+                                  placeholder="Enter Amount"
+                                />
+                              </td>
+                              <td
+                                *ngIf="
+                                  paymentLineControls().controls.length > 1
+                                "
+                              >
+                                <span
+                                  class="payment-line-remove-btn"
+                                  (click)="onRemovePaymentLine(i)"
+                                >
+                                  <i class="icon icon-trash icon-lg"></i>
+                                </span>
+                              </td>
+                            </tr>
+                          </ng-container>
+                        </ng-container>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div
+                *ngIf="paymentLineControls().controls.length > 0"
+                class="modal-footer pb-0"
+              >
+                <button
+                  [style.backgroundColor]="currentTheme?.secondaryColor"
+                  [style.borderColor]="currentTheme?.secondaryColor"
+                  type="button"
+                  class="btn btn-secondary btn-xs"
+                  (click)="closeModal()"
+                  style="color: #fff"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-claim btn-xs"
+                  *ngIf="!loader"
+                  [disabled]="AddPaymentForm.invalid"
+                  (click)="typeCheck('manual')"
+                >
+                  Submit Payment
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-claim btn-xs"
+                  *ngIf="loader"
+                  [disabled]="true"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Processing...
+                </button>
+              </div>
+            </form>
+          </div>
+          <div
+            *ngIf="currentTab === 'bulk-upload'"
+            class="tab-pane active"
+            id="tab-bulk"
+          >
+            <div class="form-row mt-3">
+              <div class="col-sm-12 mb-3">
+                <div>
+                  <small>
+                    <i>
+                      <b class="help-block"> *</b>(Payment Methods: Cash or
+                      Cheque )
+                    </i></small
+                  >
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div *ngIf="isSubscribedToFinModule" class="mb-4 finAcc">
+                  <p class="mb-1">Click <span class="text-secondary pointer" (click)="generateCsvTemplate('financeAccounts')">here</span> to download Finance Accounts</p>
+                  <small class="text-secondary">here you can find finance account ids to be used during payment upload <b>NB : </b>You don't need to upload the finance account csv file</small>
+                  <hr>
+                </div>
+                <label> Payments CSV Template </label><br />
+                <button
+                  class="btn btn-query btn-xs mb-3 mt-1"
+                  type="button"
+                  (click)="generateCsvTemplate('template')"
+                >
+                  Download
+                </button>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label class="">Upload Payments</label>
+                  <div
+                    class="custom-file input-group"
+                    data-provides="fileinput"
+                  >
+                    <span
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="input-group-addon btn btn-default btn-file px-0"
+                    >
+                      <input
+                        type="file"
+                        id="files"
+                        multiple
+                        (change)="handleFileInput($event.target.files, true)"
+                      />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <br />
+            <div class="row">
+              <div class="col-md-12">
+                <div
+                  *ngIf="errors.csvInvalidPaymentMethod"
+                  class="col-md-12 alert alert-danger"
+                >
+                  <ul>
+                    <strong>Invalid Payment Method(s):</strong
+                    ><br />
+                    <li
+                      *ngFor="let row of errors.csvInvalidPaymentMethodString"
+                    >
+                      {{ row }}
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  *ngIf="errors.csvInvalidDate"
+                  class="col-md-12 alert alert-danger"
+                >
+                  <ul>
+                    <strong>Invalid Date(s):</strong
+                    ><br />
+                    <li *ngFor="let row of errors.csvInvalidDateString">
+                      {{ row }}
+                    </li>
+                  </ul>
+                </div>
+                <div
+                  *ngIf="errors.csvInvalidNumber"
+                  class="col-md-12 alert alert-danger"
+                >
+                  <ul>
+                    <strong>Invalid Amount Figure(s):</strong
+                    ><br />
+                    <li *ngFor="let row of errors.csvInvalidNumberString">
+                      {{ row }}
+                    </li>
+                  </ul>
+                </div>
+
+                <div
+                  *ngIf="errors.csvInvalidPaymentType"
+                  class="col-md-12 alert alert-danger"
+                >
+                  <ul>
+                    <strong>Invalid Payment Type(s):</strong
+                    ><br />
+                    <li *ngFor="let row of errors.csvInvalidPaymentTypeString">
+                      {{ row }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <hr />
+            <div class="row" *ngIf="dataTables.csvDisplayTable.data">
+              <div class="col-md-12">
+                <div class="table-responsive text-center">
+                  <table id="csvDisplayTable" class="table table-responsive">
+                    <thead>
+                      <tr>
+                        <th
+                          *ngFor="let key of dataTables.csvDisplayTable.headers"
+                        >
+                          {{ key }}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let row of dataTables.csvDisplayTable.data">
+                        <td
+                          *ngFor="let key of dataTables.csvDisplayTable.headers"
+                        >
+                          <ng-container
+                            *ngIf="
+                              !ngIsNaN(row[key]) &&
+                              key != 'LoanCode' &&
+                              key !== 'EmploymentCode' &&
+                              key !== 'FinanceAccountId'
+                            "
+                          >
+                            {{ row[key] | number : "1.2-2" }}
+                          </ng-container>
+                          <ng-container
+                            *ngIf="
+                              ngIsNaN(row[key]) ||
+                              key == 'LoanCode' ||
+                              key === 'EmploymentCode' ||
+                              key === 'FinanceAccountId'
+
+                            "
+                          >
+                            {{ row[key] }}
+                          </ng-container>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="text-center">
+              <button
+                *ngIf="!forms?.configureValidated"
+                class="btn btn-warning btn-sm"
+                (click)="validateSheet()"
+              >
+                Validate Sheet
+              </button>
+            </div>
+            <div
+              *ngIf="forms?.configureValidated"
+              class="d-flex justify-content-end"
+            >
+              <button
+                type="button"
+                class="btn btn-secondary btn-xs mr-3"
+                (click)="closeModal()"
+                style="color: #fff"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                class="btn btn-claim btn-xs"
+                *ngIf="!forms?.configuring"
+                (click)="typeCheck('Bulk', '2')"
+              >
+                Post Payment
+              </button>
+              <button
+                type="button"
+                class="btn btn-claim btn-xs"
+                *ngIf="forms?.configuring"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Processing...
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #employerSearch>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">
+        <i
+          class="icon icon-search icon-2x mr-2 align-self-center text-warning"
+        ></i>
+        Search Result(s)
+      </h4>
+      <small style="color: palevioletred"
+        >*** Click outside search view once selection is completed ***</small
+      >
+    </div>
+    <div class="modal-body">
+      <div class="table-responsive" *ngIf="employersearchResult?.length > 0">
+        <table class="table table-hover">
+          <thead>
+            <th>Employer Name</th>
+            <th>Action</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of employersearchResult">
+              <td>
+                <span
+                  ngxTextHighlight
+                  [content]="item?.employerName"
+                  [searchTerm]="loanReasonSearchTerm"
+                ></span>
+              </td>
+
+              <td>
+                <button
+                  type="button"
+                  class="btn btn-xs btn-success"
+                  (click)="addToSelectedLoans(item, double, 'employer')"
+                >
+                  <i class="icon icon-add"></i>Select
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="text-center" *ngIf="employersearchResult?.length == 0">
+        <h6>
+          Employer information for search parameter: "{{
+            searchForm.get("EmployerSearch").value
+          }}" was not found.
+        </h6>
+      </div>
+    </div>
+  </ng-template>
+</div>

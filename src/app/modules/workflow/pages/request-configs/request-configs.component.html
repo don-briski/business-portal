@@ -1,0 +1,262 @@
+<header class="w-100 d-flex align-items-center justify-content-between mb-3">
+  <h1 class="dt-page__title">Workflow Configuration</h1>
+  <span class="float-right role-add">
+    <div style="position: relative; right: -5px; bottom: 5px; float: right">
+      <a
+        *ngIf="user?.permission.includes('Create Request Setup')"
+        class="btn btn-primary mr-2 orange-bg text-white"
+        [style.borderColor]="colorTheme.secondaryColor"
+        [style.backgroundColor]="colorTheme.secondaryColor"
+        (click)="isViewing = false; onOpenModal(addEditReqConfigView)"
+      >
+        <i class="icon icon-add-circle mr-2"></i>Add New</a
+      >
+    </div>
+  </span>
+</header>
+
+<div class="dt-card w-100">
+  <div class="dt-card__body">
+    <header class="my-4">
+      <div class="form-row">
+        <div class="col-md-4">
+          <label style="display: inline-flex"
+            ><span style="padding: 8px 2px; font-size: 12px">Show </span
+            ><select
+              [(ngModel)]="pagination.pageSize"
+              [ngModelOptions]="{ standalone: true }"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height mx-2"
+              (change)="fetchReqConfigs()"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span style="padding: 8px 2px; font-size: 12px"
+              >entries</span
+            ></label
+          >
+        </div>
+
+        <div class="text-center col-md-4">
+          <lnd-spinner *ngIf="fetching"></lnd-spinner>
+        </div>
+
+        <div class="col-md-4">
+          <label style="display: inline-flex; float: right">
+            <input
+              type="search"
+              class="form-control form-control-sm mr-3"
+              placeholder="Enter code"
+              aria-controls="data-table"
+              [(ngModel)]="searchParam"
+              (keydown.enter)="fetchReqConfigs()"
+            />
+
+            <button
+              class="btn btn-xs text-white"
+              [style.background]="colorTheme.secondaryColor"
+              (click)="fetchReqConfigs()"
+            >
+              <i class="icon icon-search"></i>
+            </button>
+          </label>
+        </div>
+      </div>
+      <lnd-selected-filters
+        (initialized)="onSelectedFiltersInit($event)"
+      ></lnd-selected-filters>
+      <div
+        *ngIf="!fetching && reqConfigs.length"
+        class="d-flex justify-content-between mt-4"
+      >
+        <div aria-live="polite">
+          Showing
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + 1
+              | number : "1.0-0"
+          }}
+          -
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + pagination.count
+              | number : "1.0-0"
+          }}
+          of {{ pagination.totalCount | number : "1.0-0" }} records
+        </div>
+        <div>
+          <button
+            type="button"
+            (click)="onOpenFilterModal()"
+            class="mr-1 text-white btn btn-warning btn-xs"
+          >
+            <i class="mr-2 icon icon-filter"></i>
+            Filters
+          </button>
+
+          <lnd-filter
+            [filterOptions]="filterOptions"
+            (optionSelected)="onOptionSelected($event.text)"
+          >
+          </lnd-filter>
+        </div>
+      </div>
+    </header>
+
+    <table
+      *ngIf="reqConfigs.length && !fetching"
+      id="data-table"
+      class="table table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Configuration Identifier</th>
+          <th>Configuration Name</th>
+          <th>Date Created</th>
+          <th>Configuration Type</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let rc of reqConfigs">
+          <td [style.color]="colorTheme.secondaryColor">
+            {{ rc.requestIdentifier }}
+          </td>
+          <td>{{ rc.requestName }}</td>
+          <td>{{ rc.createdAt | customDatePipe : "DD-MMM-YY" }}</td>
+          <td>{{ rc.requestType }}</td>
+          <td>
+            <span
+              class="badge"
+              [ngClass]="{
+                'badge-success': rc.isActive,
+                'badge-danger': !rc.isActive
+              }"
+              >{{ rc.isActive ? "Active" : "Inactive" }}</span
+            >
+          </td>
+          <td>
+            <div class="dropdown d-inline-block">
+              <button
+                class="btn btn-warning btn-xs dropdown-toggle"
+                data-toggle="dropdown"
+                type="button"
+                aria-haspopup="true"
+                aria-expanded="false"
+              ></button>
+              <div class="dropdown-menu p-0">
+                <a
+                  class="dropdown-item cursor"
+                  (click)="
+                    onSelectReqConfig(rc);
+                    onOpenModal(addEditReqConfigView);
+                    isViewing = true
+                  "
+                  ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+                >
+                <a
+                  class="dropdown-item cursor"
+                  (click)="
+                    onSelectReqConfig(rc);
+                    onOpenModal(addEditReqConfigView);
+                    isViewing = false
+                  "
+                  ><i class="icon icon-edit icon-fw mr-2"></i>Edit</a
+                >
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div
+      *ngIf="!reqConfigs.length && !fetching"
+      class="d-flex flex-column align-items-center w-100"
+    >
+      <h1 class="display-4 text-center font-weight-light pt-5">
+        No request configurations found
+      </h1>
+    </div>
+    <nav>
+      <ul class="pagination pagination-sm justify-content-end">
+        <li class="page-item" *ngIf="pagination.hasPreviousPage">
+          <a
+            class="page-link"
+            href="javascript:void(0)"
+            (click)="
+              pagination.pageNumber = +pagination.pageNumber - 1;
+              fetchReqConfigs()
+            "
+            tabindex="-1"
+            >Previous</a
+          >
+        </li>
+        <li class="page-item pagination-menu-wrapper">
+          <a
+            class="page-link page-target"
+            href="javascript:void(0)"
+            (click)="itemPaginatedJumpModal()"
+          >
+            {{ pagination.pageNumber }} of {{ pagination.totalPages }}
+            {{ pagination.totalPages > 1 ? "pages" : "page" }}
+            <span class="sr-only">(current)</span>
+          </a>
+          <div
+            class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+          >
+            <div class="pagination-menu-body">
+              <div class="h-auto">
+                <span>Jump to Page</span>
+                <select
+                  aria-controls="data-table"
+                  [(ngModel)]="pagination.pageNumber"
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                  (change)="fetchReqConfigs()"
+                >
+                  <option
+                    *ngFor="let line of pagination.jumpArray"
+                    (click)="pagination.pageNumber = line"
+                  >
+                    {{ line }}
+                  </option>
+                </select>
+                <div class="text-center mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-xs"
+                    (click)="itemPaginatedJumpModal()"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="page-item" *ngIf="pagination.hasNextPage">
+          <a
+            class="page-link"
+            href="javascript:void(0)"
+            (click)="
+              pagination.pageNumber = +pagination.pageNumber + 1;
+              fetchReqConfigs()
+            "
+          >
+            Next
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<ng-template #addEditReqConfigView>
+  <lnd-add-edit-request-config
+    [viewMode]="isViewing"
+    [colorTheme]="colorTheme"
+    (closeForm)="onCloseModal()"
+    (refetchConfigs)="fetchReqConfigs()"
+    [reqConfig]="selectedReqConfig"
+  ></lnd-add-edit-request-config>
+</ng-template>

@@ -1,0 +1,59 @@
+<li class="dt-list__item" *ngIf="title">
+  <div class="media">
+    <i
+      *ngIf="!ignoreIcon"
+      class="mr-5 icon icon-2x align-self-center text-warning"
+      [ngClass]="{
+        'icon-datepicker': type === 'date',
+        'icon-revenue-new': type === 'amount',
+        'icon-company': type === 'company',
+        'icon-user-o': type === 'person',
+        'icon-editor': type === 'number' || type === 'text',
+     }"
+    ></i>
+
+    <div class="media-body">
+      <span class="mb-1 d-block text-light-gray f-12"
+        >{{ title }} <lnd-tooltip *ngIf="tooltip" [text]="tooltip"></lnd-tooltip
+      ></span>
+      <h5 class="mb-0" *ngIf="type === 'date'">
+        {{ value | date : "mediumDate" }}
+        <span *ngIf="showDateTime"
+          ><i class="icon icon-timepicker ml-1"></i>
+          {{ value | date : "shortTime" }}</span
+        >
+      </h5>
+      <h5 class="mb-0" *ngIf="type === 'amount'">
+        <span *ngIf="currencySymbol">{{ currencySymbol }}</span
+        >{{ value | number : "1.2-2" }}
+      </h5>
+      <h5 class="mb-0" *ngIf="type === 'percent'">{{ value }}%</h5>
+      <h5
+        [style.color]="colorTheme?.secondaryColor"
+        class="mb-0"
+        *ngIf="type === 'code'"
+      >
+        {{ value }}
+      </h5>
+      <ng-container *ngIf="type === 'badge'">
+        <h5 *ngFor="let item of value" class="mb-0 badge mr-1" [style.backgroundColor]="primaryBadgeBg25">
+          {{ item }}
+        </h5>
+      </ng-container>
+      <h5
+        class="mb-0"
+        *ngIf="
+          type === 'number' ||
+          type === 'text' ||
+          type === 'company' ||
+          type === 'person'
+        "
+      >
+        <div class="d-flex align-items-center">
+          {{ value }}
+          <ng-content></ng-content>
+        </div>
+      </h5>
+    </div>
+  </div>
+</li>

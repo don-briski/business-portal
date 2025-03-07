@@ -1,0 +1,221 @@
+<section>
+  <header id="search-header" class="shadow bg-white rounded">
+    <p>Customer Data Query</p>
+    <div
+      id="divider"
+      [style.backgroundColor]="currentTheme.secondaryColor"
+      class="mt-3"
+    ></div>
+
+    <div class="d-flex align-items-center">
+      <div id="input-wrapper">
+        <img
+          src="assets/images/search-icon.png"
+          alt="search-icon"
+          class="img-fluid"
+          width="15px"
+        />
+        <input
+          #search
+          type="text"
+          class="form-control"
+          placeholder="Search by BVN or Account number"
+        />
+      </div>
+
+      <div
+        id="dropdown-wrapper"
+        class="d-flex justify-content-end align-items-center mt-4"
+      >
+        <slct-2
+          id="dropdown"
+          [data]="searchTypes"
+          [active]="[searchTypes[0]]"
+          [customSearchEnabled]="true"
+          (selected)="setQueryType($event.id)"
+          placeholder="Search Query Type"
+        ></slct-2>
+        <button
+          [disabled]="search.value.length === 0 || isLoading"
+          class="btn text-white"
+          (click)="fetchPayrollUser(search.value)"
+          [style.backgroundColor]="currentTheme.secondaryColor"
+        >
+          {{ !isLoading ? "Search" : "" }}
+          <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main
+    class="shadow bg-white rounded"
+    [ngClass]="{
+      'd-flex justify-content-center align-items-center': !customer
+    }"
+  >
+    <span
+      *ngIf="isLoading"
+      [style.color]="currentTheme?.secondaryColor"
+      class="d-flex justify-content-center pt-5"
+    >
+      Retrieving User...
+      <i class="icon icon-spin icon-spin2 ml-3"></i>
+    </span>
+    <div *ngIf="customer && !isLoading" class="p-5">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <th>Full Name</th>
+            <th>BVN</th>
+            <th>Gender</th>
+            <th>Action</th>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>{{ customer?.fullName }}</td>
+              <td>{{ customer?.bvn }}</td>
+              <td>{{ customer?.gender }}</td>
+              <td [style.color]="currentTheme?.secondaryColor">
+                <span
+                  class="cursor"
+                  (click)="viewPayrollHistory(customer?.employeeId)"
+                  ><i class="icon icon-forward icon-fw mr-2"></i>View</span
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div
+      *ngIf="!customer && !isLoading"
+      class="d-flex flex-column justify-content-center align-items-center"
+    >
+      <img
+        src="assets/images/search-files.svg"
+        alt="search icon"
+      />
+
+      <span *ngIf="customer !== null">
+        <p>Start by searching for a customer</p>
+        <p>
+          Your search result will be displayed here. Start by searching by BVN or Institution. <br />Select from the dropdown which
+          parameter you want to search by.
+        </p>
+      </span>
+
+      <p *ngIf="customer === null" class="not-found">
+        Sorry! We couldn't find this Customer!
+      </p>
+    </div>
+  </main>
+</section>
+
+<lnd-aside [isOpen]="openAside" (closeAside)="openAside = false">
+  <span
+    *ngIf="isLoading"
+    [style.color]="currentTheme?.secondaryColor"
+    class="d-flex justify-content-center pt-5"
+  >
+    Retrieving Payroll History...
+    <i class="icon icon-spin icon-spin2 ml-3"></i>
+  </span>
+  <div *ngIf="payrollHistory && !isLoading" class="ml-3" header>
+    <div class="dt-avatar-wrapper d-flex align-items-center">
+      <lnd-initials
+        classes="text-white"
+        [text]="payrollHistory?.fullName"
+        [bgColor]="currentTheme?.secondaryColor"
+      ></lnd-initials>
+
+      <div class="dt-avatar-info ml-3">
+        <span class="display-5 font-weight-light">
+          {{ payrollHistory?.fullName }}
+
+          <span>
+            <span class="badge badge-success btn-xs mb-1 ml-3">verified</span>
+          </span>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12" style="padding: 20px">
+      <ul class="dt-list dt-list-one-second padded-left">
+        <lnd-list-item
+          *ngFor="let listItem of listItems"
+          [label]="listItem?.label"
+          [value]="listItem?.value"
+          [iconClass]="listItem?.iconClass"
+          [type]="listItem?.type"
+        ></lnd-list-item>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dt-card__body">
+    <ul
+      class="nav nav-underline flex-row border-bottom nav-card-tabs"
+      role="tablist"
+    >
+      <li class="nav-item">
+        <a
+          class="nav-link active"
+          data-toggle="tab"
+          href="#history"
+          role="tab"
+          aria-controls="history"
+          aria-selected="true"
+          >Payroll History</a
+        >
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div id="history" class="tab-pane active">
+        <div class="row">
+          <div class="col-12">
+            <div class="table-responsive">
+              <table class="table table_sm">
+                <thead class="thead-light">
+                  <th>Payroll Year</th>
+                  <th>Payroll Month</th>
+                  <th>Ministry</th>
+                  <th>Staff Number</th>
+                  <th>Fullname</th>
+                  <th>Email</th>
+                  <th>Grade Level</th>
+                  <th>Gross Salary</th>
+                  <th>Bank Account</th>
+                  <th>Bank Name</th>
+                  <th>Total Deductions</th>
+                  <th>Total Loans</th>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let payroll of payrollHistory?.history">
+                    <td>{{payroll?.year}}</td>
+                    <td>{{payroll?.month}}</td>
+                    <td>{{payroll?.ministry}}</td>
+                    <td>{{payroll?.staffNumber}}</td>
+                    <td>{{payroll?.fullname}}</td>
+                    <td>{{payroll?.email}}</td>
+                    <td>{{payroll?.gradeLevel}}</td>
+                    <td>{{payroll?.grossSalary | number:'1.2-2'}}</td>
+                    <td>{{payroll?.accountNumber}}</td>
+                    <td>{{payroll?.bank}}</td>
+                    <td>{{payroll?.totalDeductions | number:'1.2-2'}}</td>
+                    <td>{{payroll?.totalLoans}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</lnd-aside>

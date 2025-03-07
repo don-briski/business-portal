@@ -1,0 +1,90 @@
+<main>
+  <header class="aside-header w-100">
+    <h3 class="mb-0">Case Details</h3>
+
+    <div class="aside-header-btns">
+      <button
+        *ngIf="permissions.includes('Manage Prospect Case')"
+        type="button"
+        class="btn btn-sm text-white"
+        [style.backgroundColor]="secondaryColor"
+        (click)="editSelectedCase()"
+      >
+        Edit
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-dark"
+        (click)="closeAside.emit()"
+      >
+        Back
+      </button>
+    </div>
+  </header>
+
+  <div>
+    <ul class="mt-0 mb-5">
+      <div class="list-item">
+        <p>Case Type</p>
+        <p>{{ selectedCase?.caseType }}</p>
+      </div>
+
+      <div class="list-item">
+        <p>Date</p>
+        <p>{{ selectedCase?.createdAt | date }}</p>
+      </div>
+
+      <div class="list-item">
+        <p>Title</p>
+        <p>{{ selectedCase?.title }}</p>
+      </div>
+
+      <div class="stage list-item">
+        <p class="label f-12">Stage</p>
+        <div class="d-flex align-items-center mt-1">
+          <span
+            class="badge mr-3"
+            [ngClass]="{
+              'badge-sm badge-danger':
+                selectedCase?.stage === PROSPECT_CASE_STAGE.Closed,
+              'badge-sm badge-warning':
+                selectedCase?.stage === PROSPECT_CASE_STAGE.Open,
+              'badge-sm badge-primary':
+                selectedCase?.stage === PROSPECT_CASE_STAGE.InProgress,
+              'badge-sm badge-success':
+                selectedCase?.stage === PROSPECT_CASE_STAGE.Resolved
+            }"
+          >
+            {{ selectedCase?.stage }}
+          </span>
+          <span *ngIf="permissions.includes('Manage Prospect Case')" class="dropdown-toggle pointer" data-toggle="dropdown">
+            <i *ngIf="!isProcessingStage" class="icon icon-edit"></i>
+            <i *ngIf="isProcessingStage" class="icon icon-spin icon-spin2"></i>
+          </span>
+
+          <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+            <a
+              *ngFor="let stage of caseStages"
+              class="dropdown-item pointer"
+              (click)="updateStage(stage?.id)"
+              >{{ stage?.text }}</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <p>Description</p>
+        <p>{{ selectedCase?.description }}</p>
+      </div>
+    </ul>
+
+    <lnd-note
+      [secondaryColor]="secondaryColor"
+      [selectedCaseId]="selectedCase?.id"
+      [caseType]="selectedCase?.caseType"
+      [permissions]="permissions"
+    />
+  </div>
+</main>

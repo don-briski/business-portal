@@ -1,0 +1,170 @@
+<!-- Loader -->
+<!-- <div class="dt-loader-container">
+  <div class="dt-loader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+    </svg>
+  </div>
+</div> -->
+<!-- /loader -->
+<!-- Root -->
+<div class="dt-root">
+
+  <!-- Login Container -->
+  <div class="dt-login--container dt-app-login--container">
+
+    <!-- Login Content -->
+    <div class="dt-login__content-wrapper">
+
+      <!-- Login Background Section -->
+      <div class="dt-login__bg-section" [style.background]="currentTheme?.primaryColor">
+
+        <div class="dt-login__bg-content">
+          <!-- Login Title -->
+          <h1 class="dt-login__title">Business Login </h1>
+          <!-- /login title -->
+
+          <p class="f-16">Please sign into your business account with your email and password.</p>
+        </div>
+      </div>
+      <!-- /login background section -->
+
+      <!-- Login Content Section -->
+      <div class="dt-login__content">
+          <div *ngIf="businessLoader" class="table-loader p-5" style="text-align:center;color:indianred">
+            <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+          </div>
+
+        <!-- Login Content Inner -->
+        <div class="dt-login__content-inner" *ngIf="!businessLoader">
+          <div *ngIf="appOwnerKey !== null && appOwner !== null">
+            <div class="box-header">
+              <div class="header-container">
+                <div class="icon-container">
+                  <img  *ngIf="appOwner?.logoUrl !== ''" class="icon-head img-fluid d-block mx-auto" id="logoUrl" src="{{appOwner?.logoUrl}}" alt="logo">
+                   <div class="text-in"  *ngIf="appOwner?.logoUrl === ''">
+                    <h5 class="head-text"> {{ appOwner?.appOwnerName }}</h5>
+                  </div>
+
+                </div>
+                <hr   style="border-top: 1px dashed rgba(0,0,0,.1);" />
+              </div>
+            </div>
+            <!-- Form -->
+            <form [formGroup]="loginForm" (ngSubmit)="loginUser()" *ngIf="!enterOTP">
+
+              <!-- Form Group -->
+              <div class="form-group">
+                <label class="sr-only" for="email-1">Email address</label>
+                <input type="email" formControlName="EmailAddress" class="form-control" id="email-1"
+                  aria-describedby="email-1" placeholder="Enter email">
+                <div *ngIf="loginForm.get('EmailAddress').touched && loginForm.get('EmailAddress').errors">
+                  <span *ngIf="loginForm.get('EmailAddress').hasError('email')" class="text-danger">
+                    <small>
+                      <i class="icon icon-close-circle icon-fw icon-sm"></i>
+                      This is not a valid email
+                    </small>
+                  </span>
+                </div>
+              </div>
+              <!-- /form group -->
+
+              <!-- Form Group -->
+              <div class="form-group">
+                <label class="sr-only" for="password-1">Password</label>
+                <input type="password" formControlName="Password" class="form-control" id="password-1"
+                  placeholder="Password" autocomplete="off" />
+              </div>
+              <!-- /form group -->
+              <!-- Form Group -->
+              <div class="custom-control custom-checkbox  mb-8">
+                <input class="custom-control-input" type="checkbox" id="checkbox-1" checked="checked">
+                <label class="custom-control-label" for="checkbox-1">Remember me... <a
+                    [routerLink]="['/account/forgot-password']" routerLinkActive="active">Forgot password?</a></label>
+              </div>
+              <!-- /form group -->
+              <!-- Form Group -->
+              <div class="form-group">
+                <button type="submit" *ngIf="!submitOp" class="btn orange-bg white text-uppercase"
+                  [disabled]="!loginForm.valid" [style.background]="currentTheme?.secondaryColor" [style.borderColor]="currentTheme?.secondaryColor">Sign In</button>
+                <button type="button" *ngIf="submitOp" class="btn orange-bg white text-uppercase" [style.background]="currentTheme?.secondaryColor" [style.borderColor]="currentTheme?.secondaryColor" [disabled]="true"><i
+                    class="icon icon-spin icon-spin2"></i> Authenticating... </button>
+              </div>
+              <!-- /form group -->
+            </form>
+            <!-- /form -->
+
+
+            <div class="otp-input text-center" *ngIf="enterOTP">
+              <lnd-otp-input (enteredOtp)="otp = $event" [showOtpRetry]="showOtpRetry" (requestOtp)="requestOtp()"/>
+
+              <button class="btn orange-bg white text-uppercase mt-4" [style.background]="currentTheme?.secondaryColor" [disabled]="submitOp || otp?.length < 6" [style.borderColor]="currentTheme?.secondaryColor" (click)="submitOtp()">
+                <i class="icon icon-spin icon-spin2" *ngIf="submitOp"></i> {{ submitOp ? 'Authorizing...' : 'Authorize Login' }}
+              </button>
+              <br>
+              <a href="javascript:void(0)" class="my-3 btn btn-link" (click)="enterOTP = false">Back to login</a>
+            </div>
+
+            <!-- Form Group -->
+            <div class="form-group">
+              <div *ngIf="errorMessage != null" class="alert alert-warning alert-dismissible fade show" role="alert">
+                <i class="icon icon-auth-screen"></i> {{ errorMessage }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                  <span aria-hidden="true">×</span>
+                </button>
+              </div>
+            </div>
+            <!-- /form group -->
+          </div>
+          <div *ngIf="appOwner === null">
+             <div *ngIf="businessKey">
+              <span *ngIf="appOwnerKey !== '' && businessErrMsg !== ''">
+                <div class="alert alert-warning text-center">
+                  {{businessErrMsg}}
+                </div>
+              </span>
+
+              <div *ngIf="!forgotBusinessKey" class="form-group text-center">
+                <small style="/*padding-left: 64px;*/"><a  [routerLink]="[]" class="text-primary" [style.color]="currentTheme?.secondaryColor" (click)="businessKeySwitch()">Don't know business alias?...click here</a> </small>
+              </div>
+            </div>
+            <div *ngIf="forgotBusinessKey">
+              <span *ngIf="appOwnerKey === '' && businessErrMsg !== ''">
+                <div class="alert alert-warning text-center">
+                  {{businessErrMsg}}
+                </div>
+              </span>
+              <h4 class="mb-2">No Business Identified</h4>
+              <p class="mb-5"> <small>If you are on this page, then you are trying login into your business account. If you do not know the alias, recovering the alias is easy. Just tell us the email you have registered with, and we'll send it to you. </small></p>
+
+              <div class="form-group">
+                <label class="sr-only" for="password-1">Business Email</label>
+                <input type="text" class="form-control" placeholder="Business Email" [(ngModel)]="businessEmail">
+              </div>
+              <div class="form-group">
+                             <button class="btn orange-bg btn-sm white text-uppercase" (click)="getBusinessKeyInMail()" *ngIf="!submitOp" [style.background]="currentTheme?.secondaryColor" [style.borderColor]="currentTheme?.secondaryColor" [disabled]="businessEmail === ''">Get Business Alias</button>
+              </div>
+            </div>
+
+            <div *ngIf="forgotBusinessKeyMailSent">
+              <div class="alert alert-success text-center">
+                Mail Succesfully Sent!
+              </div>
+              <p class="mb-5"> <small>Please check your email for the login link to your business account. </small></p>
+            </div>
+
+          </div>
+        </div>
+        <!-- /login content inner -->
+
+      </div>
+      <!-- /login content section -->
+
+    </div>
+    <!-- /login content -->
+
+  </div>
+  <!-- /login container -->
+
+</div>
+<!-- /root -->

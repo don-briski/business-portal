@@ -1,0 +1,98 @@
+.card {
+  border: 2px solid #e4e4e7;
+}
+
+.new-dashboard-notifier {
+  border-radius: 6px;
+  margin-bottom: 32px;
+  font-size: 16px;
+}
+
+.main-loan-stats .col-md-4,
+.main-loan-stats .col-md-6
+ {
+  padding-right: 0 !important;
+}
+
+.main-loan-stats .card {
+  margin-bottom: 16px !important;
+}
+
+.card .title {
+  font-size: 16px;
+  color: var(--lenda-grey);
+}
+
+.card .figure {
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.card .subtitle {
+  font-size: 14px;
+  color: var(--lenda-grey);
+}
+
+.card .subtitle .date-range {
+  font-weight: bold;
+}
+
+.card .subtitle span {
+  color: var(--lenda-orange);
+}
+
+.weekly-loan-funnel,
+.weekly-loan-stats-counter {
+  height: 500px;
+}
+
+.weekly-loan-stats-counter .card {
+  background: #1018280f !important;
+  border: 1px solid #e4e4e7;
+}
+
+lnd-loan-status-breakdown-chart {
+  height: 100%;
+}
+
+.chat-label-prefix {
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+}
+
+.chart-img-container {
+  width: 40;
+  height: 21;
+}
+
+.activities-card {
+  max-height: 995px;
+  height: 995px;
+}
+
+.activities-card .inner-content {
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.activity-leading {
+  width: 50px;
+  height: 50px;
+  background-color: var(--lenda-orange-light);
+  border-radius: 2px;
+}
+
+.activity-trailing {
+  flex: 1;
+}
+
+a.subtitle {
+  color: var(--lenda-grey);
+  text-decoration: none;
+}
+
+.activity-date {
+  color: var(--lenda-grey);
+  font-size: 12px;
+}

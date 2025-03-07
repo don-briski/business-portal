@@ -1,0 +1,197 @@
+<section >
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h3 class="m-0">Sweeper Cipher Service</h3>
+      <button
+        *ngIf="
+          user.permission.includes('Edit Risk Engine Configuration') &&
+          (mode === creditAffordModeEnum.View ||
+            mode === creditAffordModeEnum.None)
+        "
+        class="btn btn-sm px-6 text-white mr-1"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        (click)="
+          onModeChange(
+            mode === creditAffordModeEnum.None
+              ? creditAffordModeEnum.Configure
+              : creditAffordModeEnum.Edit
+          )
+        "
+      >
+        {{ config ? "Edit" : "Configure" }}
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <no-data
+      *ngIf="mode === creditAffordModeEnum.None"
+      title="Not Yet Configured"
+      desc="Click on the button above to set the configuration"
+    ></no-data>
+    <p
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+    >
+      This service identifies a customer's spending/withdrawal habits for Credit
+      Affordability Engine.
+      {{ mode === creditAffordModeEnum.Edit ? "Update" : "Set" }} the parameters
+      for sweeper cipher below.
+    </p>
+    <div *ngIf="mode !== creditAffordModeEnum.None" id="tips">
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="cursor text-underline"
+        (click)="hideHints = !hideHints"
+      >
+        {{ hideHints ? "Show" : "Hide" }} Hints
+      </p>
+      <ul *ngIf="!hideHints">
+        <li>
+          <b>Days Post Salary: </b
+          ><span class="hint-color"
+            >This configuration defines the number of days after the salary date
+            that the system will check a customer's account balance</span
+          >
+        </li>
+        <li>
+          <b>Balance Threshold: </b
+          ><span class="hint-color"
+            >This configuration defines the percentage of the account balance
+            that should remain after the specified number of days
+            post-salary</span
+          >
+        </li>
+        <li>
+          <b>Sweeper Threshold: </b
+          ><span class="hint-color"
+            >This configuration allows users to set the sweep score threshold
+            between 1 and 100 percent</span
+          >
+        </li>
+        <li>
+          <b>Sweep Recency Period: </b
+          ><span class="hint-color"
+            >This configuration allows users set the number of months they want
+            to consider for analyzing recent sweep consecutive occurrence</span
+          >
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="mode === creditAffordModeEnum.View" class="row">
+      <div class="col-md-4">
+        <p class="title-text mb-1">Days Post Salary</p>
+        <p class="subtitle-text">
+          {{ config.daysPostSalary }} Day{{
+            config.daysPostSalary > 1 ? "s" : ""
+          }}
+        </p>
+      </div>
+      <div class="col-md-4">
+        <p class="title-text mb-1">Balance Threshold</p>
+        <p class="subtitle-text">{{ config.balanceThreshold }}%</p>
+      </div>
+      <div class="col-md-4">
+        <p class="title-text mb-1">Sweeper Threshold</p>
+        <p class="subtitle-text">{{ config.sweeperThreshold }}%</p>
+      </div>
+      <div class="col-md-4">
+        <p class="title-text mb-1">Sweep Recency Period</p>
+        <p class="subtitle-text">
+          {{ config.sweepPeriodCheck }} Month{{
+            config.sweepPeriodCheck > 1 ? "s" : ""
+          }}
+        </p>
+      </div>
+    </div>
+    <div
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+      id="accordions"
+    >
+      <div class="d-flex flex-wrap mt-3">
+        <form class="w-100" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-row">
+            <div class="col-md-6 mb-6">
+              <label>Days Post Salary</label>
+
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter number of months"
+                formControlName="daysPostSalary"
+              />
+              <lnd-input-errors
+                label="Days Post Salary"
+                [control]="form.get('daysPostSalary')"
+              ></lnd-input-errors>
+            </div>
+
+            <div class="col-md-6 mb-6">
+              <label>Balance Threshold (%) </label>
+
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter percentage threshold"
+                formControlName="balanceThreshold"
+              />
+              <lnd-input-errors
+                label="Balance Threshold"
+                [control]="form.get('balanceThreshold')"
+              ></lnd-input-errors>
+            </div>
+
+            <div class="col-md-6">
+              <label>Sweeper Threshold (%)</label>
+
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter sweeper threshold"
+                formControlName="sweeperThreshold"
+              />
+              <lnd-input-errors
+                label="Sweeper Threshold"
+                [control]="form.get('sweeperThreshold')"
+              ></lnd-input-errors>
+            </div>
+
+            <div class="col-md-6">
+              <label>Sweep Recency Period (Months) </label>
+
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter number of months"
+                formControlName="sweepPeriodCheck"
+              />
+              <lnd-input-errors
+                label="Sweep Period Check"
+                [control]="form.get('sweepPeriodCheck')"
+              ></lnd-input-errors>
+            </div>
+          </div>
+          <button
+            class="btn btn-danger mt-6 mr-3"
+            [disabled]="isLoading"
+            (click)="onModeChange(creditAffordModeEnum.View)"
+          >
+            Cancel
+          </button>
+          <button
+            class="btn mt-6"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [disabled]="form.invalid"
+          >
+            {{ isLoading ? "Processing..." : "Update" }}
+            <i *ngIf="isLoading" class="icon icon-spin2 icon-spin"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

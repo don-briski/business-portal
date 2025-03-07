@@ -1,0 +1,161 @@
+<ng-container *ngIf="loanScheduleForm && !rescheduleLoader">
+    <form [formGroup]="loanScheduleForm" (ngSubmit)="saveScheduleForm()">
+        <div class="row">
+            <div class="col-12">
+                <div class="table_responsive">
+                    <table class="table table-hovered">
+                        <tbody>
+                          <tr>
+
+                            <td  class="text-right text-light-gray">Customer Name</td>
+                            <td class="text-right">{{ settlementInformation?.customerName }}</td>
+                        </tr>
+                            <tr >
+
+                                <td  class="text-right ">Loan Amount</td>
+                                <td class="text-right">{{ settlementInformation?.loanAmount | number : '1.2-2' }}</td>
+                            </tr>
+                            <tr>
+                                <td  class="text-right text-light-gray">Interest As At Today</td>
+                                <td class="text-right">{{ settlementInformation?.interestAccrued | number : '1.2-2'}}</td>
+                            </tr>
+                            <tr>
+                                <td  class="text-right text-light-gray">Amount Repaid</td>
+                                <td class="text-right">{{ settlementInformation?.totalRepaid | number : '1.2-2'}}</td>
+                            </tr>
+                            <tr>
+                              <td  class="text-right">Loan Balance</td>
+                              <td class="text-right"><span class="text-light-gray"><small>(As at
+                                {{settlementInformation?.endDate | date: 'mediumDate' }}) </small></span>{{ settlementInformation?.settlementAmount | number : '1.2-2'}}</td>
+                          </tr>
+                            <tr>
+                                <td  class="text-right ">Total Amount Due</td>
+                                <td class="text-right">{{ settlementInformation?.totalRepaymentsDue | number : '1.2-2'}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-12" *ngIf="settlementInformation.thresholdParameterId != null ">
+              <div style="background-color: antiquewhite; margin: 0 auto;" class="col-sm-10 mb-2 p-3">
+              <b class="font-italic">  Settlement Information:</b>
+                <br>
+                <span class="font-italic">
+                  {{settlementInformation?.settlementThresholdUsed }}
+                </span>
+              </div>
+            </div>
+
+
+
+        </div>
+        <div class="row p-5 my-4" style="background-color: antiquewhite;">
+
+          <div class="col-12" *ngIf="!hasPaymentOnAccount">
+            <div class="form-group">
+            <label >New Loan Amount
+
+            </label><b><span *ngIf="selectedLoanAmountType != ''"> : {{  selectedLoanAmount  | number : '1.2-2' }} </span></b>
+            <slct-2 [allowClear]="true" [data]="loanAmountSelectionArray" (selected)="selected($event)"
+              placeholder="Select One"> </slct-2>
+              </div>
+          </div>
+
+          <div class="col-12" *ngIf="selectedLoanAmountType != ''">
+            <div class="form-group">
+              <span class="font-italic" *ngIf="selectedLoanAmountType === 'Current Loan Amount'">
+                <i class="icon icon-question-circle icon-fw icon-xl  "></i> <b> Current Loan Amount:</b> Payments in current Loan account are carried into the new loan account that will be created
+              </span>
+
+              <span class="font-italic" *ngIf="selectedLoanAmountType === 'Loan Balance With Settlement Threshold Considered' || selectedLoanAmountType === 'Loan Balance'">
+                <i class="icon icon-question-circle icon-fw icon-xl"></i> <b> Loan Balance With Settlement Threshold Considered:</b> Payments in current Loan account are NOT carried into the new loan account that will be created
+              </span>
+
+              <span class="font-italic" *ngIf="selectedLoanAmountType === 'Loan Balance Without Settlement Threshold Considered'">
+                <i class="icon icon-question-circle icon-fw icon-xl"></i> <b> Loan Balance Without Settlement Threshold Considere:</b> Payments in current Loan account are NOT carried into the new loan account that will be created
+              </span>
+
+              <span class="font-italic" *ngIf="selectedLoanAmountType === 'Total Amount Due'">
+                <i class="icon icon-question-circle icon-fw icon-xl"></i> <b> Total Amount Due:</b> Payments in current Loan account are NOT carried into the new loan account that will be created
+              </span>
+
+              </div>
+          </div>
+
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="LoanTenor">Loan Tenor ({{loanInformation?.repaymentScheduleType}})  </label>
+                    <select id="LoanTenor" formControlName="LoanTenor" class="form-control" (change)="getRepaymentSchedule()" [disabled]="requestLoader">
+                      <option *ngFor="let item of tenorList" value="{{item}}">{{item}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="RepaymentDate">First Repayment Date</label><br/>
+                    <small  style="text-align:center;color:indianred">Leave empty to use next period cycle from the <b>Loan Start Date</b></small>
+                    <input type="date" formControlName="RepaymentDate" id="RepaymentDate" class="form-control" (change)="getRepaymentSchedule()"/>
+                </div>
+            </div>
+        </div>
+        <div class="row" *ngIf="selectedLoanAmountType != ''">
+            <div class="col-12">
+                <div class="table-responsive">
+                  <table class="table mb-0 table-striped">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col">Period</th>
+                        <th class=" text-center" scope="col">Date</th>
+                        <th class="text-right" scope="col">Installments</th>
+                      </tr>
+                    </thead>
+                    <tbody *ngIf="repaymentScheduleArray.length > 0">
+                      <tr *ngFor="let item of repaymentScheduleArray; let i = index">
+                        <th scope="row">{{item?.paymentNumber  }}</th>
+                        <td class="text-center">  {{item?.paymentDueDate | date: 'mediumDate' }}</td>
+                        <td class="text-right">{{item?.paymentAmount | number : '1.2-2' }}</td>
+                      </tr>
+                    </tbody>
+                    <tbody *ngIf="repaymentLoader">
+                      <tr>
+                        <td colspan="3" style="text-align: center;">
+                          <div *ngIf="repaymentLoader" style="text-align:center;color:indianred">
+                            <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+
+            <div class="dt-login__content-inner">
+            <div class="text-center mb-8">
+              <!-- Form Group -->
+              <div class="form-group row" >
+                <label class="sr-only" for="password-1">Confirm Password</label>
+                Enter your Transaction Pin to Proceed
+                <input type="password" class="form-control" formControlName="TransactionPin" placeholder="Transaction Pin"
+                  autocomplete="off">
+              </div>
+            </div>
+            </div>
+          <!-- /form group -->
+
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-claim  btn-sm" *ngIf="!loader" [disabled]="loanScheduleForm.invalid">
+                Proceed</button>
+              <button type="button" class="btn  btn-claim  btn-sm" *ngIf="loader" [disabled]="true"><i
+                  class="icon icon-spin icon-spin2"></i> Processing...</button>
+
+
+            </div>
+        </div>
+    </form>
+</ng-container>
+<ng-container *ngIf="rescheduleLoader">
+  <div style="text-align:center;color:indianred">
+    <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+  </div>
+</ng-container>

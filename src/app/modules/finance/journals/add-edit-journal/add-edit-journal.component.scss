@@ -1,0 +1,80 @@
+table {
+  border-right: 2px solid white !important;
+}
+.slct-2 {
+  min-width: 154px;
+}
+
+.remove-btn {
+  margin-top: 22px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.add-btn {
+  border-radius: 16px;
+  background-color: #558e80;
+  min-width: 120px;
+}
+
+.bg-custom {
+  background-color: #fbfafa;
+}
+
+.icon-dropdown {
+  color: #999;
+}
+
+.badge-outline {
+  border: 1px soild #333;
+}
+
+.dropDownWrapper {
+  position: absolute;
+  min-width: 154px;
+  height: 180px;
+  overflow-y: scroll;
+}
+
+.dashed {
+  border-bottom: 1px dashed gainsboro;
+}
+
+tbody {
+  border: none;
+  outline: none;
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+footer {
+  background-color: #fff;
+  padding: 20px 0px;
+}
+
+.itemsCard {
+  background-color: #f5f6f8;
+  border: 1px solid #8692a6;
+  border-radius: 4px;
+
+  header p {
+    color: #000;
+    font-weight: 400;
+    font-size: 14px;
+  }
+
+  .table {
+    border-right: none !important;
+    thead {
+      th {
+        font-weight: 400;
+        font-size: 14px;
+      }
+    }
+    tbody {
+      color: #8692a6;
+    }
+  }
+}

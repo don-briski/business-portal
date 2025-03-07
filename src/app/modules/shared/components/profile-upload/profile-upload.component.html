@@ -1,0 +1,75 @@
+<div class="profile">
+  <div [ngClass]="allowEdit ? 'profile-img' : ''">
+    <img
+      [src]="profile?.imgUrl || 'assets/images/male-default-profile.png'"
+      alt="profile-img"
+      class="img mb-5"
+      [ngClass]="{'rounded-circle':!allowEdit}"
+    />
+    <img *ngIf="allowEdit"
+      src="assets/images/profile-edit.svg"
+      class="pointer"
+      (click)="showPopup = true"
+    />
+  </div>
+
+  <div class="details">
+    <p>Customer Name:</p>
+    <p>{{ profile?.name }}</p>
+  </div>
+  <div class="details">
+    <p>Date Of Birth:</p>
+    <p>{{ profile?.dob }}</p>
+  </div>
+</div>
+
+<lnd-popup
+  title="Period Selection"
+  [togglePopup]="showPopup"
+  (closePopup)="showPopup = false"
+>
+  <header class="pop-header">
+    <h4>Update Profile Picture</h4>
+
+    <img
+      src="assets/images/close.svg"
+      alt="close"
+      class="cursor"
+      (click)="showPopup = false"
+    />
+  </header>
+
+  <div class="pop-content">
+    <div class="mb-1">
+      <label>Upload Image</label>
+
+      <div class="file-input cursor" (click)="profileImg.click()">
+        <img src="assets/images/download-dark.svg" />
+
+        <p class="mb-0">
+          {{ profile?.fileName ? profile?.fileName : "No file chosen" }}
+        </p>
+      </div>
+      <input
+        #profileImg
+        type="file"
+        (change)="handleProfileImgUpload($event.target.files)"
+        class="form-control"
+        style="display: none"
+      />
+    </div>
+
+    <img *ngIf="profile?.base64Img" [src]="profile?.base64Img" alt="profile" />
+  </div>
+
+  <div class="pop-footer">
+    <button class="btn" (click)="profileImg.click()">Reselect</button>
+    <button
+      class="btn btn-primary"
+      [disabled]="!profile?.newProfileImg"
+      (click)="saveProfileImage($event)"
+    >
+      Submit
+    </button>
+  </div>
+</lnd-popup>

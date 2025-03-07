@@ -1,0 +1,134 @@
+<form [formGroup]="setupForm">
+  <div class="col-md-12 mb-3">
+    <p *ngIf="monnifyInfo">
+      Monnify payment method is currently
+
+      <!-- <mat-slide-toggle>Deactivated</mat-slide-toggle> -->
+
+      <span
+        class="badge badge-pill badge-success"
+        *ngIf="setupForm.get('isActive').value"
+        >Active</span
+      >
+      <span
+        class="badge badge-pill badge-danger"
+        *ngIf="!setupForm.get('isActive').value"
+        >Inactive</span
+      >
+    </p>
+
+    <small class="mb-5 text-link"
+      >Kindly COPY and PASTE your keys from your Monnify dashboard. DO NOT
+      TYPE!!!
+      <a
+        [style.color]="currentTheme?.secondaryColor"
+        [style.color]="currentTheme?.secondaryColor"
+        class="text-link mb-3"
+        href="#"
+        target="_blank"
+        >Get your keys here.</a
+      ></small
+    >
+
+    <input
+      formControlName="apiKey"
+      type="text"
+      class="form-control"
+      placeholder="API Key"
+    />
+  </div>
+
+  <div class="col-md-12 mb-3">
+    <input
+      formControlName="secretKey"
+      type="text"
+      class="form-control"
+      placeholder="Secret Key"
+    />
+  </div>
+
+  <div class="col-md-12 mb-3">
+    <input
+      formControlName="contractCode"
+      type="text"
+      class="form-control"
+      placeholder="Contract Code"
+    />
+  </div>
+
+  <div *ngIf="monnifyInfo" class="col-md-12 my-6 d-flex">
+    <div class="d-flex align-items-center mr-6">
+      <input
+        type="radio"
+        id="retry"
+        #retry
+        name="isRetryEnabled"
+        value="true"
+        (change)="checked($event)"
+      />
+      <label class="ml-2 mb-0" for="retry"> Enable Retry </label>
+    </div>
+    <div class="d-flex align-items-center">
+      <input
+        type="radio"
+        id="dontRetry"
+        #dontRetry
+        name="isRetryEnabled"
+        value="false"
+        (change)="checked($event)"
+      />
+      <label class="ml-2 mb-0" for="dontRetry"> Disable Retry </label>
+    </div>
+  </div>
+
+  <div class="col-md-12 mb-3">
+    <div class="d-flex">
+      <button
+        [disabled]="setupForm.invalid || isLoading"
+        class="btn btn-sm btn-primary text-uppercase"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        type="button"
+        (click)="submit('update')"
+      >
+        {{ isLoading && state === "update" ? "Updating..." : "Update" }}
+        <i
+          *ngIf="setupForm.valid && isLoading && state === 'update'"
+          class="icon icon-spin icon-spin2"
+        ></i>
+      </button>
+
+      <button
+        class="btn ml-3 btn-sm btn-danger text-uppercase"
+        *ngIf="setupForm.get('isActive').value"
+        (click)="setIsActive('deactivate')"
+        type="button"
+      >
+        {{
+          !isLoading && state === "deactivate"
+            ? "Deactivating..."
+            : "Deactivate"
+        }}
+
+        <i
+          *ngIf="setupForm.valid && isLoading && state === 'deactivate'"
+          class="icon icon-spin icon-spin2"
+        ></i>
+      </button>
+
+      <button
+        class="btn ml-3 btn-sm btn-success text-uppercase"
+        *ngIf="!setupForm.get('isActive').value"
+        (click)="setIsActive('activate')"
+        type="button"
+      >
+        {{ !isLoading && state === "activate" ? "Activating..." : "Activate" }}
+
+        <i
+          *ngIf="setupForm.valid && isLoading && state === 'activate'"
+          class="icon icon-spin icon-spin2"
+        ></i>
+      </button>
+    </div>
+  </div>
+</form>

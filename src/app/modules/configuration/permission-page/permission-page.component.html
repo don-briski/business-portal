@@ -1,0 +1,188 @@
+<div class="dt-page__header" *ngIf="user?.permission?.includes('Create Role')">
+  <h1 class="dt-page__title clearfix">
+    Roles And Permissions
+    <span class="float-right role-add">
+      <button [style.backgroundColor]="currentTheme?.secondaryColor" [style.borderColor]="currentTheme?.secondaryColor"
+        class="btn btn-primary orange-bg" (click)="openModal(addModal)">
+        <i class="icon icon-add-circle mr-2"></i> New Role
+      </button>
+    </span>
+  </h1>
+</div>
+
+<div class="row" *ngIf="user?.permission?.includes('View Roles') || user?.permission?.includes('View Permissions')">
+  <div class="col-12">
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <div *ngIf="loader" class="d-flex justify-content-center">
+          <span [style.color]="currentTheme?.secondaryColor"> <i class="icon icon-spin icon-spin2"></i> Retrieving Permissions...</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Permissions</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="roles?.length > 0">
+              <tr *ngFor="let item of roles">
+                <td>{{ item.roleName }}</td>
+                <td>
+                  <ng-container *ngFor="let perm of item?.permissions">
+                    <span style="cursor: pointer" class="mr-2 badge badge-light p-2 mb-2"
+                      *ngIf="user?.permission?.includes('Remove Permission')"
+                      (click)="removePermission(perm, item.roleId)">{{ perm.permissionName }}</span>
+
+                      <span style="cursor: pointer" class="mr-2 badge badge-light p-2 mb-2"
+                      *ngIf="user?.permission?.includes('View Permissions') && !user?.permission?.includes('Remove Permission')"
+                      >{{ perm.permissionName }}</span>
+
+                  </ng-container>
+                </td>
+                <td>
+                  <div class="btn-group btn-xs dropleft" role="group">
+                    <!-- Dropdown Button -->
+                    <button type="button" class="btn btn-xs btn-primary dropdown-toggle dropdown-toggle-split"
+                      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Action
+                    </button>
+                    <!-- /dropdown button -->
+                    <!-- Dropdown Menu -->
+                    <div class="dropdown-menu" x-placement="left-start"
+                      style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-5px, 0px, 0px);">
+                      <a class="dropdown-item" href="javascript:void(0)" (click)="openEditModal(editModal, item)"
+                        *ngIf="user?.permission?.includes('Update Role')"><i class="icon icon-edit"></i> Edit</a>
+
+                        <a class="dropdown-item" href="javascript:void(0)" (click)="openEditModal(editModal, item, true)"
+                        *ngIf="user?.permission?.includes('Create Role')"><i class="icon icon-copy"></i> Duplicate</a>
+
+                      <a class="dropdown-item text-danger" href="javascript:void(0)" (click)="removeRole(item)"
+                        *ngIf="user?.permission?.includes('Delete Role')"><i class="icon icon-trash"></i> Delete</a>
+                    </div>
+                    <!-- /dropdown menu -->
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+            <tbody *ngIf="roles?.length == 0">
+              <tr>
+                <td colspan="3" class="text-center">No Role Created Yet!</td>
+              </tr>
+            <tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #addModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add Role</h4>
+    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="AddRoleForm" (ngSubmit)="submitRoleForm(AddRoleForm.value)">
+      <div class="form-group"
+        [ngClass]="{'has-error': AddRoleForm.get('RoleName').errors && AddRoleForm.get('RoleName').touched}">
+        <label for="roleName">Role Name</label>
+        <input type="text" placeholder="Role Name" class="form-control" formControlName="RoleName" id="roleName" />
+        <span [style.color]="currentTheme?.secondaryColor" class="help-block"
+          *ngIf="AddRoleForm.get('RoleName').errors && AddRoleForm.get('RoleName').touched">
+          What is your role name?
+        </span>
+      </div>
+      <div class="form-group"
+        [ngClass]="{'has-error': AddRoleForm.get('Permissions').errors && AddRoleForm.get('Permissions').touched}">
+        <label for="permission">Role Permission</label>
+        <angular2-multiselect [data]="permissions" [settings]="dropdownSettings" formControlName="Permissions"
+          placeholder="No Permission Selected">
+        </angular2-multiselect>
+        <span [style.color]="currentTheme?.secondaryColor" class="help-block"
+          *ngIf="AddRoleForm.get('Permissions').errors && AddRoleForm.get('Permissions').touched">
+          What permissions do you want to give this role?
+        </span>
+      </div>
+      <!-- <div *ngIf="AddRoleForm.get('BranchShow').value" class="form-group" [ngClass]="{'has-error': AddRoleForm.get('BranchView').errors && AddRoleForm.get('BranchView').touched}">
+        <label for="BranchView">Branch (View Global) (View Global)</label>
+        <ng-select
+          [multiple]="true"
+          [items]="branchList"
+          placeholder="No branch selected"
+          formControlName="BranchView"
+          (selected)="selectedBranch($event, 'add')"
+          (removed)="removedBranch($event, 'add')"
+        >
+        </ng-select>
+        <span class="help-block" *ngIf="AddRoleForm.get('BranchView').errors && AddRoleForm.get('BranchView').touched">
+          Select global view branches.
+        </span>
+      </div> -->
+      <div class="form-group">
+        <button type="submit" class="btn btn-block btn-secondary" *ngIf="!loader" [disabled]="
+          AddRoleForm.get('RoleName').invalid ||
+          AddRoleForm.get('Permissions').invalid ||
+          AddRoleForm.get('UserId').invalid
+        ">Add Role</button>
+        <button type="button" class="btn btn-block btn-secondary" *ngIf="loader" [disabled]="true"><i
+            class="icon icon-spin icon-spin2"></i> Processing...</button>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <!-- <button type="button" class="btn btn-outline-dark" (click)="modal.close()">Save</button> -->
+  </div>
+</ng-template>
+
+<ng-template #editModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{isDuplicateRole ? 'Duplicate existing' : 'Edit'}} role</h4>
+    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="EditRoleForm" (ngSubmit)="submitEditRoleForm(EditRoleForm.value)">
+      <div class="form-group col-md-6"
+        [ngClass]="{'has-error': EditRoleForm.get('RoleName').errors && EditRoleForm.get('RoleName').touched}">
+        <label for="roleName">Role Name</label>
+        <input type="text" placeholder="Role Name" class="form-control" formControlName="RoleName" id="roleName" />
+        <span [style.color]="currentTheme?.secondaryColor" class="help-block"
+          *ngIf="EditRoleForm.get('RoleName').errors && EditRoleForm.get('RoleName').touched">
+          What is your role name?
+        </span>
+      </div>
+      <div class="form-group col-md-12"
+        [ngClass]="{'has-error': EditRoleForm.get('Permissions').errors && EditRoleForm.get('Permissions').touched}">
+        <label for="permission">Role Permission</label>
+        <div class="multiselect">
+          <angular2-multiselect [data]="permissions" [settings]="dropdownSettings" selected="selectedPermissions"
+          formControlName="Permissions" placeholder="No Permission Selected">
+        </angular2-multiselect>
+        </div>
+        <span [style.color]="currentTheme?.secondaryColor" class="help-block"
+          *ngIf="EditRoleForm.get('Permissions').errors && EditRoleForm.get('Permissions').touched">
+          What permissions do you want to give this role?
+        </span>
+      </div>
+
+      <div class="form-group">
+        <button type="submit" class="btn btn-block btn-warning" *ngIf="!loader" [disabled]="
+          EditRoleForm.get('RoleName').invalid ||
+          EditRoleForm.get('Permissions').invalid ||
+          EditRoleForm.get('UserId').invalid
+        ">Save Role</button>
+        <button type="button" class="btn btn-block btn-warning" *ngIf="loader" [disabled]="true"><i
+            class="icon icon-spin icon-spin2"></i> Processing...</button>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <!-- <button type="button" class="btn btn-outline-dark" (click)="modal.close()">Save</button> -->
+  </div>
+</ng-template>

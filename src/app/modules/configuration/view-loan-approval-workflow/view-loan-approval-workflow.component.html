@@ -1,0 +1,78 @@
+<ng-template #loader>
+  <div class="d-flex justify-content-center">
+    <lnd-spinner text="Loading..."></lnd-spinner>
+  </div>
+</ng-template>
+<section *ngIf="!loading; else loader" class="card main-wrapper">
+  <div header class="d-flex justify-content-between align-items-center mb-6">
+    <h1 class="mb-0">
+      {{ approvalWorkflow?.name }}
+    </h1>
+    <div>
+      <button
+        [routerLink]="
+          '/configurations/parameterssetup/loan-approval-workflows/edit/' +
+          approvalWorkflowId
+        "
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        class="btn btn-sm px-6 text-white"
+      >
+        Edit
+      </button>
+      <button
+        routerLink="/configurations/parameterssetup"
+        class="btn px-6 text-dark border-light-gray"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+  <lnd-accordion
+    *ngFor="let accordItem of accordionItems; let accordIndex = index"
+    [accordionId]="'accordId' + accordIndex"
+    [open]="true"
+    [title]="approvalWorkflow.approvalLevels[accordIndex]?.name"
+    [subTitle]="'Level ' + (accordIndex + 1)"
+    accordionClass="accordion-border"
+  >
+    <main class="mt-4">
+      <div class="mb-4 border-bottom">
+        <p class="subtitle-meta">Approver Permission</p>
+        <div class="row">
+          <div
+            class="col-md-3 my-3"
+            *ngFor="let item of accordItem?.approvalPermissions"
+          >
+            <lnd-accordion-item
+              [containerStyle]="{}"
+              [bgColor]="
+                lightenColor(currentTheme?.primaryColor, lightenAmount)
+              "
+              [primaryColor]="currentTheme?.primaryColor"
+              [value]="item?.value"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <p class="subtitle-meta">Approver Roles</p>
+        <div class="row">
+          <div
+            class="col-md-3 my-3"
+            *ngFor="let item of accordItem?.approvalRoles"
+          >
+            <lnd-accordion-item
+              [containerStyle]="{}"
+              [bgColor]="
+                lightenColor(currentTheme?.primaryColor, lightenAmount)
+              "
+              [primaryColor]="currentTheme?.primaryColor"
+              [value]="item?.value"
+            />
+          </div>
+        </div>
+      </div>
+    </main>
+  </lnd-accordion>
+</section>

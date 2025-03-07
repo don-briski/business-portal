@@ -1,0 +1,593 @@
+<!-- Profile Banner -->
+<div class="profile__banner" [style.background]="currentTheme?.theme === 'dark' ? currentTheme?.dark?.primaryColor : currentTheme?.primaryColor">
+  <!-- Profile Banner Top -->
+  <div class="profile__banner-top">
+    <!-- Avatar Wrapper -->
+    <div class="dt-avatar-wrapper">
+      <!-- Info -->
+      <div class="dt-avatar-info">
+        <span class="mb-2 dt-avatar-name display-4 font-weight-light"
+          >Quick Loan Setup</span
+        >
+        <span class="f-16"
+          >Configure each aspect of the Quick loan product.</span
+        >
+      </div>
+      <!-- /info -->
+    </div>
+    <!-- /avatar wrapper -->
+  </div>
+  <!-- /profile banner top -->
+
+  <!-- Profile Banner Bottom -->
+  <div class="profile__banner-bottom">
+    <!-- Navbar -->
+    <ul class="card-header-pills nav nav-pills" role="tablist">
+      <li class="nav-item">
+        <a
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#loan-setup"
+          role="tab"
+          aria-controls="tab-pane-6"
+          aria-selected="true"
+          >Loan Setup Info
+        </a>
+      </li>
+      <!-- /nav item -->
+    </ul>
+    <!-- /navbar -->
+  </div>
+  <!-- /profile banner bottom -->
+</div>
+<!-- /profile banner -->
+
+<!-- tab content -->
+<div class="tab-content">
+  <!-- Tab panel -->
+
+  <div id="loan-setup" class="tab-pane active show">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-10 offset-xl-1 order-xl-1">
+        <form [formGroup]="configForm">
+          <div class="card mb--20">
+            <div *ngIf="this.config?.repaymentMethods" class="p-5">
+              <p class="mb-0">Repayment method : <span class="badge badge-primary">{{this.config?.repaymentMethods[0]}}</span></p>
+            </div>
+            <div class="dt-card__body">
+              <div id="accordion">
+                <div class="card">
+                  <div
+                    class="card-header cursor"
+                    id="headingOne"
+                    data-toggle="collapse"
+                    data-target="#collapseOne"
+                    aria-expanded="true"
+                    aria-controls="collapseOne"
+                  >
+                    <h5 class="mb-0">Loan limits</h5>
+                  </div>
+
+                  <div
+                    id="collapseOne"
+                    class="collapse show"
+                    aria-labelledby="headingOne"
+                  >
+                    <div class="card-body">
+                      <p [style.color]="currentTheme?.secondaryColor">
+                        Set your loan limits
+                      </p>
+
+                      <div class="row">
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label
+                              >Min. Loan Amount<span class="red">* </span>
+                            </label>
+                            <input
+                              formControlName="minimumLoanAmount"
+                              class="form-control"
+                              type="text"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+
+                            <lnd-input-errors
+                              label="Min. Loan Amount"
+                              [control]="configForm.get('minimumLoanAmount')"
+                            ></lnd-input-errors>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label
+                              >Max Loan Amount<span class="red">* </span>
+                            </label>
+                            <input
+                              formControlName="maximumLoanAmount"
+                              class="form-control"
+                              type="text"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+
+                            <lnd-input-errors
+                              label="Max. Loan Amount"
+                              [control]="configForm.get('maximumLoanAmount')"
+                            ></lnd-input-errors>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label
+                              >Risk Limit Amount<span class="red">* </span>
+                            </label>
+                            <input
+                              formControlName="riskLimitAmount"
+                              class="form-control"
+                              type="text"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+                            <lnd-input-errors
+                              label="Risk Limit Amount"
+                              [control]="configForm.get('riskLimitAmount')"
+                            ></lnd-input-errors>
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label>DSR (%)<span class="red">* </span></label>
+                            <input
+                              formControlName="dsr"
+                              class="form-control"
+                              type="text"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label
+                              >Min. Pay Check<span class="red">* </span></label
+                            >
+                            <input
+                              formControlName="minimumPayCheck"
+                              class="form-control"
+                              type="text"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label
+                              >Max. Pay Check<span class="red">* </span></label
+                            >
+                            <input
+                              formControlName="maximumPayCheck"
+                              class="form-control"
+                              type="text"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-3">
+                          <div class="form-group">
+                            <label
+                              >Interest Rate (%)<span class="red"
+                                >*
+                              </span></label
+                            >
+                            <input
+                              formControlName="interestRate"
+                              class="form-control"
+                              type="text"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="hints mt-3">
+                        <p
+                          class="title"
+                          [style.color]="currentTheme?.secondaryColor"
+                        >
+                          Hints
+                        </p>
+                        <ul>
+                          <li>
+                            <span>Minimum Loan Amount:</span> Your customers
+                            will not see offer below this amount
+                          </li>
+                          <li>
+                            <span>Maximum Loan Amount:</span> Your customers
+                            will not see offer higher this amount
+                          </li>
+                          <li>
+                            <span>Risk Limit Amount:</span> Customers with loan
+                            offers above this will need to be approved by an
+                            underwriter.
+                          </li>
+                          <li>
+                            <span>Debt Service Ratio (DSR):</span> Customers
+                            with loan offers above this will need to be approved
+                            by an underwriter.
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div
+                    class="card-header cursor"
+                    id="headingFive"
+                    data-toggle="collapse"
+                    data-target="#collapseFive"
+                    aria-expanded="true"
+                    aria-controls="collapseFive"
+                  >
+                    <h5 class="mb-0">Applicable Fees</h5>
+                  </div>
+                  <div
+                    id="collapseFive"
+                    class="collapse show"
+                    aria-labelledby="headingFive"
+                  >
+                    <div class="card-body">
+                      <table class="table table-striped" id="table">
+                        <thead>
+                          <tr>
+                            <th class="important-field text-center">
+                              Fee <b class="help-block"> *</b>
+                            </th>
+                            <th style="text-align: center">
+                              Fee Calculation&nbsp;
+                              <span
+                                ><i
+                                  class="icon icon-question-circle icon-fw icon-xl"
+                                  placement="top"
+                                  ngbTooltip="1.DEDUCTED UPFRONT: Deducted from the approved principal amount at disbursement, meaning the client receives less money as actual disbursement, but still has to repay full loan amount by the end of the loan term.  2.CAPITALIZED: Added to the approved principal amount at disbursement, meaning the client receives the approved amount as actual disbursement, but has to repay a higher amount, including the loan fees, by the end of the loan term"
+                                ></i
+                              ></span>
+                            </th>
+
+                            <th class="text-center">Fee Type</th>
+
+                            <th class="text-right">Amount</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody id="tbody">
+                          <tr *ngFor="let line of feelines; let i = index">
+                            <td>
+                              <slct-2
+                                [allowClear]="false"
+                                [data]="feesArray"
+                                (selected)="selected('fee', $event, i)"
+                                placeholder="Select a fee"
+                                [active]="setSelected('feeName', feelines, i)"
+                              >
+                              </slct-2>
+                            </td>
+                            <td>
+                              <slct-2
+                                [allowClear]="true"
+                                [data]="feeApplicationArray"
+                                (selected)="
+                                  selected('feeApplication', $event, i)
+                                "
+                                placeholder="Select One"
+                                [active]="
+                                  setSelected('feeApplication', feelines, i)
+                                "
+                              >
+                              </slct-2>
+                            </td>
+                            <td>
+                              <slct-2
+                                [allowClear]="false"
+                                [data]="feeTypeArray"
+                                [active]="setSelected('feeType', feelines, i)"
+                                (selected)="selected('feeType', $event, i)"
+                                placeholder="Select a fee type"
+                              >
+                              </slct-2>
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                class="form-control"
+                                currencyMask
+                                [options]="{
+                                  prefix: '',
+                                  thousands: ',',
+                                  decimal: '.'
+                                }"
+                                [(ngModel)]="line.feeAmount"
+                                [ngModelOptions]="{ standalone: true }"
+                                placeholder="Amount"
+                              />
+                            </td>
+                            <td style="width: 5%">
+                              <button
+                                *ngIf="i >= 0"
+                                type="button"
+                                class="btn btn-floating btn-warning btn-xs"
+                                (click)="removeFeeRow(i)"
+                              >
+                                <i class="icon icon-close icon-lg"></i>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <td colspan="3">
+                            <button
+                              type="button"
+                              style="border-radius: 15px"
+                              class="btn btn-floating btn-success btn-xs"
+                              (click)="addFeeRow()"
+                            >
+                              <i class="icon icon-add"></i> Add new fee
+                            </button>
+                          </td>
+                          <td></td>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card">
+                  <div
+                    class="card-header cursor"
+                    id="headingTwo"
+                    data-toggle="collapse"
+                    data-target="#collapseTwo"
+                    aria-expanded="true"
+                    aria-controls="collapseTwo"
+                  >
+                    <h5 class="mb-0">Loan Calculation Constraints</h5>
+                  </div>
+                  <div
+                    id="collapseTwo"
+                    class="collapse show"
+                    aria-labelledby="headingTwo"
+                  >
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label [style.color]="currentTheme?.secondaryColor"
+                          >Select all applicable tenors you want to generate
+                          loan offers for
+                        </label>
+                        <p class="mt-5 mb-3">Tenor</p>
+                        <div
+                          class="d-flex align-items-center justify-content-between"
+                        >
+                          <div class="tenor" *ngFor="let item of tenors">
+                            <input
+                              type="checkbox"
+                              [checked]="tenorSelection.isSelected(item)"
+                              (change)="toggleTenor(item)"
+                            />
+                            <span>{{ item }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div
+                    class="card-header cursor"
+                    id="headingThree"
+                    data-toggle="collapse"
+                    data-target="#collapseThree"
+                    aria-expanded="true"
+                    aria-controls="collapseThree"
+                  >
+                    <h5 class="mb-0">Daily Summary</h5>
+                  </div>
+                  <div
+                    id="collapseThree"
+                    class="collapse show"
+                    aria-labelledby="headingThree"
+                  >
+                    <div class="card-body">
+                      <div class="form-group w-75">
+                        <label [style.color]="currentTheme?.secondaryColor"
+                          >A summary of this product's daily performance will be
+                          sent to the emails included below
+                        </label>
+                        <div class="mb-6 d-flex flex-wrap">
+                          <h3
+                            class="mb-0"
+                            *ngFor="
+                              let item of dailySummaryEmails;
+                              let i = index
+                            "
+                          >
+                            <span
+                              class="badge badge-pill badge-light badge-lg mr-2 px-4 mb-1"
+                              >{{ item?.email }}
+                              <i
+                                class="icon icon-trash ml-2 cursor text-danger"
+                                (click)="removeEmail(i)"
+                              ></i>
+                            </span>
+                          </h3>
+                        </div>
+                        <div class="d-flex">
+                          <input
+                            type="email"
+                            [(ngModel)]="recipientEmail"
+                            [ngModelOptions]="{ standalone: true }"
+                            class="form-control w-50"
+                            placeholder="Enter recipient's email"
+                          />
+                          <button
+                            class="btn btn-primary ml-3"
+                            type="button"
+                            (click)="addEmail()"
+                            [disabled]="!recipientEmail"
+                          >
+                            Add Email
+                          </button>
+                        </div>
+                        <small class="red" *ngIf="emailError">{{
+                          emailError
+                        }}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div
+                    class="card-header cursor"
+                    id="headingFour"
+                    data-toggle="collapse"
+                    data-target="#collapseFour"
+                    aria-expanded="true"
+                    aria-controls="collapseFour"
+                  >
+                    <h5 class="mb-0">Communications & Guidelines</h5>
+                  </div>
+                  <div
+                    id="collapseFour"
+                    class="collapse show"
+                    aria-labelledby="headingFour"
+                  >
+                    <div class="card-body">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label
+                              >Contact Phone Number
+                              <span class="red">* </span>
+                            </label>
+                            <input
+                              type="text"
+                              [dropSpecialCharacters]="false"
+                              mask="9*"
+                              formControlName="contactPhoneNumber"
+                              class="form-control"
+                              placeholder="Enter phone number"
+                            />
+                          </div>
+                        </div>
+                        <div class="col-md-6">
+                          <div class="form-group">
+                            <label
+                              >Service Code
+                              <span class="red">* </span>
+                            </label>
+                            <input
+                              type="text"
+                              formControlName="serviceCode"
+                              class="form-control"
+                              placeholder="Enter Service Code"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-group w-100">
+                        <label
+                          >Terms & Conditions
+                          <span class="red">* </span>
+                        </label>
+                        <textarea
+                          formControlName="termsAndConditions"
+                          class="form-control"
+                          cols="30"
+                          rows="5"
+                          placeholder="Enter terms & conditions"
+                        ></textarea>
+
+                        <lnd-input-errors
+                          label="Terms and Conditions"
+                          [control]="configForm.get('termsAndConditions')"
+                        ></lnd-input-errors>
+                      </div>
+                      <div class="hints mt-3">
+                        <p
+                          class="title"
+                          [style.color]="currentTheme?.secondaryColor"
+                        >
+                          Hints
+                        </p>
+                        <ul>
+                          <li>
+                            <span>Contact Phone Number:</span> Your customers
+                            will see this phone number and use it to contact
+                            you.
+                          </li>
+                          <li>
+                            <span>Terms & Conditions:</span> Your customers will
+                            be shown these Terms & Conditions before they accept
+                            a loan.
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end">
+                <button
+                  [style.backgroundColor]="currentTheme?.secondaryColor"
+                  [style.borderColor]="currentTheme?.secondaryColor"
+                  class="mt-3 mb-3 btn btn-primary orange-bg"
+                  type="submit"
+                  (click)="submitForm()"
+                  [disabled]="configForm?.invalid || isSaving"
+                >
+                  <i class="icon icon-spin icon-spin2" *ngIf="isSaving"></i>
+                  {{ isSaving ? "Updating..." : "Update" }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+  <!-- /profile content -->
+</div>

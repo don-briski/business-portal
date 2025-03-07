@@ -1,0 +1,181 @@
+<section>
+  <h4 class="mt-5 mb-4">Fields</h4>
+  <div
+    class="row"
+    *ngFor="let field of customFields.controls; let fieldIndex = index"
+    [formGroup]="field"
+  >
+    <div class="col-md-12">
+      <div [id]="'childAccordion' + fieldIndex">
+        <div>
+          <div class="d-flex justify-content-between" id="headingOne">
+            <div>
+              <h5 class="mb-0 mr-3 d-inline-block">
+                {{
+                  field.value.customFieldName === ""
+                    ? "New Field"
+                    : field.value.customFieldName
+                }}
+              </h5>
+              <span
+                *ngIf="field.get('isRequired').value"
+                class="badge rounded-pill badge-danger mr-2"
+                >Is Required</span
+              >
+            </div>
+            <div>
+              <span
+                *ngIf="field.get('dataType').value"
+                class="badge rounded-pill badge-success mr-5"
+                >{{ getFormattedDataType(field.get("dataType").value) }}</span
+              >
+              <span
+                *ngIf="!viewMode"
+                class="cursor mr-5 text-danger"
+                (click)="onRemoveCustomField(fieldIndex)"
+              >
+                <i class="icon icon-trash"></i>
+              </span>
+              <span
+                (click)="onExpandCustomField(fieldIndex)"
+                [ngClass]="
+                  selectedCFieldIndex === fieldIndex ? 'open' : 'close'
+                "
+                class="cursor"
+                [attr.data-target]="'#cFAccrdContent' + fieldIndex"
+                ><i class="icon icon-chevron-down icon-lg"></i
+              ></span>
+            </div>
+          </div>
+          <div class="content">
+            <div
+              [id]="'cFAccrdContent' + fieldIndex"
+              [class]="selectedCFieldIndex === fieldIndex ? '' : 'collapse'"
+              aria-labelledby="headingOne"
+              [attr.data-parent]="'#childAccordion' + fieldIndex"
+            >
+              <div class="row mt-4 d-flex align-items-end">
+                <div class="col-md-4">
+                  <label>Field Name <b class="text-danger">*</b></label>
+                  <input
+                    class="form-control"
+                    formControlName="customFieldName"
+                    placeholder="Enter field name"
+                    [readonly]="viewMode"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label
+                    >Data Type <b class="text-danger">*</b>
+                    <i
+                      class="icon icon-question-circle icon-fw icon-xl"
+                      placement="top"
+                      ngbTooltip="Select the type for this field"
+                    ></i>
+                  </label>
+                  <slct-2
+                    [data]="dataTypes"
+                    [active]="
+                      field.value?.selectedDataType
+                        ? field.value?.selectedDataType
+                        : null
+                    "
+                    placeholder="Select Data Type"
+                    (selected)="onSelect('dataType', fieldIndex, $event)"
+                    (removed)="onDeselect('dataType', fieldIndex, $event)"
+                    [disabled]="viewMode"
+                  ></slct-2>
+                </div>
+                <div class="col-md-4">
+                  <label>Field Status <b class="text-danger">*</b></label>
+                  <slct-2
+                    [data]="statuses"
+                    [active]="
+                      field.value?.selectedStatus
+                        ? field.value?.selectedStatus
+                        : null
+                    "
+                    placeholder="Select Status"
+                    (selected)="onSelect('status', fieldIndex, $event)"
+                    (removed)="onDeselect('status', fieldIndex, $event)"
+                    [disabled]="viewMode"
+                  ></slct-2>
+                </div>
+              </div>
+              <ng-container
+                *ngIf="
+                  field.get('dataType').value === 'Selection' ||
+                  field.get('dataType').value === 'RadioGroup'
+                "
+              >
+                <div class="row mt-4">
+                  <ng-container
+                    *ngFor="
+                      let selectn of getSelections(fieldIndex)?.controls;
+                      let selectnIndex = index
+                    "
+                  >
+                    <div class="col-md-4 mb-4" [formGroup]="selectn">
+                      <label>Option's Label <b class="text-danger">*</b></label>
+                      <div class="d-flex align-items-center">
+                        <input
+                          class="form-control"
+                          placeholder="Enter a label"
+                          formControlName="label"
+                          [readonly]="viewMode"
+                        />
+                        <i
+                          (click)="onRemoveSelection(fieldIndex, selectnIndex)"
+                          class="cursor text-danger icon icon-trash ml-2"
+                        ></i>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+                <div *ngIf="!viewMode">
+                  <button
+                    type="button"
+                    class="btn pl-0"
+                    [style.color]="colorTheme.secondaryColor"
+                    (click)="onAddSelection(fieldIndex)"
+                  >
+                    <i class="icon icon-add"></i> Add New Option
+                  </button>
+                </div>
+              </ng-container>
+              <div class="row mt-4">
+                <div class="col-md-8">
+                  <label>Description</label>
+                  <textarea
+                    class="form-control"
+                    formControlName="customFieldDescription"
+                    rows="3"
+                    placeholder="Enter some text"
+                    [readonly]="viewMode"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="mt-4">
+                <lnd-switch
+                  text="Is Required"
+                  [value]="field.get('isRequired').value"
+                  (emittedValue)="onSetIsRequired($event, fieldIndex)"
+                  [disabled]="viewMode"
+                ></lnd-switch>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button
+    *ngIf="!viewMode"
+    type="button"
+    class="btn pl-0"
+    [style.color]="colorTheme.secondaryColor"
+    (click)="onAddCustomField()"
+  >
+    <i class="icon icon-add"></i> Add New Field
+  </button>
+</section>

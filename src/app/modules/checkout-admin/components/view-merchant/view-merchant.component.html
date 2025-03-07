@@ -1,0 +1,122 @@
+<div *ngIf="fetching" class="text-center p-5">
+  <lnd-spinner></lnd-spinner>
+</div>
+<section *ngIf="!fetching && merchant" class="card p-5">
+  <header>
+    <div class="d-flex justify-content-between align-items-top">
+      <div class="img-container mb-2">
+        <img
+          *ngIf="merchant?.logoUrl"
+          class="mx-auto img-fluid d-block"
+          [src]="merchant?.logoUrl"
+          alt="Merchant Image"
+        />
+      </div>
+      <div>
+        <button
+          [routerLink]="
+            '/checkout-admin/config/merchants/' + merchant?.id + '/edit'
+          "
+          [style.backgroundColor]="colorTheme?.secondaryColor"
+          class="btn btn-sm px-6 text-white mr-1"
+        >
+          Edit
+        </button>
+        <button
+          routerLink="/checkout-admin/config/merchants"
+          class="btn btn-sm px-6 text-dark ml-1 btn-outline-light"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+    <h1>{{ merchant?.name }}</h1>
+    <h6 class="subheading pb-3 mb-5">
+      Merchant is currently
+      <span
+        [ngClass]="{
+          'text-success': merchant?.status === 'Active',
+          'text-danger': !merchant?.status === 'Inactive',
+        }"
+        >{{ merchant?.status }}</span
+      >
+    </h6>
+  </header>
+  <div>
+    <div class="row mb-5">
+      <div class="col-md-4 b-list-item">
+        <h6>Merchant Name</h6>
+        <p>{{ merchant?.name }}</p>
+      </div>
+      <div class="col-md-4 b-list-item">
+        <h6>Merchant Email</h6>
+        <p>{{ merchant?.email }}</p>
+      </div>
+      <div class="col-md-4 b-list-item">
+        <h6>No of Applications</h6>
+        <p>{{ merchant?.successfulApplications }}</p>
+      </div>
+      <div class="col-md-4 b-list-item">
+        <h6>Merchant Address</h6>
+        <p>
+          <span *ngIf="merchant?.billingAddress?.houseNumber"
+            >{{ merchant?.billingAddress?.houseNumber }}, </span
+          >{{ merchant?.billingAddress?.address }},
+          {{ merchant?.billingAddress?.city }},
+          {{ merchant?.billingAddress?.state }},
+          {{ merchant?.billingAddress?.country }}
+        </p>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-md-4 b-list-item">
+        <h6>Phone Number</h6>
+        <p>{{ merchant?.phoneNumber }}</p>
+      </div>
+      <div class="col-md-4 b-list-item">
+        <h6>Bank</h6>
+        <p>{{ merchant?.bankName }}</p>
+      </div>
+      <div class="col-md-4 b-list-item">
+        <h6>Account Number</h6>
+        <p>{{ merchant?.accountNumber }}</p>
+      </div>
+    </div>
+    <div class="row mb-5">
+      <div class="col-md-4 b-list-item"*ngIf="merchant?.hasMaximumLoanAmount">
+        <h6>Maximum Loan Amount</h6>
+        <p>
+          {{ appOwnerInfo?.currency?.currencySymbol }}
+          {{ merchant?.maxLoanAmount | number : "1.2-2" }}
+        </p>
+      </div>
+      <div class="col-md-4 b-list-item" *ngIf="merchant?.hasCommission">
+        <h6>Commission Rate (%)</h6>
+        <p>{{ merchant?.commission }}</p>
+      </div>
+      <div class="col-md-4 b-list-item" *ngIf="merchant?.hasInterestRate">
+        <h6>Interest Rate (%)</h6>
+        <p>{{ merchant?.interestRate }}</p>
+      </div>
+      <div class="col-md-4 b-list-item" *ngIf="merchant?.autoDeclineConfiguration?.autoDeclineByCategory?.isEnabled">
+        <h6>Auto decline loans with these categories</h6>
+        <span class="badge badge-pill my-1 mr-1 badge-light" *ngFor="let cat of merchant?.autoDeclineConfiguration?.autoDeclineByCategory?.categories">Cat {{ cat }}</span>
+      </div>
+      <div class="col-md-4 b-list-item" *ngIf="merchant?.autoDeclineConfiguration?.autoDeclineByEarningClass?.isEnabled">
+        <h6>Auto decline loans with these earning classes</h6>
+        <span class="badge badge-pill my-1 mr-1 badge-light" *ngFor="let earningClass of merchant?.autoDeclineConfiguration?.autoDeclineByEarningClass?.earningClasses">{{ earningClass | humanify }}</span>
+      </div>
+
+    </div>
+    <div class="row mb-5">
+      <div class="col-md-4 b-list-item" *ngIf="merchant?.redirectUrl">
+        <h6>Redirect URL</h6>
+        <p>{{ merchant?.redirectUrl }}</p>
+      </div>
+      <div class="col-md-4 b-list-item" *ngIf="merchant?.callBackUrl">
+        <h6>Webhook URL</h6>
+        <p>{{ merchant?.callBackUrl }}</p>
+      </div>
+    </div>
+  </div>
+</section>

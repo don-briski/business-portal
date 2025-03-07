@@ -1,0 +1,752 @@
+<div class="d-flex justify-content-center">
+  <lnd-spinner
+    *ngIf="isLoading && !invoiceDetails"
+    text="Retrieving Invoice..."
+    [color]="currentTheme?.secondaryColor"
+  ></lnd-spinner>
+</div>
+
+<div *ngIf="invoiceDetails" class="wrapper single-view">
+  <div class="d-flex flex-row">
+    <div class="left pr-4">
+      <div class="top">
+        <header
+          class="w-100 d-flex align-items-center justify-content-between mb-3"
+        >
+          <h1 class="dt-page__title mb-0">Invoice</h1>
+          <span class="float-right role-add">
+            <a
+              *ngIf="user?.permission?.includes('Create Invoice')"
+              class="btn btn-primary mr-2 text-white"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [routerLink]="['/finance/invoices/create']"
+              routerLinkActive="router-link-active"
+              href="javascript:void(0)"
+            >
+              <i class="icon icon-add-circle mr-2"></i>Add Invoice</a
+            >
+          </span>
+        </header>
+      </div>
+
+      <div class="body">
+        <div class="card">
+          <div class="card-body p-0">
+            <ul class="inv-list">
+              <li
+                *ngFor="let item of invoices"
+                (click)="viewInvoice(item)"
+                [ngClass]="{
+                  selected: invoiceDetails?.invoiceId === item?.id
+                }"
+                [style.border-left]="
+                  invoiceDetails.invoiceId === item?.id
+                    ? '5px solid ' + currentTheme.secondaryColor
+                    : ''
+                "
+                (mouseover)="item.hover = true"
+                (mouseleave)="
+                  invoiceDetails.invoiceId !== item?.id
+                    ? (item.hover = false)
+                    : null
+                "
+                [ngStyle]="item.hover ? hoverStyle : {}"
+              >
+                <span
+                  class="d-flex justify-content-between align-items-center title"
+                >
+                  <span>{{ item?.customer }}</span>
+                  <span
+                    >{{ appOwner?.currency?.currencySymbol
+                    }}{{ item?.amount | number : "1.2-2" }}</span
+                  >
+                </span>
+                <span
+                  class="d-flex justify-content-between align-items-center sub-title mt-2"
+                >
+                  <span>
+                    {{ item?.code }} |
+                    {{ item?.invoiceDate | customDatePipe : "DD-MMM-YY" }}
+                  </span>
+                  <span>
+                    <span
+                      class="badge badge-sm"
+                      [ngClass]="{
+                        'badge-warning': item.status === 'Draft',
+                        'badge-approval': item.status === 'SentForApproval',
+                        'badge-success': item.status === 'Posted',
+                        'badge-notPaid':
+                          item?.status === 'Posted' &&
+                          item?.paymentStatus === 'NotPaid',
+                        'badge-partiallyPaid':
+                          item?.status === 'Posted' &&
+                          item?.paymentStatus === 'Partially Paid',
+                        'badge-danger': item.status === 'Rejected',
+                        'badge-redraft': item.status === 'Redraft',
+                        'badge-overdue': item?.status === 'Overdue'
+                      }"
+                    >
+                      <span *ngIf="item.status !== 'Posted'; else isPosted">
+                        {{
+                          item.status === "SentForApproval"
+                            ? "Awaiting Approval"
+                            : item?.status
+                        }}
+                      </span>
+
+                      <ng-template #isPosted>
+                        <span>
+                          {{ item?.paymentStatus | humanify }}
+                        </span>
+                      </ng-template>
+                    </span>
+                  </span>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="invoiceDetails && !isLoading; else loader" class="right px-2">
+      <div class="top card mb-3">
+        <div class="card-body">
+          <header class="float-right">
+            <button
+              *ngIf="
+                (invoiceDetails?.paymentStatus === 'Not Paid' ||
+                  invoiceDetails?.paymentStatus === 'Partially Paid') &&
+                user?.permission?.includes('Create Finance Payment')
+              "
+              class="btn btn-success btn-xs"
+              (click)="openModal(payment)"
+            >
+              Make Payment
+            </button>
+
+            <button
+              *ngIf="
+                invoiceDetails?.status === 'SentForApproval' &&
+                user?.permission?.includes('Approve Invoice')
+              "
+              class="btn btn-review btn-xs"
+              (click)="openModal(approval)"
+            >
+              Review Request
+            </button>
+
+            <button
+              class="btn btn-xs btn-primary"
+              (click)="printInvoice(invoiceDetails.customer)"
+            >
+              {{ printStatus }}
+              <i
+                *ngIf="printStatus === 'Processing'"
+                class="icon icon-spin icon-spin2"
+              ></i>
+            </button>
+            <button
+              *ngIf="
+                user?.permission?.includes('Create Invoice') &&
+                invoiceDetails.status === invoiceStatusEnum.Posted
+              "
+              class="btn btn-xs clone-btn"
+              (click)="cloneInvoice()"
+            >
+              Clone
+            </button>
+            <button
+              *ngIf="
+                user?.permission?.includes('Edit Invoice') &&
+                (invoiceDetails?.status === 'Draft' ||
+                  invoiceDetails?.status === 'ReDraft')
+              "
+              class="btn btn-xs btn-light"
+              [routerLink]="
+                '/finance/invoices/edit/' + invoiceDetails?.invoiceId
+              "
+            >
+              Edit
+            </button>
+            <button class="btn btn-xs btn-outline-dark" (click)="closeView()">
+              Close
+            </button>
+          </header>
+        </div>
+      </div>
+
+      <div
+        id="tabs"
+        class="d-flex justify-content-between align-items-center py-2"
+        style="padding-left: 30px"
+      >
+        <ul
+          id="active-div"
+          class="card-header-pills nav nav-pill justify-content-center align-items-center"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              id="nav-overview"
+              class="nav-link pool-nav active-tab"
+              data-toggle="tab"
+              href="#tab-overview"
+              role="tab"
+              aria-controls="tab-overview"
+              aria-selected="false"
+              (click)="switchTabs('overview')"
+              >Overview</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-comments"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-comments"
+              role="tab"
+              aria-controls="tab-comments"
+              aria-selected="false"
+              (click)="switchTabs('comments')"
+              >Comments</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-activity"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-activity"
+              role="tab"
+              aria-controls="tab-activity"
+              aria-selected="false"
+              (click)="switchTabs('activity')"
+              >Activity Logs</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-files"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-files"
+              role="tab"
+              aria-controls="tab-files"
+              aria-selected="false"
+              (click)="switchTabs('files')"
+              >Files</a
+            >
+          </li>
+
+          <li *ngIf="invoiceDetails?.payments?.length > 0" class="nav-item">
+            <a
+              id="nav-payments"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-payments"
+              role="tab"
+              aria-controls="tab-payments"
+              aria-selected="false"
+              (click)="switchTabs('payments')"
+              >Payments</a
+            >
+          </li>
+
+          <li *ngIf="invoiceDetails?.credits?.length > 0" class="nav-item">
+            <a
+              id="nav-credits"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-credits"
+              role="tab"
+              aria-controls="tab-credits"
+              aria-selected="false"
+              (click)="switchTabs('credits')"
+              >Credits</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="tab-content">
+        <div id="tab-overview" class="tab-pane active show">
+          <div class="paper p-5" #InvoicePaper>
+            <div class="card">
+              <lnd-ribbon
+                [status]="invoiceDetails?.status"
+                [paymentStatus]="invoiceDetails?.paymentStatus"
+              ></lnd-ribbon>
+              <div class="card-body">
+                <div class="content">
+                  <div class="d-flex justify-content-between mb-5">
+                    <span>
+                      <div
+                        *ngIf="businessLogo !== ''"
+                        class="img-container mb-2"
+                      >
+                        <img
+                          #bizLogo
+                          class="mx-auto img-fluid d-block"
+                          [src]="base64Image"
+                        />
+                      </div>
+                      <p class="h3 mb-1">{{ appOwner?.appOwnerName }}</p>
+                      <p class="mb-1">{{ appOwner?.appOwnerEmail }}</p>
+                      <p class="mb-1">
+                        {{ appOwner?.appOwnerInvoiceingAddress }}
+                      </p>
+                    </span>
+
+                    <span class="text-right">
+                      <h3 class="display-1">Invoice</h3>
+                      <p>Invoice # {{ invoiceDetails?.invoiceCode }}</p>
+
+                      <br />
+                      <br />
+                      <p class="mb-1">Balance Due</p>
+                      <p class="display-3">
+                        {{ appOwner?.currency?.currencySymbol
+                        }}{{ invoiceDetails?.balanceDue | number : "1.2-2" }}
+                      </p>
+                    </span>
+                  </div>
+
+                  <div
+                    class="d-flex justify-content-between align-items-center"
+                  >
+                    <div>
+                      <p class="mb-1">Invoice To</p>
+                      <p class="mb-3 text-primary">
+                        {{ invoiceDetails?.customer }}
+                      </p>
+                      <span *ngIf="invoiceDetails.subject">
+                        <p class="mb-1">Subject</p>
+                        <p class="mb-1">{{ invoiceDetails?.subject }}</p>
+                      </span>
+                    </div>
+                    <div class="float-right">
+                      <div class="d-flex">
+                        <div class="d-flex flex-column align-items-end">
+                          <p class="mb-1">Invoice Date :</p>
+
+                          <p class="mb-1">Terms :</p>
+
+                          <p class="mb-1">Invoice Due Date :</p>
+                        </div>
+
+                        <div class="d-flex flex-column align-items-end">
+                          <p class="mb-1 ml-5">
+                            {{
+                              invoiceDetails.invoiceDate
+                                | customDatePipe : "DD-MMM-YYYY"
+                            }}
+                          </p>
+
+                          <p class="mb-1 ml-5">
+                            {{ invoiceDetails.paymentTerm.paymentTermName }}
+                          </p>
+
+                          <p class="mb-1 ml-5">
+                            {{
+                              invoiceDetails.invoiceDueDate
+                                | customDatePipe : "DD-MMM-YYYY"
+                            }}
+                          </p>
+                        </div>
+                        <div></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <table class="table items-table mt-6">
+                    <thead [style.background]="currentTheme.primaryColor">
+                      <th>#</th>
+                      <th>Item</th>
+                      <th>Quantity</th>
+                      <th class="text-right">
+                        Rate ({{ appOwner?.currency?.currencySymbol }})
+                      </th>
+                      <th
+                        *ngIf="invoiceDetails.discountLevel === 'LineItemLevel'"
+                        class="text-right"
+                      >
+                        Discount (%)
+                      </th>
+                      <th class="text-right">
+                        Amount ({{ appOwner?.currency?.currencySymbol }})
+                      </th>
+                    </thead>
+
+                    <tbody>
+                      <tr
+                        *ngFor="
+                          let invoice of invoiceDetails.lines;
+                          let i = index
+                        "
+                      >
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ invoice.itemName }} ({{ invoice.itemCode }})</td>
+                        <td>{{ invoice.quantity }}</td>
+                        <td class="text-right">
+                          {{ invoice.unitPrice | number : "1.2-2" }}
+                        </td>
+                        <td
+                          *ngIf="
+                            invoiceDetails.discountLevel === 'LineItemLevel'
+                          "
+                          class="text-right"
+                        >
+                          {{ invoice.discountValueOnType }}
+                        </td>
+                        <td class="text-right">
+                          {{ invoice.totalAmount | number : "1.2-2" }}
+                        </td>
+                      </tr>
+                      <tr class="summary-sub">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td
+                          *ngIf="
+                            invoiceDetails.discountLevel === 'LineItemLevel'
+                          "
+                        ></td>
+                        <td class="text-right"><b>Sub Total</b></td>
+
+                        <td class="text-right">
+                          {{ invoiceDetails.subTotal | number : "1.2-2" }}
+                        </td>
+                      </tr>
+
+                      <tr
+                        class="tr-border"
+                        *ngIf="
+                          invoiceDetails.discountLevel === 'TransactionLevel' &&
+                          invoiceDetails.discountAmount > 0
+                        "
+                      >
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td
+                          *ngIf="
+                            invoiceDetails.discountLevel === 'LineItemLevel'
+                          "
+                        ></td>
+                        <td class="text-right">
+                          Discount ({{
+                            invoiceDetails.transactionLevelDiscount
+                              | number : "1.2-2"
+                          }}%)
+                        </td>
+                        <td class="text-right text-danger">
+                          -
+                          {{ invoiceDetails.discountAmount | number : "1.2-2" }}
+                        </td>
+                      </tr>
+
+                      <ng-container *ngFor="let line of invoiceDetails.lines">
+                        <tr *ngIf="line.tax" class="tr-border">
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td
+                            *ngIf="
+                              invoiceDetails.discountLevel === 'LineItemLevel'
+                            "
+                          ></td>
+                          <td class="text-right">
+                            {{ line.tax ? line?.tax?.name : "" }} ({{
+                              line.tax ? line?.tax?.value + "%" : ""
+                            }})
+                          </td>
+                          <td class="text-right">
+                            {{
+                              line?.taxAmount
+                                ? line.taxAmount
+                                : (null | number : "1.2-2")
+                            }}
+                          </td>
+                        </tr>
+                      </ng-container>
+
+                      <tr class="tr-border">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td
+                          *ngIf="
+                            invoiceDetails.discountLevel === 'LineItemLevel'
+                          "
+                        ></td>
+                        <td class="text-right"><b>Total</b></td>
+                        <td class="text-right">
+                          {{ appOwner?.currency?.currencySymbol
+                          }}{{ invoiceDetails.totalAmount | number : "1.2-2" }}
+                        </td>
+                      </tr>
+
+                      <tr
+                        *ngIf="invoiceDetails?.totalPayments"
+                        class="tr-border"
+                      >
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td
+                          *ngIf="
+                            invoiceDetails.discountLevel === 'LineItemLevel'
+                          "
+                        ></td>
+                        <td class="text-right">Payments Recieved</td>
+                        <td class="text-right text-danger">
+                          - {{ appOwner?.currency?.currencySymbol
+                          }}{{
+                            invoiceDetails.totalPayments | number : "1.2-2"
+                          }}
+                        </td>
+                      </tr>
+
+                      <tr
+                        *ngIf="invoiceDetails.totalCreditsApplied > 0"
+                        class="tr-border"
+                      >
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td
+                          *ngIf="
+                            invoiceDetails.discountLevel === 'LineItemLevel'
+                          "
+                        ></td>
+                        <td class="text-right">Credits Applied</td>
+                        <td class="text-right text-danger">
+                          - {{ appOwner?.currency?.currencySymbol
+                          }}{{
+                            invoiceDetails.totalCreditsApplied
+                              | number : "1.2-2"
+                          }}
+                        </td>
+                      </tr>
+
+                      <tr class="tr-border">
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td
+                          *ngIf="
+                            invoiceDetails.discountLevel === 'LineItemLevel'
+                          "
+                        ></td>
+                        <td
+                          class="text-right p-4"
+                          style="background-color: gainsboro"
+                        >
+                          <b>Balance Due</b>
+                        </td>
+                        <td
+                          class="text-right p-4"
+                          style="background-color: gainsboro"
+                        >
+                          {{ appOwner?.currency?.currencySymbol
+                          }}{{ invoiceDetails.balanceDue | number : "1.2-2" }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <div *ngIf="invoiceDetails.customerNotes" class="mt-6">
+                    <p>Notes</p>
+                    <p>{{ invoiceDetails.customerNotes }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="tab-comments" class="tab-pane">
+          <div class="p-5">
+            <div class="card">
+              <table
+                *ngIf="invoiceDetails?.comments.length > 0"
+                class="table table-striped mb-0"
+                style="font-size: 11px"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th class="text-uppercase" scope="col">Username</th>
+                    <th class="text-uppercase" scope="col">Comment</th>
+                    <th class="text-uppercase" scope="col">Date Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of invoiceDetails?.comments">
+                    <td *ngIf="item?.comment">{{ item?.name }}</td>
+                    <td *ngIf="item?.comment">{{ item?.comment }}</td>
+                    <td *ngIf="item?.comment">
+                      {{ item?.dateCreated | customDatePipe }}
+                      <i class="icon icon-timepicker ml-3"></i>
+                      {{ item?.dateCreated | date : "shortTime" }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <no-data
+                *ngIf="invoiceDetails?.comments.length === 0"
+                [currentTheme]="currentTheme"
+                [title]="'No Comments'"
+              ></no-data>
+            </div>
+          </div>
+        </div>
+        <div id="tab-activity" class="tab-pane">
+          <div class="p-5">
+            <div class="card">
+              <table
+                *ngIf="activityLogs.length > 0"
+                class="table mb-0 table-striped"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Activity</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of activityLogs">
+                    <td [style.color]="currentTheme?.secondaryColor">
+                      {{ row?.relatedObjectInitiatorCode }}
+                    </td>
+                    <td>{{ row?.activityDescription }}</td>
+                    <td>
+                      {{ row?.activityDate | customDatePipe }}
+                      <i class="icon icon-timepicker ml-3"></i>
+                      {{ row?.activityDate | date : "shortTime" }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div
+                *ngIf="activityLogs.length === 0"
+                class="d-flex flex-column align-items-center w-100 py-3"
+              >
+                <p class="display-4 text-center font-weight-light mb-0">
+                  No Activities Available
+                </p>
+                <img
+                  src="assets/images/no data.svg"
+                  alt="no-data-svg"
+                  width="200px"
+                  class="py-5"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="tab-files" class="tab-pane">
+          <lnd-uploaded-files
+            [files]="invoiceDetails.files"
+          ></lnd-uploaded-files>
+        </div>
+        <div
+          *ngIf="invoiceDetails?.payments?.length > 0"
+          id="tab-payments"
+          class="tab-pane"
+        >
+          <div class="p-5">
+            <div class="card">
+              <table class="table mb-0 table-striped">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Code</th>
+                    <th scope="col">Reference</th>
+                    <th scope="col">Payment Mode</th>
+                    <th scope="col">Amount</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let payment of invoiceDetails.payments">
+                    <td>{{ payment.datePosted | customDatePipe }}</td>
+                    <td [style.color]="currentTheme?.secondaryColor">
+                      {{ payment.paymentCode }}
+                    </td>
+
+                    <td>{{ payment.paymentReference }}</td>
+                    <td>Payment Mode</td>
+                    <td>{{ payment.amountAllocated | number : "1.2-2" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div
+          *ngIf="invoiceDetails?.credits?.length > 0"
+          id="tab-credits"
+          class="tab-pane"
+        >
+          <div class="p-5">
+            <div class="card">
+              <table class="table mb-0 table-striped">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Code</th>
+                    <th scope="col">Amount</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let credit of invoiceDetails.credits">
+                    <td>{{ credit?.createdAt | customDatePipe }}</td>
+                    <td [style.color]="currentTheme?.secondaryColor">
+                      {{ credit.parentCode }}
+                    </td>
+                    <td>{{ credit.amount | number : "1.2-2" }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #loader>
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="text-center right px-2"
+      >
+        Retrieving Invoice... <i class="icon icon-spin icon-spin2"></i>
+      </p>
+    </ng-template>
+  </div>
+</div>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [comments]="invoiceDetails?.comments"
+    feature="invoice"
+    [canApprove]="user?.permission?.includes('Approve Invoice')"
+    (sendPayload)="submit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>
+
+<ng-template #payment>
+  <fin-payment
+    [invoiceDetails]="invoiceDetails"
+    [user]="user"
+    paymentType="Invoice"
+    (closeModal)="closeModal()"
+    (fetchData)="getInvoice(selectedInvoiceId)"
+  ></fin-payment>
+</ng-template>

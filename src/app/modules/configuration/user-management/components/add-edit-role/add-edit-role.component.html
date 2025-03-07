@@ -1,0 +1,111 @@
+<main class="card">
+  <div *ngIf="isLoading" class="d-flex justify-content-center">
+    <lnd-spinner />
+  </div>
+  <ng-container *ngIf="!isLoading">
+    <h3>{{ !role?.id ? "Create New" : "Edit" }} Role</h3>
+    <form [formGroup]="form">
+      <section id="role">
+        <div>
+          <label>Role Name <b class="text-danger">*</b></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Enter Role Name"
+            formControlName="roleName"
+          />
+        </div>
+
+        <div>
+          <label>Role Description <b class="text-danger">*</b></label>
+          <textarea
+            class="form-control"
+            placeholder="Enter Role Description"
+            formControlName="description"
+          ></textarea>
+
+          <div id="max-length-exceeded">
+            <p
+              *ngIf="form.get('description').errors?.maxlength"
+              class="text-danger"
+            >
+              Character Limit Exceeded
+            </p>
+            <p *ngIf="!form.get('description').errors?.maxlength">
+              {{ 250 - form.get("description").value?.length }}
+              Characters
+            </p>
+          </div>
+
+          <div class="mb-1">
+            <label
+              >Accessible Modules <b class="text-danger">*</b>
+              <lnd-tooltip
+                placement="top"
+                text="Choose the modules this role should have access to"
+              />
+            </label>
+          </div>
+          <slct-2
+            [multiple]="true"
+            [allowSelectAll]="true"
+            (removed)="removedModule($event)"
+            [data]="modules"
+            placeholder="Select Accessible Module"
+            formControlName="accessibleModules"
+          />
+          <small *ngIf="isFetching"><lnd-spinner text="Removing module permissions..."/></small>
+        </div>
+      </section>
+
+      <section id="accessibleModules">
+        <h3>Accessible Modules</h3>
+        <p>Modules selected for this role above will be displayed here</p>
+
+        <ng-container *ngIf="form.value.accessibleModules.length > 0">
+          <div
+            *ngFor="let module of form.value.accessibleModules"
+            class="module-card pointer mt-3"
+            (click)="openAside(module)"
+          >
+            <h3>{{ module.text }} Module</h3>
+            <p>Click to select permissions for this module</p>
+          </div>
+        </ng-container>
+      </section>
+
+      <footer>
+        <button
+          [disabled]="isProcessing"
+          type="button"
+          class="btn cancel-btn"
+          routerLink="/configurations/roles-and-permissions"
+        >
+          Cancel
+        </button>
+        <button
+          [disabled]="isProcessing || form.invalid || isFetching"
+          type="button"
+          class="btn default"
+          (click)="submit()"
+        >
+          <span *ngIf="isProcessing"
+            ><i class="icon icon-spin icon-spin2"></i
+          ></span>
+          {{ isProcessing ? "Processing..." : "Submit" }}
+        </button>
+      </footer>
+    </form>
+  </ng-container>
+</main>
+
+<lnd-aside [isOpen]="showAside" (closeAside)="showAside = false">
+  <ng-container *ngIf="showAside">
+    <h3 header>{{ selectedModule?.text }} Module Permissions</h3>
+    <lnd-permissions
+      [moduleId]="selectedModule?.id"
+      [roleId]="role?.id"
+      (closeAside)="showAside = false"
+    />
+  </ng-container>
+</lnd-aside>

@@ -1,0 +1,30 @@
+<footer class="mt-6 d-flex justify-content-between align-items-center">
+  <div class="navs">
+    <button
+    [style.borderColor]="currentTheme?.secondaryColor"
+    [style.color]="currentTheme?.secondaryColor"
+    type="button"
+    *ngIf="currentStepIndex - 1 >= 0"
+    class="btn btn-sm mr-1"
+    (click)="previous.emit()"
+  >
+    <i class="icon icon-arrow-left icon-xl mr-1"></i>
+    {{ steps[currentStepIndex - 1].stage }}
+  </button>
+  <button
+    [style.borderColor]="currentTheme?.primaryColor"
+    [style.color]="currentTheme?.primaryColor"
+    type="button"
+    [disabled]="!currentStepIsValid"
+    *ngIf="currentStepIndex < steps.length - 1"
+    class="btn btn-sm ml-1"
+    (click)="next.emit()"
+  >
+    {{ steps[currentStepIndex + 1].stage }}
+    <i class="icon icon-arrow-right icon-xl ml-1"></i>
+  </button>
+</div>
+  <button [disabled]="!formValid" class="btn btn-primary" type="submit">{{isLoading ? 'Processing...' : 'Submit'}}
+    <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+  </button>
+</footer>

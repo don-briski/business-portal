@@ -1,0 +1,1739 @@
+<div class="dt-customizer__inner">
+  <!-- Customizer Header -->
+  <div class="dt-customizer__header">
+    <!-- Avatar Wrapper -->
+    <div class="dt-avatar-wrapper">
+      <!-- Avatar -->
+      <h4>
+        <i class="icon icon-ckeditor mr-2 icon-3x"> {{ reportType }} </i>
+      </h4>
+      <!-- /avatar -->
+    </div>
+    <!-- /avatar wrapper -->
+
+    <!-- Close Button -->
+    <button
+      type="button"
+      class="close"
+      data-toggle="customizer"
+      (click)="toggleAside()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <!-- /close button -->
+  </div>
+  <!-- /customizer header -->
+  <!-- Customizer Body -->
+  <div class="dt-customizer__body ps-custom-scrollbar">
+    <div class="row">
+      <div class="col-md-12" style="padding: 20px">
+        <!-- List -->
+        <ul class="dt-list dt-list-one-second padded-left">
+          <!-- List Item -->
+
+          <!-- List Item -->
+          <li class="dt-list__item">
+            <!-- Media -->
+            <div class="media">
+              <i
+                class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+              ></i>
+              <!-- Media Body -->
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Created by</span
+                >
+                <h5 class="mb-0">{{ userInfo?.person?.displayName }}</h5>
+              </div>
+              <!-- /media body -->
+            </div>
+            <!-- /media -->
+          </li>
+          <!-- /list item -->
+
+          <!-- List Item -->
+          <li class="dt-list__item">
+            <!-- Media -->
+            <div class="media">
+              <i
+                class="icon icon-datepicker icon-3x mr-5 align-self-center text-warning"
+              ></i>
+
+              <!-- Media Body -->
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Date Created</span
+                >
+                <h5 class="mb-0">{{ today | date : "dd/MM/yyyy, h:mm a" }}</h5>
+              </div>
+              <!-- /media body -->
+            </div>
+            <!-- /media -->
+          </li>
+          <!-- /list item -->
+        </ul>
+        <!-- /list -->
+        <div
+          class="btn-group mr-2 mb-2"
+          role="group"
+          aria-label="Basic example"
+          style="float: right"
+        >
+          <div class="mr-3">
+            <lnd-filter-btn
+              (filterModalOpen)="savePreviousDate(); onToggleFilterModal()"
+            ></lnd-filter-btn>
+          </div>
+          <!-- generate-report menu -->
+          <div class="generate-menu generate-menu-right">
+            <div class="generate-menu-header">
+              <h4 class="title">
+                <i class="icon icon-ckeditor mr-2"></i> Period Selection
+              </h4>
+            </div>
+            <form
+              *ngIf="searchForm"
+              [formGroup]="searchForm"
+              (ngSubmit)="filterReport()"
+            >
+              <div class="generate-menu-body">
+                <div class="h-auto">
+                  <div class="row">
+                    <div
+                      *ngIf="reportDateType === 'AsAt'"
+                      style="width: 500px"
+                      class="col-md-6 mb-3"
+                    >
+                      <label for="as-at-date-time-picker">As at</label>
+                      <div
+                        class="input-group date"
+                        id="as-at-date-time-picker"
+                        data-target-input="nearest"
+                      >
+                        <input
+                          lndInvalidDateChecker
+                          type="date"
+                          [(ngModel)]="endDate"
+                          formControlName="EndDate"
+                          class="form-control"
+                        />
+                        <div class="input-group-append">
+                          <div class="input-group-text">
+                            <i class="icon icon-calendar"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      *ngIf="reportDateType !== 'AsAt'"
+                      [ngClass]="
+                        showSecondColumnInFilterModal ? 'col-md-4' : 'col-md-12'
+                      "
+                      [ngStyle]="{
+                        width: showSecondColumnInFilterModal ? '500px' : '300px'
+                      }"
+                    >
+                      <ul class="date-ranges">
+                        <li
+                          *ngFor="let range of dateRanges"
+                          [style.backgroundColor]="
+                            selectedDateRange === range
+                              ? currentTheme?.secondaryColor
+                              : ''
+                          "
+                          [style.borderColor]="
+                            selectedDateRange === range
+                              ? currentTheme?.secondaryColor
+                              : ''
+                          "
+                          [style.color]="
+                            selectedDateRange === range ? '#fff' : ''
+                          "
+                          [ngClass]="
+                            selectedDateRange === range
+                              ? 'date-range-selected'
+                              : ''
+                          "
+                          (click)="
+                            onDateRangeSelected({
+                              range: range,
+                              clickedOnDateRange: true
+                            })
+                          "
+                          (mouseenter)="onMouseEnterDateRange(range)"
+                          (mouseleave)="onMouseLeaveDateRange()"
+                        >
+                          {{ range | humanify }}
+                        </li>
+                      </ul>
+                    </div>
+                    <div *ngIf="showSecondColumnInFilterModal" class="col-md-8">
+                      <div class="row">
+                        <div *ngIf="showCustomDatePicker" class="col-md-12">
+                          <label for="date-range">Select Date Range</label>
+                          <mat-form-field appearance="outline">
+                            <mat-date-range-input [rangePicker]="picker">
+                              <input
+                                id="date-range"
+                                matStartDate
+                                placeholder="Start Date"
+                                formControlName="StartDate"
+                              />
+                              <input
+                                matEndDate
+                                placeholder="End Date"
+                                formControlName="EndDate"
+                              />
+                            </mat-date-range-input>
+                            <mat-datepicker-toggle
+                              matSuffix
+                              [for]="picker"
+                            ></mat-datepicker-toggle>
+                            <mat-date-range-picker
+                              #picker
+                            ></mat-date-range-picker>
+                          </mat-form-field>
+                        </div>
+                        <div
+                          class="col-md-12 mb-3"
+                          *ngIf="reportName === 'CreditRefundReport'"
+                        >
+                          <label>Select Related Object</label>
+                          <div>
+                            <slct-2
+                              [data]="['Credit Note', 'Vendor Credit Note']"
+                              (selected)="
+                                selected('creditRefundRelatedObject', $event)
+                              "
+                              (removed)="
+                                removed('creditRefundRelatedObject', $event)
+                              "
+                              placeholder="Select Related Object"
+                            ></slct-2>
+                          </div>
+                        </div>
+                        <div
+                          class="col-md-12 mb-3"
+                          [ngClass]="{ 'mt-3': showCustomDatePicker }"
+                          *ngIf="showBranch && !loader"
+                        >
+                          <label>Select Preferred Branch(es)</label>
+                          <div>
+                            <slct-2
+                              [multiple]="true"
+                              [data]="allBranches"
+                              [active]="selectedBranches"
+                              (selected)="selected('AccessibleBranch', $event)"
+                              (removed)="removed('AccessibleBranch', $event)"
+                              placeholder="Select Branch(es)"
+                            ></slct-2>
+                          </div>
+                        </div>
+                        <div class="col-md-12 mb-3" *ngIf="showStatus">
+                          <label>Select Status</label>
+                          <div>
+                            <slct-2
+                              [multiple]="false"
+                              [data]="statusList"
+                              (selected)="selected('Status', $event)"
+                              (removed)="removed('Status', $event)"
+                              placeholder="Select Status"
+                            ></slct-2>
+                          </div>
+                        </div>
+                        <div
+                          class="col-md-12 mb-3"
+                          *ngIf="
+                            reportName === reportNames.AssetRegisterReport &&
+                            !loader
+                          "
+                        >
+                          <label>Select Status</label>
+                          <div>
+                            <slct-2
+                              [data]="assetRegisterReportFilters"
+                              [active]="selectedAssetRegisterReportFilters"
+                              [multiple]="true"
+                              (selected)="
+                                selected('assetRegisterReportFilter', $event)
+                              "
+                              (removed)="
+                                removed('assetRegisterReportFilter', $event)
+                              "
+                              placeholder="Select Status"
+                            ></slct-2>
+                          </div>
+                        </div>
+                        <div
+                          class="col-md-12 mb-3"
+                          *ngIf="
+                            reportType === reportTypes.TrialBalanceReport ||
+                            reportType ===
+                              reportTypes.AccountTransactionsReport ||
+                            reportType === reportTypes.GeneralLedgerReport ||
+                            reportType === reportTypes.AccountSummary
+                          "
+                        >
+                          <label>Select Module</label>
+                          <div>
+                            <slct-2
+                              [data]="modules"
+                              (selected)="selected('module', $event)"
+                              (removed)="removed('module', $event)"
+                              placeholder="Select Module"
+                            ></slct-2>
+                          </div>
+                        </div>
+                        <div *ngIf="paginated" class="col-md-12">
+                          <label>Desired result size (in rows)</label>
+                          <slct-2
+                            [data]="desiredRows"
+                            [active]="[
+                              {
+                                id: pagination.pageSize,
+                                text: pagination.pageSize.toString()
+
+                              }
+                            ]"
+                            (selected)="selected('rowSize', $event)"
+                          ></slct-2>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="generate-menu-footer">
+                  <div class="footer-right">
+                    <button
+                      type="submit"
+                      class="btn btn-xs mr-2 text-white"
+                      [style.backgroundColor]="currentTheme?.secondaryColor"
+                      [style.borderColor]="currentTheme?.secondaryColor"
+                      *ngIf="!loader"
+                      [disabled]="!isFormValid || loader"
+                    >
+                      <span *ngIf="loader"
+                        ><i class="icon icon-spin icon-spin2"></i
+                      ></span>
+                      {{ !loader ? "Generate Report" : "Generating ..." }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="onCloseModal()"
+                      class="btn btn-danger btn-xs"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Customizer Body Inner  -->
+      <div class="col-md-12">
+        <br />
+        <!-- Section -->
+        <div class="dt-card__body">
+          <ul
+            class="nav nav-underline flex-row border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                class="nav-link clicked active show"
+                data-toggle="tab"
+                href="#tab-pane1"
+                role="tab"
+                aria-controls="tab-pane1"
+                aria-selected="true"
+                >Report Table</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                (click)="loadQueuedReports()"
+                data-toggle="tab"
+                href="#tab-pane2"
+                role="tab"
+                aria-controls="tab-pane2"
+                aria-selected="false"
+                >Queued Reports</a
+              >
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div id="tab-pane1" class="tab-pane active show">
+              <!-- Card -->
+              <div class="dt-card">
+                <div
+                  *ngIf="this.loader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+
+                <!-- Card Body -->
+                <div class="dt-card__body" style="padding: 1.4rem 1.4rem">
+                  <!-- <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})</small
+                  > -->
+                  <p class="text-center">
+                    <span *ngIf="reportDateType !== 'AsAt' && fiscalYear">
+                      <span> {{ reportType }}</span> &nbsp;
+                      <span
+                        ><b>From:</b>
+                        {{ startDate | customDatePipe : "DD-MMM-YYYY" }}</span
+                      >
+                      &nbsp;
+                      <span
+                        ><b>To:</b>
+                        {{ endDate | customDatePipe : "DD-MMM-YYYY" }}</span
+                      ></span
+                    >
+                    <span *ngIf="reportDateType === 'AsAt' && fiscalYear">
+                      <span> {{ reportType }}</span> &nbsp;
+                      <small>
+                        <b>As at:</b>
+                        {{ endDate | customDatePipe : "DD-MMM-YYYY" }}</small
+                      >
+                    </span>
+                  </p>
+                  <!-- Pagination Top-->
+                  <div class="row" *ngIf="paginated">
+                    <div class="col-md-4">
+                      <label style="display: inline-flex"
+                        ><span style="padding: 8px 2px; font-size: 12px"
+                          >Show
+                        </span>
+                        <select
+                          [(ngModel)]="pagination.pageSize"
+                          aria-controls="data-table"
+                          (change)="
+                            getItemsPaginatedSearch(
+                              this.pagination.searchTerm,
+                              this.pagination.pageSize,
+                              1
+                            )
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option value="10000">10,000</option>
+                          <option value="20000">20,000</option>
+                          <option value="30000">30,000</option>
+                          <option value="100000">All</option>
+                        </select>
+                        <span style="padding: 8px 2px; font-size: 12px"
+                          >entries</span
+                        ></label
+                      >
+                    </div>
+                    <div class="col-md-4"></div>
+                    <div class="form-group col-md-4">
+                      <nav>
+                        <ul
+                          class="pagination pagination-sm justify-content-end"
+                        >
+                          <li
+                            class="page-item"
+                            *ngIf="
+                              (pagination.pageNum - 1) * pagination.pageSize +
+                                1 >
+                              10
+                            "
+                          >
+                            <a
+                              class="page-link"
+                              href="javascript:void(0)"
+                              (click)="
+                                getItemsPaginatedSearch(
+                                  this.pagination.searchTerm,
+                                  this.pagination.pageSize,
+                                  pagination.pageNum - 1
+                                )
+                              "
+                              tabindex="-1"
+                              >Previous</a
+                            >
+                          </li>
+                          <li class="page-item pagination-menu-wrapper">
+                            <a
+                              class="page-link page-target"
+                              (click)="getItemsPaginatedPageJumpModal()"
+                              href="javascript:void(0)"
+                              >{{ pagination.pageNum }} of
+                              {{ this.pagination.maxPage }} page<span
+                                *ngIf="pagination.pageNum > 1"
+                                >s</span
+                              ><span class="sr-only">(current)</span></a
+                            >
+
+                            <div class="pagination-menu pagination-menu-right">
+                              <div class="pagination-menu-body">
+                                <div class="h-auto">
+                                  <span>Jump to Page</span>
+                                  <select
+                                    aria-controls="data-table"
+                                    [(ngModel)]="pagination.pageNum"
+                                    (change)="filterReport(pagination.pageNum)"
+                                    class="custom-select custom-select-xl form-control form-control-xl height"
+                                  >
+                                    <option
+                                      *ngFor="let line of pagination.jumpArray"
+                                    >
+                                      {{ line }}
+                                    </option>
+                                  </select>
+                                  <div class="text-center mt-3">
+                                    <button
+                                      type="button"
+                                      (click)="getItemsPaginatedPageJumpModal()"
+                                      class="btn btn-danger btn-xs"
+                                    >
+                                      Close
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li
+                            class="page-item"
+                            *ngIf="
+                              this.pagination.pageNum < this.pagination.maxPage
+                            "
+                          >
+                            <a
+                              class="page-link"
+                              href="javascript:void(0)"
+                              (click)="
+                                getItemsPaginatedSearch(
+                                  this.pagination.searchTerm,
+                                  this.pagination.pageSize,
+                                  pagination.pageNum + 1
+                                )
+                              "
+                              >Next</a
+                            >
+                          </li>
+                        </ul>
+                      </nav>
+                    </div>
+                    <div
+                      *ngIf="!loader && reportList.length"
+                      class=""
+                      aria-live="polite"
+                      style="
+                        padding-left: 18px;
+                        font-size: 13px;
+                        margin-top: -8px;
+                      "
+                    >
+                      Showing
+                      {{
+                        (pagination.pageNum - 1) * pagination.pageSize + 1
+                          | number : "1.0-0"
+                      }}
+                      -
+                      {{
+                        (pagination.pageNum - 1) * pagination.pageSize +
+                          pagination.count | number : "1.0-0"
+                      }}
+                      of
+                      {{ pagination.totalRecords | number : "1.0-0" }}
+                      record(s)
+                    </div>
+                  </div>
+
+                  <div class="mb-5">
+                    <lnd-selected-filters
+                      (initialized)="onSelectedFiltersInit($event)"
+                    ></lnd-selected-filters>
+                  </div>
+                  <!-- /pagination Top -->
+                  <br />
+
+                  <ng-container *ngIf="reportList.length">
+                    <button
+                      [style.backgroundColor]="currentTheme?.secondaryColor"
+                      [style.borderColor]="currentTheme?.secondaryColor"
+                      *ngIf="selectedOutputType !== 'Grouped'"
+                      class="btn btn-xs mr-2 text-white"
+                      (click)="exportLog(reportList)"
+                      [disabled]="downloading"
+                    >
+                      <i
+                        *ngIf="!downloading"
+                        class="icon icon-editor icon-fw icon-lg"
+                      ></i>
+                      <i
+                        class="icon icon-spin icon-spin2"
+                        *ngIf="downloading"
+                      ></i>
+                      {{ downloading ? "Exporting..." : "Export" }}
+                    </button>
+                    <button
+                      *ngIf="selectedOutputType !== 'Grouped'"
+                      [style.backgroundColor]="currentTheme?.secondaryColor"
+                      [style.borderColor]="currentTheme?.secondaryColor"
+                      class="btn btn-xs text-white"
+                      printSectionId="reportListTable"
+                      styleSheetFile="assets\css\lite-style-1.min.css, assets\css\enterprise\default.min.css, src\app\library\lib-finance-report\lib-finance-report.component.scss"
+                      [printTitle]="getReportTitle()"
+                      [printStyle]="{ table: { 'font-size': '12px' } }"
+                      [useExistingCss]="true"
+                      ngxPrint
+                    >
+                      <i class="icon icon-files icon-fw icon-lg"></i>
+                      Print
+                    </button>
+                    <br />
+                    <br />
+                    <div class="table-reponsive" id="reportListTable">
+                      <div class="logo-container" *ngIf="ownerInformation.logoUrl">
+                        <img class="logo" [src]="ownerInformation.logoUrl" alt="Business Logo">
+                      </div>
+
+                      <div class="report-info">
+                        <h5><span> Business Name: {{ownerInformation.appOwnerName}}</span></h5>
+                        <h5><span> Report Name: {{reportType}} </span></h5>
+                        <h5><span> Period: From {{ startDate | customDatePipe : "DD-MMM-YYYY" }} to {{endDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                        <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                      </div>
+
+                      <small
+                        style="color: darkred"
+                        *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                        >*Base Currency:
+                        {{ ownerInformation?.currency?.currencyName }} ({{
+                          ownerInformation?.currency?.currencySymbol
+                        }})
+                      </small>
+                      <table
+                        *ngIf="
+                          reportType !== reportTypes.AssetScheduleReport &&
+                          reportType !== reportTypes.TrialBalanceReport &&
+                          reportType !== reportTypes.ProfitLossReport
+                        "
+                        class="table table-bordered table-hover table-striped table-sm custom-table"
+                        style="font-size: 12px"
+                      >
+                        <thead>
+                          <tr>
+                            <th
+                              [ngClass]="{
+                                'text-center': col?.alignment === 'center',
+                                'text-right': col?.alignment === 'right',
+                                'text-left': !col?.alignment || col?.alignment === 'left'
+                              }"
+                              *ngFor="let col of tableCols"
+                            >
+                              {{ col?.name }}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody *ngIf="!rowHeaders.length">
+                          <ng-container *ngFor="let el of reportList">
+                            <ng-container
+                              *ngIf="reportType === reportTypes.AccountSummary"
+                            >
+                              <tr>
+                                <td
+                                  *ngFor="
+                                    let col of tableCols;
+                                    let colIndex = index
+                                  "
+                                >
+                                  <span
+                                    class="d-flex align-items-center"
+                                    [ngClass]="{
+                                      'justify-content-center':
+                                        col?.alignment === 'center',
+                                      'justify-content-end':
+                                        col?.alignment === 'right'
+                                    }"
+                                  >
+                                    <i
+                                      *ngIf="colIndex === 0"
+                                      class="icon icon-folder-o icon-fw mr-1"
+                                    ></i>
+                                    <a
+                                      class="cursor"
+                                      [ngClass]="{ underline: colIndex === 0 }"
+                                      (click)="el.expanded = !el.expanded"
+                                    >
+                                      {{
+                                        col?.type === "date"
+                                          ? (el[col?.property]
+                                            | customDatePipe : "DD-MMM-YYYY")
+                                          : col?.type === "number"
+                                          ? (el[col?.property]
+                                            | number : "1.2-2")
+                                          : el[col?.property]
+                                      }}
+                                    </a>
+                                  </span>
+                                </td>
+                              </tr>
+                              <ng-container *ngIf="el.expanded">
+                                <tr
+                                  *ngFor="
+                                    let postingAccount of el.postingAccounts;
+                                    let postingAccIndex = index
+                                  "
+                                >
+                                  <td
+                                    *ngFor="
+                                      let subCol of tableSubCols;
+                                      let subColIndex = index
+                                    "
+                                    [class]="'cell' + ' ' + col?.class"
+                                  >
+                                    <span
+                                      class="d-flex align-items-center h-100"
+                                      [ngClass]="{
+                                        'justify-content-end':
+                                          subColIndex !== 0,
+                                        'vl-pl': subColIndex === 0
+                                      }"
+                                    >
+                                      <div
+                                        *ngIf="subColIndex === 0"
+                                        class="vl"
+                                        [ngClass]="{
+                                          'vl-half':
+                                            postingAccIndex ===
+                                            el.postingAccounts.length - 1
+                                        }"
+                                      ></div>
+                                      <hr
+                                        *ngIf="subColIndex === 0"
+                                        class="hl"
+                                      />
+                                      <span
+                                        class="ml-1 text-lighten-primary cursor"
+                                        (click)="
+                                          openAccountTransactions(
+                                            postingAccount,
+                                            accountTransactionsView
+                                          )
+                                        "
+                                        >{{
+                                          subCol?.name === "AccountId"
+                                            ? ""
+                                            : postingAccount[subCol?.property]
+                                        }}</span
+                                      >
+                                    </span>
+                                  </td>
+                                </tr>
+                              </ng-container>
+                            </ng-container>
+                            <ng-container
+                              *ngIf="reportType !== reportTypes.AccountSummary"
+                            >
+                              <tr>
+                                <ng-container *ngIf="!canDeepLink">
+                                  <td
+                                    *ngFor="let col of tableCols"
+                                    [class]="col?.class"
+                                    [ngClass]="{
+                                      'text-center':
+                                        col?.alignment === 'center',
+                                      'text-right': col?.alignment === 'right'
+                                    }"
+                                  >
+                                    <span
+                                      *ngIf="
+                                        col?.type !== 'date' &&
+                                        col?.type !== 'number'
+                                      "
+                                      >{{ el[col?.property] }}</span
+                                    >
+                                    <span *ngIf="col?.type === 'date'">{{
+                                      el[col?.property]
+                                        ? (el[col?.property]
+                                          | customDatePipe : "DD-MMM-YYYY")
+                                        : "-"
+                                    }}</span>
+                                    <span *ngIf="col?.type === 'number'">
+                                      {{
+                                        el[col?.property] | number : "1.2-2"
+                                      }}</span
+                                    >
+                                  </td>
+                                </ng-container>
+                                <ng-container *ngIf="canDeepLink">
+                                  <td
+                                    *ngFor="let col of tableCols"
+                                    [class]="col?.class"
+                                    [ngClass]="{
+                                      'text-center':
+                                        col?.alignment === 'center',
+                                      'text-right': col?.alignment === 'right',
+                                      'text-lighten-primary cursor':
+                                        col?.type === 'number'
+                                    }"
+                                    (click)="
+                                      openAccountTransactions(
+                                        el,
+                                        accountTransactionsView
+                                      )
+                                    "
+                                  >
+                                    {{
+                                      col?.type === "date"
+                                        ? (el[col?.property]
+                                          | customDatePipe : "DD-MMM-YYYY")
+                                        : col?.type === "number"
+                                        ? (el[col?.property] | number : "1.2-2")
+                                        : el[col?.property]
+                                    }}
+                                  </td>
+                                </ng-container>
+                              </tr>
+                            </ng-container>
+                          </ng-container>
+
+                          <ng-container *ngIf="rowsWithTotal.length">
+                            <tr *ngFor="let row of rowsWithTotal">
+                              <ng-container *ngFor="let tCol of tableCols">
+                                <td
+                                  *ngIf="row[tCol.property] === 'Total'"
+                                  style="font-size: 1.8rem"
+                                >
+                                  Total
+                                </td>
+                                <td
+                                  *ngIf="row[tCol.property] !== 'Total'"
+                                  style="font-size: 1.8rem"
+                                  class="text-right"
+                                >
+                                  {{ row[tCol.property] | number : "1.2-2" }}
+                                </td>
+                              </ng-container>
+                            </tr>
+                          </ng-container>
+                        </tbody>
+                        <ng-container *ngIf="rowHeaders.length">
+                          <tbody *ngFor="let item of reportList; let i = index">
+                            <tr>
+                              <td class="code">
+                                {{ rowHeaders[i] }}
+                              </td>
+                            </tr>
+                            <tr *ngFor="let el of reportList[i]">
+                              <td
+                                [class]="col?.class"
+                                *ngFor="let col of tableCols"
+                                [ngClass]="{
+                                  'text-center': col?.alignment === 'center',
+                                  'text-right': col?.alignment === 'right'
+                                }"
+                              >
+                                {{
+                                  col?.type === "date"
+                                    ? (el[col.property]
+                                      | customDatePipe : "DD-MMM-YYYY")
+                                    : col?.type === "number"
+                                    ? (el[col.property] | number : "1.2-2")
+                                    : el[col.property]
+                                }}
+                              </td>
+                            </tr>
+                            <ng-container *ngIf="rowsWithTotal.length">
+                              <tr>
+                                <ng-container *ngFor="let tCol of tableCols">
+                                  <td
+                                    *ngIf="
+                                      rowsWithTotal[i][tCol.property] ===
+                                      'Total'
+                                    "
+                                    style="font-size: 1.8rem"
+                                  >
+                                    Total
+                                  </td>
+                                  <td
+                                    *ngIf="
+                                      rowsWithTotal[i][tCol.property] !==
+                                      'Total'
+                                    "
+                                    style="font-size: 1.8rem"
+                                    class="text-right"
+                                  >
+                                    {{
+                                      rowsWithTotal[i][tCol.property]
+                                        | number : "1.2-2"
+                                    }}
+                                  </td>
+                                </ng-container>
+                              </tr>
+                            </ng-container>
+                          </tbody>
+                        </ng-container>
+                      </table>
+                      <table
+                        class="table table-hover table-striped table-sm"
+                        style="font-size: 12px"
+                        *ngIf="reportType === reportTypes.AssetScheduleReport"
+                      >
+                        <tbody>
+                          <tr>
+                            <th></th>
+                            <th
+                              *ngFor="let rep of reportList"
+                              class="text-right"
+                            >
+                              {{ rep?.assetSubClassName }}
+                            </th>
+                            <th class="text-right">Total</th>
+                          </tr>
+                          <tr>
+                            <th>Cost</th>
+                          </tr>
+                          <tr>
+                            <td>Opening Balance</td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                rep?.costPeriodOpeningBalance < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                              *ngFor="let rep of reportList"
+                            >
+                              {{
+                                rep?.costPeriodOpeningBalance | number : "1.2-2"
+                              }}
+                            </td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                getTotal(
+                                  'costPeriodOpeningBalance',
+                                  reportList
+                                ) < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal("costPeriodOpeningBalance", reportList)
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Additions</td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                rep?.costAdditionsInPeriod < 0
+                                  ? 'text-danger'
+                                  : 'text-lighten-primary'
+                              "
+                              *ngFor="let rep of reportList"
+                            >
+                              {{
+                                rep?.costAdditionsInPeriod | number : "1.2-2"
+                              }}
+                            </td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                getTotal('costAdditionsInPeriod', reportList) <
+                                0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal("costAdditionsInPeriod", reportList)
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Disposals</td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                rep?.costDisposalsInPeriod < 0
+                                  ? 'text-danger'
+                                  : 'text-lighten-primary'
+                              "
+                              *ngFor="let rep of reportList"
+                            >
+                              {{
+                                rep?.costDisposalsInPeriod | number : "1.2-2"
+                              }}
+                            </td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                getTotal('costDisposalsInPeriod', reportList) <
+                                0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal("costDisposalsInPeriod", reportList)
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Closing Balance</td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                rep?.costPeriodClosingBalance < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                              *ngFor="let rep of reportList"
+                            >
+                              {{
+                                rep?.costPeriodClosingBalance | number : "1.2-2"
+                              }}
+                            </td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                getTotal(
+                                  'costPeriodClosingBalance',
+                                  reportList
+                                ) < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal("costPeriodClosingBalance", reportList)
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>Depreciation and Impairment</th>
+                          </tr>
+                          <tr>
+                            <td>Opening Balance</td>
+                            <td
+                              class="text-right"
+                              *ngFor="let rep of reportList"
+                              [ngClass]="
+                                rep?.accumDepPeriodOpeningBalance < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                rep?.accumDepPeriodOpeningBalance
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                getTotal(
+                                  'accumDepPeriodOpeningBalance',
+                                  reportList
+                                ) < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal(
+                                  "accumDepPeriodOpeningBalance",
+                                  reportList
+                                ) | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Depreciation</td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                rep?.accumDepreciationInPeriod < 0
+                                  ? 'text-danger'
+                                  : 'text-lighten-primary'
+                              "
+                              *ngFor="let rep of reportList"
+                            >
+                              {{
+                                rep?.accumDepreciationInPeriod
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                getTotal(
+                                  'accumDepreciationInPeriod',
+                                  reportList
+                                ) < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal(
+                                  "accumDepreciationInPeriod",
+                                  reportList
+                                ) | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Disposals</td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                rep?.accumDepDisposalsInPeriod < 0
+                                  ? 'text-danger'
+                                  : 'text-lighten-primary'
+                              "
+                              *ngFor="let rep of reportList"
+                            >
+                              {{
+                                rep?.accumDepDisposalsInPeriod
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                getTotal(
+                                  'accumDepDisposalsInPeriod',
+                                  reportList
+                                ) < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal(
+                                  "accumDepDisposalsInPeriod",
+                                  reportList
+                                ) | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td>Closing Balance</td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                rep?.accumDepPeriodClosingBalance < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                              *ngFor="let rep of reportList"
+                            >
+                              {{
+                                rep?.accumDepPeriodClosingBalance
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                            <td
+                              class="text-right"
+                              [ngClass]="
+                                getTotal(
+                                  'accumDepPeriodClosingBalance',
+                                  reportList
+                                ) < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal(
+                                  "accumDepPeriodClosingBalance",
+                                  reportList
+                                ) | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>Net Book Value (NBV)</th>
+                            <td
+                              class="text-right font-weight-bold"
+                              [ngClass]="
+                                rep?.periodNetBookValue < 0 ? 'text-danger' : ''
+                              "
+                              *ngFor="let rep of reportList"
+                            >
+                              {{ rep?.periodNetBookValue | number : "1.2-2" }}
+                            </td>
+                            <td
+                              class="text-right font-weight-bold"
+                              [ngClass]="
+                                getTotal('periodNetBookValue', reportList) < 0
+                                  ? 'text-danger'
+                                  : ''
+                              "
+                            >
+                              {{
+                                getTotal("periodNetBookValue", reportList)
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+                      <table
+                        class="table borderless table-hover table-sm"
+                        *ngIf="reportType === reportTypes.TrialBalanceReport"
+                      >
+                        <thead class=" w-full">
+                          <tr class="d-flex">
+                               <th class="col-1"></th>
+                            <th class="col border-bottom">Account</th>
+                            <th class="text-center border-bottom col">
+                              Account Code
+                            </th>
+                            <th class="text-right border-bottom col">
+                              Net Debit
+                            </th>
+                            <th class="text-right border-bottom col">
+                              Net Credit
+                            </th>
+                            <th class="col-1"></th></tr>
+                        </thead>
+                        <tbody>
+                          <ng-container *ngFor="let type of reportList">
+                            <tr class="d-flex">
+                              <td class="col-1"></td>
+                              <td
+                                [colSpan]="4"
+                                class="font-weight-bold bg-light border-bottom col"
+                              >
+                                {{ type?.accountType }}
+                              </td>
+                              <td class="col-1"></td>
+                            </tr>
+                            <tr
+                              *ngFor="let acc of type?.accounts"
+                              class="d-flex"
+                            >
+                              <td class="col-1"></td>
+                              <td class="pl-5 col">{{ acc?.name }}</td>
+                              <td class="text-center col">
+                                {{ acc?.reference }}
+                              </td>
+                              <td
+                                (click)="
+                                  openAccountTransactions(
+                                    acc,
+                                    accountTransactionsView
+                                  )
+                                "
+                                class="text-right col text-lighten-primary pointer"
+                              >
+                                {{ acc?.netDebit | number : "1.2-2" }}
+                              </td>
+                              <td
+                                (click)="
+                                  openAccountTransactions(
+                                    acc,
+                                    accountTransactionsView
+                                  )
+                                "
+                                class="text-right col text-lighten-primary pointer"
+                              >
+                                {{ acc?.netCredit | number : "1.2-2" }}
+                              </td>
+                              <td class="col-1"></td>
+                            </tr>
+                            <tr class="d-flex">
+                              <td class="col-1"></td>
+                              <td class="col">Total {{ type?.accountType }}</td>
+                              <td class="col"></td>
+                              <td class="text-right border-bottom col">
+                                {{
+                                  getTrialBalanceTotalByAccount(
+                                    type?.accountType,
+                                    reportList,
+                                    "debit"
+                                  ) | number : "1.2-2"
+                                }}
+                              </td>
+                              <td class="text-right border-bottom col">
+                                {{
+                                  getTrialBalanceTotalByAccount(
+                                    type?.accountType,
+                                    reportList,
+                                    "credit"
+                                  ) | number : "1.2-2"
+                                }}
+                              </td>
+                              <td class="col-1"></td>
+                            </tr>
+                            <tr>
+                              <td [colSpan]="4" class="p-5"></td>
+                            </tr>
+                          </ng-container>
+                          <tr class="d-flex">
+                            <td class="col-1"></td>
+                            <td class="font-weight-bold col">
+                              Total for all accounts
+                            </td>
+                            <td class="col"></td>
+                            <td class="text-right border-bottom border-top col">
+                              {{
+                                getTrialBalanceTotal(reportList, "debit")
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                            <td class="text-right border-bottom border-top col">
+                              {{
+                                getTrialBalanceTotal(reportList, "credit")
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                            <td class="col-1"></td>
+                          </tr>
+                          <tr class="d-flex">
+                            <td class="col-6"></td>
+                            <td class="border-top col mt-1"></td>
+                            <td class="border-top col mt-1"></td>
+                            <td class="col-1"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <table
+                        class="table table-hover borderless"
+                        *ngIf="
+                          reportType === reportTypes.ProfitLossReport ||
+                          reportType === reportTypes.BalanceSheetReport
+                        "
+                      >
+                        <thead class=" font-weight-bold">
+                          <tr class="d-flex ">
+                            <th class="col-1">&nbsp;</th>
+                            <th class="col-5 border-bottom">Account</th>
+                            <th class="col-2 text-center border-bottom">
+                              Account Code
+                            </th>
+                            <th class="text-right col-2 border-bottom">Total</th>
+                            <th class="col-1">&nbsp;</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <ng-container *ngFor="let type of reportList">
+                            <ng-container
+                              [ngTemplateOutlet]="reportTemp"
+                              [ngTemplateOutletContext]="{ data: type }"
+                            >
+                            </ng-container>
+                          </ng-container>
+
+                          <tr
+                            class="d-flex"
+                            *ngIf="
+                              reportType === reportTypes.BalanceSheetReport
+                            "
+                          >
+                            <td class="col-1"></td>
+                            <td class="col-5"></td>
+                            <td class="col-2 text-right">
+                              <span class="font-weight-bold"
+                                >Total Liabilities and Equity</span
+                              >
+                            </td>
+                            <td class="text-right col-2 total-box double">
+                              <span>
+                                {{
+                                  getChildrenAccountTotal(reportList[1]) +
+                                    getChildrenAccountTotal(reportList[2])
+                                    | number : "1.2-2"
+                                }}
+                              </span>
+                            </td>
+                            <td class="col-1"></td>
+                          </tr>
+
+                          <tr
+                            class="d-flex"
+                            *ngIf="reportType === reportTypes.ProfitLossReport"
+                          >
+                            <td class="col-1"></td>
+                            <td class="col-5"></td>
+                            <td class="col-2 text-right">
+                              <span class="font-weight-bold">Net Profit</span>
+                            </td>
+                            <td class="text-right col-2 total-box">
+                              <span>
+                                {{ getProfitAndLossTotal() | number : "1.2-2" }}
+                              </span>
+                            </td>
+                            <td class="col-1"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </ng-container>
+                  <div>
+                    <no-data
+                      *ngIf="!reportList.length && !loader && !reportQueuedMsg"
+                      title="No data found for the selected criteria"
+                    ></no-data>
+                    <p
+                      class="text-center display-6 lenda-text-dark"
+                      *ngIf="!loader && reportQueuedMsg"
+                    >
+                      {{ reportQueuedMsg }}
+                    </p>
+                  </div>
+                  <!-- Pagination Bottom-->
+                  <div
+                    class="row"
+                    *ngIf="
+                      reportList.length &&
+                      paginated &&
+                      pagination.totalRecords > 50
+                    "
+                  >
+                    <div class="form-group col-md-12">
+                      <nav>
+                        <ul
+                          class="pagination pagination-sm justify-content-end"
+                        >
+                          <li
+                            class="page-item"
+                            *ngIf="
+                              (pagination.pageNum - 1) * pagination.pageSize +
+                                1 >
+                              10
+                            "
+                          >
+                            <a
+                              class="page-link"
+                              href="javascript:void(0)"
+                              (click)="
+                                getItemsPaginatedSearch(
+                                  this.pagination.searchTerm,
+                                  this.pagination.pageSize,
+                                  pagination.pageNum - 1
+                                )
+                              "
+                              tabindex="-1"
+                              >Previous</a
+                            >
+                          </li>
+                          <li class="page-item pagination-menu-wrapper">
+                            <a
+                              class="page-link page-target"
+                              (click)="getItemsPaginatedPageJumpModal()"
+                              href="javascript:void(0)"
+                              >{{ pagination.pageNum }} of
+                              {{ this.pagination.maxPage }} page<span
+                                *ngIf="pagination.pageNum > 1"
+                                >s</span
+                              ><span class="sr-only">(current)</span></a
+                            >
+
+                            <div class="pagination-menu pagination-menu-right">
+                              <div class="pagination-menu-body">
+                                <div class="h-auto">
+                                  <span>Jump to Page</span>
+                                  <select
+                                    aria-controls="data-table"
+                                    [(ngModel)]="pagination.pageNum"
+                                    (change)="filterReport(pagination.pageNum)"
+                                    class="custom-select custom-select-xl form-control form-control-xl height"
+                                  >
+                                    <option
+                                      *ngFor="let line of pagination.jumpArray"
+                                    >
+                                      {{ line }}
+                                    </option>
+                                  </select>
+                                  <div class="text-center mt-3">
+                                    <button
+                                      type="button"
+                                      (click)="getItemsPaginatedPageJumpModal()"
+                                      class="btn btn-danger btn-xs"
+                                    >
+                                      Close
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li
+                            class="page-item"
+                            *ngIf="
+                              this.pagination.pageNum < this.pagination.maxPage
+                            "
+                          >
+                            <a
+                              class="page-link"
+                              href="javascript:void(0)"
+                              (click)="
+                                getItemsPaginatedSearch(
+                                  this.pagination.searchTerm,
+                                  this.pagination.pageSize,
+                                  pagination.pageNum + 1
+                                )
+                              "
+                              >Next</a
+                            >
+                          </li>
+                        </ul>
+                      </nav>
+                    </div>
+                    <div class="mb-5">
+                      <lnd-selected-filters
+                        (initialized)="onSelectedFiltersInit($event)"
+                      ></lnd-selected-filters>
+                    </div>
+
+                    <div
+                      *ngIf="loader"
+                      class="table-loader"
+                      style="text-align: center; color: indianred"
+                    >
+                      <span>
+                        <i class="icon icon-spin icon-spin2"></i>
+                        Loading...</span
+                      >
+                    </div>
+                  </div>
+                  <!-- /pagination Bottom -->
+                </div>
+                <!-- /card body -->
+              </div>
+              <!-- /card -->
+            </div>
+            <div id="tab-pane2" class="tab-pane">
+              <div class="dt-card">
+                <div
+                  *ngIf="requestLoader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+                <div *ngIf="!this.requestLoader" class="dt-card__body p-5">
+                  <no-data
+                    *ngIf="!queuedReportList?.length"
+                    title="No queued report(s)"
+                  ></no-data>
+                  <div
+                    *ngIf="queuedReportList?.length"
+                    class="table-reponsive"
+                    id="queuedReportListTable"
+                  >
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Requested By</th>
+                          <th>Requested When</th>
+                          <th class="text-center">Report Start Date</th>
+                          <th class="text-center">Report End Date</th>
+                          <th class="text-center">Filtered By Branch</th>
+                          <th>Status</th>
+                          <th class="text-center">Completion Time</th>
+                          <th class="text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of queuedReportList"
+                        >
+                          <td [style.color]="currentTheme?.secondaryColor">
+                            {{ item?.createdByName }}
+                          </td>
+                          <td>{{ item?.requestTime | date : "medium" }}</td>
+                          <td class="text-center">
+                            <span
+                              *ngIf="
+                                item?.parameters.startDate == null ||
+                                item?.parameters.startDate == ''
+                              "
+                            >
+                              --
+                            </span>
+                            <span
+                              *ngIf="
+                                item?.parameters.startDate != null &&
+                                item?.parameters.startDate != null
+                              "
+                            >
+                              {{ item?.parameters.startDate }}
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            {{ item?.parameters.endDate }}
+                          </td>
+                          <td class="text-center">
+                            <span *ngIf="item?.parameters.branchesList == ''">
+                              No
+                            </span>
+                            <span *ngIf="item?.parameters.branchesList != ''">
+                              Yes
+                            </span>
+                          </td>
+                          <td>
+                            <span *ngIf="item?.status == 'Requested'"
+                              >{{ item?.status }}
+                            </span>
+                            <span *ngIf="item?.status == 'Completed'">
+                              <i class="icon icon-check"> </i>
+                              {{ item?.status }}
+                            </span>
+                            <span
+                              class="grayed"
+                              *ngIf="
+                                item?.status != 'Completed' &&
+                                item?.status != 'Requested'
+                              "
+                            >
+                              <i class="icon icon-setting icon-spin"> </i>
+                              {{ item?.status }}
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            <span *ngIf="item?.completionTime == null">
+                              --
+                            </span>
+                            <span *ngIf="item?.completionTime != null">
+                              {{ item?.completionTime | date : "medium" }}
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            <span *ngIf="item?.downloadPath == null"> -- </span>
+
+                            <a
+                              *ngIf="item?.downloadPath != null"
+                              href="javascript:void(0);"
+                              target="_blank"
+                              class="btn btn-xs btn-outline-secondary"
+                              (click)="downloadQueuedReport(item?.downloadPath)"
+                              ><i
+                                class="mr-2 icon icon-long-arrow-down icon-fw"
+                              ></i
+                            ></a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="tab-pane3" class="tab-pane">
+              <div class="dt-card p-4">
+                <div class="download">
+                  <button class="btn btn-query btn-xs" [disabled]="downloading">
+                    <span *ngIf="downloading"
+                      ><i class="icon icon-spin icon-spin2"></i></span
+                    >{{ downloading ? "Download..." : "Download Now" }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /section -->
+  </div>
+</div>
+
+<ng-template let-data="data" #reportTemp>
+  <tr class="d-flex">
+    <td class="col-1"></td>
+    <td
+      [ngClass]="{
+        'text-lighten-primary': data?.reference,
+        'font-weight-bold': !data?.parentId
+      }"
+      [colSpan]="!data?.reference || data?.isSystemAccount ? 5 : 1"
+      class="col-5"
+    >
+      {{ data?.name }}
+    </td>
+    <td
+      class="col-2 text-center"
+      [ngClass]="{ 'text-lighten-primary': data?.reference }"
+    >
+      {{ data?.reference ? data?.reference : "" }}
+    </td>
+    <td
+      *ngIf="data?.balance"
+      class="text-right col-2 pointer"
+      [ngClass]="
+        data?.balance < 0 || compareTransactionType(data)
+          ? 'text-danger'
+          : 'text-lighten-primary'
+      "
+      (click)="openAccountTransactions(data, accountTransactionsView)"
+    >
+      {{ data?.balance | number : "1.2-2" }}
+    </td>
+    <td class="col-1"></td>
+  </tr>
+  <ng-container
+    *ngFor="let child of data?.children"
+    [ngTemplateOutlet]="reportTemp"
+    [ngTemplateOutletContext]="{ data: child }"
+  >
+  </ng-container>
+  <tr *ngIf="!data?.reference && !data?.parentId" class="d-flex">
+    <td class="col-1"></td>
+    <td class="col-5"></td>
+    <td class="col-2 text-right">
+      <span class="font-weight-bold">Total {{ data?.name }}</span>
+    </td>
+    <td class="text-right col-2 total-box">
+      <span>
+        {{ getChildrenAccountTotal(data) | number : "1.2-2" }}
+      </span>
+    </td>
+    <td class="col-1"></td>
+  </tr>
+  <tr
+    *ngIf="!data?.reference && data?.parentId && !data?.isSystemAccount"
+    class="d-flex"
+  >
+    <td class="col-1"></td>
+    <td class="col-5 bold-450">Total {{ data?.name }}</td>
+    <td class="col-2"></td>
+    <td class="text-right col-2 total-box">
+      <span>
+        {{ getChildrenAccountTotal(data) | number : "1.2-2" }}
+      </span>
+    </td>
+    <td class="col-1"></td>
+  </tr>
+</ng-template>
+<ng-template #accountTransactionsView>
+  <lnd-ledger-transaction-details
+    [accountTransactionsViewData]="accountTransactionsViewData"
+  ></lnd-ledger-transaction-details>
+</ng-template>

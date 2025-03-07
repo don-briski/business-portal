@@ -1,0 +1,4083 @@
+<div class="dt-page__header">
+  <h1
+    class="dt-page__title clearfix"
+    [style.color]="
+      currentTheme?.theme === 'Dark' ? currentTheme?.dark?.textColor : ''
+    "
+  >
+    Loan Applications
+    <span class="float-right role-add">
+      <div>
+        <div class="dropdown">
+          <!-- Dropdown Button -->
+          <button
+            type="button"
+            class="btn btn-info orange-bg dropdown-toggle dropdown-toggle-split"
+            [style.background]="currentTheme?.secondaryColor"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Add New&nbsp;
+          </button>
+          <!-- /dropdown button -->
+
+          <!-- Dropdown Menu -->
+          <div
+            class="dropdown-menu"
+            x-placement="left-start"
+            style="
+              position: absolute;
+              will-change: transform;
+              top: 0px;
+              left: 0px;
+              transform: translate3d(-5px, 0px, 0px);
+            "
+          >
+            <a
+              *ngIf="
+                currentuser?.permission?.includes('Create Loan Application')
+              "
+              routerLink="/loan/new-application"
+              routerLinkActive="active"
+              class="dropdown-item"
+              href="javascript:void(0)"
+              >Add New Application</a
+            >
+            <a
+              *ngIf="currentuser?.permission?.includes('Create Loan Top-Up')"
+              class="dropdown-item"
+              href="javascript:void(0)"
+              (click)="triggerModal('topup-unknown', addTopUpModal)"
+              >Top-Up on Existing Loan</a
+            >
+          </div>
+          <!-- /dropdown menu -->
+        </div>
+      </div>
+    </span>
+  </h1>
+</div>
+
+<!-- Grid -->
+<div class="row">
+  <!-- Grid Item -->
+  <div class="col-xl-12">
+    <ul
+      id="active-div"
+      class="card-header-pills nav nav-pill justify-content-center"
+      role="tablist"
+    >
+      <li
+        class="nav-item"
+        *ngIf="currentuser?.permission?.includes('View My Loan Applications')"
+      >
+        <a
+          (mouseover)="hover_open = true"
+          (mouseleave)="hover_open = false"
+          [ngStyle]="hover_open ? { color: currentTheme?.secondaryColor } : {}"
+          class="nav-link pool-nav active-tab"
+          href="javascript:void(0)"
+          (click)="switchView(LoanAppsPageCurrentView.OpenLoanApplications,false,true)"
+        >
+          My Applications
+        </a>
+      </li>
+
+      <li
+        class="nav-item"
+        *ngIf="currentuser?.permission?.includes('Team Lead') && currentuser?.permission?.includes('View My Loan Applications')"
+      >
+        <a
+          class="nav-link pool-nav"
+          href="javascript:void(0)"
+          (click)="switchTeamLeadViews(
+              LoanAppsPageCurrentView.AwaitingPoolApproval,
+              'submitted',true
+            )
+          "
+        >
+          My Team Applications
+        </a>
+      </li>
+
+      <li
+        class="nav-item"
+        *ngIf="
+          currentuser?.permission?.includes('View Failed Disbursements') ||
+          currentuser?.permission?.includes('View My Loan Applications')
+        "
+      >
+        <a
+          (mouseover)="hover_failed = true"
+          (mouseleave)="hover_failed = false"
+          [ngStyle]="
+            hover_failed ? { color: currentTheme?.secondaryColor } : {}
+          "
+          class="nav-link pool-nav"
+          href="javascript:void(0)"
+          (click)="switchView(LoanAppsPageCurrentView.FailedDisbursements,false,true)"
+        >
+          Failed Disbursements
+        </a>
+      </li>
+
+      <li
+        class="nav-item"
+        *ngIf="currentuser?.permission?.includes('View Loans')"
+      >
+        <a
+          (mouseover)="hover_deactivated_apps = true"
+          (mouseleave)="hover_deactivated_apps = false"
+          [ngStyle]="
+            hover_deactivated_apps
+              ? { color: currentTheme?.secondaryColor }
+              : {}
+          "
+          class="nav-link pool-nav"
+          href="javascript:void(0)"
+          (click)="
+            switchView(LoanAppsPageCurrentView.DeactivatedLoanApplications,false,true)
+          "
+        >
+          Deactivated Applications
+        </a>
+      </li>
+
+      <li
+        class="nav-item"
+        *ngIf="currentuser?.permission?.includes('View All Loan Applications')"
+      >
+        <a
+          (mouseover)="hover_all = true"
+          (mouseleave)="hover_all = false"
+          [ngStyle]="hover_all ? { color: currentTheme?.secondaryColor } : {}"
+          class="nav-link pool-nav"
+          href="javascript:void(0)"
+          (click)="switchView(LoanAppsPageCurrentView.AllLoanApplications,false,true)"
+        >
+          All Applications
+        </a>
+      </li>
+    </ul>
+
+    <!-- Card -->
+    <div
+      class="dt-card"
+      [style.background]="
+        currentTheme?.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+      "
+    >
+      <div
+        style="text-align: center"
+        *ngIf="
+          this.currentView !== LoanAppsPageCurrentView.AllLoanApplications &&
+          this.currentView !== LoanAppsPageCurrentView.OpenLoanApplications &&
+          this.currentView !==
+            LoanAppsPageCurrentView.ReviewedLoanApplications &&
+          this.currentView !== LoanAppsPageCurrentView.FailedDisbursements &&
+          this.currentView !==
+            LoanAppsPageCurrentView.DeactivatedLoanApplications &&
+          this.currentView !== LoanAppsPageCurrentView.AwaitingPoolApproval
+        "
+      >
+        <br />
+        <p style="text-align: center; color: indianred" *ngIf="!requestLoader">
+          Click on the application tab above to view content
+        </p>
+        <a
+          *ngIf="!requestLoader"
+          class="btn btn-refresh btn-xs mb-3 mt-1"
+          type="button"
+          href="javascript:location.reload(true)"
+          >Refresh Page</a
+        >
+      </div>
+
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="tab-pane">
+          <lnd-table
+            *ngIf="!repaymentLoader"
+            [isLoading]="requestLoader"
+            [config]="loanAppConfig"
+            [headers]="loanAppHeaders"
+            [data]="loanAppData"
+            [filters]="filters"
+            [pagination]="pagination"
+            [searchColumns]="searchColumns"
+            [selectedFilters]="selectedFilters"
+            [subTabs]="tableSubTabs"
+            [useNewFilter]="useNewFilter"
+            [filterTypes]="filterTypes"
+            (retrieveRowDetails)="getLoanDetailsById($event)"
+            (filter)="filter($event)"
+            (openFilterModal)="filterModalOpen()"
+            (paginationChange)="updatePagination($event)"
+            (searchParams)="search($event)"
+            (switchSubTab)="switchSubTab($event)"
+            (filterParams)="setFilterParams($event)"
+          ></lnd-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Customizer Sidebar -->
+<aside
+  style="display: block"
+  class="dt-customizer dt-drawer position-right"
+  [ngClass]="{ open: openAside }"
+>
+  <div
+    *ngIf="requestLoader"
+    class="table-loader"
+    style="text-align: center; color: indianred"
+  >
+    <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+  </div>
+  <div *ngIf="viewloandetails" class="dt-customizer__inner">
+    <div
+      class="dt-customizer__header shadow-none border-bottom"
+      [style.color]="
+        currentTheme?.theme === 'Dark' ? currentTheme?.dark?.textColor : ''
+      "
+      [style.background]="
+        currentTheme?.theme === 'Dark' ? currentTheme?.dark?.primaryColor : ''
+      "
+    >
+      <div class="dt-avatar-wrapper">
+        <img
+          class="dt-avatar size-75 mr-sm-4"
+          [src]="loaninformation?.customerImageUrl"
+          alt="Default"
+        />
+        <div class="dt-avatar-info">
+          <div class="display-5 mb-2 font-weight-bold">
+            {{ loaninformation?.person?.displayName }}
+          </div>
+          <div class="f-12 flex">
+            <span class="code">{{ loaninformation?.loanCode }}</span>
+            <span
+              *ngIf="loaninformation?.loanStage"
+              class="badge badge-xs mb-1 ml-2"
+              [ngClass]="
+                getAllAppsStatusClass({ loanStage: loaninformation?.loanStage })
+              "
+              >{{ loaninformation?.loanStage }}</span
+            >
+          </div>
+          <span>
+            <span *ngIf="loaninformation?.person?.emailAddress != null">
+              <i class="icon icon-email icon-xl mr-5"></i>&nbsp;
+              {{ loaninformation?.person?.emailAddress }}</span
+            >
+            &nbsp;&nbsp;<span *ngIf="loaninformation?.person?.phoneNumber">
+              <i class="icon icon-phone icon-xl mr-5"></i> &nbsp;{{
+                loaninformation?.person?.phoneNumber
+              }}
+            </span>
+            &nbsp;
+            <small *ngIf="loaninformation?.parentLoanId != null" class="notify">
+              Loan Top-Up Application for running Loan:
+              {{ getFromJson(loaninformation?.loanTypeInfo, "parentLoanCode") }}
+              ({{ ownerInformation?.currency?.currencySymbol
+              }}{{
+                getFromJson(loaninformation?.loanTypeInfo, "parentLoanAmount")
+                  | number : "1.2-2"
+              }})
+            </small>
+          </span>
+        </div>
+      </div>
+      <button type="button" class="close" (click)="toggleAside()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div
+      class="dt-customizer__body ps-custom-scrollbar"
+      [style.color]="
+        currentTheme?.theme === 'Dark' ? currentTheme?.dark?.textColor : ''
+      "
+      [style.background]="
+        currentTheme?.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+      "
+    >
+      <div class="row">
+        <div class="col-md-12" style="padding: 20px">
+          <ul class="dt-list dt-list-one-second padded-left">
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Loan Amount</span
+                  >
+                  <h5
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    class="mb-0"
+                  >
+                    <b
+                      >{{ ownerInformation?.currency?.currencySymbol
+                      }}{{ loaninformation?.loanAmount | number : "1.2-2" }}</b
+                    >
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-datepicker icon-2x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1">Tenor</span>
+                  <h5
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    class="mb-0"
+                  >
+                    {{ loaninformation?.loanTenor }}
+                    {{ loaninformation?.repaymentScheduleType
+                    }}{{ loaninformation?.loanTenor === 1 ? "" : "s" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li
+              class="dt-list__item"
+              *ngIf="
+                !isEmpty(loaninformation?.loanTypeInfo) &&
+                !isEmpty(
+                  getFromJson(loaninformation?.loanTypeInfo, 'loanTypeName')
+                )
+              "
+            >
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-editor icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Loan Type</span
+                  >
+                  <h5
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    class="mb-0"
+                  >
+                    {{
+                      getFromJson(loaninformation?.loanTypeInfo, "loanTypeName")
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <lnd-loan-deposit-card
+              *ngIf="openAside"
+              [loanDeposit]="loaninformation?.loanDeposit"
+              [currentTheme]="currentTheme"
+            ></lnd-loan-deposit-card>
+
+            <li
+              class="dt-list__item"
+              *ngIf="
+                !isEmpty(loaninformation?.loanTypeInfo) &&
+                !isEmpty(
+                  getFromJson(loaninformation?.loanTypeInfo, 'loanTypeCategory')
+                )
+              "
+            >
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-editor icon-3x mr-3 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Loan Type Category</span
+                  >
+                  <h5
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    class="mb-0"
+                  >
+                    {{
+                      getFromJson(
+                        loaninformation?.loanTypeInfo,
+                        "loanTypeCategory"
+                      )
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <li
+              class="dt-list__item"
+              *ngIf="!isEmpty(loaninformation?.user?.person?.displayName)"
+            >
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Created by</span
+                  >
+                  <h5
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    class="mb-0"
+                  >
+                    {{ loaninformation?.user?.person?.displayName }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <li
+              class="dt-list__item"
+              *ngIf="
+                !isEmpty(loaninformation?.salesPerson?.person?.displayName)
+              "
+            >
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Sales Person</span
+                  >
+                  <h5
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    class="mb-0"
+                  >
+                    {{ loaninformation?.salesPerson?.person?.displayName }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+
+            <li
+              class="dt-list__item"
+              *ngIf="
+                !isEmpty(loaninformation?.loanStartDate) &&
+                currentuser?.permission?.includes(
+                  'Set Loan Application Start Date'
+                )
+              "
+            >
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Loan Start Date</span
+                  >
+                  <h5
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    class="mb-0"
+                  >
+                    {{ loaninformation?.loanStartDate | date : "mediumDate" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+
+            <!-- List Item -->
+
+            <!-- /list item -->
+          </ul>
+          <div class="d-flex p-3 align-items-center ml-3">
+            <div class="mr-3">
+              <button
+                *ngIf="!repaymentLoader"
+                type="button"
+                class="btn btn-outline-secondary"
+                (click)="viewRepaymentSchedule(repaymentSchedule)"
+              >
+                View Repayment Schedule
+              </button>
+              <button
+                *ngIf="repaymentLoader"
+                type="button"
+                class="btn btn-outline-secondary"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i>
+                Processing ...
+              </button>
+            </div>
+            <span
+              *ngIf="
+                loaninformation?.statusString != 'Deactivated' &&
+                loaninformation?.statusString != 'Settled' &&
+                loaninformation?.statusString != 'DeactivationRequestSent' &&
+                currentuser?.permission?.includes(
+                  'Initiate Deactivation Request'
+                )
+              "
+            >
+              <button
+                class="btn btn-danger"
+                type="button"
+                (click)="
+                  toggleDeactivationModal(
+                    loaninformation?.loanId,
+                    deactivationModal
+                  )
+                "
+              >
+                Deactivate Application
+              </button>
+            </span>
+            <span
+              *ngIf="
+                loaninformation?.statusString != 'Deactivated' &&
+                loaninformation?.statusString != 'Settled' &&
+                loaninformation?.statusString == 'DeactivationRequestSent' &&
+                currentuser?.permission?.includes('Deactivate Loans')
+              "
+            >
+              <button
+                class="btn btn-danger btn-xs mb-3 mt-1"
+                type="button"
+                (click)="
+                  toggleDeactivationModal(
+                    loaninformation?.loanId,
+                    deactivationModal
+                  )
+                "
+              >
+                View Deactivation Request
+              </button></span
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="">
+        <br />
+        <div class="dt-card__body">
+          <ul
+            class="nav nav-underline flex-row border-bottom nav-card-tabs w-75"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                (mouseover)="hover_lai = true"
+                (mouseleave)="hover_lai = false"
+                [ngStyle]="
+                  hover_lai ? { color: currentTheme?.secondaryColor } : {}
+                "
+                class="nav-link active"
+                data-toggle="tab"
+                href="#tab-pane1"
+                role="tab"
+                aria-controls="tab-pane1"
+                aria-selected="true"
+                >Application Information</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                (mouseover)="hover_ch = true"
+                (mouseleave)="hover_ch = false"
+                [ngStyle]="
+                  hover_ch ? { color: currentTheme?.secondaryColor } : {}
+                "
+                class="nav-link"
+                data-toggle="tab"
+                href="#tab-pane2"
+                role="tab"
+                aria-controls="tab-pane2"
+                aria-selected="true"
+                >Customer History</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                (mouseover)="hover_act = true"
+                (mouseleave)="hover_act = false"
+                [ngStyle]="
+                  hover_act ? { color: currentTheme?.secondaryColor } : {}
+                "
+                (click)="
+                  submitLoanRequest(
+                    'LoanActivities',
+                    loaninformation?.loanId,
+                    loaninformation?.applicationCode
+                  )
+                "
+                data-toggle="tab"
+                href="#tab-pane6"
+                role="tab"
+                aria-controls="tab-pane6"
+                aria-selected="true"
+                >Loan Activities</a
+              >
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div id="tab-pane1" class="tab-pane active">
+              <div class="d-flex align-items-center mb-3"></div>
+              <div class="row">
+                <div class="col-xl-10">
+                  <div id="account-tab" class="mb-5 border-bottom">
+                    <div
+                      class="h4 my-5"
+                      [style.color]="currentTheme?.secondaryColor"
+                    >
+                      Personal Information
+                    </div>
+                    <ul class="dt-list dt-list-one-third">
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.bvnInfo) &&
+                          !isEmpty(
+                            getFromJson(loaninformation?.bvnInfo, 'bvnNumber')
+                          )
+                        "
+                      >
+                        <div class="media">
+                          <i
+                            class="icon icon-link icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <div class="d-flex">
+                              <span
+                                class="d-block text-light-gray f-12 mb-1 mr-2"
+                                >BVN</span
+                              >
+                              <lnd-check-icon
+                                *ngIf="
+                                  getFromJson(
+                                    loaninformation?.bvnInfo,
+                                    'IsBvnValidated'
+                                  )
+                                "
+                                tooltip="BVN was validated during loan creation."
+                              >
+                              </lnd-check-icon>
+                            </div>
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.bvnInfo,
+                                  "bvnNumber"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.bvnInfo) &&
+                          !isEmpty(
+                            getFromJson(loaninformation?.bvnInfo, 'bvnDOB')
+                          )
+                        "
+                      >
+                        <div class="media">
+                          <i
+                            class="icon icon-birthday-new icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >DOB (BVN)</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(loaninformation?.bvnInfo, "bvnDOB")
+                                  | date : "mediumDate"
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.bvnInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.bvnInfo,
+                              'bvnPhoneNumber'
+                            )
+                          )
+                        "
+                      >
+                        <div class="media">
+                          <i
+                            class="icon icon-phone icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Phone (BVN)</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.bvnInfo,
+                                  "bvnPhoneNumber"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.bankInfo) &&
+                          !isEmpty(
+                            getFromJson(loaninformation?.bankInfo, 'bankName')
+                          )
+                        "
+                      >
+                        <div class="media">
+                          <i
+                            class="icon icon-company icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Bank</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.bankInfo,
+                                  "bankName"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.bankInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.bankInfo,
+                              'bankAccountNumber'
+                            )
+                          )
+                        "
+                      >
+                        <div class="media">
+                          <i
+                            class="icon icon-company icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Account Number</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.bankInfo,
+                                  "bankAccountNumber"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.bankInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.bankInfo,
+                              'bankAccountName'
+                            )
+                          )
+                        "
+                      >
+                        <div class="media">
+                          <i
+                            class="icon icon-user icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Account Name</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.bankInfo,
+                                  "bankAccountName"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="!isEmpty(loaninformation?.person?.sex)"
+                      >
+                        <div class="media">
+                          <i
+                            class="mr-3 icon icon-user icon-2x align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="mb-1 d-block text-light-gray f-12"
+                              >Gender</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{ loaninformation?.person?.sex }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.residentialInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.residentialInfo,
+                              'customerPhoneNumber'
+                            )
+                          )
+                        "
+                      >
+                        <div class="media">
+                          <i
+                            class="icon icon-phone icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Customer Phone Number</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.residentialInfo,
+                                  "customerPhoneNumber"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                      </li>
+                      <li *ngIf="loaninformation?._residentialInfo?.customerAltPhoneNumber" class="dt-list__item">
+                        <div class="media">
+                          <i
+                            class="icon icon-phone icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+
+                          <div  class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Alt. Phone Number</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              <span
+                                >{{
+                                  getFromJson(
+                                    loaninformation?.residentialInfo,
+                                    "customerAltPhoneNumber"
+                                  )
+                                }}
+                              </span>
+                              <img
+                                *ngIf="
+                                  getFromJson(
+                                    loaninformation?.residentialInfo,
+                                    'isAltPhoneNumberValidated'
+                                  )
+                                "
+                                src="assets/images/check-fill.png"
+                                alt="Verified"
+                                class="ml-2"
+                                width="24px"
+                              />
+                              <button
+                                *ngIf="!loaninformation?._residentialInfo?.isAltPhoneNumberValidated && enableFeature()"
+                                type="button"
+                                class="btn btn-outline-success btn-xs ml-2"
+                                (click)="
+                                  openPhoneVerificationModal(
+                                    phoneValidationDetailsView
+                                  )
+                                "
+                              >
+                                <span *ngIf="verifyingAltPhoneNo"
+                                  ><i class="icon icon-spin icon-spin2"></i
+                                ></span>
+                                {{
+                                  verifyingAltPhoneNo
+                                    ? "Validating..."
+                                    : "Validate"
+                                }}
+                              </button>
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <!-- /list item -->
+
+                      <!-- /list item -->
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.residentialInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.residentialInfo,
+                              'address'
+                            )
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-home icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Lives in</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.residentialInfo,
+                                  "address"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+
+                      <!-- List Item -->
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.residentialInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.residentialInfo,
+                              'nextOfKinName'
+                            )
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-user icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Next of Kin Name</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.residentialInfo,
+                                  "nextOfKinName"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <!-- /list item -->
+                      <!-- List Item -->
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.residentialInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.residentialInfo,
+                              'nextOfKinPhoneNumber'
+                            )
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-phone icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Next of Kin Phone Number</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.residentialInfo,
+                                  "nextOfKinPhoneNumber"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <!-- /list item -->
+
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.residentialInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.residentialInfo,
+                              'nextOfKinAddress'
+                            )
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-home icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Next of Kin Address</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.residentialInfo,
+                                  "nextOfKinAddress"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+
+                      <!-- List Item -->
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(
+                            loaninformation?.loanTypeInfo?.loanReasonCode
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-link icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Loan Reason</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.loanTypeInfo,
+                                  "loanReasonCode"
+                                )
+                              }}:
+                              {{
+                                getFromJson(
+                                  loaninformation?.loanTypeInfo,
+                                  "loanReasonName"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <!-- /list item -->
+
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.residentialInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.residentialInfo,
+                              'utilityBill'
+                            )
+                          )
+                        "
+                      >
+                        <button
+                          class="btn btn-outline-primary mr-2 mb-2"
+                          (click)="
+                            documentViewer(
+                              '',
+                              getFromJson(
+                                loaninformation?.residentialInfo,
+                                'utilityBill'
+                              ),
+                              getFromJson(
+                                loaninformation?.residentialInfo,
+                                'fileUploadType'
+                              ),
+                              documentViewerModal
+                            )
+                          "
+                          type="button"
+                          data-toggle="collapse"
+                          data-target="#doc1"
+                          aria-expanded="false"
+                          aria-controls="doc1"
+                        >
+                          <i class="icon icon-folder-o icon-xl mr-5"></i>View
+                          Supporting Document
+                        </button>
+                      </li>
+
+                      <!-- /list item -->
+                    </ul>
+                  </div>
+
+                  <div id="employ-tab" class="mb-5 border-bottom">
+                    <div
+                      class="h4 my-5"
+                      [style.color]="currentTheme?.secondaryColor"
+                    >
+                      Employment Info
+                    </div>
+                    <div
+                      *ngIf="
+                        getFromJson(
+                          loaninformation?.repaymentInfo,
+                          'repaymentMethod'
+                        ) == 'Deduction At Source'
+                      "
+                    >
+                      <span class=""
+                        >*Repayment method for applicant is:
+                        <span style="color: red">{{
+                          getFromJson(
+                            loaninformation?.repaymentInfo,
+                            "repaymentMethod"
+                          )
+                        }}</span></span
+                      >
+                      <br />
+                      <br />
+                    </div>
+
+                    <div
+                      *ngIf="
+                        loaninformation?.employerVerified == false &&
+                        loaninformation?.employmentInfo != null
+                      "
+                      class=""
+                    >
+                      <img
+                        style="width: 25px"
+                        src="assets/images/not-verified1.png"
+                        alt="Default"
+                      />&nbsp;
+                      <span
+                        ><b>
+                          {{
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              "employerName"
+                            )
+                          }}</b
+                        >
+                        is not verified, you will not be allowed to
+                        proceed.</span
+                      >
+                      <br />
+                      <br />
+                      <br />
+                    </div>
+
+                    <!-- List -->
+                    <ul class="dt-list dt-list-one-third">
+                      <!-- List Item -->
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'employmentStatus'
+                            )
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-stats icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Employment Status</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "employmentStatus"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <!-- /list item -->
+
+                      <!-- List Item -->
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          getFromJson(
+                            loaninformation?.employmentInfo,
+                            'employmentStatus'
+                          ) != 'SELF EMPLOYED'
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-company icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Works at</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "employerName"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <!-- /list item -->
+                      <!-- List Item -->
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'employmentIndustry'
+                            )
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-company icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Industry</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "employmentIndustry"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <!-- /list item -->
+
+                      <!-- List Item -->
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'employmentCode'
+                            )
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-user-o icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Employment ID/Code</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "employmentCode"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                        </div>
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'employerAddress'
+                            )
+                          ) &&
+                          getFromJson(
+                            loaninformation?.employmentInfo,
+                            'employmentStatus'
+                          ) != 'SELF EMPLOYED'
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-geo-location icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Address</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "employerAddress"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'employmentYears'
+                            )
+                          ) &&
+                          getFromJson(
+                            loaninformation?.employmentInfo,
+                            'employmentStatus'
+                          ) != 'SELF EMPLOYED'
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-contacts icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Date of Employment</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "employmentYears"
+                                )
+                              }}
+                              <small>
+                                ({{
+                                  getFullDateDiff(
+                                    loaninformation?.createdAt,
+                                    getFromJson(
+                                      loaninformation?.employmentInfo,
+                                      "employmentYears"
+                                    )
+                                  )
+                                }})</small
+                              >
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'employmentLevel'
+                            )
+                          ) &&
+                          getFromJson(
+                            loaninformation?.employmentInfo,
+                            'employmentStatus'
+                          ) != 'SELF EMPLOYED'
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-graduation icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Grade Level</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "employmentLevel"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'employerPayDate'
+                            )
+                          ) &&
+                          getFromJson(
+                            loaninformation?.employmentInfo,
+                            'employmentStatus'
+                          ) != 'SELF EMPLOYED'
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-datepicker icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Pay Date</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "employerPayDate"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'netIncome'
+                            )
+                          )
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-revenue-new icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Net Income</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{ ownerInformation?.currency?.currencySymbol }}
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "netIncome"
+                                ) | number : "1.2-2"
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'WorkPhone'
+                            )
+                          ) &&
+                          getFromJson(
+                            loaninformation?.employmentInfo,
+                            'employmentStatus'
+                          ) != 'SELF EMPLOYED'
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-phone icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Work Phone</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "WorkPhone"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                      <li
+                        class="dt-list__item"
+                        *ngIf="
+                          !isEmpty(loaninformation?.employmentInfo) &&
+                          !isEmpty(
+                            getFromJson(
+                              loaninformation?.employmentInfo,
+                              'WorkEmail'
+                            )
+                          ) &&
+                          getFromJson(
+                            loaninformation?.employmentInfo,
+                            'employmentStatus'
+                          ) != 'SELF EMPLOYED'
+                        "
+                      >
+                        <!-- Media -->
+                        <div class="media">
+                          <i
+                            class="icon icon-phone icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+
+                          <!-- Media Body -->
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Work Email</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                getFromJson(
+                                  loaninformation?.employmentInfo,
+                                  "WorkEmail"
+                                )
+                              }}
+                            </h5>
+                          </div>
+                          <!-- /media body -->
+                        </div>
+                        <!-- /media -->
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div id="files-tab" class="mb-5 border-bottom pb-5">
+                    <div
+                      class="h4 my-5"
+                      [style.color]="currentTheme?.secondaryColor"
+                    >
+                      Files
+                    </div>
+                    <div class="row">
+                      <div class="col-xl-8">
+                        <button
+                          *ngIf="
+                            !isEmpty(loaninformation?.employmentInfo) &&
+                            !isEmpty(
+                              getFromJson(
+                                loaninformation?.employmentInfo,
+                                'bankStatement'
+                              )
+                            )
+                          "
+                          style="display: inline"
+                          class="btn mx-2 btn-outline-primary mb-2"
+                          (click)="
+                            documentViewer(
+                              '',
+                              getFromJson(
+                                loaninformation?.employmentInfo,
+                                'bankStatement'
+                              ),
+                              getFromJson(
+                                loaninformation?.residentialInfo,
+                                'fileUploadType'
+                              ),
+                              documentViewerModal
+                            )
+                          "
+                          type="button"
+                          data-toggle="collapse"
+                          data-target="#doc1"
+                          aria-expanded="false"
+                          aria-controls="doc1"
+                        >
+                          <i class="icon icon-folder-o icon-xl mr-5"></i>View
+                          Bank Statement
+                        </button>
+                        <button
+                          *ngIf="
+                            !isEmpty(loaninformation?.residentialInfo) &&
+                            !isEmpty(
+                              getFromJson(
+                                loaninformation?.residentialInfo,
+                                'utilityBill'
+                              )
+                            )
+                          "
+                          class="mb-2 mr-2 btn btn-outline-primary"
+                          (click)="
+                            documentViewer(
+                              '',
+                              getFromJson(
+                                loaninformation?.residentialInfo,
+                                'utilityBill'
+                              ),
+                              getFromJson(
+                                loaninformation?.residentialInfo,
+                                'fileUploadType'
+                              ),
+                              documentViewerModal
+                            )
+                          "
+                          type="button"
+                          data-toggle="collapse"
+                          data-target="#doc1"
+                          aria-expanded="false"
+                          aria-controls="doc1"
+                        >
+                          <i class="mr-3 icon icon-folder-o icon-xl"></i>View
+                          Utility Bill
+                        </button>
+                        <div class="overflow-hidden">
+                          <div class="dt-card__body p-0">
+                            <div
+                              class="table-responsive"
+                              *ngIf="!isEmpty(loaninformation?.files)"
+                            >
+                              <table class="table table-striped mb-0">
+                                <thead>
+                                  <tr>
+                                    <th scope="col">File Name</th>
+                                    <th scope="col">Stage</th>
+                                    <th scope="col">Date Uploaded (M/d/y)</th>
+                                    <th scope="col">Action</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr
+                                    *ngFor="
+                                      let row of loaninformation?.files;
+                                      let i = index
+                                    "
+                                  >
+                                    <th scope="row">
+                                      {{ row?.originalName }}
+                                    </th>
+                                    <td>{{ row?.activity }}</td>
+                                    <td>{{ row?.createdAt | date }}</td>
+                                    <td>
+                                      <a
+                                        class="d-inline-block"
+                                        (click)="
+                                          documentViewer(
+                                            row?.fileName,
+                                            row?.filePath,
+                                            row?.fileType,
+                                            documentViewerModal,
+                                            imageViewerModal
+                                          )
+                                        "
+                                        href="javascript:void(0)"
+                                        ><i
+                                          class="icon icon-forward icon-fw mr-2"
+                                        ></i
+                                        >View</a
+                                      >
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                            <div
+                              class="text-center"
+                              *ngIf="isEmpty(loaninformation?.files)"
+                            >
+                              No file Uploaded
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    id="buyover-tab"
+                    class="mb-5 border-bottom pb-5"
+                    *ngIf="!isEmpty(loaninformation?.lendingInstitutionId)"
+                  >
+                    <div
+                      class="h4 my-5"
+                      [style.color]="currentTheme?.secondaryColor"
+                    >
+                      Buy-Over Info
+                    </div>
+                    <ul class="dt-list dt-list-one-third">
+                      <li class="dt-list__item">
+                        <div class="media">
+                          <i
+                            class="icon icon-revenue-new icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Buy-Over Amount</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{ ownerInformation?.currency?.currencySymbol }}
+                              {{
+                                loaninformation?.buyOverAmount
+                                  | number : "1.2-2"
+                              }}
+                            </h5>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="dt-list__item">
+                        <div class="media">
+                          <i
+                            class="icon icon-company icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Lending Institution</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                loaninformation?.lendingInstitution
+                                  ?.lendingInstitutionName
+                              }}
+                            </h5>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="dt-list__item">
+                        <div class="media">
+                          <i
+                            class="icon icon-phone icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Contact Phone Number</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{
+                                loaninformation?.lendingInstitution?.phoneNumber
+                              }}
+                            </h5>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="dt-list__item">
+                        <div class="media">
+                          <i
+                            class="icon icon-email icon-2x mr-3 align-self-center text-warning"
+                          ></i>
+                          <div class="media-body">
+                            <span class="d-block text-light-gray f-12 mb-1"
+                              >Email</span
+                            >
+                            <h5
+                              [style.color]="
+                                currentTheme?.theme === 'Dark'
+                                  ? currentTheme?.dark?.textColor
+                                  : ''
+                              "
+                              class="mb-0"
+                            >
+                              {{ loaninformation?.lendingInstitution?.email }}
+                            </h5>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="tab-pane2" class="tab-pane">
+              <div class="row">
+                <div class="col-xl-10">
+                  <div
+                    class="h4 mt-5"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    Previous Loan Applications
+                  </div>
+                  <div class="overflow-hidden">
+                    <!-- Card Body -->
+                    <div class="dt-card__body p-0">
+                      <!-- Tables -->
+                      <div class="table-responsive">
+                        <table
+                          class="table table-striped mb-0"
+                          style="font-size: 11px"
+                        >
+                          <thead class="">
+                            <tr>
+                              <th scope="col">Application ID</th>
+                              <th scope="col">Date Created</th>
+                              <th scope="col">Date Reviewed</th>
+                              <th scope="col">Status</th>
+                              <th scope="col">View Info</th>
+                            </tr>
+                          </thead>
+                          <tbody></tbody>
+                        </table>
+                      </div>
+                      <!-- /tables -->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="tab-pane6" class="tab-pane">
+              <div class="row">
+                <div class="col-xl-8">
+                  <div
+                    class="pb-4"
+                    [style.background]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.secondaryColor
+                        : ''
+                    "
+                  >
+                    <div class="dt-card__header mb-3 pt-0 pl-0">
+                      <div
+                        class="h4 mt-5"
+                        [style.color]="currentTheme?.secondaryColor"
+                      >
+                        Events & Comments
+                      </div>
+                      <div class="dt-card__tools">
+                        <a
+                          href="javascript:void(0)"
+                          (click)="
+                            submitLoanRequest(
+                              'LoanActivities',
+                              loaninformation?.loanId,
+                              loaninformation?.applicationCode
+                            )
+                          "
+                          class="dt-card__more"
+                          [style.color]="currentTheme?.secondaryColor"
+                          >Refresh Activities
+                          <i class="icon icon-ripple icon-xl ml-2"></i
+                        ></a>
+                      </div>
+                    </div>
+                    <div class="dt-card__body p-0">
+                      <div
+                        *ngIf="this.requestLoader"
+                        class="table-loader"
+                        style="text-align: center; color: indianred"
+                      >
+                        <span>
+                          <i class="icon icon-spin icon-spin2"></i>
+                          Loading...</span
+                        >
+                      </div>
+
+                      <div class="table-responsive">
+                        <table
+                          class="table mb-0"
+                          style="font-size: 11px"
+                          [ngClass]="
+                            currentTheme?.theme === 'Dark'
+                              ? ''
+                              : 'table-striped'
+                          "
+                        >
+                          <thead>
+                            <tr>
+                              <th
+                                [style.color]="
+                                  currentTheme?.theme === 'Dark'
+                                    ? currentTheme?.dark?.textColor
+                                    : ''
+                                "
+                                class="text-center"
+                                scope="col"
+                              >
+                                Activity
+                              </th>
+                              <th
+                                [style.color]="
+                                  currentTheme?.theme === 'Dark'
+                                    ? currentTheme?.dark?.textColor
+                                    : ''
+                                "
+                              >
+                                Description
+                              </th>
+                              <th
+                                [style.color]="
+                                  currentTheme?.theme === 'Dark'
+                                    ? currentTheme?.dark?.textColor
+                                    : ''
+                                "
+                                class="text-center"
+                                scope="col"
+                              >
+                                Date
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              *ngFor="let row of loanactivities; let i = index"
+                            >
+                              <td
+                                [style.color]="
+                                  currentTheme?.theme === 'Dark'
+                                    ? currentTheme?.dark?.textColor
+                                    : ''
+                                "
+                                class="text-center code"
+                                [style.color]="currentTheme?.secondaryColor"
+                              >
+                                {{ row?.relatedObjectInitiatorCode }}
+                              </td>
+                              <td
+                                [style.color]="
+                                  currentTheme?.theme === 'Dark'
+                                    ? currentTheme?.dark?.textColor
+                                    : ''
+                                "
+                              >
+                                {{ row?.activityDescription }}
+                              </td>
+                              <td
+                                [style.color]="
+                                  currentTheme?.theme === 'Dark'
+                                    ? currentTheme?.dark?.textColor
+                                    : ''
+                                "
+                                class="text-center"
+                                scope="col"
+                              >
+                                {{ row?.activityDate | date : "medium" }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-xl-4 col-md-6 col-12 order-xl-1">
+                  <div
+                    class=""
+                    [style.background]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.secondaryColor
+                        : ''
+                    "
+                  >
+                    <div class="dt-card__body">
+                      <div
+                        *ngIf="loaninformation?.salesPerson?.person"
+                        class="media mb-5"
+                      >
+                        <i
+                          [style.color]="currentTheme?.secondaryColor"
+                          class="icon icon-user icon-xl mr-5 orange"
+                        ></i>
+                        <div class="media-body">
+                          <span class="d-block text-light-gray f-12 mb-1"
+                            >Initiating Officer</span
+                          >
+                          <span class="h5">{{
+                            loaninformation?.salesPerson?.person?.displayName
+                          }}</span>
+                          <br />
+                          <small>
+                            Date:
+                            {{
+                              loaninformation.createdAt | date : "mediumDate"
+                            }}</small
+                          >
+                        </div>
+                      </div>
+                      <div
+                        class="media mb-5"
+                        *ngIf="!isEmpty(loaninformation?.approversInfo)"
+                      >
+                        <i
+                          class="icon icon-user icon-xl mr-5 orange"
+                          [style.color]="currentTheme?.secondaryColor"
+                        ></i>
+
+                        <div class="media-body">
+                          <span class="d-block text-light-gray f-12 mb-1"
+                            >Review Officer</span
+                          >
+                          <span class="d-block">{{
+                            getReviewInfo("CommentBy")
+                          }}</span>
+                          <small
+                            class="d-block mt-1"
+                            *ngIf="getReviewInfo('InternalNote')"
+                            >Comment: {{ getReviewInfo("InternalNote") }}
+                          </small>
+                          <small
+                            >Date: {{ reviewDate | date : "mediumDate" }}</small
+                          >
+                          <br />
+                        </div>
+                      </div>
+                      <div
+                        class="media"
+                        *ngIf="loaninformation?.loanDisbursementId != null"
+                      >
+                        <i
+                          [style.color]="currentTheme?.secondaryColor"
+                          class="icon icon-user icon-xl mr-5 orange"
+                        ></i>
+
+                        <div class="media-body">
+                          <span class="d-block text-light-gray f-12 mb-1"
+                            >Disbursement Officer</span
+                          >
+                          <span class="h5">{{
+                            loaninformation?.disbursementClaimer?.person
+                              ?.displayName
+                          }}</span>
+                          <br />
+                          <small>
+                            Date:
+                            {{
+                              loaninformation?.dateDisbursed
+                                | date : "mediumDate"
+                            }}</small
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+<div *ngIf="openAside" class="dt-backdrop" (click)="toggleAside()"></div>
+<ng-template #documentViewerModal>
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-4">Document Viewer</h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row mb-5">
+      <div class="col-xl-12">
+        <div
+          *ngIf="currentFileType == 'image'"
+          id="imagefile"
+          style="text-align: center"
+        >
+          <img class="" width="90%;" src="{{ currentFileUrl }}" alt="Default" />
+        </div>
+
+        <!-- Card -->
+        <div
+          *ngIf="currentFileType == 'document'"
+          id="docfile"
+          style="text-align: center"
+        >
+          <span
+            ><i class="icon icon-exclamation mr-2" style="color: indianred"></i
+            >If document is taking too long to load, please click on the
+            download button below</span
+          ><br /><br />
+          <iframe
+            [src]="currentFileUrl"
+            frameborder="0"
+            height="500px"
+            width="100%"
+          ></iframe>
+        </div>
+        <!-- car-->
+      </div>
+    </div>
+  </div>
+  <!-- /modal body -->
+
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn orange-bg btn-xs text-white"
+      (click)="closeModal()"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+    >
+      <i class="icon icon-long-arrow-left icon-fw mr-2"></i>Back to review
+    </button>
+    <a
+      href="javascript:void(0);"
+      target="_blank"
+      class="btn btn-claim btn-xs text-white"
+      (click)="downloadfile()"
+    >
+      <i class="icon icon-long-arrow-down icon-fw mr-2"></i>Download</a
+    >
+  </div>
+  <!-- /modal footer -->
+</ng-template>
+
+<ng-template #deactivationModal>
+  <!-- Modal Header -->
+
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="DeactivationForm"
+    (ngSubmit)="submitDeactivationForm(DeactivationForm.value)"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Login Content Inner -->
+      <div class="dt-login__content-inner">
+        <div class="text-center mb-8">
+          <!-- Avatar -->
+          <!-- /avatar -->
+
+          <div class="row">
+            <span
+              class="dt-avatar mr-4 size-35 rounded-circle bg-light-blue text-white"
+              >{{ currentuser?.person?.initials }}</span
+            >
+
+            <h3 class="mb-2">{{ currentuser?.person?.displayName }}</h3>
+            &nbsp;
+
+            <span>
+              <span
+                *ngIf="loaninformation?.loanStage == 'Loan Active'"
+                class="badge badge-success btn-xs mb-1 mr-1"
+                >{{ loaninformation?.loanStage }}</span
+              >
+              <span
+                *ngIf="
+                  loaninformation?.loanStage == 'Rejected' ||
+                  loaninformation?.statusString == 'DisbursementFailed' ||
+                  loaninformation?.statusString == 'Deactivated'
+                "
+                class="badge badge-danger btn-xs mb-1 mr-1"
+                >{{ loaninformation?.loanStage }}</span
+              >
+              <span
+                *ngIf="loaninformation?.statusString == 'Redraft'"
+                style="background-color: #453488; color: white"
+                class="badge badge-warning btn-xs mb-1 mr-1"
+                >{{ loaninformation?.loanStage }}</span
+              >
+              <span
+                *ngIf="
+                  loaninformation?.loanStage != 'Loan Active' &&
+                  loaninformation?.loanStage != 'Rejected' &&
+                  loaninformation?.statusString != 'Redraft' &&
+                  loaninformation?.statusString != 'DisbursementFailed' &&
+                  loaninformation?.statusString != 'Deactivated'
+                "
+                class="badge badge-warning btn-xs mb-1 mr-1"
+                >{{ loaninformation?.loanStage }}</span
+              >
+            </span>
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>
+                    <i
+                      class="icon icon-contacts align-self-center text-warning"
+                    ></i>
+                    Customer
+                  </th>
+                  <th>Application Code</th>
+                  <th class="amount-field">
+                    <i
+                      class="icon icon-revenue-new align-self-center text-warning"
+                    ></i>
+                    Amount ({{ ownerInformation?.currency?.currencySymbol }})
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="gradeX">
+                  <td class="small">
+                    <span>{{ loaninformation?.person?.displayName }}</span>
+                  </td>
+                  <td class="code small">
+                    {{ loaninformation?.applicationCode }}
+                  </td>
+                  <td class="amount-field small">
+                    {{ loaninformation?.loanAmount | number : "1.2-2" }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+          <div class="">
+            <ul
+              class="nav nav-underline mt-3 flex-row border-bottom nav-card-tabs"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  (mouseover)="hover_das = true"
+                  (mouseleave)="hover_das = false"
+                  [ngStyle]="
+                    hover_das ? { color: currentTheme?.secondaryColor } : {}
+                  "
+                  data-toggle="tab"
+                  href="#one-tab"
+                  role="tab"
+                  aria-controls="tab-pane0"
+                  aria-selected="true"
+                  >Deactivation Section
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  data-toggle="tab"
+                  (mouseover)="hover_anc = true"
+                  (mouseleave)="hover_anc = false"
+                  [ngStyle]="
+                    hover_anc ? { color: currentTheme?.secondaryColor } : {}
+                  "
+                  (click)="
+                    submitLoanRequest(
+                      'LoanActivities',
+                      loaninformation?.loanId,
+                      loaninformation?.applicationCode
+                    )
+                  "
+                  href="#second-tab"
+                  role="tab"
+                  aria-controls="tab-pane0"
+                  aria-selected="true"
+                  >Activities & Comments</a
+                >
+              </li>
+            </ul>
+            <br />
+            <div class="tab-content">
+              <div id="one-tab" class="tab-pane active">
+                <!-- <div class="dt-card overflow-hidden"> -->
+                <!-- Card Body -->
+                <!-- <div class="dt-card__body p-0"> -->
+
+                <small
+                  *ngIf="
+                    loaninformation?.statusString !=
+                      'DeactivationRequestSent' ||
+                    loaninformation?.statusString != 'DeactivationRejected' ||
+                    loaninformation?.statusString != 'Deactivated'
+                  "
+                >
+                  Check Activites & Comments tab for deactivation comments
+                  made(if any).
+                </small>
+
+                <div class="col-md-12">
+                  <label for="validationDefault02" class="left-aligned"
+                    >Additional Comment</label
+                  ><br />
+
+                  <textarea
+                    class="form-control"
+                    formControlName="Reason"
+                    rows="4"
+                    placeholder="Enter Here"
+                  ></textarea>
+                  <br /><br />
+                  <!-- Form Group -->
+                  <div class="form-group row">
+                    <!-- <small>This will deactivate the loan application above </small><br /><br /> -->
+                    <div class="text-right col-md-8">
+                      <small>Enter your Transaction Pin to Proceed</small>
+                    </div>
+                    <div class="col-md-4">
+                      <input
+                        type="password"
+                        class="form-control"
+                        formControlName="TransactionPin"
+                        placeholder="Transaction Pin"
+                        autocomplete="off"
+                      />
+                    </div>
+                  </div>
+                  <!-- /form group -->
+                  <!-- /tables -->
+                  <hr />
+                  <div class="">
+                    <button
+                      type="button"
+                      class="btn btn-secondary btn-sm"
+                      (click)="closeModal()"
+                      style="color: #fff"
+                    >
+                      Close
+                    </button>
+                    &nbsp;
+                    <button
+                      type="submit"
+                      class="btn btn-warning btn-sm"
+                      *ngIf="
+                        !loader &&
+                        loaninformation?.statusString !=
+                          'DeactivationRequestSent' &&
+                        currentuser?.permission?.includes(
+                          'Initiate Deactivation Request'
+                        )
+                      "
+                      (click)="statusCheck('v3kre87')"
+                      [disabled]="DeactivationForm.invalid"
+                    >
+                      Send Deactivation Request
+                    </button>
+                    <button
+                      type="submit"
+                      class="btn btn-danger btn-sm"
+                      *ngIf="
+                        !loader &&
+                        loaninformation?.statusString ==
+                          'DeactivationRequestSent' &&
+                        currentuser?.permission?.includes('Deactivate Loans')
+                      "
+                      (click)="statusCheck('dfe3df')"
+                      [disabled]="DeactivationForm.invalid"
+                    >
+                      Reject Deactivation
+                    </button>
+                    &nbsp;
+                    <button
+                      type="submit"
+                      class="btn btn-claim btn-sm"
+                      *ngIf="
+                        !loader &&
+                        loaninformation?.statusString ==
+                          'DeactivationRequestSent' &&
+                        currentuser?.permission?.includes('Deactivate Loans')
+                      "
+                      (click)="statusCheck('nkfjre')"
+                      [disabled]="DeactivationForm.invalid"
+                    >
+                      Approve Deactivation
+                    </button>
+
+                    &nbsp;<button
+                      type="button"
+                      class="btn btn-claim btn-sm"
+                      *ngIf="loader"
+                      [disabled]="true"
+                    >
+                      <i class="icon icon-spin icon-spin2"></i> Processing...
+                    </button>
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- /card body -->
+
+                <!-- </div> -->
+                <!-- /card -->
+                <!-- </div> -->
+              </div>
+              <div id="second-tab" class="tab-pane">
+                <div class="">
+                  <!-- Card Header -->
+                  <!-- <div class="dt-card__header mb-3"> -->
+
+                  <!-- Card Heading -->
+                  <!-- <div class="dt-card__heading"> -->
+                  <!-- <h3 class="dt-card__title">Events & Comments</h3> -->
+                  <!-- </div> -->
+                  <!-- /card heading -->
+
+                  <!-- Card Tools -->
+                  <!-- <div class="dt-card__tools">
+                                          <a href="javascript:void(0)" (click)="submitLoanRequest('LoanActivities', loaninformation?.loanId,loaninformation?.applicationCode)" class="dt-card__more">Refresh Activities <i class="icon icon-ripple icon-xl ml-2"></i></a>
+                                        </div> -->
+                  <!-- /card tools -->
+
+                  <!-- </div> -->
+                  <!-- /card header -->
+
+                  <!-- Card Body -->
+                  <!-- <div class="dt-card__body p-0"> -->
+
+                  <div
+                    *ngIf="this.requestLoader"
+                    class="table-loader"
+                    style="text-align: center; color: indianred"
+                  >
+                    <span>
+                      <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                    >
+                  </div>
+
+                  <!-- Tables -->
+                  <div class="table-responsive">
+                    <table
+                      class="table table-striped mb-0"
+                      style="font-size: 11px"
+                    >
+                      <thead class="thead-light">
+                        <tr>
+                          <!-- <th class="text-center" scope="col">Activity  </th> -->
+                          <th class="" scope="col">Description</th>
+                          <th class="" scope="col">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody class="text-left">
+                        <tr *ngFor="let row of loanactivities; let i = index">
+                          <!-- <td class="text-center code">{{row?.relatedObjectInitiatorCode  }}</td> -->
+                          <td>{{ row?.activityDescription }}</td>
+                          <td>{{ row?.activityDate | date : "medium" }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- /tables -->
+
+                  <!-- </div> -->
+                  <!-- /card body -->
+                </div>
+              </div>
+            </div>
+
+            <!-- Card -->
+          </div>
+        </div>
+      </div>
+      <!-- /login content inner -->
+    </div>
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<ng-template #addTopUpModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Loan Top-up</h4>
+
+    <button
+      type="button"
+      class="close-btn"
+      aria-label="Close"
+      (click)="clearLoanTopUpData(); modal.dismiss('Cross click')"
+    >
+      <i class="icon icon-close"></i>
+    </button>
+  </div>
+
+  <div class="container-fluid">
+    <div class="form-row mt-3">
+      <div class="" style="width: 100%">
+        <div class="dt-card__body">
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-manual">
+              <form [formGroup]="AddTopUpForm">
+                <div class="form-row">
+                  <div class="col-md-3">
+                    <div class="mt-6">
+                      <slct-2
+                        [data]="searchByCol"
+                        placeholder="Search By"
+                        (selected)="setSearchParams($event, 'select')"
+                        (removed)="setSearchParams($event, 'remove')"
+                      ></slct-2>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="validationDefault02" class="left-aligned"
+                      >Search by Loan Code, BVN, First name or Last name
+                      <span class="text-danger">*</span></label
+                    >
+                    <input
+                      formControlName="SearchParam"
+                      placeholder="Please input your search query here."
+                      class="form-control"
+                      (blur)="trimWhitespace('SearchParam')"
+                    />
+                    <div
+                      *ngIf="searchrequestLoader"
+                      class="table-loader mt-5"
+                      style="text-align: center; color: indianred"
+                    >
+                      <span>
+                        <i class="icon icon-spin icon-spin2"></i>
+                        Searching...Please wait</span
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-md-3">
+                    <button
+                      [disabled]="
+                        !selectedSearchCol ||
+                        !AddTopUpForm.controls.SearchParam.valid
+                      "
+                      type="button"
+                      class="btn btn-floating search-btn btn-warning btn-x search button"
+                      (click)="triggerSearch()"
+                    >
+                      <i class="icon icon-search"></i> Search
+                    </button>
+                  </div>
+
+                  <div class="col-sm-12 mb-3">
+                    <div
+                      *ngIf="requestLoader"
+                      class="table-loader"
+                      style="text-align: center; color: indianred"
+                    >
+                      <span>
+                        <i class="icon icon-spin icon-spin2"></i>
+                        Loading...</span
+                      >
+                    </div>
+
+                    <section class="mt-5" style="margin-top: 40px !important">
+                      <div *ngIf="loanSearchResult?.length == 0">
+                        <h4>
+                          <i
+                            class="icon icon-search icon-2x mr-2 align-self-center text-warning"
+                          ></i>
+                          Search Result(s):
+                        </h4>
+                        <hr />
+                        <h6>
+                          Loan information for search parameter: "{{
+                            AddTopUpForm.get("SearchParam").value
+                          }}" was not found.
+                        </h6>
+                      </div>
+                      <div
+                        class="modal-body px-0"
+                        *ngIf="loanSearchResult?.length > 0"
+                      >
+                        <div
+                          class="modal-header p-0"
+                          style="border-bottom: none"
+                        >
+                          <h4 class="modal-title" id="modal-basic-title">
+                            <i
+                              class="icon icon-search icon-2x mr-2 align-self-center text-warning"
+                            ></i>
+                            Search Result(s):
+                          </h4>
+                        </div>
+                        <div class="table-responsive">
+                          <table class="table table-hover">
+                            <thead>
+                              <th class="pl-0">Loan Information</th>
+                              <th>Action</th>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let item of loanSearchResult">
+                                <td class="pl-0">
+                                  <span
+                                    ngxTextHighlight
+                                    [content]="item?.combinedLoanInformation"
+                                    [searchTerm]="loanReasonSearchTerm"
+                                  ></span>
+                                </td>
+
+                                <td>
+                                  <button
+                                    type="button"
+                                    class="btn btn-xs btn-success"
+                                    (click)="
+                                      pushtoSelectedLoan(
+                                        item,
+                                        double,
+                                        'topup-known',
+                                        addTopUpModal
+                                      )
+                                    "
+                                  >
+                                    <i class="icon icon-add"></i>Select Loan
+                                  </button>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </section>
+                    <ng-container *ngIf="topuplines.length > 0">
+                      <ul
+                        class="dt-list dt-list-one-third"
+                        *ngFor="let line of topuplines; let i = index"
+                      >
+                        <li class="dt-list__item">
+                          <div class="media">
+                            <i
+                              class="icon icon-editor icon-2x mr-3 align-self-center text-warning"
+                            ></i>
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1">
+                                Loan Code</span
+                              >
+                              <h5 class="mb-0">
+                                {{ topuplines[i].LoanCode }}
+                              </h5>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="dt-list__item">
+                          <div class="media">
+                            <i
+                              class="icon icon-user-o icon-2x mr-3 align-self-center text-warning"
+                            ></i>
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1">
+                                Customer Name
+                              </span>
+                              <h5 class="mb-0">
+                                {{ topuplines[i].CustomerName }}
+                              </h5>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="dt-list__item">
+                          <div class="media">
+                            <i
+                              class="icon icon-editor icon-2x mr-3 align-self-center text-warning"
+                            ></i>
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1">
+                                Loan Type</span
+                              >
+                              <h5 class="mb-0">
+                                {{ topuplines[i].LoanType }}
+                              </h5>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="dt-list__item">
+                          <div class="media">
+                            <i
+                              class="icon icon-revenue-new icon-2x mr-3 align-self-center text-warning"
+                            ></i>
+
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1">
+                                Loan Amount</span
+                              >
+                              <h5 class="mb-0">
+                                {{
+                                  topuplines[i].LoanAmount | number : "1.2-2"
+                                }}
+                              </h5>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="dt-list__item">
+                          <div class="media">
+                            <i
+                              class="icon icon-revenue-new icon-2x mr-3 align-self-center text-warning"
+                            ></i>
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1">
+                                Amount Outstanding</span
+                              >
+                              <h5 class="mb-0">
+                                {{ topuplines[i].AmountDue | number : "1.2-2" }}
+                              </h5>
+                            </div>
+                          </div>
+                        </li>
+                        <li class="dt-list__item">
+                          <div class="media">
+                            <i
+                              class="icon icon-datepicker icon-2x mr-3 align-self-center text-warning"
+                            ></i>
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1">
+                                Last Payment Date</span
+                              >
+                              <h5 class="mb-0">
+                                {{ topuplines[i].LastPaymentDate }}
+                              </h5>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </ng-container>
+                    <div
+                      *ngIf="topuplines.length > 0"
+                      class="text-left"
+                      style="margin-top: 36px"
+                    >
+                      <h5>Top-Up Information</h5>
+                    </div>
+
+                    <table
+                      *ngIf="topuplines.length > 0"
+                      class="table table-striped"
+                      id="table"
+                    >
+                      <thead>
+                        <tr>
+                          <th
+                            style="text-align: left"
+                            class="important-field pl-0"
+                          >
+                            <small>
+                              New Loan Amount &nbsp;<i
+                                class="icon icon-ckeditor"
+                              ></i>
+                            </small>
+                          </th>
+                          <th
+                            *ngIf="showProductChangeSection"
+                            style="text-align: left"
+                            class="important-field"
+                          >
+                            <small>
+                              Select Preferred Product? &nbsp;<i
+                                class="icon icon-ckeditor"
+                              ></i
+                            ></small>
+                          </th>
+                          <th
+                            *ngIf="showProductInformationSection"
+                            style="text-align: left"
+                            class="important-field"
+                          >
+                            <small>
+                              Interest Rate &nbsp;<i
+                                class="icon icon-ckeditor"
+                              ></i
+                            ></small>
+                          </th>
+                          <th
+                            *ngIf="showtenorSection"
+                            style="text-align: left"
+                            class="important-field"
+                          >
+                            <small>
+                              Net Income &nbsp;<i class="icon icon-ckeditor"></i
+                              ><b class="help-block"> *</b></small
+                            >
+                          </th>
+                          <th *ngIf="showtenorSection" style="text-align: left">
+                            <small
+                              >Tenor&nbsp;<i class="icon icon-ckeditor"></i
+                              ><b class="help-block"> *</b>
+                            </small>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody id="tbody">
+                        <tr *ngFor="let line of topuplines; let i = index">
+                          <td class="p-0 pt-3">
+                            <input
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                              formControlName="LoanAmount"
+                              placeholder="Enter Top Up Loan Amount"
+                            />
+                          </td>
+                          <td
+                            style="width: 30%"
+                            class="p-0 pt-3 pl-3"
+                            *ngIf="showProductChangeSection"
+                          >
+                            <slct-2
+                              [allowClear]="true"
+                              [data]="loanProductsArray"
+                              (selected)="selected('Product', $event, i)"
+                              placeholder="Select One"
+                            >
+                            </slct-2>
+                          </td>
+
+                          <td
+                            style="width: 10%"
+                            class="p-0 pt-3 pl-3"
+                            *ngIf="showProductInformationSection"
+                          >
+                            <input
+                              type="text"
+                              class="form-control"
+                              value="{{ topUpReturnInformation.interestRate }}"
+                              placeholder="Interest Rate"
+                              readonly
+                            />
+                          </td>
+                          <td
+                            style="width: 15%"
+                            *ngIf="showtenorSection"
+                            class="p-0 pt-3 pl-3"
+                          >
+                            <input
+                              type="text"
+                              class="form-control"
+                              currencyMask
+                              [options]="{
+                                prefix: '',
+                                thousands: ',',
+                                decimal: '.'
+                              }"
+                              value="{{ topuplines[i].NetIncome }}"
+                              formControlName="NetIncome"
+                              placeholder="Enter Net Income"
+                            />
+                          </td>
+
+                          <td
+                            style="width: 15%"
+                            *ngIf="showtenorSection"
+                            class="p-0 pt-3 pl-3"
+                          >
+                            <slct-2
+                              [allowClear]="true"
+                              [data]="tenorArray"
+                              (selected)="selected('Tenor', $event, i)"
+                              placeholder="Select One"
+                            >
+                            </slct-2>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <button
+                      type="button"
+                      *ngIf="showProceedButton"
+                      (click)="getLoanCalculationParamters(null)"
+                      class="btn btn-primary"
+                      [style.borderColor]="currentTheme.secondaryColor"
+                      [style.backgroundColor]="currentTheme.secondaryColor"
+                      [disabled]="
+                        !selectedNewLoanAmount || selectedNewLoanAmount <= 0
+                      "
+                    >
+                      Proceed
+                    </button>
+                  </div>
+                </div>
+                <div *ngIf="topuplines.length > 0" class="modal-footer px-0">
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-xs"
+                    (click)="clearLoanTopUpData(); closeModal()"
+                    style="color: #fff"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-claim btn-xs"
+                    (click)="submitLoanRequest('TopUpEligibility')"
+                    *ngIf="!loader && showtenorSection"
+                    [disabled]="AddTopUpForm.invalid"
+                  >
+                    Check Eligilibity
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-claim btn-xs"
+                    *ngIf="loader"
+                    [disabled]="true"
+                  >
+                    <i class="icon icon-spin icon-spin2"></i> Processing...
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #addAccountUpdateModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-search icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      Account Update
+    </h4>
+
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="container-fluid">
+    <div class="form-row mt-3">
+      <div class="" style="width: 100%">
+        <div class="dt-card__body">
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-manual">
+              <form [formGroup]="bankUpdateForm">
+                <div class="form-row">
+                  <div class="col-sm-12 mb-3">
+                    <br />
+                    <div
+                      *ngIf="requestLoader"
+                      class="table-loader"
+                      style="text-align: center; color: indianred"
+                    >
+                      <span>
+                        <i class="icon icon-spin icon-spin2"></i>
+                        Loading...</span
+                      >
+                    </div>
+
+                    <div class="media">
+                      <!-- Media Body -->
+                      <div class="media-body">
+                        <span class="d-block text-light-gray f-12 mb-1">
+                          <i
+                            class="icon icon-editor icon-2x mr-2 align-self-center text-warning"
+                          ></i>
+                          Application Code
+                        </span>
+                        <h5 class="mb-0 pl-9">
+                          {{ selectedLoan.applicationCode }}
+                        </h5>
+                      </div>
+                      <!-- /media body -->
+
+                      <!-- Media Body -->
+                      <div class="media-body">
+                        <span class="d-block text-light-gray f-12 mb-1">
+                          <i
+                            class="icon icon-user-o icon-2x mr-2 align-self-center text-warning"
+                          ></i>
+                          Customer Name
+                        </span>
+                        <h5 class="mb-0 pl-9">
+                          {{ selectedLoan.customerName }}
+                        </h5>
+                      </div>
+                      <!-- /media body -->
+
+                      <!-- Media Body -->
+                      <div class="media-body">
+                        <span class="d-block text-light-gray f-12 mb-1">
+                          <i
+                            class="icon icon-editor icon-2x mr-2 align-self-center text-warning"
+                          ></i
+                          >Loan Type</span
+                        >
+                        <h5 class="mb-0 pl-9">
+                          {{ selectedLoan.loanTypeName }}
+                        </h5>
+                      </div>
+                      <!-- /media body -->
+
+                      <!-- Media Body -->
+                      <div class="media-body">
+                        <span class="d-block text-light-gray f-12 mb-1">
+                          <i
+                            class="icon icon-revenue-new icon-2x mr-2 align-self-center text-warning"
+                          ></i
+                          >Loan Amount</span
+                        >
+                        <h5 class="mb-0 pl-9">
+                          {{ ownerInformation?.currency?.currencySymbol
+                          }}{{ selectedLoan.loanAmount | number : "1.2-2" }}
+                        </h5>
+                        <!-- <h5 class="mb-0 pl-9">{{topuplines[i].LoanAmount  | number : '1.2-2'}}</h5> -->
+                      </div>
+                      <!-- /media body -->
+
+                      <!-- Media Body -->
+                      <div class="media-body">
+                        <span class="d-block text-light-gray f-12 mb-1">
+                          <i
+                            class="icon icon-revenue-new icon-2x mr-2 align-self-center text-warning"
+                          ></i
+                          >Date Disbursed
+                        </span>
+                        <h5 class="mb-0 pl-9">
+                          {{ selectedLoan.dateDisbursed | date : "dd/MM/yyyy" }}
+                        </h5>
+                      </div>
+                      <!-- /media body -->
+
+                      <!-- Media Body -->
+                      <div class="media-body">
+                        <span class="d-block text-light-gray f-12 mb-1">
+                          <i
+                            class="icon icon-datepicker icon-2x mr-2 align-self-center text-warning"
+                          ></i
+                          >Disburser
+                        </span>
+                        <h5 class="mb-0 pl-9">
+                          {{ selectedLoan.disbursementClaimer }}
+                        </h5>
+                      </div>
+                      <!-- /media body -->
+                    </div>
+
+                    <br />
+
+                    <!-- form goes here -->
+
+                    <div
+                      class="row mb-2"
+                      *ngIf="
+                        bankUpdateForm &&
+                        selectedLoan.disbursementUpdateStatus !==
+                          'AwaitingApproval'
+                      "
+                    >
+                      <div class="col-sm-6 mb-3">
+                        <label for="validationDefault03" class="left-aligned"
+                          >Select Bank <span class="red">*</span></label
+                        >
+                        <div>
+                          <select
+                            class="custom-select custom-select-xl form-control form-control-xl height"
+                            formControlName="BankList"
+                            id="simple-select"
+                            (change)="getBankSelected($event)"
+                          >
+                            <option
+                              *ngFor="let item of bankList"
+                              value="{{ item.code }}"
+                            >
+                              {{ item.name }}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div class="col-sm-6 mb-3">
+                        <label class="left-aligned"
+                          >Bank Account Number <span class="red">*</span>
+                          <span
+                            ><i
+                              class="icon icon-question-circle icon-fw icon-xl"
+                              placement="top"
+                              ngbTooltip="Bank account number must 10 digits"
+                            ></i
+                          ></span>
+                        </label>
+                        <div class="input-group">
+                          <input
+                            type="text"
+                            [dropSpecialCharacters]="false"
+                            mask="9*"
+                            formControlName="BankAccountNumber"
+                            class="form-control"
+                            placeholder="Type your account number"
+                          />
+                          <div
+                            class="input-group-append"
+                            *ngIf="
+                              bankUpdateForm.get('BankAccountNumber').valid &&
+                              bankUpdateForm.get('BankSortCode').valid
+                            "
+                          >
+                            <button
+                              class="btn btn-outline-secondary"
+                              type="button"
+                              id="button-addon2"
+                              *ngIf="!verifyloader"
+                              (click)="validateAccount()"
+                            >
+                              Validate
+                            </button>
+                            <button
+                              class="btn btn-outline-secondary"
+                              type="button"
+                              id="button-addon2"
+                              *ngIf="verifyloader"
+                              [disabled]="true"
+                            >
+                              <i class="icon icon-spin icon-spin2"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-12 mb-2 mt-3">
+                      <div class="row">
+                        <div class="col-md-6">
+                          <u><b>Current Account Information</b></u>
+                          <br />
+                          <br />
+                          <p>
+                            Account Name:
+                            <span class="text-light-gray">{{
+                              selectedLoan?.bankInfo?.bankAccountName
+                            }}</span>
+                          </p>
+                          <p>
+                            Account Number:
+                            <span class="text-light-gray">{{
+                              selectedLoan?.bankInfo?.bankAccountNumber
+                            }}</span>
+                          </p>
+                          <p>
+                            Bank:
+                            <span class="text-light-gray">{{
+                              selectedLoan?.bankInfo?.bankName
+                            }}</span>
+                          </p>
+                        </div>
+
+                        <div
+                          class="col-md-6"
+                          *ngIf="
+                            !!bankUpdateForm &&
+                            !!bankInfo &&
+                            selectedLoan.disbursementUpdateStatus !==
+                              'AwaitingApproval'
+                          "
+                        >
+                          <u> <b>New Account Information</b></u>
+                          <br />
+                          <br />
+                          <p>
+                            Account Name:
+                            <span class="text-light-gray">{{
+                              bankInfo?.accountName
+                            }}</span>
+                          </p>
+                          <p>
+                            Account Number:
+                            <span class="text-light-gray">{{
+                              bankInfo?.accountNumber
+                            }}</span>
+                          </p>
+                          <p>
+                            Bank:
+                            <span class="text-light-gray">{{
+                              bankUpdateForm.get("BankName").value
+                            }}</span>
+                          </p>
+                        </div>
+
+                        <div
+                          class="col-md-6"
+                          *ngIf="
+                            !!tempBankDetails &&
+                            selectedLoan.disbursementUpdateStatus ===
+                              'AwaitingApproval'
+                          "
+                        >
+                          <u> <b>New Account Information</b> </u>
+                          <br />
+                          <br />
+                          <p>
+                            Account Name:
+                            <span class="text-light-gray">{{
+                              tempBankDetails?.bankAccountName
+                            }}</span>
+                          </p>
+                          <p>
+                            Account Number:
+                            <span class="text-light-gray">{{
+                              tempBankDetails?.bankAccountNumber
+                            }}</span>
+                          </p>
+                          <p>
+                            Bank:
+                            <span class="text-light-gray">{{
+                              tempBankDetails?.bankName
+                            }}</span>
+                          </p>
+
+                          <div class="dt-list__item">
+                            <button
+                              *ngIf="
+                                !isEmpty(selectedLoan?.residentialInfo) &&
+                                !isEmpty(
+                                  getFromJson(
+                                    selectedLoan?.residentialInfo,
+                                    'utilityBill'
+                                  )
+                                )
+                              "
+                              style="display: inline"
+                              class="btn btn-outline-primary mx-2 mb-2"
+                              (click)="
+                                documentViewer(
+                                  '',
+                                  getFromJson(
+                                    selectedLoan?.residentialInfo,
+                                    'utilityBill'
+                                  ),
+                                  getFromJson(
+                                    selectedLoan?.residentialInfo,
+                                    'fileUploadType'
+                                  ),
+                                  documentViewerModal
+                                )
+                              "
+                              type="button"
+                              data-toggle="collapse"
+                              data-target="#doc1"
+                              aria-expanded="false"
+                              aria-controls="doc1"
+                            >
+                              <i class="icon icon-folder-o icon-xl mr-5"></i
+                              >View Supporting Document
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="form-row mb-2"
+                      *ngIf="
+                        bankUpdateForm &&
+                        selectedLoan.disbursementUpdateStatus !==
+                          'AwaitingApproval'
+                      "
+                    >
+                      <div class="col-sm-6 mt-3">
+                        <label for="validationDefault03" class="left-aligned"
+                          >Upload 6 months salary acc. statement</label
+                        >
+                        <div class="form-group">
+                          <input
+                            type="file"
+                            (change)="
+                              fileUploader(
+                                $event.target.files,
+                                'BankStatementFile'
+                              )
+                            "
+                            class="form-control pb-3"
+                            data-max-file-size="5M"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="col-sm-6 mt-3">
+                        <label for="validationDefault03" class="left-aligned"
+                          >Supporting Document</label
+                        >
+                        <div class="form-group">
+                          <input
+                            (change)="
+                              fileUploader(
+                                $event.target.files,
+                                'SupportingDocumentFile'
+                              )
+                            "
+                            class="form-control pb-3"
+                            type="file"
+                            data-max-file-size="5M"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="userCanApprove()">
+                  <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+                  <ul
+                    class="nav nav-underline mt-3 flex-row border-bottom nav-card-tabs"
+                    role="tablist"
+                  >
+                    <li class="nav-item">
+                      <a
+                        class="nav-link active"
+                        data-toggle="tab"
+                        href="#one-tab"
+                        role="tab"
+                        aria-controls="tab-pane0"
+                        (mouseover)="hover_aps = true"
+                        (mouseleave)="hover_aps = false"
+                        [ngStyle]="
+                          hover_aps
+                            ? { color: currentTheme?.secondaryColor }
+                            : {}
+                        "
+                        aria-selected="true"
+                        >Approval Section
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a
+                        class="nav-link"
+                        data-toggle="tab"
+                        (mouseover)="hover_anc = true"
+                        (mouseleave)="hover_anc = false"
+                        [ngStyle]="
+                          hover_anc
+                            ? { color: currentTheme?.secondaryColor }
+                            : {}
+                        "
+                        (click)="
+                          submitLoanRequest(
+                            'LoanActivities',
+                            selectedLoan?.loanId,
+                            selectedLoan?.applicationCode
+                          )
+                        "
+                        href="#second-tab"
+                        role="tab"
+                        aria-controls="tab-pane0"
+                        aria-selected="true"
+                        >Activities & Comments</a
+                      >
+                    </li>
+                  </ul>
+                  <br />
+                  <div class="tab-content">
+                    <div id="one-tab" class="tab-pane active text-center">
+                      <!-- Card Body -->
+
+                      <small
+                        *ngIf="
+                          loaninformation?.statusString !=
+                            'DeactivationRequestSent' ||
+                          loaninformation?.statusString !=
+                            'DeactivationRejected' ||
+                          loaninformation?.statusString != 'Deactivated'
+                        "
+                      >
+                        Check Activites & Comments tab for approval comments
+                        made(if any).
+                      </small>
+
+                      <div class="col-md-12">
+                        <label for="validationDefault02" class="left-aligned"
+                          >Additional Comment</label
+                        ><br />
+
+                        <textarea
+                          class="form-control"
+                          formControlName="Reason"
+                          rows="4"
+                          placeholder="Enter Here"
+                        ></textarea>
+                        <br /><br />
+                      </div>
+                      <!-- /card body -->
+                    </div>
+                    <div id="second-tab" class="tab-pane">
+                      <div class="">
+                        <div
+                          *ngIf="this.requestLoader"
+                          class="table-loader"
+                          style="text-align: center; color: indianred"
+                        >
+                          <span>
+                            <i class="icon icon-spin icon-spin2"></i>
+                            Loading...</span
+                          >
+                        </div>
+
+                        <!-- Tables -->
+                        <div class="table-responsive">
+                          <table
+                            class="table table-striped mb-0"
+                            style="font-size: 11px"
+                          >
+                            <thead class="thead-light">
+                              <tr>
+                                <!-- <th class="text-center" scope="col">Activity  </th> -->
+                                <th class="" scope="col">Description</th>
+                                <th class="" scope="col">Date</th>
+                              </tr>
+                            </thead>
+                            <tbody class="text-left">
+                              <tr
+                                *ngFor="
+                                  let row of loanactivities;
+                                  let i = index
+                                "
+                              >
+                                <!-- <td class="text-center code">{{row?.relatedObjectInitiatorCode  }}</td> -->
+                                <td>{{ row?.activityDescription }}</td>
+                                <td>
+                                  {{ row?.activityDate | date : "medium" }}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!-- /tables -->
+
+                        <!-- </div> -->
+                        <!-- /card body -->
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Card -->
+                </div>
+                <div class="modal-footer">
+                  <button
+                    type="button"
+                    class="btn btn-secondary btn-xs"
+                    (click)="closeModal()"
+                    style="color: #fff"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn btn-claim btn-xs"
+                    *ngIf="
+                      !loader &&
+                      (selectedLoan.state === 'DisbursementFailed' ||
+                        selectedLoan.disbursementUpdateStatus !==
+                          'AwaitingApproval')
+                    "
+                    (click)="submitFailedApplication()"
+                    [disabled]="!bankUpdateForm.valid"
+                  >
+                    Submit Update
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-claim btn-xs"
+                    *ngIf="loader"
+                    [disabled]="true"
+                  >
+                    <i class="icon icon-spin icon-spin2"></i> Processing...
+                  </button>
+                  <!-- <button type="submit" class="btn btn-claim  btn-xs"
+                        *ngIf="!loader">Send for Redraft</button> -->
+
+                  <button
+                    class="btn btn-warning btn-xs"
+                    type="button"
+                    *ngIf="!loader && userCanApprove()"
+                    (click)="approveFailedApplication(false)"
+                  >
+                    Send back for redraft
+                  </button>
+                  <button
+                    (click)="approveFailedApplication(true)"
+                    *ngIf="!loader && userCanApprove()"
+                    class="btn btn-query btn-xs"
+                    type="button"
+                    href="javascript:void(0)"
+                  >
+                    Approve change
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <hr style="border-top: 1px dashed #ced4da;" class="fainted"> -->
+    </div>
+  </div>
+</ng-template>
+
+<!--Modals Section-->
+<ng-template #loanRecheduleModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-search icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      Change Loan Repayment Schedule
+    </h4>
+
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <app-reschedule-loan
+      [loanStage]="'PreDisbursement'"
+      [loanId]="currentLoanApplicationId"
+      (close)="closeModal()"
+    >
+    </app-reschedule-loan>
+  </div>
+  <!-- /modal body -->
+</ng-template>
+
+<ng-template #repaymentSchedule>
+  <!-- Modal Content -->
+  <div class="modal-content">
+    <!-- Modal Header -->
+    <div class="border-0 modal-header">
+      <h3
+        [style.color]="currentTheme?.secondaryColor"
+        class="modal-title orange"
+        id="model-1"
+      >
+        Repayment Schedule
+      </h3>
+      <button
+        type="button"
+        class="close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="closeModal()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- /modal header -->
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="row mt-1 mb-6">
+        <div class="col-md-12 mt-3">
+          <div class="shadow-sm p-5 bg-gainsboro rounded">
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>Loan amount:</p>
+              <p>
+                {{ ownerInformation?.currency?.currencySymbol
+                }}{{ loaninformation?.loanAmount | number : "1.2-2" }}
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>
+                Fees upfront
+                <span
+                  ><i
+                    class="icon icon-question-circle icon-fw icon-xl"
+                    placement="top"
+                    ngbTooltip="Deducted before disbursement"
+                  ></i></span
+                >:
+              </p>
+              <p>
+                {{
+                  this.scheduleInformation.feesInfo.totalUpFrontFees
+                    | number : "1.2-2"
+                }}
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>
+                Fees capitalized<span
+                  ><i
+                    class="icon icon-question-circle icon-fw icon-xl"
+                    ngbTooltip="Spread accross the lifespan of the schedule"
+                  ></i></span
+                >:
+              </p>
+              <p>
+                {{
+                  this.scheduleInformation.feesInfo.totalPostDisbursementFees
+                    | number : "1.2-2"
+                }}
+              </p>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>Total fees:</p>
+              <p>
+                {{
+                  this.scheduleInformation.feesInfo.totalPostDisbursementFees +
+                    this.scheduleInformation.feesInfo.totalUpFrontFees
+                    | number : "1.2-2"
+                }}
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p><b>Amount to be disbursed to customer:</b></p>
+              <p>
+                <b>
+                  {{
+                    this.scheduleInformation.feesInfo.amountToBeDisbursed
+                      | number : "1.2-2"
+                  }}</b
+                >
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>Amount used to generate schedule:</p>
+              <p>
+                {{
+                  this.scheduleInformation.feesInfo.amountUsedForSchedule
+                    | number : "1.2-2"
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="table mb-0 table-striped">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col">Period</th>
+              <th class="text-center" scope="col">Date</th>
+              <th class="text-right" scope="col">Installment</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="repaymentScheduleArray.length > 0">
+            <tr *ngFor="let item of repaymentScheduleArray; let i = index">
+              <td scope="row">{{ item?.paymentNumber }}</td>
+              <td class="text-center">
+                {{ item?.paymentDueDate | date : "mediumDate" }}
+              </td>
+              <td class="text-right">
+                {{ item?.paymentAmount | number : "1.2-2" }}
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="repaymentLoader">
+            <tr>
+              <td colspan="3" style="text-align: center">Loading ...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="border-0 modal-footer">
+      <button
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        type="button"
+        class="btn btn-secondary btn-sm white"
+        (click)="closeModal()"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</ng-template>
+<ng-template #phoneValidationDetailsView>
+  <lnd-phone-number-validation-details [customerAltPhoneNumber]="customerAltPhoneNumber" [loanId]="loaninformation?.loanId" />
+</ng-template>

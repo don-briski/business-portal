@@ -1,0 +1,71 @@
+<section
+  [ngClass]="{
+    'z-11': dropdownState === 'open',
+    'z-10': dropdownState === 'close'
+  }"
+  [ngStyle]="{'min-width': mainContainerWidth, 'max-height':'100px'}"
+>
+  <header
+    class="d-flex justify-content-between align-items-center p-2 cursor"
+    (click)="toggleDropdownState()"
+  >
+    <span id="selected-wrapper">
+      <span *ngIf="selectedItems?.length === 0">{{ placeholder }}</span>
+      <span *ngIf="selectedItems?.length > 0">
+        <span *ngFor="let item of selectedItems" class="selected-item">{{
+          item.text
+        }}</span>
+      </span>
+    </span>
+    <span>
+      <img
+        src="assets/images/caret-down.png"
+        alt="caret-down"
+        width="20"
+        height="20"
+      />
+    </span>
+  </header>
+  <div *ngIf="dropdownState === 'open'" id="list">
+    <input #search type="text" class="form-control my-3" placeholder="Search" />
+    <span
+      *ngIf="isLoading"
+      class="spinner"
+      ><i class="icon icon-spin icon-spin2 mr-2"></i
+    ></span>
+    <span
+      class="addItemBtn cursor d-flex justify-content-end"
+      [ngClass]="{'text':showAddBtnText}"
+      *ngIf="!isLoading && showAddBtn && search.value.length === 0"
+      href="javascript:void(0)"
+      (click)="addBtnClick.emit(true)"
+    >
+      <i *ngIf="!showAddBtnText"
+        class="icon icon-add-circle icon-lg ml-2"
+      ></i>
+
+      <small *ngIf="showAddBtnText">{{showAddBtnText}} <b>+</b></small>
+    </span>
+    <div
+      *ngFor="let item of data; let i = index"
+      id="item"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      class="d-flex align-items-center mt-3 cursor"
+      [ngClass]="{'bg-gray': item.disabled}"
+      (click)="checker.click()"
+    >
+      <input
+        #checker
+        type="checkbox"
+        class="cursor checkboxField mr-3"
+        (change)="selectItem(item)"
+        [checked]="itemInSelectedItems(item.id) > 0"
+        [disabled]="item.disabled"
+      />
+      <div class="text-break" [ngClass]="{'text-darkgray': item.disabled}">{{ item?.text }}</div>
+    </div>
+    <p *ngIf="data.length === 0 && !isLoading" class="pl-1">
+      No results found!
+    </p>
+  </div>
+</section>

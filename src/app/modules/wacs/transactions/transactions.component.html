@@ -1,0 +1,130 @@
+<h1>Transactions</h1>
+
+<div class="card p-5">
+  <lnd-table
+    [config]="config"
+    [headers]="headers"
+    [isLoading]="isLoading"
+    [data]="data"
+    [pagination]="pagination"
+    [searchColumns]="pagination?.searchColumns"
+    [filters]="filterStatuses"
+    [selectedFilters]="selectedFilter"
+    (paginationChange)="getTransactions($event)"
+    (searchParams)="getTransactions($event)"
+    (filter)="filter($event)"
+    (retrieveRowDetails)="viewTransaction($event)"
+  />
+</div>
+
+<lnd-popup
+  title="Period Selection"
+  [togglePopup]="showPopup"
+  [hideFooter]="true"
+  (closePopup)="showPopup = false"
+>
+<header class="pop-header d-flex justify-content-between align-items-center w-100">
+  <h4 class="mb-0">{{popupView === 'transaction' ? 'Transaction' : 'Invoice'}} Details</h4>
+
+  <img
+    src="assets/images/close.svg"
+    alt="close"
+    class="cursor"
+    (click)="showPopup = false"
+  />
+</header>
+
+<div class="pop-content">
+  <div *ngIf="retrievingTxnDetails" class="d-flex justify-content-center mb-3">
+    <lnd-spinner text="Retrieving Details..." />
+  </div>
+  <ng-container *ngIf="!retrievingTxnDetails && popupView === 'transaction'">
+    <div class="detail">
+      <p><b>Name:</b></p>
+      <p>{{wacsTransaction?.firstName}} {{wacsTransaction?.middleName}} {{wacsTransaction?.lastName}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Code:</b></p>
+      <p class="code">{{wacsTransaction?.productCode}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Email:</b></p>
+      <p>{{wacsTransaction?.emailAddress}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Phone:</b></p>
+      <p>{{wacsTransaction?.phoneNumber}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Product:</b></p>
+      <p>{{wacsTransaction?.productName}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Loan Amount:</b></p>
+      <p>{{wacsTransaction?.loanAmount | number:'1.2-2'}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Payback Period:</b></p>
+      <p>{{wacsTransaction?.paybackPeriod}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Created At:</b></p>
+      <p>{{wacsTransaction?.createdAt | customDatePipe}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Created By:</b></p>
+      <p>{{wacsTransaction?.createdBy}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Sold By:</b></p>
+      <p>{{wacsTransaction?.soldBy}}</p>
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!retrievingTxnDetails && popupView === 'invoice'">
+    <div class="detail">
+      <p><b>Reference:</b></p>
+      <p>{{wacsTransactionInvoice?.reference}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Amount:</b></p>
+      <p>{{wacsTransactionInvoice?.amount | number:'1.2-2'}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Bank Name:</b></p>
+      <p>{{wacsTransactionInvoice?.bankName}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Account Number:</b></p>
+      <p>{{wacsTransactionInvoice?.accountNumber}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Account Name:</b></p>
+      <p>{{wacsTransactionInvoice?.accountName}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Loan Id:</b></p>
+      <p>{{wacsTransactionInvoice?.loanId}}</p>
+    </div>
+
+    <div class="detail">
+      <p><b>Created At:</b></p>
+      <p>{{wacsTransactionInvoice?.createdAt}}</p>
+    </div>
+  </ng-container>
+</div>
+</lnd-popup>

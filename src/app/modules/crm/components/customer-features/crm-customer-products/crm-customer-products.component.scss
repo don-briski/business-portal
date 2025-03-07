@@ -1,0 +1,35 @@
+main {
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+      background-color: var(--secondary-color);
+      color: var(--white);
+      border: none;
+      border-radius: 5px;
+      padding: 7px;
+    }
+
+    .dropdown-item {
+      cursor: pointer;
+    }
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    span {
+      font-size: 16px;
+      padding: 0 6px;
+      cursor: pointer;
+      &.active {
+        color: var(--secondary-color);
+        border-bottom: 2px solid var(--secondary-color);
+      }
+    }
+  }
+}

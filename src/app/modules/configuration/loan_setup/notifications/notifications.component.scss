@@ -1,0 +1,43 @@
+.card{
+  h1{
+    font-size: 24px;
+    font-weight: 400;
+  }
+
+  .card-body {
+    border: 1px solid #8692a6;
+    border-radius: 10px;
+    padding: 0;
+
+    header {
+      background-color: #F8F8F8;
+      padding: 10px;
+      border-radius: 10px 10px 0 0;
+
+      p {
+        font-weight: 400;
+        font-size: 18px;
+        &:first-child {
+          color: var(--text-color);
+        }
+        &:last-child {
+          color: #979797;
+        }
+      }
+    }
+
+    form{
+      font-size: 16px;
+
+      .url{
+        width: 120px;
+      }
+
+      .events{
+        margin: 30px 0;
+        width: 50%;
+      }
+    }
+  }
+
+}

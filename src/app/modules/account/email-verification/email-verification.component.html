@@ -1,0 +1,56 @@
+<!-- Loader -->
+<!-- <div class="dt-loader-container">
+  <div class="dt-loader">
+    <svg class="circular" viewBox="25 25 50 50">
+      <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10"></circle>
+    </svg>
+  </div>
+</div> -->
+<!-- /loader -->
+<!-- Root -->
+<div class="dt-root">
+
+    <!-- Login Container -->
+    <div class="dt-login--container dt-forgot-password">
+  
+        <!-- Login Content -->
+        <div class="dt-login__content-wrapper">
+         
+          <div *ngIf="loader" class="table-loader" style="text-align:center;color:indianred">
+              <p> <i class="icon icon-spin icon-spin2"></i> Loading...</p>
+          </div>
+  
+          <!-- Login Content Inner -->
+          <div *ngIf="!loader" class="dt-login__content-inner" style="text-align: center;">
+  
+            <!-- Brand logo -->
+            <span class="dt-login__logo">
+                <a class="dt-brand__logo-link" href="javascript:void(0)">
+                  <img class="dt-brand__logo-img" src="assets/images/logo-blue.png" alt="Logo">
+                </a>
+              </span>
+            <!-- /brand logo -->
+            <div style="text-align: center;" *ngIf="verified"><img class="img-responsive" style="width:200px" src="./assets/images/verification.svg" alt="Logo" /> </div>
+          
+            <p class="mb-5">{{ message }}
+              <span *ngIf="verified"><img class="dt-brand__logo-img" style="width:15px" src="./assets/images/verified2.png" alt="Logo" /> </span> </p>
+  
+  
+                <div *ngIf="verified" class="form-group">
+                  <a class="btn btn-sm orange-bg text-light" routerLink="/account/login" routerLinkActive="active">Sign into your account</a>
+                 </div>
+           
+          </div>
+          <!-- /login content inner -->
+  
+        </div>
+        <!-- /login content -->
+  
+    </div>
+    <!-- /login container -->
+  
+  </div>
+  <!-- /root -->
+  
+  
+  

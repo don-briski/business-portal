@@ -1,0 +1,115 @@
+<header class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">WACS Customers</h1>
+
+  <a
+    *ngIf="permissions.includes('Create Wacs Customers')"
+    class="btn text-white"
+    href="javascript:void(0)"
+    (click)="togglePopup()"
+  >
+    <i class="icon icon-add-circle mr-2"></i>Add New</a
+  >
+</header>
+
+<main class="card">
+  <lnd-table
+    [config]="config"
+    [headers]="headers"
+    [data]="tableData"
+    [isLoading]="isLoading"
+    [pagination]="pagination"
+    (retrieveRowDetails)="viewCustomer($event)"
+    [searchColumns]="pagination?.searchColumns"
+    (paginationChange)="getWacsCustomers($event)"
+    (searchParams)="getWacsCustomers($event)"
+  />
+</main>
+
+<lnd-popup [togglePopup]="showPopup" (closePopup)="togglePopup()">
+  <header
+    class="pop-header d-flex justify-content-between align-items-center w-100"
+  >
+    <h4 class="mb-0">Create a Wacs Customer</h4>
+    <img
+      src="assets/images/close.svg"
+      alt="close"
+      class="cursor"
+      (click)="togglePopup()"
+    />
+  </header>
+  <div class="pop-content">
+    <form [formGroup]="form">
+      <div class="form-row">
+        <div>
+          <label>Ippis <b class="text-danger">*</b></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Enter Ippis Number"
+            formControlName="ippisNumber"
+          />
+          <lnd-input-errors
+            label="IPPIS Number"
+            [control]="form.get('ippisNumber')"
+          />
+        </div>
+
+        <div>
+          <label>Bank Verification Number <b class="text-danger">*</b></label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Enter BVN"
+            formControlName="bvn"
+          />
+          <lnd-input-errors label="BVN" [control]="form.get('bvn')" />
+        </div>
+
+        <div>
+          <label>Select Bank <b class="text-danger">*</b></label>
+          <slct-2
+            [customSearchEnabled]="true"
+            [data]="banks"
+            placeholder="Search Banks"
+            formControlName="bank"
+          >
+          </slct-2>
+        </div>
+
+        <div>
+          <label>Account Number <b class="text-danger">*</b> </label>
+          <input
+            type="text"
+            placeholder="Enter Account Number"
+            class="form-control"
+            formControlName="accountNumber"
+          />
+          <lnd-input-errors
+            label="Account Number"
+            [control]="form.get('accountNumber')"
+          />
+
+          <div *ngIf="form.value.accountName" class="badge badge-success mt-3 mb-0">{{form.value.accountName}}</div>
+
+          <lnd-submit-btn
+            customClasses="btn-xs mt-3 btn-outline-success"
+            text="Validate"
+            [isProcessing]="validatingBankAccount"
+            [isValid]="form.get('bank').valid && form.get('accountNumber').valid"
+            (triggerAction)="validateBank()"
+          />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <footer class="pop-footer">
+    <lnd-submit-btn
+      customClasses="btn-sm mt-3 bg-secondary text-white"
+      text="Continue"
+      [isProcessing]="isProcessing"
+      [isValid]="form.valid"
+      (triggerAction)="continue()"
+    />
+  </footer>
+</lnd-popup>

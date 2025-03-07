@@ -1,0 +1,224 @@
+<header class="px-4 py-3 d-flex justify-content-between align-items-center">
+  <h3>Mandate Payment History</h3>
+  <button
+    type="button"
+    class="close-btn"
+    aria-label="Close"
+    (click)="onClose()"
+  >
+    <i class="icon icon-close"></i>
+  </button>
+</header>
+<hr class="m-0" />
+<section class="p-4">
+  <ul class="dt-list dt-list-one-third">
+    <li class="dt-list__item">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1">First Name</span>
+          <h5 class="mb-0">
+            {{ data?.firstName }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1">Last Name</span>
+          <h5 class="mb-0">
+            {{ data?.lastName }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1">Phone Number</span>
+          <h5 class="mb-0">
+            {{ data?.phoneNumber }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1"
+            >Loan Mandate Reference</span
+          >
+          <h5 class="mb-0">
+            {{ data?.loanMandateReference }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item">
+      <div class="media">
+        <i
+          class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1">Total Disbursed</span>
+          <h5 class="mb-0">
+            {{ data?.totalDisbursed | number : "1.2-2" }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item">
+      <div class="media">
+        <i
+          class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1"
+            >Outstanding Balance</span
+          >
+          <h5 class="mb-0">
+            {{ data?.outstandingLoanBal | number : "1.2-2" }}
+          </h5>
+        </div>
+      </div>
+    </li>
+  </ul>
+  <div class="dotted-divider"></div>
+  <h4>Other Information</h4>
+  <ul class="dt-list dt-list-one-second">
+    <li class="dt-list__item mr-3">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-company icon-2x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1">Employer Name</span>
+          <h5 class="mb-0">
+            {{ data?.employerName }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item mr-3">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1">Salary Account</span>
+          <h5 class="mb-0">
+            {{ data?.salaryAccount }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item mr-3">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1"
+            >Authorisation Code</span
+          >
+          <h5 class="mb-0">
+            {{ data?.authorisationCode }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item mr-3">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1"
+            >Collection Start Date</span
+          >
+          <h5 class="mb-0">
+            {{
+              transformDate(data?.collectionStartDate)
+                | customDatePipe : "DD-MMM-YY"
+            }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item mr-3">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1"
+            >Date of Disbursement</span
+          >
+          <h5 class="mb-0">
+            {{
+              transformDate(data?.dateOfDisbursement)
+                | customDatePipe : "DD-MMM-YY"
+            }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item mr-3">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1"
+            >Disbursement Account Bank</span
+          >
+          <h5 class="mb-0">
+            {{ data?.disbursementAccountBank }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item mr-3">
+      <div class="media">
+        <i
+          class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1"
+            >Disbursement Account</span
+          >
+          <h5 class="mb-0">
+            {{ data?.disbursementAccount }}
+          </h5>
+        </div>
+      </div>
+    </li>
+    <li class="dt-list__item mr-3">
+      <div class="media">
+        <i
+          class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+        ></i>
+        <div class="media-body">
+          <span class="d-block text-light-gray f-12 mb-1"
+            >Total Amount Expected</span
+          >
+          <h5 class="mb-0">
+            {{ data?.totalAmountExpected | number : "1.2-2" }}
+          </h5>
+        </div>
+      </div>
+    </li>
+  </ul>
+</section>

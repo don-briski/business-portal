@@ -1,0 +1,22 @@
+<section class="card p-3 mt-5">
+  <table class="table mb-0">
+    <thead class="table-striped">
+      <tr>
+        <th class="header-text" scope="col">Approver</th>
+        <th class="header-text" scope="col">Comment</th>
+        <th class="header-text" scope="col">Approval Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let approval of approvals">
+        <td>{{ approval?.approverName }}</td>
+        <td>
+          {{ approval?.comment }}
+        </td>
+        <td>
+          {{ approval?.approvedAt | date }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</section>

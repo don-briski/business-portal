@@ -1,0 +1,30 @@
+#basic-info,
+#other-details,
+#add-left,
+#add-right,
+#contact {
+  border: 1px dashed gainsboro;
+  padding: 15px;
+  border-radius: 5px;
+}
+
+#basic-info {
+  header {
+    margin-bottom: 15px;
+  }
+
+  margin-bottom: 20px;
+}
+
+#other-details {
+  #tabs {
+    margin-bottom: 30px;
+    ul {
+      a {
+        &:hover {
+          color: #000;
+        }
+      }
+    }
+  }
+}

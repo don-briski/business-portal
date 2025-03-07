@@ -1,0 +1,43 @@
+<section class="p-3">
+  <header class="w-100 d-flex justify-content-between align-items-center">
+    <h3 class="mb-0">Disbursements Failed</h3>
+    <span class="cursor" (click)="closeModal.emit(true)"> <strong>X</strong> </span>
+  </header>
+  <table class="table table-striped mb-5">
+    <thead>
+      <tr>
+        <th>Applicant</th>
+        <th>{{loanCodeType}}</th>
+        <th class="amount-field">
+          <i
+            class="icon icon-revenue-new align-self-center text-warning"
+          ></i>
+          Loan Amount ({{ currencySymbol }})
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        class="gradeX"
+        *ngFor="let disbursement of disbursements; let i = index"
+      >
+        <td class="small">
+          <span>{{ disbursement?.applicant }}</span>
+        </td>
+        <td class="small" [style.color]="secondaryColor">
+          {{ disbursement?.code }}
+        </td>
+        <td class="amount-field small">
+          {{ disbursement?.loanAmount | number : "1.2-2" }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <textarea class="form-control" placeholder="Description" (blur)="setDisbFailedDescription($event.target.value)"></textarea>
+
+  <button class="btn btn-xs btn-primary mt-5" (click)="submit()">
+    {{ !isLoading ? "Submit" : "Processing..." }}
+    <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+  </button>
+</section>

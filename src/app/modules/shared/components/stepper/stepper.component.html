@@ -1,0 +1,92 @@
+<section
+  class="d-flex align-items-center flex-wrap"
+  [ngClass]="{ 'w-100': fullWidth }"
+>
+  <lnd-step
+    *ngFor="let step of steps; let i = index"
+    [stage]="step?.stage"
+    [type]="step?.type"
+    [status]="step?.status"
+    [index]="i"
+    [lastIndex]="steps.length - 1"
+    [currentStepStroke]="currentStepStroke"
+    (activeStepIndex)="stepIndex.emit($event)"
+  >
+    <div *ngIf="i === 0" class="step-wrapper">
+      <div
+        class="step-border edge"
+        [ngClass]="{
+          'border-current': step?.status === stepStatus.current && !step?.usePrimaryBg,
+          'border-complete': step?.status === stepStatus.complete,
+          'border-pending': step?.status === stepStatus.pending,
+          'border-invalid': step?.status === stepStatus.invalid
+        }"
+      >
+        <div
+          class="step-inner edge"
+          [ngClass]="{
+            complete: step?.status === stepStatus.complete,
+            invalid: step?.status === stepStatus.invalid,
+            pending: step?.status === stepStatus.pending,
+            'use-primary': step?.usePrimaryBg
+          }"
+        >
+          <p class="mb-1">{{ step?.stage | titlecase }}</p>
+          <small>{{ step?.type | titlecase }}</small>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="i > 0 && i < steps.length - 1" class="step-wrapper">
+      <div
+        class="step-border border-inner"
+        [ngClass]="{
+          'border-current': step?.status === stepStatus.current && !step?.usePrimaryBg,
+          'border-complete': step?.status === stepStatus.complete,
+          'border-pending': step?.status === stepStatus.pending,
+          'border-invalid': step?.status === stepStatus.invalid,
+          'border-primary': step?.usePrimaryBg
+        }"
+      >
+        <div
+          class=" step-inner"
+          [ngClass]="{
+            complete: step?.status === stepStatus.complete,
+            invalid: step?.status === stepStatus.invalid,
+            pending: step?.status === stepStatus.pending,
+            'use-primary': step?.usePrimaryBg
+          }"
+        >
+          <p class="mb-1">{{ step?.stage | titlecase }}</p>
+          <small>{{ step?.type | titlecase }}</small>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="i === steps.length - 1" class="step-wrapper">
+      <div
+        class="step-border end"
+        [ngClass]="{
+          'border-current': step?.status === stepStatus.current && !step?.usePrimaryBg,
+          'border-complete': step?.status === stepStatus.complete,
+          'border-pending': step?.status === stepStatus.pending,
+          'border-invalid': step?.status === stepStatus.invalid,
+          'border-primary': step?.usePrimaryBg
+        }"
+        [ngStyle]="borderElemStyle"
+      >
+        <div
+          class="step-inner end"
+          [ngStyle]="innerElemStyle"
+          [ngClass]="{
+            complete: step?.status === stepStatus.complete,
+            invalid: step?.status === stepStatus.invalid,
+            pending: step?.status === stepStatus.pending,
+            'use-primary': step?.usePrimaryBg
+          }"
+        >
+          <p class="mb-1">{{ step?.stage | titlecase }}</p>
+          <small>{{ step?.type | titlecase }}</small>
+        </div>
+      </div>
+    </div>
+  </lnd-step>
+</section>

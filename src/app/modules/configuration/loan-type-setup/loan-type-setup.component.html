@@ -1,0 +1,1255 @@
+<section class="setup card p-5" *ngIf="!isInitializing; else loader">
+  <header class="d-flex justify-content-between align-items-center">
+    <div class="d-flex">
+      <i class="icon icon-setting icon-2x mr-2 text-warning"></i>
+      <span>
+        <span class="mb-0">
+          <h3 *ngIf="!loanType" class="mb-2">Loan Type Setup</h3>
+          <h3 *ngIf="loanType">Edit {{ loanType?.loanName | titlecase }}</h3>
+        </span>
+        <p>
+          Kindly fill in all information correctly. All form fields with an
+          asterisk(*) are mandatory.
+        </p>
+      </span>
+    </div>
+    <a
+      class="btn btn-primary mr-2 text-white"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [routerLink]="['/configurations/loantypes']"
+      routerLinkActive="router-link-active"
+      href="javascript:void(0)"
+      >Back</a
+    >
+  </header>
+  <div class="d-flex align-items-center my-4">
+    <lnd-switch
+      [value]="loanTypeForm.get('status').value === 'Active' ? true : false"
+      text="Loan Type is currently"
+      (emittedValue)="toggleSwitch($event, 'status')"
+    ></lnd-switch>
+    <span
+      class="ml-1"
+      [ngClass]="
+        loanTypeForm.get('status').value === 'Active'
+          ? 'text-success'
+          : 'text-danger'
+      "
+      >{{
+        loanTypeForm.get("status").value === "Active" ? "Active" : "Inactive"
+      }}</span
+    >
+  </div>
+  <div class="my-6">
+    <lnd-stepper
+      [steps]="steps"
+      [currentStepStroke]="currentTheme.primaryColor"
+      (stepIndex)="switchStep($event)"
+    ></lnd-stepper>
+  </div>
+  <form [formGroup]="loanTypeForm" (ngSubmit)="submit()" class="mt-6 px-4">
+    <ng-container formGroupName="loanDetails">
+      <section [ngClass]="{ 'd-none': currentStepIndex !== 0 }">
+        <header>
+          <h1>Loan Details</h1>
+          <p>Set up basic loan details to customize your loan type.</p>
+        </header>
+        <div class="form-row mb-6">
+          <div class="col-sm-8">
+            <label for="loanName"
+              >Loan name <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Input a name for your loan type.
+                This will be used to identify the
+                loan type."
+                ></i>
+              </span>
+            </label>
+            <input
+              id="loanName"
+              type="text"
+              formControlName="loanName"
+              class="form-control"
+              placeholder="Name of the loan"
+            />
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('loanDetails.loanName').errors &&
+                loanTypeForm.get('loanDetails.loanName').touched
+              "
+            >
+              What is name of the Loan?
+            </span>
+          </div>
+          <div class="col-sm-4">
+            <label
+              >Loan Type Code <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Input a code to match your loan type. This will be used to search for loans and segment them according to type."
+                ></i>
+              </span>
+            </label>
+            <input
+              type="text"
+              formControlName="loanTypeCode"
+              class="form-control"
+              id="validationDefault02"
+              placeholder="E.g LND00123"
+            />
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('loanDetails.loanTypeCode').errors &&
+                loanTypeForm.get('loanDetails.loanTypeCode').touched
+              "
+            >
+              What code should be tied to this Loan?
+            </span>
+          </div>
+        </div>
+
+        <div class="form-row mb-6">
+          <div class="col-sm-8">
+            <label
+              >Applicable Branches <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Select locations through which Borrower can make repayments."
+                ></i>
+              </span>
+            </label>
+            <slct-2
+              [multiple]="true"
+              [active]="loanType?.branchesApplicable"
+              [data]="branches"
+              [allowSelectAll]="true"
+              [customSearchEnabled]="true"
+              [hideSelectedItems]="true"
+              (selected)="select('branch', $event)"
+              (removed)="remove('branch', $event)"
+              (selectedAll)="select('branch', $event, true)"
+              (deselectedAll)="remove('branch', $event, true)"
+              placeholder="Select branches"
+            ></slct-2>
+          </div>
+
+          <div class="col-sm-4">
+            <label
+              >Applicable Platforms <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Select channels through which Borrower can make repayments."
+                ></i>
+              </span>
+            </label>
+            <slct-2
+              [multiple]="true"
+              [active]="loanType?.applicablePlatform"
+              [data]="applicablePlatforms"
+              [allowSelectAll]="true"
+              [customSearchEnabled]="true"
+              (selected)="select('platforms', $event)"
+              (removed)="remove('platforms', $event)"
+              (selectedAll)="select('platforms', $event, true)"
+              (deselectedAll)="remove('platforms', $event, true)"
+              placeholder="Select Platforms"
+            ></slct-2>
+          </div>
+        </div>
+
+        <div class="form-row mb-6">
+          <div class="col-sm-12">
+            <label
+              >Loan Type Terms & Conditions
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Provide your users with the terms of
+              service in detail."
+                ></i> </span
+            ></label>
+            <textarea
+              class="form-control"
+              formControlName="termsAndConditions"
+              rows="3"
+              placeholder="Enter Terms & Conditons"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+    <ng-container formGroupName="termsAndParameters">
+      <section [ngClass]="{ 'd-none': currentStepIndex !== 1 }">
+        <header>
+          <h1>Loan Terms and Parameters</h1>
+          <p>Customise your rates, units and amounts to fit the loan types.</p>
+        </header>
+        <div class="form-row">
+          <div
+            class="col-12 p-4 mb-6"
+            [ngClass]="{
+              deposit: loanTypeForm.get('termsAndParameters.isDepositRequired')
+                .value
+            }"
+          >
+            <lnd-switch
+              [value]="
+                loanTypeForm.get('termsAndParameters.isDepositRequired').value
+              "
+              text="Requires a Deposit"
+              (emittedValue)="toggleSwitch($event, 'isDepositRequired')"
+            ></lnd-switch>
+
+            <div
+              *ngIf="
+                loanTypeForm.get('termsAndParameters.isDepositRequired').value
+              "
+              class="row my-6"
+            >
+              <div class="col-md-3">
+                <label>Deposit Type <b class="help-block"> *</b></label>
+                <slct-2
+                  [allowClear]="true"
+                  [active]="
+                    loanTypeForm.get('termsAndParameters.depositType')
+                      .value && [
+                      loanTypeForm.get('termsAndParameters.depositType').value
+                    ]
+                  "
+                  [data]="depositType"
+                  (selected)="select('depositType', $event)"
+                  (removed)="remove('depositType', $event)"
+                  placeholder="Select Deposit Type"
+                >
+                </slct-2>
+              </div>
+
+              <div
+                *ngIf="
+                  loanTypeForm.get('termsAndParameters.depositType').value !==
+                  null
+                "
+                class="col-md-4"
+              >
+                <label
+                  >Deposit Amount
+                  <sup class="text-success"
+                    ><strong>{{
+                      loanTypeForm.get("termsAndParameters.depositType")
+                        .value === "Fixed"
+                        ? "Fixed"
+                        : "%"
+                    }}</strong></sup
+                  >
+                  <b class="help-block"> *</b>
+                  <span>
+                    <i
+                      class="icon icon-question-circle icon-fw icon-xl"
+                      placement="top"
+                      ngbTooltip="Mininum Required Deposit for Loan Approval"
+                    ></i>
+                  </span>
+                </label>
+
+                <input
+                  *ngIf="
+                    loanTypeForm.get('termsAndParameters.depositType').value ===
+                    'Fixed'
+                  "
+                  type="text"
+                  placeholder="Enter an amount"
+                  class="form-control"
+                  currencyMask
+                  [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                  formControlName="depositValue"
+                />
+
+                <input
+                  *ngIf="
+                    loanTypeForm.get('termsAndParameters.depositType').value ===
+                    'Percent'
+                  "
+                  type="number"
+                  min="1"
+                  max="100"
+                  placeholder="Enter an amount"
+                  class="form-control"
+                  formControlName="depositValue"
+                />
+
+                <lnd-input-errors
+                  label="Deposit Amount"
+                  [control]="
+                    loanTypeForm.get('termsAndParameters.depositValue')
+                  "
+                ></lnd-input-errors>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 mb-6">
+            <label
+              >Min Loan Amount <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Minimum amount that can be disbursed in this loan type. Borrower cannot select an amount less than this."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <div class="input-group-prepend"></div>
+              <input
+                type="text"
+                class="form-control"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="minAmount"
+                placeholder="Minimum Loan Amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('termsAndParameters.minAmount').errors &&
+                loanTypeForm.get('termsAndParameters.minAmount').touched
+              "
+            >
+              What is the Minimum Amount allowed?
+            </span>
+          </div>
+
+          <div class="col-sm-4 mb-6">
+            <label
+              >Max Loan Amount <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Maximum amount that can be disbursed in this loan type. Borrower cannot select an amount greater than this."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <div class="input-group-prepend"></div>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="maxAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Maximum loan amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('termsAndParameters.maxAmount').errors &&
+                loanTypeForm.get('termsAndParameters.maxAmount').touched
+              "
+            >
+              What is the Maximum Amount allowed?
+            </span>
+          </div>
+
+          <div class="col-sm-4">
+            <label
+              >Debt Service Ratio (DSR)
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Minimum ratio in which a loan can be approved for disbursement. Set this number by dividing Borrowers' disposable income by debt."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="dsrRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="DSR rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('termsAndParameters.dsrRate').errors &&
+                loanTypeForm.get('termsAndParameters.dsrRate').touched
+              "
+            >
+              What is the Base DSR Rate?
+            </span>
+          </div>
+
+          <div class="col-sm-4">
+            <label
+              >Max Interest Rate <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Rate of interest that will result in the maximum interest amount. Borrowers cannot be charged higher than this rate."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="interestRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Interest rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('termsAndParameters.interestRate').errors &&
+                loanTypeForm.get('termsAndParameters.interestRate').touched
+              "
+            >
+              What is the maximum Interest Rate?
+            </span>
+          </div>
+
+          <div class="col-sm-4">
+            <label for="permission"
+              >Interest Rate Unit <b class="help-block"> *</b>
+            </label>
+            <slct-2
+              [allowClear]="true"
+              [active]="selectedInterestRateUnit"
+              [data]="interestRateUnitArray"
+              (selected)="select('rateUnit', $event)"
+              (removed)="remove('rateUnit', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('termsAndParameters.rateUnit').errors &&
+                loanTypeForm.get('termsAndParameters.rateUnit').touched
+              "
+            >
+              What is the Interest Rate Unit?
+            </span>
+          </div>
+
+          <div class="col-sm-4">
+            <label
+              >Maximum Tenor Limit <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Maximum length of time in which the loan must be fully repaid.	Input a period in months when the borrower must fully repay the loan."
+                ></i>
+              </span>
+            </label>
+            <div class="input-group">
+              <input
+                type="number"
+                class="form-control"
+                formControlName="loanTypeTenor"
+                placeholder="Enter Value"
+                min="1"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('termsAndParameters.loanTypeTenor').errors &&
+                loanTypeForm.get('termsAndParameters.loanTypeTenor').touched
+              "
+            >
+              How long should loans last?
+            </span>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+    <ng-container formGroupName="repayment">
+      <section [ngClass]="{ 'd-none': currentStepIndex !== 2 }">
+        <header>
+          <h1>Repayment Structure</h1>
+          <p>
+            Select payment and access options that best suit your loan products.
+          </p>
+        </header>
+        <div class="form-row">
+          <div
+            *ngIf="
+              !isClearingRepaymentType &&
+              selectedRepaymentType &&
+              currentStepIndex === 2
+            "
+            class="col-sm-6 mb-6"
+          >
+            <label
+              >Repayment Type <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Select a schedule for the borrower as a
+                  guide to paying back the loan"
+                ></i>
+              </span>
+            </label>
+            <slct-2
+              [allowClear]="true"
+              [active]="selectedRepaymentType"
+              [disabled]="true"
+              (selected)="select('repaymentType', $event)"
+              (removed)="remove('repaymentType', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+            <lnd-spinner
+              *ngIf="isClearingRepaymentType"
+              class="d-block"
+              text="Clearing..."
+            ></lnd-spinner>
+          </div>
+
+          <div class="col-sm-6 mb-6">
+            <label
+              >Repayment Balance Type <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Select a repayment balance type from
+                  the dropdown"
+                ></i>
+              </span>
+            </label>
+            <slct-2
+              [allowClear]="true"
+              [data]="repaymentBalanceType"
+              [active]="selectedRepaymentBalType"
+              (selected)="select('repaymentBalanceType', $event)"
+              (removed)="remove('repaymentBalanceType', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-6 mb-6">
+            <label
+              >Applicable Repayment Methods <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Select repayment options from the drop-down menu."
+                ></i>
+              </span>
+            </label>
+            <slct-2
+              [multiple]="true"
+              [allowSelectAll]="true"
+              [customSearchEnabled]="true"
+              (selectedAll)="select('repaymentMethod', $event, true)"
+              (deselectedAll)="remove('repaymentMethod', $event, true)"
+              [data]="repaymentMethods"
+              [active]="loanType?.repaymentMethods"
+              (selected)="select('repaymentMethod', $event)"
+              (removed)="remove('repaymentMethod', $event)"
+              placeholder="None selected"
+            ></slct-2>
+          </div>
+
+          <div class="col-sm-6 mb-6">
+            <label>Account Closure Value </label>
+            <span
+              ><i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="Loan accounts under this product whose loan balance falls between 0 and Value entered here will be automatically closed(settled)"
+              ></i
+            ></span>
+
+            <div class="input-group">
+              <div class="input-group-prepend"></div>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="accountClosureValue"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Enter Value"
+              />
+            </div>
+            <span
+              class="help-block"
+              *ngIf="
+                loanTypeForm.get('repayment.accountClosureValue').errors &&
+                loanTypeForm.get('repayment.accountClosureValue').touched
+              "
+            >
+              What is the account closure value allowed?
+            </span>
+          </div>
+
+          <div class="col-sm-6">
+            <label
+              >Settlement Threshold
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Maximum length of time in which the loan must be fully repaid. Input a period in months when the borrower must fully repay the loan."
+                ></i>
+              </span>
+            </label>
+            <slct-2
+              [allowClear]="true"
+              [data]="thresholdparameters"
+              [active]="selectedThreshold"
+              (selected)="select('threshold', $event)"
+              (removed)="remove('threshold', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+          </div>
+
+          <div class="col-sm-6">
+            <label
+              >Days In a Year <b class="help-block"> *</b>
+              <span>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Customise the number of days preferred in a Fiscal calendar year."
+                ></i>
+              </span>
+            </label>
+            <slct-2
+              [allowClear]="true"
+              [data]="daysInYear"
+              [active]="loanType ? [loanType?.daysInAYear] : []"
+              (selected)="select('daysInAYear', $event)"
+              (removed)="remove('daysInAYear', $event)"
+              placeholder="Select One"
+            >
+            </slct-2>
+          </div>
+        </div>
+      </section>
+    </ng-container>
+    <ng-container formArrayName="applicableFees">
+      <section [ngClass]="{ 'd-none': currentStepIndex !== 3 }">
+        <header>
+          <h1>Applicable Fees <span>(Optional)</span></h1>
+          <p>
+            Add or remove applicable fees associated with your loan product.
+          </p>
+        </header>
+        <table class="table table-striped" id="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th style="text-align: center" class="important-field">
+                Fee <b class="help-block"> *</b>
+                &nbsp;
+                <i class="icon icon-ckeditor"></i>
+              </th>
+              <th style="text-align: center">
+                Fee Calculation&nbsp;
+                <span
+                  ><i
+                    class="icon icon-question-circle icon-fw icon-xl"
+                    placement="top"
+                    ngbTooltip="1.DEDUCTED UPFRONT: Deducted from the approved principal amount at disbursement, meaning the client receives less money as actual disbursement, but still has to repay full loan amount by the end of the loan term.  2.CAPITALIZED: Added to the approved principal amount at disbursement, meaning the client receives the approved amount as actual disbursement, but has to repay a higher amount, including the loan fees, by the end of the loan term"
+                  ></i
+                ></span>
+              </th>
+              <th style="text-align: center" class="important-field">
+                Application &nbsp;
+                <span
+                  ><i
+                    class="icon icon-question-circle icon-fw icon-xl"
+                    placement="top"
+                    ngbTooltip="Percentage: % of Loan amount."
+                  ></i
+                ></span>
+              </th>
+
+              <th style="text-align: center">
+                Is Mandatory&nbsp;
+                <span
+                  ><i
+                    class="icon icon-question-circle icon-fw icon-xl"
+                    placement="top"
+                    ngbTooltip="When a fee is set as mandatory (YES), it will be automatically applied to any loan created. If NO is selected, the user creating the loan has the ability to add or remove this fee during loan origination"
+                  ></i
+                ></span>
+              </th>
+
+              <th style="text-align: center">
+                Amount&nbsp;
+                <i class="icon icon-ckeditor"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <ng-container
+              *ngFor="let feeLineControls of feeLines().controls; let i = index"
+            >
+              <tr [formGroup]="feeLineControls">
+                <td style="width: 5%">
+                  <button
+                    *ngIf="i == 0"
+                    type="button"
+                    style="border-radius: 15px"
+                    class="btn btn-floating btn-warning btn-xs"
+                    (click)="removeFee(i)"
+                  >
+                    <i class="icon icon-close icon-lg"></i>
+                  </button>
+                  <button
+                    *ngIf="i > 0"
+                    type="button"
+                    style="border-radius: 15px"
+                    class="btn btn-floating btn-warning btn-xs"
+                    (click)="removeFee(i)"
+                  >
+                    <i class="icon icon-close icon-lg"></i>
+                  </button>
+                </td>
+
+                <td>
+                  <slct-2
+                    [allowClear]="true"
+                    [data]="fees"
+                    [active]="
+                      feeLineControls.get('FeeID').value
+                        ? [
+                            {
+                              id: feeLineControls.get('FeeID').value,
+                              text: feeLineControls.get('FeeName').value
+                            }
+                          ]
+                        : []
+                    "
+                    (selected)="select('fee', $event, false, i)"
+                    (removed)="remove('fee', $event, false, i)"
+                    placeholder="Select One"
+                  >
+                  </slct-2>
+                </td>
+                <td>
+                  <slct-2
+                    [allowClear]="true"
+                    [data]="feeCalculation"
+                    [active]="
+                      feeLineControls.get('FeeID').value
+                        ? [feeLineControls.get('FeeApplication').value]
+                        : []
+                    "
+                    (selected)="select('feeApplication', $event, false, i)"
+                    (removed)="remove('feeApplication', $event, false, i)"
+                    placeholder="Select One"
+                  >
+                  </slct-2>
+                </td>
+                <td>
+                  <slct-2
+                    [allowClear]="true"
+                    [data]="feeTypes"
+                    [active]="
+                      feeLineControls.get('FeeID').value
+                        ? [feeLineControls.get('FeeType').value]
+                        : []
+                    "
+                    (selected)="select('feeType', $event, false, i)"
+                    (removed)="remove('feeType', $event, false, i)"
+                    placeholder="Select One"
+                  >
+                  </slct-2>
+                </td>
+
+                <td>
+                  <slct-2
+                    [allowClear]="true"
+                    [data]="feeMandatoryOptions"
+                    [active]="
+                      feeLineControls.get('FeeID').value
+                        ? [feeLineControls.get('FeeIsMandatory').value]
+                        : []
+                    "
+                    (selected)="select('feeMandatory', $event, false, i)"
+                    (removed)="remove('feeMandatory', $event, false, i)"
+                    placeholder="Select One"
+                  >
+                  </slct-2>
+                </td>
+
+                <td>
+                  <input
+                    type="text"
+                    class="form-control"
+                    currencyMask
+                    [options]="{
+                      prefix: '',
+                      thousands: ',',
+                      decimal: '.'
+                    }"
+                    formControlName="FeeAmount"
+                    placeholder="Value"
+                  />
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+          <tfoot>
+            <td colspan="3">
+              <button
+                type="button"
+                style="border-radius: 15px"
+                class="btn btn-floating btn-success btn-xs"
+                (click)="addFee()"
+              >
+                <i class="icon icon-add"></i> Add new fee
+              </button>
+            </td>
+            <td></td>
+          </tfoot>
+        </table>
+      </section>
+    </ng-container>
+    <ng-container formGroupName="topUpConstraints">
+      <section [ngClass]="{ 'd-none': currentStepIndex !== 4 }">
+        <header>
+          <h1>Top-up Constraints <span>(Optional)</span></h1>
+          <div class="d-flex align-items-center my-4 top-up-switch-container">
+            <lnd-switch
+              [value]="loanTypeForm.get('topUpConstraints.isTopUpActive').value"
+              text="Top-up is"
+              (emittedValue)="toggleSwitch($event, 'isTopUpActive')"
+            ></lnd-switch>
+            <span
+              class="ml-1"
+              [ngClass]="
+                loanTypeForm.get('topUpConstraints.isTopUpActive').value
+                  ? 'text-success'
+                  : 'text-danger'
+              "
+              >{{
+                loanTypeForm.get("topUpConstraints.isTopUpActive").value
+                  ? "Allowed"
+                  : "Not Allowed"
+              }}</span
+            >
+          </div>
+          <p>
+            Select orders that allow or restrict the borrower access to more
+            loans at any given time.
+          </p>
+        </header>
+        <div class="form-row constraint">
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>
+                <p class="mb-0">
+                  Volume of Repayments Made (%). (Percentage of Total Repayments
+                  Expected) <i class="icon icon-ckeditor"></i>
+                </p>
+                &nbsp;
+              </span>
+              <span>
+                <lnd-switch
+                  class="switch"
+                  [value]="
+                    loanTypeForm.get(
+                      'topUpConstraints.volumeOfRepaymentsIsActive'
+                    ).value
+                  "
+                  (emittedValue)="
+                    toggleSwitch($event, 'volumeOfRepaymentsIsActive')
+                  "
+                ></lnd-switch>
+                <span
+                  [ngClass]="
+                    loanTypeForm.get(
+                      'topUpConstraints.volumeOfRepaymentsIsActive'
+                    ).value
+                      ? 'badge-success'
+                      : 'badge-warning text-white'
+                  "
+                  class="badge badge-sm badge-pill"
+                  >{{
+                    loanTypeForm.get(
+                      "topUpConstraints.volumeOfRepaymentsIsActive"
+                    ).value
+                      ? "Active"
+                      : "Inactive"
+                  }}</span
+                >
+              </span>
+            </div>
+
+            <div
+              *ngIf="
+                loanTypeForm.get('topUpConstraints.volumeOfRepaymentsIsActive')
+                  .value
+              "
+            >
+              <input
+                formControlName="volumeOfRepayments"
+                type="text"
+                class="tp-input form-control"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+            </div>
+            <hr />
+          </div>
+
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>
+                <p class="mb-0">
+                  Number of Late Repayments Allowable
+                  <i class="icon icon-ckeditor"></i>
+                </p>
+                &nbsp;
+              </span>
+              <span>
+                <lnd-switch
+                  class="switch"
+                  [value]="
+                    loanTypeForm.get(
+                      'topUpConstraints.lateRepaymentsAllowableIsActive'
+                    ).value
+                  "
+                  (emittedValue)="
+                    toggleSwitch($event, 'lateRepaymentsAllowableIsActive')
+                  "
+                ></lnd-switch>
+                <span
+                  [ngClass]="
+                    loanTypeForm.get(
+                      'topUpConstraints.lateRepaymentsAllowableIsActive'
+                    ).value
+                      ? 'badge-success'
+                      : 'badge-warning text-white'
+                  "
+                  class="badge badge-sm badge-pill"
+                  >{{
+                    loanTypeForm.get(
+                      "topUpConstraints.lateRepaymentsAllowableIsActive"
+                    ).value
+                      ? "Active"
+                      : "Inactive"
+                  }}</span
+                >
+              </span>
+            </div>
+
+            <div
+              *ngIf="
+                loanTypeForm.get(
+                  'topUpConstraints.lateRepaymentsAllowableIsActive'
+                ).value
+              "
+            >
+              <input
+                formControlName="lateRepaymentsAllowable"
+                type="text"
+                class="tp-input form-control"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+            </div>
+            <hr />
+          </div>
+
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>
+                <p class="mb-0">
+                  Dsr Threshold (%) <i class="icon icon-ckeditor"></i>
+                </p>
+                &nbsp;
+              </span>
+              <span>
+                <lnd-switch
+                  class="switch"
+                  [value]="
+                    loanTypeForm.get('topUpConstraints.topUpDsrIsActive').value
+                  "
+                  (emittedValue)="toggleSwitch($event, 'topUpDsrIsActive')"
+                ></lnd-switch>
+                <span
+                  [ngClass]="
+                    loanTypeForm.get('topUpConstraints.topUpDsrIsActive').value
+                      ? 'badge-success'
+                      : 'badge-warning text-white'
+                  "
+                  class="badge badge-sm badge-pill"
+                  >{{
+                    loanTypeForm.get("topUpConstraints.topUpDsrIsActive").value
+                      ? "Active"
+                      : "Inactive"
+                  }}</span
+                >
+              </span>
+            </div>
+
+            <div
+              *ngIf="
+                loanTypeForm.get('topUpConstraints.topUpDsrIsActive').value
+              "
+            >
+              <input
+                formControlName="topUpDsr"
+                type="text"
+                class="tp-input form-control"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+            </div>
+            <hr />
+          </div>
+
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>
+                <p class="mb-0">
+                  Number of Repayments<i class="icon icon-ckeditor"></i>
+                </p>
+                &nbsp;
+              </span>
+              <span>
+                <lnd-switch
+                  class="switch"
+                  [value]="
+                    loanTypeForm.get(
+                      'topUpConstraints.numberOfRepaymentsIsActive'
+                    ).value
+                  "
+                  (emittedValue)="
+                    toggleSwitch($event, 'numberOfRepaymentsIsActive')
+                  "
+                ></lnd-switch>
+                <span
+                  [ngClass]="
+                    loanTypeForm.get(
+                      'topUpConstraints.numberOfRepaymentsIsActive'
+                    ).value
+                      ? 'badge-success'
+                      : 'badge-warning text-white'
+                  "
+                  class="badge badge-sm badge-pill"
+                  >{{
+                    loanTypeForm.get(
+                      "topUpConstraints.numberOfRepaymentsIsActive"
+                    ).value
+                      ? "Active"
+                      : "Inactive"
+                  }}</span
+                >
+              </span>
+            </div>
+
+            <div
+              *ngIf="
+                loanTypeForm.get('topUpConstraints.numberOfRepaymentsIsActive')
+                  .value
+              "
+            >
+              <input
+                formControlName="numberOfRepayments"
+                type="text"
+                class="tp-input form-control"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+            </div>
+            <hr />
+          </div>
+
+          <div class="col-md-12">
+            <div class="d-flex justify-content-between align-items-center">
+              <span>
+                <p class="mb-0">
+                  Min Loan Tenor<i class="icon icon-ckeditor"></i>
+                </p>
+                &nbsp;
+              </span>
+              <span>
+                <lnd-switch
+                  class="switch"
+                  [value]="
+                    loanTypeForm.get('topUpConstraints.minLoanTenorIsActive')
+                      .value
+                  "
+                  (emittedValue)="toggleSwitch($event, 'minLoanTenorIsActive')"
+                ></lnd-switch>
+                <span
+                  [ngClass]="
+                    loanTypeForm.get('topUpConstraints.minLoanTenorIsActive')
+                      .value
+                      ? 'badge-success'
+                      : 'badge-warning text-white'
+                  "
+                  class="badge badge-sm badge-pill"
+                  >{{
+                    loanTypeForm.get("topUpConstraints.minLoanTenorIsActive")
+                      .value
+                      ? "Active"
+                      : "Inactive"
+                  }}</span
+                >
+              </span>
+            </div>
+
+            <div
+              *ngIf="
+                loanTypeForm.get('topUpConstraints.minLoanTenorIsActive').value
+              "
+            >
+              <input
+                formControlName="minLoanTenor"
+                type="text"
+                class="tp-input form-control"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+            </div>
+            <hr />
+          </div>
+        </div>
+      </section>
+    </ng-container>
+    <div class="d-flex align-items-center my-4">
+      <lnd-switch
+        [value]="loanTypeForm.get('isMultiLevelLoanApproval').value"
+        text="Apply A Loan Approval Workflow"
+        (emittedValue)="toggleSwitch($event, 'isMultiLevelLoanApproval')"
+      ></lnd-switch>
+    </div>
+    <div class="row mb-5">
+      <div
+        *ngIf="!loanTypeForm.value.isMultiLevelLoanApproval"
+        class="col-md-4"
+      >
+        <p class="loan-approval-workflow-info mt-2">
+          Any previous loan approval workflow attached to this product will be
+          removed after you have saved the product setup
+        </p>
+      </div>
+      <div *ngIf="loanTypeForm.value.isMultiLevelLoanApproval" class="col-md-4">
+        <label
+          >Loan Approval Workflow
+          <span>
+            <i
+              class="icon icon-question-circle icon-fw icon-xl"
+              placement="top"
+              ngbTooltip="Select the loan approval workflow applicable for this loan product."
+            ></i>
+          </span>
+        </label>
+        <slct-2
+          [active]="
+            loanTypeForm.value.loanApplicationWorkflowId &&
+            loanTypeForm.value.loanApplicationWorkflow
+              ? [
+                  {
+                    id: loanTypeForm.value.loanApplicationWorkflowId,
+                    text: loanTypeForm.value.loanApplicationWorkflow
+                  }
+                ]
+              : []
+          "
+          [data]="approvalWorkflows"
+          [customSearchEnabled]="true"
+          (selected)="
+            onSelect({ type: 'loanApplicationWorkflow', value: $event })
+          "
+          (removed)="
+            onRemove({ type: 'loanApplicationWorkflow', value: $event })
+          "
+          placeholder="Select loan approval workflow"
+        ></slct-2>
+        <p
+          *ngIf="
+            loanTypeForm.value.isMultiLevelLoanApproval &&
+            loanTypeForm.value.loanApplicationWorkflowId
+          "
+          class="loan-approval-workflow-info mt-2"
+        >
+          This approval workflow will be applied to this loan product after you
+          have successfully saved the product setup
+        </p>
+      </div>
+    </div>
+    <lnd-step-footer
+      [formValid]="
+        loanTypeForm.valid && loanTypeForm.value.isMultiLevelLoanApproval
+          ? loanTypeForm.value.isMultiLevelLoanApproval &&
+            loanTypeForm.value.loanApplicationWorkflowId
+          : true
+      "
+      [isLoading]="isLoading"
+      [currentTheme]="currentTheme"
+      [currentStepIndex]="currentStepIndex"
+      [steps]="steps"
+      [currentStepIsValid]="loanTypeForm.get(steps[currentStepIndex].id)?.valid"
+      (previous)="previous()"
+      (next)="next()"
+    ></lnd-step-footer>
+  </form>
+</section>
+<ng-template #loader>
+  <div class="d-flex justify-content-center">
+    <lnd-spinner text="Retrieving Loan Type"></lnd-spinner>
+  </div>
+</ng-template>

@@ -1,0 +1,77 @@
+.w-amount {
+  width: 130px;
+  padding-right: 40px;
+}
+
+.nav-item a {
+  margin-bottom: 0;
+}
+
+.header-2 {
+  margin: 0 16px;
+}
+
+.single-view {
+  .left {
+    width: 25%;
+    position: fixed;
+    height: calc(100vh - 150px);
+    overflow-y: auto;
+    border-right: 2.5px solid #b3b3b3;
+    ul.payment-list {
+      padding: 0px;
+      list-style: none;
+      li {
+        cursor: pointer;
+        padding: 15px 20px;
+        margin-bottom: 2px;
+        border-left: 5px solid #fff;
+        border-radius: 5px;
+        .title {
+          font-size: 14px;
+          font-weight: bold;
+        }
+        .sub-title {
+          font-size: 11px;
+        }
+        &.selected,
+        &:not(:last-child) {
+          border-bottom: 1px solid #ccc;
+        }
+      }
+    }
+  }
+
+  .payment-text {
+    font-weight: 500;
+  }
+
+  .right {
+    width: 73%;
+    position: relative;
+    left: 28%;
+
+    .card {
+      box-shadow: none !important;
+    }
+
+    .paper {
+      .content {
+        .img-container {
+          max-width: 150px;
+        }
+      }
+    }
+  }
+
+  .w-65 {
+    width: 65%;
+  }
+  .w-10 {
+    width: 10%;
+  }
+}
+
+.icon-spin {
+  color: indianred;
+}

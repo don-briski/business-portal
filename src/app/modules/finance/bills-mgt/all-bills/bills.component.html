@@ -1,0 +1,1145 @@
+<div class="row m-0" *ngIf="!isSingleView; else singleView">
+  <header class="w-100 d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Bills</h1>
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <a
+          *ngIf="user?.permission?.includes('Create Bill')"
+          class="btn btn-primary mr-2 text-white"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [routerLink]="['/finance/bills/create']"
+          routerLinkActive="router-link-active"
+          href="javascript:void(0)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New</a
+        >
+      </div>
+    </span>
+  </header>
+  <div class="col-xl-12">
+    <ul
+      id="active-div"
+      class="card-header-pills nav nav-pill justify-content-center mb-2"
+      role="tablist"
+    >
+      <li class="nav-item">
+        <a
+          id="nav-open"
+          class="nav-link pool-nav active-tab"
+          href="javascript:void(0)"
+          (click)="switchviews('open')"
+        >
+          Open
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          id="nav-closed"
+          class="nav-link pool-nav"
+          href="javascript:void(0)"
+          (click)="switchviews('closed')"
+        >
+          Closed
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a
+          id="nav-all"
+          class="nav-link pool-nav"
+          href="javascript:void(0)"
+          (click)="switchviews('all')"
+        >
+          All
+        </a>
+      </li>
+    </ul>
+    <div class="dt-card w-100">
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-4">
+            <label style="display: inline-flex"
+              ><span style="padding: 8px 2px; font-size: 12px">Show </span
+              ><select
+                [(ngModel)]="pagination.pageSize"
+                aria-controls="data-table"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+                (change)="fetchBills()"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span style="padding: 8px 2px; font-size: 12px"
+                >entries</span
+              ></label
+            >
+          </div>
+
+          <div class="col-md-4">
+            <div
+              *ngIf="tabLoader"
+              class="table-loader"
+              style="text-align: center; color: indianred"
+            >
+              <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+            </div>
+          </div>
+
+          <div class="form-group col-md-4">
+            <label style="display: inline-flex; float: right">
+              <input
+                type="search"
+                placeholder="Bill Code"
+                class="form-control form-control-sm"
+                aria-controls="data-table"
+                (keydown.enter)="fetchBills({ search: billCode.value })"
+                #billCode
+              />
+
+              <button
+                class="btn btn-xs text-white ml-3"
+                [style.background]="currentTheme.secondaryColor"
+                (click)="fetchBills({ search: billCode.value })"
+              >
+                <i class="icon icon-search"></i>
+              </button>
+            </label>
+          </div>
+          <div class="col-md-12">
+            <lnd-selected-filters
+              (initialized)="onSelectedFiltersInit($event)"
+            ></lnd-selected-filters>
+          </div>
+          <div
+            class="d-flex justify-content-between w-100 align-items-center"
+            style="padding: 0 18px"
+          >
+            <div
+              class=""
+              aria-live="polite"
+              style="font-size: 13px; margin-top: -8px"
+            >
+              Showing
+              {{
+                (pagination.pageNumber - 1) * pagination.pageSize + 1
+                  | number : "1.0-0"
+              }}
+              -
+              {{
+                (pagination.pageNumber - 1) * pagination.pageSize +
+                  pagination.count | number : "1.0-0"
+              }}
+              of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+            </div>
+            <div>
+              <lnd-filter-btn
+                (filterModalOpen)="filterModalOpen()"
+              ></lnd-filter-btn>
+              <lnd-filter
+                *ngIf="!tabLoader"
+                [filterOptions]="filterStatuses"
+                (optionSelected)="fetchBills($event)"
+              >
+              </lnd-filter>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive" *ngIf="!tabLoader">
+          <table
+            id="data-table"
+            class="table mt-5 table-striped"
+            *ngIf="allBills.length > 0; else noData"
+          >
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Vendor</th>
+                <th class="text-center">Reference</th>
+                <th>Bill Date</th>
+                <th>Due Date</th>
+                <th class="text-right">
+                  Amount ({{ appOwner?.currency?.currencySymbol }})
+                </th>
+                <th class="text-right">
+                  Balance Due ({{ appOwner?.currency?.currencySymbol }})
+                </th>
+                <th class="text-right">Status</th>
+                <th></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr
+                *ngFor="let item of allBills"
+                class="cursor"
+                (click)="viewBill(item.billId, dropdownToggle)"
+              >
+                <td
+                  class="copy_icon_wrapper"
+                  [style.color]="currentTheme?.secondaryColor"
+                >
+                  {{ item?.billCode }}
+
+                  <img
+                    (mouseover)="copy_hover = true"
+                    (mouseleave)="copy_hover = false"
+                    class="copy_icon"
+                    src="assets/images/copy.png"
+                    alt="copy icon"
+                    width="15"
+                    height="15"
+                    (click)="copyCode(item?.billCode)"
+                    placement="right"
+                    ngbTooltip="Copy Bill Code"
+                  />
+                </td>
+                <td>{{ item?.vendorName }}</td>
+                <td class="text-center">{{ item?.billReference || "-" }}</td>
+                <td>{{ item?.billDate | customDatePipe }}</td>
+                <td
+                  [ngClass]="{
+                    'text-danger':
+                      item?.isOverdue &&
+                      (item.status !== 'Draft' || item.status !== 'Redraft')
+                  }"
+                >
+                  {{ item?.billDueDate | customDatePipe }}
+                </td>
+                <td class="text-right">
+                  {{ item?.totalAmount | number : "1.2-2" }}
+                </td>
+                <td class="text-right">
+                  {{ item?.balanceDue | number : "1.2-2" }}
+                </td>
+                <td class="text-right">
+                  <span
+                    class="badge badge-sm"
+                    [ngClass]="{
+                      'badge-warning': item?.billStatus === 'Draft',
+                      'badge-approval':
+                        item?.billStatus === 'Sent For Approval',
+                      'badge-success':
+                        item?.billStatus === 'Posted' &&
+                        item?.paymentStatus === 'Paid',
+                      'badge-notPaid':
+                        item?.billStatus === 'Posted' &&
+                        item?.paymentStatus === 'Not Paid',
+                      'badge-partiallyPaid':
+                        item?.billStatus === 'Posted' &&
+                        item?.paymentStatus === 'Partially Paid',
+                      'badge-redraft': item?.billStatus === 'Redraft',
+                      'badge-danger': item?.billStatus === 'Rejected'
+                    }"
+                  >
+                    <span *ngIf="item?.billStatus !== 'Posted'">
+                      {{
+                        item?.billStatus === "Sent For Approval"
+                          ? "Awaiting Approval"
+                          : item?.billStatus
+                      }}
+                    </span>
+                    <span *ngIf="item?.billStatus === 'Posted'">
+                      {{ item?.paymentStatus }}
+                    </span>
+                  </span>
+                </td>
+                <td class="text-center">
+                  <div
+                    #dropdownToggle
+                    class="dropdown mr-2 mb-2 d-inline-block"
+                  >
+                    <button
+                      class="btn btn-warning btn-xs dropdown-toggle"
+                      type="button"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                    ></button>
+
+                    <div class="dropdown-menu">
+                      <a class="dropdown-item" href="javascript:void(0)"
+                        ><i class="icon icon-forward icon-fw mr-2"></i>View
+                        Bill</a
+                      >
+                      <a
+                        *ngIf="
+                          (user?.permission?.includes('Edit Bill') &&
+                            item?.billStatus === 'Draft') ||
+                          item?.billStatus === 'Redraft'
+                        "
+                        class="dropdown-item"
+                        [routerLink]="'/finance/bills/edit/' + item?.billId"
+                        ><i class="icon icon-edit icon-fw mr-2"></i>Edit Bill</a
+                      >
+                      <a
+                        *ngIf="
+                          user?.permission?.includes(
+                            'Create Finance Payment'
+                          ) &&
+                          item?.billStatus == 'Posted' &&
+                          (item?.paymentStatus == 'Not Paid' ||
+                            item?.paymentStatus == 'Partially Paid')
+                        "
+                        class="dropdown-item"
+                        href="javascript:void(0)"
+                        (click)="
+                          openPaymentModal($event, payment, item, 'payment')
+                        "
+                        ><i class="icon icon-card icon-fw mr-2"></i>Make
+                        Payment</a
+                      >
+
+                      <a
+                        *ngIf="
+                          (user?.permission?.includes('Delete Bill') &&
+                            item?.billStatus === 'Draft') ||
+                          item?.billStatus === 'Redraft'
+                        "
+                        class="dropdown-item text-danger"
+                        (click)="attemptDelete(item.billId)"
+                        href="javascript:void(0)"
+                        ><i class="icon icon-trash icon-fw mr-2"></i>Delete
+                        Bill</a
+                      >
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <ng-template #noData>
+            <h1 class="display-4 text-center font-weight-light p-5">
+              No Data Available
+            </h1>
+          </ng-template>
+        </div>
+
+        <footer>
+          <nav>
+            <ul class="pagination pagination-sm justify-content-end">
+              <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="
+                    pagination.pageNumber = pagination.pageNumber - 1;
+                    fetchBills({ pageNumber: pagination.pageNumber })
+                  "
+                  >Previous</a
+                >
+              </li>
+              <li class="page-item pagination-menu-wrapper">
+                <a
+                  class="page-link page-target"
+                  href="javascript:void(0)"
+                  (click)="itemPaginatedJumpModal()"
+                >
+                  {{ pagination.pageNumber }} of
+                  {{ pagination.totalPages }} page{{
+                    pagination.pageNumber > 1 ? "s" : ""
+                  }}
+                  <span class="sr-only">(current)</span>
+                </a>
+                <div
+                  class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                >
+                  <div class="pagination-menu-body">
+                    <div class="h-auto">
+                      <span>Jump to Page</span>
+                      <select
+                        aria-controls="data-table"
+                        [(ngModel)]="pagination.pageNumber"
+                        (change)="
+                          fetchBills({ pageNumber: pagination.pageNumber })
+                        "
+                        class="custom-select custom-select-xl form-control form-control-xl height"
+                      >
+                        <option
+                          (click)="pagination.pageNumber = line"
+                          *ngFor="let line of pagination.jumpArray"
+                        >
+                          {{ line }}
+                        </option>
+                      </select>
+                      <div class="text-center mt-3">
+                        <button type="button" class="btn btn-danger btn-xs">
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="page-item" *ngIf="pagination.hasNextPage">
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="
+                    pagination.pageNumber = pagination.pageNumber + 1;
+                    fetchBills({ pageNumber: pagination.pageNumber })
+                  "
+                >
+                  Next
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #singleView>
+  <div class="wrapper single-view">
+    <div class="d-flex flex-row">
+      <div class="left pr-4">
+        <div class="top">
+          <header
+            class="w-100 d-flex align-items-center justify-content-between mb-3"
+          >
+            <h1 class="dt-page__title">Bills</h1>
+            <span class="float-right role-add">
+              <a
+                *ngIf="user?.permission?.includes('Create Bill')"
+                class="btn btn-primary mr-2 text-white"
+                [style.borderColor]="currentTheme?.secondaryColor"
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                [routerLink]="['/finance/bills/create']"
+                routerLinkActive="router-link-active"
+                href="javascript:void(0)"
+              >
+                <i class="icon icon-add-circle mr-2"></i>Add New Bill</a
+              >
+            </span>
+          </header>
+        </div>
+        <div class="body">
+          <div class="card">
+            <div class="card-body p-0">
+              <ul class="bill-list">
+                <li
+                  *ngFor="let item of allBills"
+                  (click)="viewBill(item.billId)"
+                  [ngClass]="{
+                    selected: selectedBill?.billId === item?.billId
+                  }"
+                  [style.border-left]="
+                    selectedBill?.billId === item?.billId
+                      ? '5px solid ' + currentTheme.secondaryColor
+                      : ''
+                  "
+                  (mouseover)="item.hover = true"
+                  (mouseleave)="
+                    selectedBill?.billId !== item?.billId
+                      ? (item.hover = false)
+                      : null
+                  "
+                  [ngStyle]="item.hover ? hoverStyle : {}"
+                >
+                  <span
+                    class="d-flex justify-content-between align-items-center title"
+                  >
+                    <span>{{ item?.vendorName }}</span>
+                    <span>{{ item?.balanceDue | number : "1.2-2" }}</span>
+                  </span>
+                  <span
+                    class="d-flex justify-content-between align-items-center sub-title mt-2"
+                  >
+                    <span>
+                      {{ item?.billCode }} |
+                      {{ item?.billDate | customDatePipe : "DD-MMM-YY" }}
+                    </span>
+                    <span>
+                      <span
+                        class="badge badge-sm"
+                        [ngClass]="{
+                          'badge-warning': item.billStatus === 'Draft',
+                          'badge-approval':
+                            item.billStatus === 'Sent For Approval',
+                          'badge-success':
+                            item?.billStatus === 'Posted' &&
+                            item?.paymentStatus === 'Paid',
+                          'badge-notPaid':
+                            item?.billStatus === 'Posted' &&
+                            item?.paymentStatus === 'Not Paid',
+                          'badge-partiallyPaid':
+                            item?.billStatus === 'Posted' &&
+                            item?.paymentStatus === 'Partially Paid',
+                          'badge-danger': item.billStatus === 'Rejected',
+                          'badge-redraft': item.billStatus === 'Redraft',
+                          'badge-danger': item?.billStatus === 'Overdue'
+                        }"
+                      >
+                        <span *ngIf="item?.billStatus !== 'Posted'">
+                          {{
+                            item?.billStatus === "Sent For Approval"
+                              ? "Awaiting Approval"
+                              : item?.billStatus
+                          }}
+                        </span>
+
+                        <span *ngIf="item?.billStatus === 'Posted'">
+                          {{ item?.paymentStatus }}
+                        </span>
+                      </span>
+                    </span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="right px-2">
+        <div class="top card mb-3">
+          <div class="card-body">
+            <div class="float-right">
+              <button
+                *ngIf="
+                  (selectedBill?.paymentStatus === 'Not Paid' ||
+                    selectedBill?.paymentStatus === 'Partially Paid') &&
+                  user?.permission?.includes('Create Finance Payment')
+                "
+                class="btn btn-success btn-xs"
+                (click)="openModal(payment)"
+              >
+                Make Payment
+              </button>
+              <button
+                *ngIf="
+                  selectedBill?.billStatus === 'Sent For Approval' &&
+                  user?.permission?.includes('Approve Bill')
+                "
+                class="btn btn-review btn-xs"
+                (click)="openModal(approval)"
+              >
+                Review Request
+              </button>
+
+              <button
+                class="btn btn-xs btn-primary"
+                (click)="printBill(selectedBill?.vendorName)"
+              >
+                {{ printStatus }}
+                <i
+                  *ngIf="printStatus === 'Processing'"
+                  class="icon icon-spin icon-spin2"
+                ></i>
+              </button>
+              <button
+                *ngIf="
+                  user?.permission?.includes('Create Bill') &&
+                  selectedBill?.billStatus === 'Posted'
+                "
+                class="btn btn-xs clone-btn"
+                (click)="cloneBill()"
+              >
+                Clone
+              </button>
+              <button
+                *ngIf="
+                  user?.permission?.includes('Edit Bill') &&
+                  (selectedBill?.billStatus === 'Draft' ||
+                    selectedBill?.billStatus === 'Redraft')
+                "
+                class="btn btn-xs btn-light"
+                [routerLink]="'/finance/bills/edit/' + selectedBill?.billId"
+              >
+                Edit
+              </button>
+              <button class="btn btn-xs btn-outline-dark" (click)="closeView()">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+        <div
+          id="tabs"
+          class="d-flex justify-content-between align-items-center py-2"
+          style="padding-left: 30px"
+        >
+          <ul
+            id="active-div"
+            class="card-header-pills nav nav-pill justify-content-center align-items-center"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                id="nav-overview"
+                class="nav-link pool-nav active-tab"
+                data-toggle="tab"
+                href="#tab-overview"
+                role="tab"
+                aria-controls="tab-overview"
+                aria-selected="false"
+                (click)="switchTabs('overview')"
+                >Overview</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                id="nav-comments"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                href="#tab-comments"
+                role="tab"
+                aria-controls="tab-comments"
+                aria-selected="false"
+                (click)="switchTabs('comments')"
+                >Comments</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                id="nav-activity"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                href="#tab-activity"
+                role="tab"
+                aria-controls="tab-activity"
+                aria-selected="false"
+                (click)="switchTabs('activity')"
+                >Activity Logs</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                id="nav-files"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                href="#tab-files"
+                role="tab"
+                aria-controls="tab-files"
+                aria-selected="false"
+                (click)="switchTabs('files')"
+                >Files</a
+              >
+            </li>
+
+            <li *ngIf="selectedBill?.payments?.length > 0" class="nav-item">
+              <a
+                id="nav-payments"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                href="#tab-payments"
+                role="tab"
+                aria-controls="tab-payments"
+                aria-selected="false"
+                (click)="switchTabs('payments')"
+                >Payments</a
+              >
+            </li>
+
+            <li *ngIf="selectedBill?.credits?.length > 0" class="nav-item">
+              <a
+                id="nav-credits"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                href="#tab-credits"
+                role="tab"
+                aria-controls="tab-credits"
+                aria-selected="false"
+                (click)="switchTabs('credits')"
+                >Credits</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div *ngIf="!loadingBillLines; else noData" class="tab-content">
+          <div id="tab-overview" class="tab-pane active show">
+            <div class="paper p-5" #billPaper>
+              <div class="card">
+                <lnd-ribbon
+                  [status]="selectedBill?.billStatus"
+                  [paymentStatus]="selectedBill?.paymentStatus"
+                ></lnd-ribbon>
+                <div class="card-body">
+                  <div class="content">
+                    <div class="d-flex justify-content-between mb-5">
+                      <span>
+                        <div class="img-container mb-2">
+                          <img
+                            class="mx-auto img-fluid d-block"
+                            [src]="businessLogo"
+                          />
+                        </div>
+                        <p class="h3 mb-1">{{ appOwner?.appOwnerName }}</p>
+                        <p class="mb-1">{{ appOwner?.appOwnerEmail }}</p>
+                        <p class="mb-1">
+                          {{ appOwner?.appOwnerBillingAddress }}
+                        </p>
+                      </span>
+                      <span class="text-right">
+                        <h3 class="display-1">Bill</h3>
+                        <p>Bill # {{ selectedBill?.billCode }}</p>
+
+                        <br />
+                        <br />
+                        <p class="mb-1">Balance Due</p>
+                        <p class="display-3">
+                          {{ selectedBill?.balanceDue | number : "1.2-2" }}
+                        </p>
+                      </span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3 mb-3">
+                      <span>
+                        <p class="mb-1">Bill From</p>
+                        <p class="mb-3 text-primary">
+                          {{ selectedBill?.vendorName }}
+                        </p>
+                        <p class="mb-1">Terms</p>
+                        <p class="mb-1">{{ selectedBill?.paymentTermName }}</p>
+                      </span>
+                      <span>
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td>Bill Date:</td>
+                              <td>
+                                {{
+                                  selectedBill?.billDate
+                                    | customDatePipe : "DD-MMM-YYYY"
+                                }}
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>Due Date:</td>
+                              <td>
+                                {{
+                                  selectedBill?.billDueDate
+                                    | customDatePipe : "DD-MMM-YYYY"
+                                }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </span>
+                    </div>
+                    <div class="text-center">
+                      <div
+                        *ngIf="loadingBillLines"
+                        class="table-loader"
+                        style="text-align: center; color: indianred"
+                      >
+                        <span>
+                          <i class="icon icon-spin icon-spin2"></i> Loading
+                          items...</span
+                        >
+                      </div>
+                    </div>
+                    <div
+                      class="line"
+                      *ngIf="selectedBill?.billLines?.length > 0"
+                    >
+                      <table class="table items-table">
+                        <thead [style.background]="currentTheme.primaryColor">
+                          <tr>
+                            <th>#</th>
+                            <th>Item</th>
+                            <th *ngIf="lineHasAtLeastOneDesc">Description</th>
+                            <th class="text-right wt-10">Quantity</th>
+                            <th
+                              *ngIf="
+                                selectedBill?.discountLevel === 'LineItemLevel'
+                              "
+                              class="text-right wt-10"
+                            >
+                              Discount (%)
+                            </th>
+                            <th
+                              *ngIf="selectedBill?.taxTotalAmount > 0"
+                              class="text-right wt-10"
+                            >
+                              Tax ({{ appOwner?.currency?.currencySymbol }})
+                            </th>
+                            <th class="text-right wt-10">
+                              Rate ({{ appOwner?.currency?.currencySymbol }})
+                            </th>
+
+                            <th class="text-right wt-10">
+                              Amount ({{ appOwner?.currency?.currencySymbol }})
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            *ngFor="
+                              let row of selectedBill?.billLines;
+                              let i = index
+                            "
+                          >
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ row?.itemName }} ({{ row?.itemCode }})</td>
+                            <td *ngIf="lineHasAtLeastOneDesc">
+                              {{ row?.description }}
+                            </td>
+                            <td class="text-right wt-10">
+                              {{ row?.quantity }}
+                            </td>
+
+                            <td
+                              *ngIf="
+                                selectedBill?.discountLevel === 'LineItemLevel'
+                              "
+                              class="text-right wt-10"
+                            >
+                              {{ row?.discountValueOnType | number : "1.2-2" }}
+                            </td>
+                            <td
+                              *ngIf="selectedBill?.taxTotalAmount > 0"
+                              class="text-right wt-10"
+                            >
+                              {{ row?.taxAmount | number : "1.2-2" }}
+                            </td>
+                            <td class="text-right wt-10">
+                              {{ row?.unitPrice | number : "1.2-2" }}
+                            </td>
+                            <td class="text-right wt-10">
+                              {{ row?.amountAfterDiscount | number : "1.2-2" }}
+                            </td>
+                          </tr>
+
+                          <tr class="summary-sub">
+                            <td></td>
+                            <td></td>
+                            <td *ngIf="lineHasAtLeastOneDesc"></td>
+                            <td></td>
+                            <td
+                              *ngIf="
+                                selectedBill?.discountLevel === 'LineItemLevel'
+                              "
+                            ></td>
+                            <td *ngIf="selectedBill?.taxTotalAmount > 0"></td>
+                            <td class="text-right"><b>Sub Total</b></td>
+                            <td class="text-right">
+                              {{ selectedBill?.subTotal | number : "1.2-2" }}
+                            </td>
+                          </tr>
+
+                          <tr class="summary">
+                            <td></td>
+                            <td></td>
+                            <td *ngIf="lineHasAtLeastOneDesc"></td>
+                            <td></td>
+                            <td
+                              *ngIf="
+                                selectedBill?.discountLevel === 'LineItemLevel'
+                              "
+                            ></td>
+                            <td *ngIf="selectedBill?.taxTotalAmount > 0"></td>
+                            <td class="text-right">Total Tax</td>
+                            <td class="text-right">
+                              {{
+                                selectedBill?.taxTotalAmount | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+
+                          <tr class="summary">
+                            <td></td>
+                            <td></td>
+                            <td *ngIf="lineHasAtLeastOneDesc"></td>
+                            <td></td>
+                            <td
+                              *ngIf="
+                                selectedBill?.discountLevel === 'LineItemLevel'
+                              "
+                            ></td>
+                            <td *ngIf="selectedBill?.taxTotalAmount > 0"></td>
+                            <td class="text-right">
+                              <b>Total</b>
+                            </td>
+                            <td class="text-right">
+                              {{ appOwner?.currency?.currencySymbol
+                              }}{{
+                                selectedBill?.totalAmount | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+
+                          <tr
+                            *ngIf="selectedBill?.totalPayments > 0"
+                            class="summary"
+                          >
+                            <td></td>
+                            <td></td>
+                            <td *ngIf="lineHasAtLeastOneDesc"></td>
+                            <td></td>
+                            <td
+                              *ngIf="
+                                selectedBill?.discountLevel === 'LineItemLevel'
+                              "
+                            ></td>
+                            <td *ngIf="selectedBill?.taxTotalAmount > 0"></td>
+                            <td class="text-right" style="width: 16%">
+                              Payments Made
+                            </td>
+                            <td class="text-right text-danger">
+                              <span>
+                                - {{ appOwner?.currency?.currencySymbol
+                                }}{{
+                                  selectedBill?.totalPayments | number : "1.2-2"
+                                }}
+                              </span>
+                            </td>
+                          </tr>
+
+                          <tr
+                            *ngIf="selectedBill?.totalCreditsApplied > 0"
+                            class="summary"
+                          >
+                            <td></td>
+                            <td></td>
+                            <td *ngIf="lineHasAtLeastOneDesc"></td>
+                            <td></td>
+                            <td
+                              *ngIf="
+                                selectedBill?.discountLevel === 'LineItemLevel'
+                              "
+                            ></td>
+                            <td *ngIf="selectedBill?.taxTotalAmount > 0"></td>
+                            <td class="text-right" style="width: 16%">
+                              Credits Applied
+                            </td>
+                            <td class="text-right text-danger">
+                              <span>
+                                - {{ appOwner?.currency?.currencySymbol
+                                }}{{
+                                  selectedBill?.totalCreditsApplied
+                                    | number : "1.2-2"
+                                }}
+                              </span>
+                            </td>
+                          </tr>
+
+                          <tr class="summary">
+                            <td></td>
+                            <td></td>
+                            <td *ngIf="lineHasAtLeastOneDesc"></td>
+                            <td></td>
+                            <td
+                              *ngIf="
+                                selectedBill?.discountLevel === 'LineItemLevel'
+                              "
+                            ></td>
+                            <td *ngIf="selectedBill?.taxTotalAmount > 0"></td>
+                            <td
+                              class="text-right p-2"
+                              style="background-color: gainsboro"
+                            >
+                              <b>Balance Due</b>
+                            </td>
+                            <td
+                              class="text-right p-2"
+                              style="background-color: gainsboro"
+                            >
+                              {{ appOwner?.currency?.currencySymbol
+                              }}{{
+                                selectedBill?.balanceDue | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-comments" class="tab-pane">
+            <div class="p-5 paper">
+              <div class="card">
+                <table
+                  class="table table-striped mb-0"
+                  *ngIf="selectedBill?.billStatusCommentData.length > 0"
+                >
+                  <thead class="thead-light">
+                    <tr>
+                      <th class="text-uppercase" scope="col">Username</th>
+                      <th class="text-uppercase" scope="col">Comment</th>
+                      <th class="text-uppercase" scope="col">Date Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let item of selectedBill?.billStatusCommentData"
+                    >
+                      <td *ngIf="item?.comment">{{ item?.name }}</td>
+                      <td *ngIf="item?.comment">{{ item?.comment }}</td>
+                      <td *ngIf="item?.comment">
+                        {{ item?.dateCreated | customDatePipe }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <no-data
+                  *ngIf="selectedBill?.billStatusCommentData.length === 0"
+                  [currentTheme]="currentTheme"
+                  [title]="'No Comments'"
+                ></no-data>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-activity" class="tab-pane">
+            <div class="p-5">
+              <div class="card">
+                <table
+                  *ngIf="selectedBill?.appActivities?.length > 0"
+                  class="table mb-0 table-striped"
+                >
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Activity</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let row of selectedBill.appActivities">
+                      <td [style.color]="currentTheme?.secondaryColor">
+                        {{ row?.relatedObjectInitiatorCode }}
+                      </td>
+                      <td>{{ row?.activityDescription }}</td>
+                      <td>
+                        {{ row?.activityDate | customDatePipe }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div
+                  *ngIf="selectedBill?.appActivities?.length === 0"
+                  class="d-flex flex-column align-items-center w-100 py-3"
+                >
+                  <p class="display-4 text-center font-weight-light mb-0">
+                    No Activities Available
+                  </p>
+                  <img
+                    src="assets/images/no data.svg"
+                    alt="no-data-svg"
+                    width="200px"
+                    class="py-5"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-files" class="tab-pane">
+            <lnd-uploaded-files
+              [files]="selectedBill?.files"
+            ></lnd-uploaded-files>
+          </div>
+
+          <div
+            *ngIf="selectedBill?.payments?.length > 0"
+            id="tab-payments"
+            class="tab-pane"
+          >
+            <div class="p-5">
+              <div class="card">
+                <table class="table mb-0 table-striped">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Code</th>
+                      <th scope="col">Reference</th>
+                      <th scope="col">Payment Mode</th>
+                      <th scope="col">Amount</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr *ngFor="let payment of selectedBill.payments">
+                      <td>{{ payment.datePosted | customDatePipe }}</td>
+                      <td [style.color]="currentTheme?.secondaryColor">
+                        {{ payment.paymentCode }}
+                      </td>
+
+                      <td>{{ payment.paymentReference }}</td>
+                      <td>Payment Mode</td>
+                      <td>{{ payment.amountAllocated | number : "1.2-2" }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="selectedBill?.credits?.length > 0"
+            id="tab-credits"
+            class="tab-pane"
+          >
+            <div class="p-5">
+              <div class="card">
+                <table class="table mb-0 table-striped">
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Code</th>
+                      <th scope="col">Amount</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr *ngFor="let credit of selectedBill.credits">
+                      <td>{{ credit?.createdAt | customDatePipe }}</td>
+                      <td [style.color]="currentTheme?.secondaryColor">
+                        {{ credit.parentCode }}
+                      </td>
+                      <td>{{ credit.amount | number : "1.2-2" }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #noData>
+          <div class="d-flex justify-content-center">
+            <span
+              [style.color]="currentTheme?.secondaryColor"
+              class="text-center"
+              >Retrieving Bill <i class="icon icon-spin icon-spin2"></i
+            ></span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [comments]="selectedBill?.billStatusCommentData"
+    [isLoading]="loading"
+    feature="bill"
+    [canApprove]="user?.permission?.includes('Approve Bill')"
+    (sendPayload)="submit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>
+
+<ng-template #payment>
+  <fin-payment
+    [selectedBill]="selectedBill"
+    [user]="user"
+    paymentType="Bill"
+    (fetchData)="updateBillView()"
+    (closeModal)="closeModal()"
+  ></fin-payment>
+</ng-template>

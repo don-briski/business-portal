@@ -1,0 +1,643 @@
+<header class="d-flex justify-content-between align-items-center w-100 mb-3">
+  <h1 class="mb-0">
+    <span>{{ !isEditing ? "Add " : "Edit " }}Invoice</span>
+  </h1>
+  <a
+    class="btn text-white"
+    [routerLink]="['/finance/invoices']"
+    routerLinkActive="router-link-active"
+    [style.background]="currentTheme?.secondaryColor"
+    [style.borderColor]="currentTheme?.secondaryColor"
+    href="javascript:void(0)"
+    >Back</a
+  >
+</header>
+<div *ngIf="(selectedInvoice && isEditing) || !isEditing" class="dt-card">
+  <div class="dt-card__body">
+    <form [formGroup]="invoiceForm">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-row form-row-space">
+            <div class="col-md-6">
+              <label for="customer"
+                >Customer <b class="text-danger">*</b></label
+              >
+              <multi-select-dropdown
+                formControlName="customer"
+                placeholder="Select a Customer"
+                [data]="customers"
+                [currentTheme]="currentTheme"
+                [searchService]="getSearchCustomerService()"
+                (searchResult)="updateDropdown($event, 'customer')"
+                (addBtnClick)="openModal(customer)"
+                [showAddBtn]="true"
+                showAddBtnText="Create New Customer"
+              ></multi-select-dropdown>
+              <div
+                class="mt-1"
+                *ngIf="
+                  invoiceForm.get('customer').invalid &&
+                  (invoiceForm.get('customer').dirty ||
+                    invoiceForm.get('customer').touched)
+                "
+              >
+                <small
+                  *ngIf="invoiceForm.get('customer').errors?.required"
+                  class="text-danger"
+                >
+                  Customer is required.
+                </small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="reference">Reference </label>
+              <input
+                type="text"
+                id="reference"
+                class="form-control"
+                placeholder="Reference"
+                formControlName="invoiceReference"
+              />
+            </div>
+          </div>
+          <div class="form-row form-row-space">
+            <div class="col-md-6">
+              <label for="salesPerson"
+                >Sales Person</label
+              >
+              <slct-2
+                [data]="salesPersons"
+                [customSearchEnabled]="true"
+                placeholder="Search Sales Person"
+                formControlName="salesPerson"
+                [searchService]="getSearchSalePersonService()"
+                (searchResult)="updateDropdown($event, 'salesPerson')"
+              ></slct-2>
+            </div>
+            <div class="col-md-6">
+              <label for="invoiceDate"
+                >Invoice Date <b class="text-danger">*</b></label
+              >
+              <input
+              lndInvalidDateChecker
+                type="date"
+                id="invoiceDate"
+                formControlName="invoiceDate"
+                class="form-control"
+              />
+
+              <div
+                class="mt-1"
+                *ngIf="
+                  invoiceForm.get('invoiceDate').invalid &&
+                  (invoiceForm.get('invoiceDate').dirty ||
+                    invoiceForm.get('invoiceDate').touched)
+                "
+              >
+                <small
+                  *ngIf="invoiceForm.get('invoiceDate').errors?.required"
+                  class="text-danger"
+                >
+                  Invoice Date is required.
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row form-row-space">
+            <div class="col-md-6">
+              <label for="paymentTerms"
+                >Payment Terms <b class="text-danger">*</b></label
+              >
+              <slct-2
+                [data]="paymentTerms"
+                [customSearchEnabled]="true"
+                [placeholder]="'Search Payment Terms'"
+                formControlName="paymentTerm"
+                [searchService]="getPaymentTermsService()"
+                (searchResult)="updateDropdown($event, 'paymentTerms')"
+              ></slct-2>
+
+              <div
+                class="mt-1"
+                *ngIf="
+                  invoiceForm.get('paymentTerm').invalid &&
+                  (invoiceForm.get('paymentTerm').dirty ||
+                    invoiceForm.get('paymentTerm').touched)
+                "
+              >
+                <small
+                  *ngIf="invoiceForm.get('paymentTerm').errors?.required"
+                  class="text-danger"
+                >
+                  Payment Term is required.
+                </small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="invoiceDueDate"
+                >Invoice Due Date <b class="text-danger">*</b></label
+              >
+              <input
+              lndInvalidDateChecker
+                type="date"
+                id="invoiceDueDate"
+                formControlName="invoiceDueDate"
+                class="form-control"
+              />
+
+              <div
+                class="mt-1"
+                *ngIf="
+                  invoiceForm.get('invoiceDueDate').invalid &&
+                  (invoiceForm.get('invoiceDueDate').dirty ||
+                    invoiceForm.get('invoiceDueDate').touched)
+                "
+              >
+                <small
+                  *ngIf="invoiceForm.get('invoiceDueDate').errors?.required"
+                  class="text-danger"
+                >
+                  Invoice Due Date is required.
+                </small>
+              </div>
+            </div>
+          </div>
+          <div class="form-row form-row-space">
+            <div class="col-md-6">
+              <label for="subject">Subject</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="what's the purpose of this invoice"
+                formControlName="subject"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <lnd-approval-comments
+            *ngIf="isEditing && selectedInvoice?.comments.length > 0"
+            [comments]="selectedInvoice.comments"
+          ></lnd-approval-comments>
+        </div>
+      </div>
+      <div>
+        <div class="dashed"></div>
+        <div class="my-6">
+          <div class="form-row">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center">
+                <p class="mb-0 mr-3">Tax Option</p>
+                <span class="w-50">
+                  <slct-2
+                    (selected)="setTaxOption($event)"
+                    [customSearchEnabled]="true"
+                    [data]="taxOptions"
+                    [active]="
+                      !isEditing
+                        ? [taxOptions[0]]
+                        : selectedInvoice.taxOption === 'Inclusive'
+                        ? [taxOptions[1]]
+                        : [taxOptions[0]]
+                    "
+                  ></slct-2>
+                </span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex align-items-center">
+                <p class="mb-0 mr-3">Discount Type</p>
+                <span class="w-50">
+                  <slct-2
+                    (selected)="setDiscountLevel($event)"
+                    [customSearchEnabled]="true"
+                    [data]="discountTypes"
+                    [active]="
+                      !isEditing
+                        ? [discountTypes[0]]
+                        : selectedInvoice.discountLevel === 'LineItemLevel'
+                        ? [discountTypes[1]]
+                        : [discountTypes[0]]
+                    "
+                  ></slct-2>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="form-row mt-6">
+            <div *ngIf="invoiceForAsset !== null" class="col-md-6">
+              <lnd-switch
+                [value]="invoiceForAsset"
+                text="Raising Invoice for Asset"
+                (emittedValue)="setInvoiceForAsset($event)"
+              ></lnd-switch>
+            </div>
+          </div>
+        </div>
+
+        <table
+          class="table mt-5 table-bordered table-sm shadow-sm p-3 bg-white rounded"
+        >
+          <thead>
+            <th>{{ invoiceForAsset ? "Asset" : "Item" }}</th>
+            <th>Account</th>
+            <th>Quantity</th>
+            <th>Rate</th>
+            <th
+              *ngIf="invoiceForm.get('discountLevel').value === 'LineItemLevel'"
+            >
+              Discount
+            </th>
+            <th>Tax</th>
+            <th class="text-right">
+              Amount ({{ ownerInformation?.currency?.currencySymbol }})
+            </th>
+          </thead>
+
+          <tbody *ngIf="!isLoading" formArrayName="lines">
+            <ng-container
+              *ngFor="
+                let invoiceLinesControls of invoiceLines().controls;
+                let i = index
+              "
+            >
+              <tr [formGroup]="invoiceLinesControls">
+                <td>
+                  <multi-select-dropdown
+                    formControlName="item"
+                    [data]="items"
+                    [showAddBtn]="!invoiceForAsset"
+                    [currentTheme]="currentTheme"
+                    [searchService]="getSearchItemsService()"
+                    (searchResult)="updateDropdown($event, 'items')"
+                    (addBtnClick)="openModal(item, i)"
+                    (selected)="onSelectItem($event, i)"
+                    [showAddBtn]="!invoiceForAsset"
+                  ></multi-select-dropdown>
+                </td>
+                <td>
+                  <span
+                    *ngIf="accounts.length === 0; else account"
+                    class="text-primary"
+                  >
+                    <i class="icon icon-spin icon-spin2"></i> Loading
+                    accounts...
+                  </span>
+
+                  <ng-template #account>
+                    <account-slct
+                      [data]="accounts"
+                      (selectedAccount)="selectItemAccount($event, i)"
+                      [preselectedAccount]="{
+                        accountId: invoiceLines().value[i].accountId,
+                        name: invoiceLines().value[i].accountName
+                      }"
+                    ></account-slct>
+                  </ng-template>
+                </td>
+                <td class="c-width-100">
+                  <input
+                    type="number"
+                    class="form-control"
+                    min="0"
+                    placeholder="Quantity"
+                    formControlName="quantity"
+                  />
+                </td>
+
+                <td class="c-width">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Rate"
+                    formControlName="unitPrice"
+                    currencyMask
+                    [options]="{
+                      prefix: currencySymbol,
+                      thousands: ',',
+                      decimal: '.'
+                    }"
+                  />
+                </td>
+
+                <td
+                  *ngIf="
+                    invoiceForm.get('discountLevel').value === 'LineItemLevel'
+                  "
+                  class="c-width"
+                >
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Discount"
+                      formControlName="discountValueOnType"
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text" id="basic-addon2">%</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="c-width-200">
+                  <slct-2
+                    [data]="invoiceLinesControls.get('taxes').value || []"
+                    [active]="[{ id: null, text: 'No Tax' }]"
+                    [customSearchEnabled]="true"
+                    formControlName="tax"
+                  ></slct-2>
+                </td>
+                <td class="c-width-200">
+                  <div class="d-flex align-items-center">
+                    <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Amount"
+                    readonly
+                    formControlName="amount"
+                    currencyMask
+                    [options]="{
+                      prefix: currencySymbol,
+                      thousands: ',',
+                      decimal: '.'
+                    }"
+                  />
+                  <span 
+                  *ngIf="invoiceLines().controls.length > 1"
+                  class="remove-btn" 
+                  (click)="onRemoveLine(i)"
+                  >
+                    <i class="icon icon-trash icon-lg"></i>
+                  </span>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+
+          <button
+            class="btn add-btn btn-xs text-white my-5 mx-1"
+            (click)="addInvoice()"
+          >
+            <i class="icon icon-add"></i> Add New Line
+          </button>
+        </table>
+      </div>
+
+      <div class="form-row form-row-space">
+        <div class="col-md-6">
+          <div class="mb-6">
+            <span
+              *ngFor="let file of invoiceFilesView; let fileIndex = index"
+              class="badge badge-pill badge-outline mr-2 px-4 mb-1"
+              >{{ file.name || file.originalName }}
+              <i
+                class="icon icon-trash ml-2 cursor text-danger"
+                (click)="removeFile(fileIndex)"
+              ></i>
+            </span>
+          </div>
+
+          <div class="mb-6">
+            <div class="d-flex">
+              <small>Attach relevant files </small>
+            </div>
+            <button
+              class="btn btn-xs btn-secondary text-white"
+              (click)="files.click()"
+            >
+              <i class="icon icon-upload"></i>
+              {{ !fileDelete ? "Attach File" : "Deleting file..." }}
+              <i *ngIf="fileDelete" class="icon icon-spin icon-spin2"></i>
+            </button>
+
+            <input
+              #files
+              type="file"
+              multiple
+              (change)="handleFileInput($event.target.files)"
+              style="display: none"
+            />
+          </div>
+
+          <label for="notes">Notes</label>
+          <textarea
+            id="notes"
+            placeholder="Customer Notes"
+            class="form-control"
+            formControlName="customerNotes"
+          ></textarea>
+        </div>
+
+        <div class="col-md-6">
+          <label for=""> </label>
+          <div class="shadow-sm p-5 bg-gainsboro rounded">
+            <div class="d-flex">
+              <div class="col-md-3">Sub Total</div>
+              <div class="col-md-6"></div>
+              <div class="col-md-3">
+                <span class="float-right"
+                  >{{ ownerInformation?.currency?.currencySymbol }}
+                  {{ subTotal | number : "1.2-2" }}</span
+                >
+              </div>
+            </div>
+
+            <div *ngIf="invoiceForm.get('discountAfterTax').value" class="my-6">
+              <div class="d-flex my-6" *ngFor="let tax of taxesObj">
+                <div class="col-md-3">{{ tax?.name }}</div>
+                <div class="col-md-6"></div>
+                <div class="col-md-3">
+                  <span class="float-right"
+                    >{{ ownerInformation?.currency?.currencySymbol }}
+                    {{ tax?.value | number : "1.2-2" }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="d-flex align-items-center my-6"
+              *ngIf="
+                invoiceForm.get('discountLevel').value === 'TransactionLevel'
+              "
+            >
+              <div class="col-md-3">Discount</div>
+              <div class="col-md-6">
+                <div class="input-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Discount"
+                    formControlName="transactionLevelDiscountRate"
+                    (keyup)="performCalculations()"
+                    aria-describedby="basic-addon2"
+                  />
+                  <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2">%</span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <span class="float-right text-danger">
+                  <span *ngIf="discount > 0" class="mr-1"><b>-</b> </span>
+                  {{ ownerInformation?.currency?.currencySymbol }}
+                  {{ discount | number : "1.2-2" }}</span
+                >
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <button
+                *ngIf="invoiceForm.get('transactionLevelDiscountRate').value"
+                class="btn btn-primary btn-xs"
+                (click)="setDiscountOrder()"
+              >
+                {{
+                  invoiceForm.get("discountAfterTax").value
+                    ? "Apply Before Tax"
+                    : "Apply After Tax"
+                }}
+              </button>
+            </div>
+
+            <div
+              *ngIf="
+                invoiceForm.get('transactionLevelDiscountRate').value ||
+                showDiscountAcc
+              "
+              class="d-flex align-items-center my-6"
+            >
+              <div class="col-md-3">Discount Acc</div>
+              <div class="col-md-6">
+                <account-slct
+                  [data]="accounts"
+                  [preselectedAccount]="
+                    isEditing && selectedInvoice
+                      ? {
+                          accountId:
+                            selectedInvoice?.discountAccount?.accountId,
+                          name: selectedInvoice?.discountAccount?.name
+                        }
+                      : null
+                  "
+                  (selectedAccount)="selectAccount($event)"
+                ></account-slct>
+              </div>
+              <div class="col-md-3"></div>
+            </div>
+
+            <div
+              *ngIf="!invoiceForm.get('discountAfterTax').value"
+              class="my-6"
+            >
+              <div class="d-flex my-6" *ngFor="let tax of taxesObj">
+                <div class="col-md-3">{{ tax?.name }}</div>
+                <div class="col-md-6"></div>
+                <div class="col-md-3">
+                  <span class="float-right"
+                    >{{ ownerInformation?.currency?.currencySymbol }}
+                    {{ tax?.value | number : "1.2-2" }}</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex">
+              <div class="col-md-3">
+                <b>Total ({{ ownerInformation?.currency?.currencySymbol }})</b>
+              </div>
+              <div class="col-md-6"></div>
+              <div class="col-md-3">
+                <span class="float-right"
+                  ><b
+                    >{{ ownerInformation?.currency?.currencySymbol }}
+                    {{ totalAmount | number : "1.2-2" }}</b
+                  ></span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <footer class="d-flex justify-content-end">
+      <div *ngIf="!isLoading; else processing">
+        <button
+          class="btn btn-light btn-xs"
+          [disabled]="invoiceForm.invalid || isLoading"
+          (click)="submit('Draft')"
+        >
+          Save as Draft
+        </button>
+
+        <button
+          *ngIf="user?.permission?.includes('Approve Invoice')"
+          class="btn btn-primary btn-xs mx-2"
+          [disabled]="invoiceForm.invalid || isLoading"
+          (click)="submit('SentForApproval')"
+        >
+          Send For Approval
+        </button>
+
+        <button
+          class="btn btn-success btn-xs"
+          [disabled]="invoiceForm.invalid || isLoading"
+          (click)="openModal(approval)"
+        >
+          Post
+        </button>
+      </div>
+
+      <ng-template #processing>
+        <button class="btn btn-xs btn-warning mx-1" disabled>
+          <i class="icon icon-spin icon-spin2"></i> Processing..
+        </button>
+      </ng-template>
+    </footer>
+  </div>
+</div>
+
+<p
+  *ngIf="!selectedInvoice && isLoading && isEditing"
+  class="text-center"
+  [style.color]="currentTheme?.secondaryColor"
+>
+  Retrieving Invoice... <i class="icon icon-spin icon-spin2"></i>
+</p>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [canApprove]="user?.permission?.includes('Approve Invoice')"
+    (sendPayload)="submit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>
+
+<ng-template #item>
+  <div class="p-5">
+    <div class="item-header d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">Add Item</h1>
+      <span class="cursor" (click)="closeModal()" style="font-size: 32px"
+        >&times;</span
+      >
+    </div>
+    <app-add-edit-items
+      emitNewItem="true"
+      accountType="SalesAccount"
+      (itemAssetAdded)="setItem($event)"
+    ></app-add-edit-items>
+  </div>
+</ng-template>
+
+<ng-template #customer>
+  <header class="p-5">
+    <div class="item-header d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">Create a new Customer</h1>
+      <span class="cursor" (click)="closeModal()" style="font-size: 32px"
+        >&times;</span
+      >
+    </div>
+  </header>
+  <lnd-add-edit-customer [addCustomerPopup]="true" (customerAdded)="customerAdded($event)"></lnd-add-edit-customer>
+</ng-template>

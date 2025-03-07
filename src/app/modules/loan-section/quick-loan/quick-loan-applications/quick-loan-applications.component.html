@@ -1,0 +1,500 @@
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">
+    Quick Loans
+    <span class="float-right role-add"> </span>
+  </h1>
+</div>
+<div class="row">
+  <div class="col-xl-12">
+    <ul
+      id="active-div"
+      class="card-header-pills nav nav-pill justify-content-center"
+      role="tablist"
+    >
+      <li
+        class="nav-item"
+        *ngIf="currentUser?.permission?.includes('View Customers')"
+      >
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{'active-tab':currentView === 'Applications'}"
+          href="javascript:void(0)"
+          (click)="switchView('Applications')"
+        >
+          Applications
+        </a>
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="currentUser?.permission?.includes('View Customers')"
+      >
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{'active-tab':currentView === 'Loans'}"
+          href="javascript:void(0)"
+          (click)="switchView('Loans')"
+        >
+          Successful Loans
+        </a>
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="currentUser?.permission?.includes('View Customers')"
+      >
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{'active-tab':currentView === 'Callback'}"
+          href="javascript:void(0)"
+          (click)="switchView('Callback')"
+        >
+          Call Back Log
+        </a>
+      </li>
+    </ul>
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+        <div class="tab-pane">
+          <div class="row">
+            <div class="col-md-4">
+              <label style="display: inline-flex"
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [(ngModel)]="pagination.pageSize"
+                  aria-controls="data-table"
+                  (change)="triggerRequest()"
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+            <div class="col-md-4 d-flex justify-content-center">
+              <lnd-spinner
+                *ngIf="isLoading"
+                text="Retrieving records..."
+                [color]="currentTheme?.secondaryColor"
+              ></lnd-spinner>
+            </div>
+            <div class="form-group col-md-4">
+              <label style="display: inline-flex; float: right; width: 300px"
+                ><span style="padding: 10px 2px; font-size: 12px"></span
+                ><input
+                  type="search"
+                  [(ngModel)]="pagination.searchTerm"
+                  (keydown.enter)="
+                    triggerRequest({ keyword: pagination?.searchTerm })
+                  "
+                  class="form-control form-control-sm"
+                  [placeholder]="placeholder"
+                  aria-controls="data-table"
+                />
+
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.background]="currentTheme.secondaryColor"
+                  (click)="triggerRequest({ keyword: pagination?.searchTerm })"
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </label>
+            </div>
+
+            <div class="col-md-12 mb-3">
+              <lnd-selected-filters
+                (initialized)="onSelectedFiltersInit($event)"
+              ></lnd-selected-filters>
+            </div>
+            <div
+              class="d-flex justify-content-between align-items-center w-100"
+            >
+              <div
+                class=""
+                aria-live="polite"
+                style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+              >
+                Showing
+                {{
+                  (pagination?.pageNumber - 1) * pagination?.pageSize + 1
+                    | number : "1.0-0"
+                }}
+                -
+                {{
+                  (pagination?.pageNumber - 1) * pagination?.pageSize +
+                    pagination?.count | number : "1.0-0"
+                }}
+                of {{ pagination?.totalCount | number : "1.0-0" }} record(s)
+              </div>
+              <div style="padding-right: 16px">
+              <lnd-filter-btn (filterModalOpen)="filterModalOpen()"></lnd-filter-btn>
+                <lnd-filter
+                  *ngIf="!isLoading"
+                  [filterOptions]="statusArray"
+                  [btnText]="'Filter By Status'"
+                  [placeholder]="'Select status'"
+                  (optionSelected)="triggerRequest({ filter: $event?.id })"
+                >
+                </lnd-filter>
+              </div>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table
+              *ngIf="
+                currentView === 'Applications' &&
+                currentUser?.permission?.includes('View Customers')
+              "
+              id="table1"
+              class="table table-striped table-hover"
+            >
+              <thead>
+                <tr>
+                  <th>Phone No</th>
+                  <th>BVN</th>
+                  <th>Account Number</th>
+                  <th>Bank</th>
+                  <th>Bank Validation</th>
+                  <th>Validated Name</th>
+                  <th>Set Pin</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let application of applications">
+                  <td>
+                    {{ application?.phoneNumber }}
+                  </td>
+                  <td>{{ application?.bvn }}</td>
+                  <td>{{ application?.accountNumber }}</td>
+                  <td>{{ application?.bank }}</td>
+                  <td>
+                    <span
+                      class="badge badge-sm"
+                      [ngClass]="{
+                        'badge-success': application?.validatedName,
+                        'badge-warning': !application?.validatedName
+                      }"
+                    >
+                      <span>
+                        {{
+                          application?.validatedName
+                            ? "Complete"
+                            : "In Progress"
+                        }}
+                      </span>
+                    </span>
+                  </td>
+                  <td [ngClass]="{ centered: !application?.validatedName }">
+                    {{ application?.validatedName || "-" }}
+                  </td>
+                  <td>{{ application?.isSetPin ? "Yes" : "No" }}</td>
+                  <td>
+                    <span
+                      class="badge badge-sm"
+                      [ngClass]="{
+                        'badge-success': application?.status === 1,
+                        'badge-danger': application?.status === 2,
+                        'badge-info': application?.status === 3,
+                        'badge-danger': application?.status === 4,
+                        'badge-success': application?.status === 5,
+                        'badge-info': application?.status === 6,
+                        'badge-warning': application?.status === 7
+                      }"
+                    >
+                      <span [ngSwitch]="application?.status">
+                        <span *ngSwitchCase="2">Barred</span>
+                        <span *ngSwitchCase="3">Validation Started</span>
+                        <span *ngSwitchCase="4">Validation Failed</span>
+                        <span *ngSwitchCase="5">Registered</span>
+                        <span *ngSwitchCase="6">Security Pin Set</span>
+                        <span *ngSwitchCase="7">Call backRequested</span>
+                        <span *ngSwitchDefault>Registration Started</span>
+                      </span>
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table
+              *ngIf="
+                currentView === 'Loans' &&
+                currentUser?.permission?.includes('View Customers')
+              "
+              id="table1"
+              class="table table-striped table-hover"
+            >
+              <thead>
+                <tr>
+                  <th>Loan Code</th>
+                  <th>Validated Name</th>
+                  <th>Phone No</th>
+                  <th>Date Disbursed</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let loan of loans" class="cursor" (click)="viewLoan(loan?.loanId)">
+                  <td class="copy_icon_wrapper" [style.color]="currentTheme?.secondaryColor">
+                    {{ loan?.loanCode }}
+                    <img
+                      (mouseover)="copy_hover = true"
+                      (mouseleave)="copy_hover = false"
+                      class="copy_icon"
+                      src="assets/images/copy.png"
+                      alt="copy icon"
+                      width="15"
+                      height="15"
+                      (click)="copyCode(loan?.loanCode,'Loan Code')"
+                      placement="right"
+                      ngbTooltip="Copy Loan Code"
+                    >
+                  </td>
+                  <td>
+                    {{ loan?.validatedName }}
+                  </td>
+                  <td>{{ loan?.phoneNumber }}</td>
+                  <td>{{ loan?.dateDisbursed | customDatePipe }}</td>
+                  <td>
+                    <span class="badge badge-sm" [ngClass]="{
+                      'badge-success':loan?.loanStatus === 'Paid',
+                      'badge-warning':loan?.loanStatus === 'Disbursed',
+                      'badge-secondary':loan?.loanStatus === 'DisbursementRequestSent',
+                      'badge-info':loan?.loanStatus}">
+
+                      {{loan?.loanStatus | humanify}}
+                    </span>
+                  </td>
+                  <td [style.color]="currentTheme?.secondaryColor"><i class="icon icon-forward icon-fw mr-2"></i> View</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table
+              *ngIf="
+                currentView === 'Callback' &&
+                currentUser?.permission?.includes('View Customers')
+              "
+              id="table1"
+              class="table table-striped table-hover"
+            >
+              <thead>
+                <tr>
+                  <th>Validated Name</th>
+                  <th>Phone No</th>
+                  <th>Date Requested</th>
+                  <th>Stage</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let callback of callbacks" class="cursor" (click)="viewCallback(callback)">
+                  <td [ngClass]="{'text-danger':callback.validatedName === nullPersonValue}">
+                    {{ callback?.validatedName }}
+                  </td>
+                  <td class="copy_icon_wrapper">
+                    {{ callback?.phoneNumber }}
+                    <img
+                      (mouseover)="copy_hover = true"
+                      (mouseleave)="copy_hover = false"
+                      class="copy_icon"
+                      src="assets/images/copy.png"
+                      alt="copy icon"
+                      width="15"
+                      height="15"
+                      (click)="copyCode(callback?.phoneNumber, 'Phone number')"
+                      placement="right"
+                      ngbTooltip="Copy Phone number"
+                    >
+                  </td>
+                  <td>{{ callback?.dateRequested | customDatePipe }}</td>
+                  <td>{{ callback?.stage | humanify }}</td>
+                  <td>
+                    <span class="badge badge-sm" [ngClass]="{'badge-success': callback?.callbackStatus === 'Treated',
+                    'badge-warning': callback?.callbackStatus === 'Open'}">
+                      {{callback?.callbackStatus | humanify}}
+                    </span>
+                  </td>
+                  <td [style.color]="currentTheme?.secondaryColor"><i class="icon icon-forward icon-fw mr-2"></i> View</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="
+                    (pagination?.pageNumber - 1) * pagination?.pageSize + 1 > 10
+                  "
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      triggerRequest({ pageNumber: pagination.pageNumber - 1 })
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="itemPaginatedJumpModal()"
+                    href="javascript:void(0)"
+                    >{{ pagination?.pageNumber }} of
+                    {{ this.pagination?.maxPage }} page<span
+                      *ngIf="pagination?.pageNumber > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+
+                  <div class="itemPaginatedJumpModal pagination-menu pagination-menu-right">
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="pagination.pageNumber"
+                          (change)="triggerRequest({pageNumber:pagination?.pageNumber})"
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option *ngFor="let line of pagination?.jumpArray">
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="triggerRequest()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="this.pagination?.pageNumber < this.pagination?.maxPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      triggerRequest({ pageNumber: pagination.pageNumber + 1 })
+                    "
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<lnd-aside *ngIf="callback" [isOpen]="callback" (closeAside)="callback = null;">
+  <header header class="d-flex align-items-center">
+    <div>
+      <lnd-initials
+        classes="text-white"
+        [text]="callback?.validatedName"
+        [bgColor]="currentTheme?.secondaryColor"
+      ></lnd-initials>
+    </div>
+    <div class="ml-4">
+      <h1 class="mb-0">{{callback?.validatedName}}</h1>
+      <span> <i class="icon icon-phone icon-lg mr-2" [style.color]="currentTheme?.primaryColor"></i>{{callback?.phoneNumber}}</span>
+    </div>
+  </header>
+
+  <div class="row">
+    <div class="col-md-12" style="padding: 20px">
+      <ul class="dt-list dt-list-one-second padded-left">
+        <lnd-list-item
+          *ngFor="let listItem of listItems"
+          [label]="listItem?.label"
+          [value]="listItem?.value"
+          [iconClass]="listItem?.iconClass"
+          [type]="listItem?.type"
+        ></lnd-list-item>
+      </ul>
+    </div>
+  </div>
+
+  <div class="dt-card__body">
+    <ul
+      class="nav nav-underline flex-row border-bottom nav-card-tabs"
+      role="tablist"
+    >
+      <li class="nav-item">
+        <a
+          class="nav-link active"
+          data-toggle="tab"
+          href="#activity"
+          role="tab"
+          aria-controls="activity"
+          aria-selected="true"
+          >Activity</a
+        >
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div id="activity" class="tab-pane active">
+        <div class="table-responsive">
+          <table class="table table_sm">
+            <thead class="thead-light">
+              <tr>
+                <th>Name</th>
+                <th>Comment</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr *ngFor="let activity of callback?.notes">
+                <td [ngClass]="{'text-danger':activity?.personName === nullPersonValue}">{{activity?.personName}}</td>
+                <td>{{activity?.note}}</td>
+                <td>{{activity?.dateAdded | customDatePipe}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="callback.callbackStatus === 'Open'">
+          <label for="comment">Comment <span style="color: gainsboro;">(Optional)</span></label>
+          <textarea id="comment" cols="30" rows="6" class="form-control" placeholder="Enter comment here" (keyup)="setNoteValues($event.target.value,'note')"></textarea>
+
+          <div class="my-4">
+            <input type="checkbox" name="status" (change)="setNoteValues($event.target.value,'status')"> <span class="ml-2">Mark as Treated</span>
+          </div>
+
+          <button [disabled]="!this.note.note && !this.note.callBackLogId" type="button" (click)="postNote()" class="btn btn-sm px-6 text-white" [style.backgroundColor]="currentTheme?.primaryColor">{{isLoading ? 'Processing...' : 'Post'}} <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</lnd-aside>

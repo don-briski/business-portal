@@ -1,0 +1,198 @@
+<header>
+  <h1 class="dt-page__title">Opening Balances</h1>
+</header>
+
+<section>
+  <div class="opening-balance-date row m-0">
+    <div class="col-md-6">
+      <label class="sr-only" for="inlineFormInputGroup"
+        >Opening Balances Date</label
+      >
+      <div class="input-group mb-2">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+            Opening Balances Date<b class="text-danger ml-2">*</b>
+          </div>
+        </div>
+        <input
+        lndInvalidDateChecker
+          type="date"
+          class="form-control"
+          id="inlineFormInputGroup"
+          placeholder="Date"
+          [(ngModel)]="openingBalanceDate"
+          [disabled]="!allowEdit || disableDateSelection"
+        />
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="buttons d-flex mt-1 justify-content-end">
+        <button
+          *ngIf="!allowEdit"
+          class="btn btn-sm btn-primary text-white"
+          type="button"
+          (click)="allowEdit = !allowEdit"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+        >
+          Update
+        </button>
+
+        <button
+          *ngIf="allowEdit"
+          type="button"
+          class="btn btn-sm btn-outline-lenda mr-3"
+          (click)="importFile.click()"
+          placement="top"
+          ngbTooltip="Streamline transaction management. Click to bring in external data efficiently."
+        >
+          <i class="icon icon-upload mr-1"></i>
+          {{ isImporting ? "Importing..." : "Import" }}
+          <i class="icon icon-spin icon-spin2" *ngIf="isImporting"></i>
+        </button>
+
+        <button
+          *ngIf="allowEdit"
+          type="button"
+          class="btn btn-sm btn-light btn-success ml-0"
+          (click)="allowEdit = !allowEdit"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p *ngIf="allowEdit" class="text-right">
+    Download a
+    <span class="sample-text cursor" (click)="downloadSampleOB()"
+      ><b>sample here</b></span
+    >
+    to see the required format
+  </p>
+
+  <div *ngIf="loader" class="d-flex justify-content-center">
+    <lnd-spinner
+      text="Retrieving Opening Balances"
+      [color]="currentTheme?.secondaryColor"
+    ></lnd-spinner>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Account</th>
+          <th>Type</th>
+          <th>Credit</th>
+          <th>Debit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of allPostingAccount; let i = index">
+          <td>{{ item?.accountName }}</td>
+          <td>{{ item?.accountType }}</td>
+          <td>
+            <input
+              type="text"
+              currencyMask
+              [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              class="form-control"
+              [(ngModel)]="item.credit"
+              (ngModelChange)="
+                setBalance(item, 'credit', $event);
+                calculateDifference()
+              "
+              [disabled]="!allowEdit || openBalanceFile"
+            />
+          </td>
+          <td>
+            <input
+              type="text"
+              currencyMask
+              [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              class="form-control"
+              [(ngModel)]="item.debit"
+              (ngModelChange)="
+                setBalance(item, 'debit', $event);
+                calculateDifference()
+              "
+              [disabled]="!allowEdit || openBalanceFile"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td></td>
+          <td class="font-weight-bold text-danger text-right">
+            <span *ngIf="creditIsGreater">{{
+              differenceInCreditAndDebit | number : "1.2-2"
+            }}</span>
+          </td>
+          <td class="font-weight-bold text-danger text-right">
+            <span *ngIf="debitIsGreater">{{
+              differenceInCreditAndDebit | number : "1.2-2"
+            }}</span>
+          </td>
+        </tr>
+        <tr>
+          <td></td>
+          <td><b>Total</b></td>
+          <td class="font-weight-bold text-right">
+            {{ totalCredit | number : "1.2-2" }}
+          </td>
+          <td class="font-weight-bold text-right">
+            {{ totalDebit | number : "1.2-2" }}
+          </td>
+        </tr>
+        <tr *ngIf="totalCredit !== totalDebit">
+          <td></td>
+          <td></td>
+          <td
+            *ngIf="totalCredit !== totalDebit"
+            colspan="2"
+            class="text-danger text-right"
+          >
+            This debit and credit leg must balance before you can continue;
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="buttons mt-5 d-flex" *ngIf="allowEdit">
+    <button
+      class="btn btn-light ml-auto"
+      type="button"
+      (click)="cancel()"
+      *ngIf="!saving"
+    >
+      Cancel
+    </button>
+    <button
+      [disabled]="
+        totalCredit === 0 || totalDebit === 0 || saving || !openingBalanceDate
+      "
+      class="btn btn-lenda text-white"
+      type="button"
+      (click)="attemptSubmit()"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="saving"></i>
+      {{ saving ? "Processing..." : "Save" }}
+    </button>
+  </div>
+</section>
+
+<ng-template #newAccount>
+  <app-create></app-create>
+</ng-template>
+
+<input
+  #importFile
+  type="file"
+  class="d-none"
+  (change)="importOB($event)"
+  [(ngModel)]="obInputValue"
+  placeholder="Upload file"
+  accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+/>

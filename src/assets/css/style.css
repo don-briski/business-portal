@@ -1,0 +1,261 @@
+@import url('./icons.css');
+@font-face {
+  font-family: "gaxon";
+  src: url("../fonts/gaxon3aac.eot");
+  src: url("../fonts/gaxon3aac.eot") format("embedded-opentype"),
+    url("../fonts/gaxon3aac.ttf") format("truetype"),
+    url("../fonts/gaxon3aac.woff") format("woff"),
+    url("../fonts/gaxon3aac.svg#gaxon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+::-webkit-scrollbar {
+  width: 8px; 
+  height: 8px;
+  background: #cacaca;
+  right: 1px;
+}
+
+::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 8px;
+  border-radius: 8px;
+  background: rgb(128, 128, 128);
+  -webkit-box-shadow: inset 0 0 6px rgb(150, 150, 150);
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+  background: rgb(146, 146, 146);
+}
+
+#mat-dialog-1,
+#mat-dialog-2,
+#mat-dialog-3 {
+  background-color: #ffefeb !important;
+}
+.mat-dialog-container {
+  box-shadow: none !important;
+  background-color: beige;
+}
+
+.cdk-overlay-container {
+  z-index: 2000 !important;
+}
+
+.cursor {
+  cursor: pointer;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.not-allowed{
+  cursor: not-allowed;
+}
+.badge-approval {
+  background-color: #453488;
+  color: #fff;
+}
+
+.badge-approval:hover {
+  color: #fff;
+}
+.badge-redraft {
+  background-color: rgb(175, 86, 126);
+  border-color: rgb(175, 86, 126);
+  color: #fff;
+}
+
+.badge-notPaid {
+  background-color: #ef5350 !important;
+  color: #fff;
+}
+
+.badge-partiallyPaid {
+  background-color: #4caf50 !important;
+  color: #fff;;
+}
+
+.badge-overdue {
+  background-color: #ff1744;
+  color: #fff;
+}
+
+.modalSubclassWidth .modal-dialog {
+  min-width: 600px;
+}
+
+.force-loan-activation .modal-dialog {
+  min-width: 800px !important;
+}
+
+.btn-review {
+  background-color: rgb(175, 86, 126) !important;
+  color: #fff !important;
+}
+
+.modalApprovalWidth .modal-dialog {
+  min-width: 700px;
+}
+
+.bg-gainsboro {
+  background-color: #fbfafa;
+}
+
+.add-btn {
+  border-radius: 16px !important;
+  background-color: #558e80 !important;
+  min-width: 120px !important;
+  color: #fff !important;
+
+  &:hover{
+    color: #fff !important;
+  }
+}
+
+.c-width {
+  width: 164px;
+}
+
+.line-btn {
+  position: relative;
+  top: 26px;
+  left: 80%;
+  z-index: 20000;
+}
+
+.filter-textbox {
+  border: 1px solid gainsboro;
+  border-radius: 3px;
+}
+
+.def-text-color{
+  color: #545454 !important;
+}
+
+.lnd-border{
+  border: 1px dashed gainsboro;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.indian_red{
+  color: indianred;
+}
+
+.copy_icon_wrapper{
+  .copy_icon{
+    visibility: hidden;
+    margin-left: 3px;
+  }
+  &:hover{
+    .copy_icon{
+      visibility: visible;
+      transition: all .2s ease-in-out;
+      cursor: pointer;
+      &:hover{
+        transform: scale(1.5 , 1.5);
+      }
+    }
+  }
+}
+
+.table_sm{
+  font-size: 11px;
+}
+
+.text-white{
+  color: #fff;
+}
+
+.stepper_red{
+  stroke: red;
+}
+
+.stepper_g{
+  stroke: green;
+}
+
+.blurry-bg {
+  backdrop-filter: blur(3px);
+}
+
+.transparent-bg {
+  background: transparent;
+}
+
+.swal-cancel-btn{
+  color:#262626 !important;
+  border: 1px solid #262626 !important;
+  background-color: transparent !important;
+}
+
+.swal-cancel-btn,.swal-confirm-btn{
+  width: 30% !important;
+}
+.swal-close-btn{
+  color: #262626 !important;
+}
+
+.swal-actions{
+  gap: 20px !important;
+}
+
+mat-slide-toggle.mat-primary:not(.mat-checked):not(.mat-disabled)
+  .mat-slide-toggle-bar {
+  background-color: #0dc709;
+}
+
+mat-slide-toggle.mat-accent:not(.mat-checked):not(.mat-disabled)
+  .mat-slide-toggle-bar {
+  background-color: rgb(255, 0, 0);
+}
+
+.lnd-border-dashed{
+  border-top: 1px dashed gainsboro;
+}
+
+.lnd-border-left {
+  border-left: 5px solid;
+}
+
+.light-mode-text{
+  color: #1c1c1c !important;
+}
+.cdk-overlay-dark-backdrop {
+  background: rgb(0, 0, 0, 0.1) !important;
+}
+.tooltip-container{
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  padding: 10px 5px !important;
+}
+
+.checkout-config{
+  padding-top: 30px;
+  .card-body{
+    background-color: #fff;
+  }
+  #tips{
+    ul{
+      li{
+        margin: 10px 0;
+      }
+    }
+
+  }
+
+  .subtitle{
+    font-size: 16px;
+    color: #979797;
+    font-weight: 300;
+  }
+
+  .hint-color{
+    color: #979797;
+  }
+}
+
+

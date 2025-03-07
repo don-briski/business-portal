@@ -1,0 +1,667 @@
+<div *ngIf="decideInfo" style="padding: 4rem">
+  <header>
+    <div
+      [ngClass]="selectedTab === 'BA' ? 'select' : 'unselect'"
+      id="nav-BA"
+      class="anchor-wrapper selected"
+      (click)="switchTabs('BA')"
+    >
+      <a
+        [ngStyle]="selectedTab === 'BA' ? { color: '#545454' } : null"
+        class="tab"
+        data-toggle="tab"
+        role="tab"
+        aria-controls="tab-pane1"
+        aria-selected="true"
+        href="#tab-BA"
+        >Behavioral Analysis</a
+      >
+    </div>
+    <div
+      [ngClass]="selectedTab === 'CFA' ? 'select' : 'unselect'"
+      id="nav-CFA"
+      (click)="switchTabs('CFA')"
+      class="anchor-wrapper"
+    >
+      <a
+        [ngStyle]="selectedTab === 'CFA' ? { color: '#545454' } : null"
+        class="tab"
+        data-toggle="tab"
+        role="tab"
+        aria-controls="tab-pane2"
+        aria-selected="true"
+        href="#tab-CFA"
+        >Cash Flow Analysis</a
+      >
+    </div>
+    <div
+      [ngClass]="selectedTab === 'IA' ? 'select' : 'unselect'"
+      id="nav-IA"
+      class="anchor-wrapper"
+      (click)="switchTabs('IA')"
+    >
+      <a
+        [ngStyle]="selectedTab === 'IA' ? { color: '#545454' } : null"
+        class="tab"
+        data-toggle="tab"
+        role="tab"
+        aria-controls="tab-pane3"
+        aria-selected="true"
+        href="#tab-IA"
+        >Income Analysis</a
+      >
+    </div>
+    <div
+      [ngClass]="selectedTab === 'SA' ? 'select' : 'unselect'"
+      id="nav-SA"
+      class="anchor-wrapper"
+      (click)="switchTabs('SA')"
+    >
+      <a
+        [ngStyle]="selectedTab === 'SA' ? { color: '#545454' } : null"
+        class="tab"
+        data-toggle="tab"
+        role="tab"
+        aria-controls="tab-pane4"
+        aria-selected="true"
+        href="#tab-SA"
+        >Spend Analysis</a
+      >
+    </div>
+  </header>
+
+  <div>
+    <div class="d-flex align-items-center">
+      <div id="avatar" class="mr-5" [style.backgroundColor]="'#545454'">
+        <i class="icon icon-user"></i>
+      </div>
+
+      <div>
+        <h3 [style.color]="'#545454'">
+          <b>{{ this.decideInfo.applicant }}</b>
+        </h3>
+
+        <p [style.color]="'#545454'">
+          {{ decideInfo.loanApplicationCode }} - {{ loanInfo.branchName }}
+        </p>
+
+        <div class="mb-2">
+          <i [style.color]="'#545454'" class="icon icon-email mr-3"></i>
+          <span>{{ loanInfo.email }}</span>
+        </div>
+
+        <div>
+          <i [style.color]="'#545454'" class="icon icon-phone mr-3"></i>
+          <span>{{ loanInfo.phoneNumber }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content">
+      <div
+        id="tab-BA"
+        class="tab-pane"
+        [ngClass]="selectedTab === 'BA' ? 'active show' : 'hide'"
+      >
+        <div class="row">
+          <div class="col-md-4">
+            <p class="title">Account Sweep</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.behaviouralAnalysis
+                  .accountSweep
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Gambling Rate</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.behaviouralAnalysis
+                  .gamblingRate | number: "1.2-2"
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Inflow Outflow Rate</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.behaviouralAnalysis
+                  .inflowOutflowRate
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Loan Amount</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData
+                    .behaviouralAnalysis.loanAmount | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Loan Inflow Rate</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.behaviouralAnalysis
+                  .loanInflowRate | number: "1.2-2"
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Loan Repayment Inflow Rate</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.behaviouralAnalysis
+                  .loanRepaymentInflowRate | number: "1.2-2"
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Loan Repayment</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.behaviouralAnalysis
+                  .loanRepayments | number: "1.2-2"
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Top Incoming Transfer Account</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.behaviouralAnalysis
+                  .topIncomingTransferAccount
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">LoanTop Transfer Recipient Account</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.behaviouralAnalysis
+                  .topTransferRecipientAccount
+              }}</b>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="tab-CFA"
+        class="tab-pane"
+        [ngClass]="selectedTab === 'CFA' ? 'active show' : 'hide'"
+      >
+        <div class="row">
+          <div class="col-md-4">
+            <p class="title">Account Activity</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                    .accountActivity | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Average Balance</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                    .averageBalance | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Average Credits</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                    .averageCredits | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Closing Balance</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                    .averageCredits | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">First Day</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                  .firstDay | customDatePipe
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Last Day</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                  .lastDay | customDatePipe
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Last Day</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                  .lastDay | customDatePipe
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Net Average Monthly Earnings</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                    .netAverageMonthlyEarnings | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">No of Transacting Months</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                  .noOfTransactingMonths
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Total Credit Turnover</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                    .totalCreditTurnover | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Total Debit Turnover</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                    .totalDebitTurnover | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Year in Statement</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.cashFlowAnalysis
+                  .yearInStatement
+              }}</b>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="tab-IA"
+        class="tab-pane"
+        [ngClass]="selectedTab === 'IA' ? 'active show' : 'hide'"
+      >
+        <div class="row">
+          <div class="col-md-4">
+            <p class="title">Average Other Income</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                    .averageOtherIncome | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Average Salary</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                    .averageSalary | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Confidence Interval on Salary Detection</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                  .confidenceIntervalOnSalaryDetection | number: "1.2-2"
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Expected Salary Day</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                  .expectedSalaryDay
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Last Salary Date</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                  .lastSalaryDate | customDatePipe
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Median Income</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                    .medianIncome | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Number of Other Income Payments</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                  .numberOtherIncomePayments
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Number of Salary Payment</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                  .numberOfSalaryPayments
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Salary Earner</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                  .salaryEarner
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Salary Frequency</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.incomeAnalysis
+                  .salaryFrequency
+              }}</b>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="tab-SA"
+        class="tab-pane"
+        [ngClass]="selectedTab === 'SA' ? 'active show' : 'hide'"
+      >
+        <div class="row">
+          <div class="col-md-4">
+            <p class="title">Airtime</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .airtime | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">ATM Withdrawals Spend</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .atmWithdrawalsSpend
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Average Recurring Expense</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .averageRecurringExpense | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Bank Charges</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .bankCharges | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Bills</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .bills | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Cable TV</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .cableTv | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Clubs and Bars</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .clubsAndBars | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Gambling</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .gambling | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Has Recurring Expense</p>
+            <p class="text" [style.color]="'#545454'">
+              <b>{{
+                decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                  .hasRecurringExpense
+              }}</b>
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">International Transactions Spend</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .internationalTransactionsSpend | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">POS Spend</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .posSpend | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Religious Giving</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .religiousGiving | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Spend on Transfers</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .spendOnTransfers | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Total Expenses</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .totalExpenses | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">USSD Transactions</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .ussdTransactions | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Utilities and Internet</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .utilitiesAndInternet | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+
+          <div class="col-md-4">
+            <p class="title">Web Spend</p>
+            <p class="text" [style.color]="'#545454'">
+              <b
+                >{{ ownerInformation?.currency?.currencySymbol }}{{
+                  decideInfo.bankStatementAnalysisResponseData.spendAnalysis
+                    .webSpend | number: "1.2-2"
+                }}</b
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

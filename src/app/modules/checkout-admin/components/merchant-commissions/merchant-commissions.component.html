@@ -1,0 +1,18 @@
+<lnd-table
+  [isLoading]="isLoading"
+  [config]="tableConfig"
+  [pagination]="pagination"
+  [headers]="tableHeaders"
+  [data]="tableData"
+  [complexFilters]="filters"
+  [useComplexFilters]="true"
+  [rowClickable]="false"
+  (complexFiltersChange)="onComplexFiltersChange($event)"
+  [searchColumns]="pagination?.searchColumns"
+  (paginationChange)="onPaginationChange($event)"
+  (searchParams)="onSearchParams($event)"
+  (filter)="onFilter($event)"
+  noDataTitle="Invoice page is empty by default"
+  noDataDesc="Use the filter button to display specific content based
+  on your preferences."
+></lnd-table>

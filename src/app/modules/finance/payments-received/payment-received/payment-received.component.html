@@ -1,0 +1,420 @@
+<div class="d-flex justify-content-center">
+  <lnd-spinner *ngIf="isLoading && !selectedPayment" text="Retrieving Payment..." [color]="currentTheme?.secondaryColor"></lnd-spinner>
+</div>
+
+<div *ngIf="selectedPayment" class="wrapper single-view">
+  <div class="d-flex flex-row">
+    <div class="left pr-4">
+      <div class="top">
+        <header
+          class="w-100 d-flex align-items-center justify-content-between mb-3"
+        >
+          <h1 class="dt-page__title mb-0">Payment</h1>
+          <span class="float-right role-add">
+            <a
+              *ngIf="user?.permission?.includes('Create Finance Payment')"
+              class="btn btn-primary mr-2 text-white"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [routerLink]="['/finance/payments-received/create']"
+              routerLinkActive="router-link-active"
+              href="javascript:void(0)"
+            >
+              <i class="icon icon-add-circle mr-2"></i>Add Payment</a
+            >
+          </span>
+        </header>
+      </div>
+
+      <div class="body">
+        <div class="card">
+          <div class="card-body p-0">
+            <ul class="payment-list">
+              <li
+                *ngFor="let item of allPayments"
+                (click)="viewPayment(item.financePaymentId)"
+                [style.border-left]="
+                  selectedPayment?.financePaymentId === item?.financePaymentId
+                    ? '5px solid ' + currentTheme.secondaryColor
+                    : ''
+                "
+                (mouseover)="item.hover = true"
+                (mouseleave)="selectedPayment?.financePaymentId !== item?.financePaymentId ? item.hover = false : null"
+                [ngStyle]="item.hover ? hoverStyle : {}"
+              >
+                <span
+                  class="d-flex justify-content-between align-items-center title"
+                >
+                  <span>{{ item?.personName }}</span>
+                  <span
+                    >{{ appOwner?.currency?.currencySymbol
+                    }}{{ item?.paymentAmount | number : "1.2-2" }}</span
+                  >
+                </span>
+                <span
+                  class="d-flex justify-content-between align-items-center sub-title mt-2"
+                >
+                  <span>
+                    {{ item?.paymentCode }} |
+                    {{ item?.paymentMadeDate | customDatePipe : "DD-MMM-YY" }}
+                  </span>
+                  <span>
+                    <span
+                      class="badge badge-sm"
+                      [ngClass]="{
+                        'badge-warning': item.status === 'Draft',
+                        'badge-approval': item.status === 'Sent For Approval',
+                        'badge-success': item.status === 'Posted',
+                        'badge-danger': item.status === 'Rejected',
+                        'badge-redraft': item.status === 'Redraft',
+                        'badge-danger': item?.status === 'Overdue'
+                      }"
+                      >{{
+                        item.status === "Sent For Approval"
+                          ? "Awaiting Approval"
+                          : item?.status
+                      }}</span
+                    >
+                  </span>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="selectedPayment && !isLoading; else loading" class="right px-2">
+      <div class="top card mb-3">
+        <div class="card-body">
+          <header class="float-right">
+            <button
+              *ngIf="
+                selectedPayment?.status === 'Sent For Approval' &&
+                user?.permission?.includes('Approve Finance Payment')
+              "
+              class="btn btn-review btn-xs"
+              (click)="openModal(approval)"
+            >
+              Review Request
+            </button>
+
+            <button
+              class="btn btn-xs btn-primary"
+              (click)="printPayment(selectedPayment?.peronsName)"
+            >
+              {{ printStatus }}
+              <i
+                *ngIf="printStatus === 'Processing'"
+                class="icon icon-spin icon-spin2"
+              ></i>
+            </button>
+            <button
+              *ngIf="
+                user?.permission?.includes('Edit Finance Payment') &&
+                (selectedPayment?.status === 'Draft' ||
+                  selectedPayment?.status === 'Redraft')
+              "
+              class="btn btn-xs btn-light"
+              [routerLink]="
+                '/finance/payments-received/edit/' +
+                selectedPayment?.financePaymentId
+              "
+            >
+              Edit
+            </button>
+            <button
+              class="btn btn-xs btn-outline-dark"
+              (click)="closePaymentModal()"
+            >
+              Close
+            </button>
+          </header>
+        </div>
+      </div>
+
+      <div
+        id="tabs"
+        class="d-flex justify-content-between align-items-center py-2"
+        style="padding-left: 30px"
+      >
+        <ul
+          id="active-div"
+          class="card-header-pills nav nav-pill justify-content-center align-items-center"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              id="nav-overview"
+              class="nav-link pool-nav active-tab"
+              data-toggle="tab"
+              href="#tab-overview"
+              role="tab"
+              aria-controls="tab-overview"
+              aria-selected="false"
+              (click)="switchTabs('overview')"
+              >Overview</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-comments"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-comments"
+              role="tab"
+              aria-controls="tab-comments"
+              aria-selected="false"
+              (click)="switchTabs('comments')"
+              >Comments</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-activity"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-activity"
+              role="tab"
+              aria-controls="tab-activity"
+              aria-selected="false"
+              (click)="switchTabs('activity')"
+              >Activity Logs</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-files"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-files"
+              role="tab"
+              aria-controls="tab-files"
+              aria-selected="false"
+              (click)="switchTabs('files')"
+              >Files</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="tab-content">
+        <div id="tab-overview" class="tab-pane active show">
+          <div class="paper p-5" #paymentPaper>
+            <div class="card">
+              <lnd-ribbon [status]="selectedPayment.status"></lnd-ribbon>
+              <div class="card-body">
+                <div class="content">
+                  <header class="row">
+                    <div class="col-md-4">
+                      <img class="img-fluid logo d-block" [src]="base64Image" />
+                      <p class="h3 mb-1">{{ appOwner?.appOwnerName }}</p>
+                      <p class="mb-1">{{ appOwner?.appOwnerEmail }}</p>
+                      <p class="mb-1">
+                        {{ appOwner?.appOwnerBillingAddress }}
+                      </p>
+                    </div>
+                  </header>
+                  <p class="text-center">PAYMENT RECIEPT</p>
+                  <div class="row mt-6 mb-6">
+                    <div class="col-md-8">
+                      <div class="d-flex align-items-center">
+                        <p>Payment Date :</p>
+                        <p class="ml-2">
+                          <b>{{
+                            selectedPayment.paymentMadeDate | customDatePipe
+                          }}</b>
+                        </p>
+                      </div>
+
+                      <div class="d-flex align-items-center">
+                        <p>Payment Code :</p>
+                        <p
+                          class="ml-2"
+                          [style.color]="currentTheme?.secondaryColor"
+                        >
+                          <b>{{ selectedPayment.paymentCode }}</b>
+                        </p>
+                      </div>
+
+                      <div class="d-flex align-items-center">
+                        <p>Payment Mode :</p>
+                        <p class="ml-2">
+                          <b>{{ selectedPayment.paymentModeName }}</b>
+                        </p>
+                      </div>
+
+                      <div class="d-flex align-items-center">
+                        <p>Paid Through :</p>
+                        <p class="ml-2">
+                          <b>{{ selectedPayment.paidThroughAccountName }}</b>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div
+                        class="d-flex justify-content-end align-items-center"
+                      >
+                        <div
+                          class="text-white p-6"
+                          style="background-color: #6faa8f"
+                        >
+                          <p class="text-center">Amount Recieved</p>
+                          <p class="text-center">
+                            <b
+                              >{{ appOwner?.currency?.currencySymbol
+                              }}{{
+                                selectedPayment.paymentAmount | number : "1.2-2"
+                              }}</b
+                            >
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p class="mt-6">Payment For</p>
+                  <table class="table mt-6 items-table">
+                    <thead [style.background]="currentTheme.primaryColor">
+                      <th>#</th>
+                      <th class="text-right">
+                        Amount Received ({{
+                          appOwner?.currency?.currencySymbol
+                        }})
+                      </th>
+                      <th class="text-right">
+                        Witholding Tax ({{
+                          appOwner?.currency?.currencySymbol
+                        }})
+                      </th>
+                      <th class="text-right">
+                        Payment Amount ({{
+                          appOwner?.currency?.currencySymbol
+                        }})
+                      </th>
+                    </thead>
+                    <tbody>
+                      <tr
+                        *ngFor="
+                          let invoice of selectedPayment.paymentLines;
+                          let i = index
+                        "
+                      >
+                        <td [style.color]="currentTheme?.secondaryColor">
+                          {{ invoice.invoiceCode }}
+                        </td>
+                        <!-- <td>{{invoice.}}</td> -->
+                        <td class="text-right">
+                          {{ invoice.amountAllocated | number : "1.2-2" }}
+                        </td>
+                        <td class="text-right">
+                          {{ invoice.whtAmount }}
+                        </td>
+                        <td class="text-right">
+                          {{ invoice.amountExpected | number : "1.2-2" }}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-comments" class="tab-pane">
+          <div class="p-5">
+            <div class="card">
+              <app-comments
+                [comments]="selectedPayment?.financePaymentStatusCommentData"
+                [caller]="'singleView'"
+              ></app-comments>
+
+              <no-data
+                *ngIf="
+                  selectedPayment?.financePaymentStatusCommentData.length === 0
+                "
+                [currentTheme]="currentTheme"
+                [title]="'No Comments'"
+              ></no-data>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-activity" class="tab-pane">
+          <div class="p-5">
+            <div class="card">
+              <table
+                *ngIf="activityLogs.length > 0"
+                class="table mb-0 table-striped"
+                style="font-size: 11px"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Activity</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of activityLogs">
+                    <td [style.color]="currentTheme?.secondaryColor">
+                      {{ row?.relatedObjectInitiatorCode }}
+                    </td>
+                    <td>{{ row?.activityDescription }}</td>
+                    <td>
+                      {{ row?.activityDate | customDatePipe }}
+                      <i class="icon icon-timepicker ml-3"></i>
+                      {{ row?.activityDate | date : "shortTime" }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div
+                *ngIf="activityLogs.length === 0"
+                class="d-flex flex-column align-items-center w-100 py-3"
+              >
+                <p class="display-4 text-center font-weight-light mb-0">
+                  No Activities Available
+                </p>
+                <img
+                  src="assets/images/no data.svg"
+                  alt="no-data-svg"
+                  width="200px"
+                  class="py-5"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-files" class="tab-pane">
+          <lnd-uploaded-files
+            [files]="selectedPayment.files"
+          ></lnd-uploaded-files>
+        </div>
+      </div>
+    </div>
+    <ng-template #loading>
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="text-center right px-2"
+      >
+        Retrieving Payment... <i class="icon icon-spin icon-spin2"></i>
+      </p>
+    </ng-template>
+  </div>
+</div>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [isLoading]="isLoading"
+    [comments]="selectedPayment?.financePaymentStatusCommentData"
+    feature="payments received"
+    [isLoading]="isLoading"
+    [canApprove]="user?.permission?.includes('Approve Finance Payment')"
+    (sendPayload)="submit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>

@@ -1,0 +1,455 @@
+<form *ngIf="smsEvents" [formGroup]="form">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card mb--20">
+        <div class="bg-transparent card-header card-nav">
+          <h2 class="mb--20">Settings</h2>
+        </div>
+        <div class="dt-card__body">
+          <div class="d-flex justify-content-between align-items-center">
+            <p class="mb-3">Status</p>
+            <span *ngIf="loadingState.isLoading && !activateSms" [style.color]="currentTheme.secondaryColor"><i class="icon icon-spin icon-spin2"></i> Deactivating ...</span>
+            <lnd-switch
+              *ngIf="!loadingState.isLoading"
+              [value]="activateSms"
+              (emittedValue)="toggleSms($event)"
+            />
+          </div>
+
+          <div *ngIf="activateSms" class="my-2">
+            <p class="mb-3">Provider</p>
+            <slct-2
+              [data]="smsProviders"
+              [customSearchEnabled]="true"
+              placeholder="Search sms providers"
+              formControlName="smsProvider"
+            ></slct-2>
+
+            <button
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              class="btn btn-sm text-uppercase btn-block my-5 text-white"
+              (click)="activateSmsProvider()"
+              [disabled]="loadingState.isLoading"
+            >
+              <i
+                *ngIf="loadingState.isLoading"
+                class="icon icon-spin icon-spin2"
+              ></i>
+              {{
+                !loadingState.isLoading ? "Change Provider" : loadingState.text
+              }}
+            </button>
+          </div>
+
+          <div *ngIf="activateSms" class="helpers">
+            <p>Template variables</p>
+            <p class="mb-2">
+              <small
+                >Each of these variables represents data that is unique to each
+                sms recepients. Click on any to copy and paste in the template
+                area.</small
+              >
+            </p>
+            <span
+              *ngFor="let helper of smsTemplateSyntaxStrings"
+              (click)="copyKey(helper)"
+              class="badge badge-pill badge-light mr-1 mb-1 cursor"
+              >{{ helper }}</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card mb--20">
+        <div class="bg-transparent card-header card-nav">
+          <h2 class="mb--20">Templates</h2>
+        </div>
+        <div class="dt-card__body">
+          <div class="templates">
+            <div id="accordion">
+              <div class="card">
+                <div
+                  class="card-header pointer"
+                  id="headingOne"
+                  data-toggle="collapse"
+                  data-target="#collapseOne"
+                  aria-expanded="true"
+                  aria-controls="collapseOne"
+                >
+                  <h5 class="mb-0">
+                    <button class="btn btn-link">
+                      Loan approved SMS template
+                    </button>
+                  </h5>
+                </div>
+
+                <div
+                  id="collapseOne"
+                  class="collapse show"
+                  aria-labelledby="headingOne"
+                  data-parent="#accordion"
+                >
+                  <div class="card-body">
+                    <div class="d-flex mb-3 align-items-center">
+                      <p class="mr-5 mb-0">Status</p>
+                      <lnd-switch
+                        [value]="smsEvents?.LoanApproved?.IsActive"
+                        (emittedValue)="
+                          toggleStatusSwitch($event, 'LoanApproved')
+                        "
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Template</label>
+                      <textarea
+                        [value]="smsEvents?.LoanApproved?.Template"
+                        cols="4"
+                        rows="5"
+                        (keyup)="
+                          setTemplate($event.target.value, 'LoanApproved')
+                        "
+                        class="form-control"
+                        [ngClass]="{
+                          'border-red':
+                            smsEvents?.LoanApproved?.Template?.length > 160
+                        }"
+                      ></textarea>
+                      <small
+                        *ngIf="smsEvents?.LoanApproved?.Template?.length > 160"
+                        class="mt-4 text-danger"
+                        >Template exceeds 160 characters</small
+                      >
+                      <div class="float-right">
+                        <small>
+                          {{ smsEvents?.LoanApproved?.Template?.length }}/160
+                          <span
+                            *ngIf="
+                              smsEvents?.LoanApproved?.Template?.length > 160
+                            "
+                            >({{
+                              smsEvents?.LoanApproved?.Template?.length / 160
+                                | number : "1.0-0"
+                            }}
+                            pages)</span
+                          >
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div
+                  class="card-header pointer"
+                  id="headingTwo"
+                  data-toggle="collapse"
+                  data-target="#collapseTwo"
+                  aria-expanded="false"
+                  aria-controls="collapseTwo"
+                >
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed">
+                      Loan disbursed sms template
+                    </button>
+                  </h5>
+                </div>
+                <div
+                  id="collapseTwo"
+                  class="collapse"
+                  aria-labelledby="headingTwo"
+                  data-parent="#accordion"
+                >
+                  <div class="card-body">
+                    <div class="d-flex mb-3 align-items-center">
+                      <p class="mr-5 mb-0">Status</p>
+                      <lnd-switch
+                        [value]="smsEvents?.LoanDisbursed?.IsActive"
+                        (emittedValue)="
+                          toggleStatusSwitch($event, 'LoanDisbursed')
+                        "
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Template</label>
+                      <textarea
+                        [value]="smsEvents?.LoanDisbursed?.Template"
+                        cols="4"
+                        rows="5"
+                        (keyup)="
+                          setTemplate($event.target.value, 'LoanDisbursed')
+                        "
+                        class="form-control"
+                        [ngClass]="{
+                          'border-red':
+                            smsEvents?.LoanDisbursed?.Template?.length > 160
+                        }"
+                      ></textarea>
+                      <small
+                        *ngIf="smsEvents?.LoanDisbursed?.Template?.length > 160"
+                        class="mt-4 text-danger"
+                        >Template exceeds 160 characters</small
+                      >
+
+                      <div class="float-right">
+                        <small>
+                          {{ smsEvents?.LoanDisbursed?.Template?.length }}/160
+                          <span
+                            *ngIf="
+                              smsEvents?.LoanDisbursed?.Template?.length > 160
+                            "
+                            >({{
+                              smsEvents?.LoanDisbursed?.Template?.length / 160
+                                | number : "1.0-0"
+                            }}
+                            pages)</span
+                          >
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card">
+                <div
+                  class="card-header pointer"
+                  id="headingThree"
+                  data-toggle="collapse"
+                  data-target="#collapseThree"
+                  aria-expanded="false"
+                  aria-controls="collapseThree"
+                >
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed">
+                      Loan settled sms template
+                    </button>
+                  </h5>
+                </div>
+                <div
+                  id="collapseThree"
+                  class="collapse"
+                  aria-labelledby="headingThree"
+                  data-parent="#accordion"
+                >
+                  <div class="card-body">
+                    <div class="d-flex mb-3 align-items-center">
+                      <p class="mr-5 mb-0">Status</p>
+                      <lnd-switch
+                        [value]="smsEvents?.LoanSettled?.IsActive"
+                        (emittedValue)="
+                          toggleStatusSwitch($event, 'LoanSettled')
+                        "
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Template</label>
+                      <textarea
+                        [value]="smsEvents?.LoanSettled?.Template"
+                        cols="4"
+                        rows="5"
+                        (keyup)="
+                          setTemplate($event.target.value, 'LoanSettled')
+                        "
+                        class="form-control"
+                        [ngClass]="{
+                          'border-red':
+                            smsEvents?.LoanSettled?.Template?.length > 160
+                        }"
+                      ></textarea>
+                      <small
+                        *ngIf="smsEvents?.LoanSettled?.Template?.length > 160"
+                        class="mt-4 text-danger"
+                        >Template exceeds 160 characters</small
+                      >
+                      <div class="float-right">
+                        <small>
+                          {{ smsEvents?.LoanSettled?.Template?.length }}/160
+                          <span
+                            *ngIf="
+                              smsEvents?.LoanSettled?.Template?.length > 160
+                            "
+                            >({{
+                              smsEvents?.LoanSettled?.Template?.length / 160
+                                | number : "1.0-0"
+                            }}
+                            pages)</span
+                          >
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div
+                  class="card-header pointer"
+                  id="headingFour"
+                  data-toggle="collapse"
+                  data-target="#collapseFour"
+                  aria-expanded="false"
+                  aria-controls="collapseFour"
+                >
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed">
+                      Loan repayment due sms template
+                    </button>
+                  </h5>
+                </div>
+                <div
+                  id="collapseFour"
+                  class="collapse"
+                  aria-labelledby="headingFour"
+                  data-parent="#accordion"
+                >
+                  <div class="card-body">
+                    <div class="d-flex mb-3 align-items-center">
+                      <p class="mr-5 mb-0">Status</p>
+                      <lnd-switch
+                        [value]="smsEvents?.LoanRepaymentDue?.IsActive"
+                        (emittedValue)="
+                          toggleStatusSwitch($event, 'LoanRepaymentDue')
+                        "
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Template</label>
+                      <textarea
+                        [value]="smsEvents?.LoanRepaymentDue?.Template"
+                        cols="4"
+                        rows="5"
+                        (keyup)="
+                          setTemplate($event.target.value, 'LoanRepaymentDue')
+                        "
+                        class="form-control"
+                        [ngClass]="{
+                          'border-red':
+                            smsEvents?.LoanRepaymentDue?.Template?.length > 160
+                        }"
+                      ></textarea>
+                      <small
+                        *ngIf="
+                          smsEvents?.LoanRepaymentDue?.Template?.length > 160
+                        "
+                        class="mt-4 text-danger"
+                        >Template exceeds 160 characters</small
+                      >
+                      <div class="float-right">
+                        <small>
+                          {{ smsEvents?.LoanRepaymentDue?.Template?.length }}/160
+                          <span
+                            *ngIf="
+                              smsEvents?.LoanRepaymentDue?.Template?.length > 160
+                            "
+                            >({{
+                              smsEvents?.LoanRepaymentDue?.Template?.length / 160
+                                | number : "1.0-0"
+                            }}
+                            pages)</span
+                          >
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div
+                  class="card-header pointer"
+                  id="headingFour"
+                  data-toggle="collapse"
+                  data-target="#collapseFive"
+                  aria-expanded="false"
+                  aria-controls="collapseFive"
+                >
+                  <h5 class="mb-0">
+                    <button class="btn btn-link collapsed">
+                      Loan payment posted sms template
+                    </button>
+                  </h5>
+                </div>
+                <div
+                  id="collapseFive"
+                  class="collapse"
+                  aria-labelledby="headingFour"
+                  data-parent="#accordion"
+                >
+                  <div class="card-body">
+                    <div class="d-flex mb-3 align-items-center">
+                      <p class="mr-5 mb-0">Status</p>
+                      <lnd-switch
+                        [value]="smsEvents?.LoanPaymentMade?.IsActive"
+                        (emittedValue)="
+                          toggleStatusSwitch($event, 'LoanPaymentMade')
+                        "
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label>Template</label>
+                      <textarea
+                        [value]="smsEvents?.LoanPaymentMade?.Template"
+                        cols="4"
+                        rows="5"
+                        (keyup)="
+                          setTemplate($event.target.value, 'LoanPaymentMade')
+                        "
+                        class="form-control"
+                        [ngClass]="{
+                          'border-red':
+                            smsEvents?.LoanPaymentMade?.Template?.length > 160
+                        }"
+                      ></textarea>
+                      <small
+                        *ngIf="
+                          smsEvents?.LoanPaymentMade?.Template?.length > 160
+                        "
+                        class="mt-4 text-danger"
+                        >Template exceeds 160 characters</small
+                      >
+                      <div class="float-right">
+                        <small>
+                          {{ smsEvents?.LoanPaymentMade?.Template?.length }}/160
+                          <span
+                            *ngIf="
+                              smsEvents?.LoanPaymentMade?.Template?.length > 160
+                            "
+                            >({{
+                              smsEvents?.LoanPaymentMade?.Template?.length / 160
+                                | number : "1.0-0"
+                            }}
+                            pages)</span
+                          >
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-3">
+              <button
+                *ngIf="!loadingState.isLoading"
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                [style.borderColor]="currentTheme?.secondaryColor"
+                class="btn btn-primary btn-sm text-uppercase orange-bg"
+                (click)="saveTemplates()"
+                [disabled]="invalidTemplates.length > 0"
+              >
+                Update Template
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary btn-sm text-uppercase orange-bg"
+                *ngIf="loadingState.isLoading"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Updating ...
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

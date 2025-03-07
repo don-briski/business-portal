@@ -1,0 +1,81 @@
+<header class="mb-3">
+  <h3 [style.color]="currentTheme?.secondaryColor" class="mb-2">
+    Update Mono Integration Details
+  </h3>
+
+  <p>
+    Mono is currently
+    <span
+      class="ml-2 badge badge-pill"
+      [ngClass]="form.value.isActive ? 'badge-success' : 'badge-danger'"
+      >{{ form.value.isActive ? "Active" : "Inactive" }}</span
+    >
+  </p>
+</header>
+
+<form [formGroup]="form">
+  <div class="form-group">
+    <div class="row">
+      <div class="col-md-3">
+        <lnd-switch
+          [value]="form.value.isActive"
+          text="Activate Mono"
+          (emittedValue)="toggleSwitch('isActive', $event)"
+        ></lnd-switch>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>API Secret Key</label>
+    <input
+      type="text"
+      formControlName="apiSecretKey"
+      class="form-control"
+      placeholder="Enter API Secret Key"
+    />
+  </div>
+
+  <div class="form-group">
+    <label>API Public Key</label>
+    <input
+      type="text"
+      formControlName="apiPublicKey"
+      class="form-control"
+      placeholder="Enter API Public Key"
+    />
+  </div>
+
+  <div class="form-group">
+    <label>Sender ID</label>
+    <input
+      type="text"
+      formControlName="senderName"
+      class="form-control"
+      placeholder="Enter Sender ID"
+    />
+  </div>
+
+  <div class="form-group">
+    <label>Webhook Secret</label>
+    <input
+      type="text"
+      formControlName="webHookSecret"
+      class="form-control"
+      placeholder="Enter Webhook Secret"
+    />
+  </div>
+
+  <div class="form-group">
+    <button
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      (click)="updateConfig()"
+      class="btn btn-primary btn-sm text-uppercase orange-bg"
+      [disabled]="form.invalid || isLoading"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="isLoading"></i>
+      {{ isLoading ? "Updating..." : "Update" }}
+    </button>
+  </div>
+</form>

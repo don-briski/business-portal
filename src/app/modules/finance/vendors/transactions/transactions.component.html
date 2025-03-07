@@ -1,0 +1,421 @@
+<header class="row">
+  <div class="col-md-4">
+    <slct-2
+      [data]="transactions"
+      (selected)="fetchTransactionDetails($event.text)"
+      id="protocol"
+      [customSearchEnabled]="true"
+      [placeholder]="'Search Transactions'"
+    ></slct-2>
+  </div>
+</header>
+
+<div>
+  <div
+    *ngIf="isLoading"
+    [style.color]="currentTheme?.secondaryColor"
+    class="d-flex justify-content-center"
+  >
+    <p>
+      <span>Retrieving data...</span>
+      <i class="icon icon-spin icon-spin2"></i>
+    </p>
+  </div>
+
+  <div *ngIf="!noResultFound">
+    <div class="mt-4" *ngIf="pagination.count > 0">
+      <lnd-table-header
+        [pagination]="pagination"
+        [currentTheme]="currentTheme"
+        [isLoading]="isLoading"
+        (paginationChange)="fetchTransactionDetails(type, null, $event)"
+        placeholder="Code"
+      ></lnd-table-header>
+    </div>
+
+    <table
+      *ngIf="!isLoading && expenses.length > 0"
+      class="table mt-5 table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Reference</th>
+          <th>Date</th>
+          <th class="text-right">
+            ({{ ownerInformation?.currency?.currencySymbol }}) Total Amount
+          </th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let expense of expenses">
+          <td
+            class="cursor"
+            [style.color]="currentTheme?.secondaryColor"
+            (click)="onViewRelatedEntity('Expense', expense.expenseId)"
+          >
+            {{ expense.expenseCode }}
+          </td>
+          <td>{{ expense.reference ? expense.reference : "-" }}</td>
+          <td>{{ expense.date | date : "mediumDate" }}</td>
+          <td class="text-right">
+            {{ expense.totalAmount | number : "1.2-2" }}
+          </td>
+          <td>
+            <span
+              class="badge btn-xs mb-1 mr-1"
+              [ngClass]="{
+                'badge-warning': expense.status === 'Draft',
+                'badge-approval': expense.status === 'SentForApproval',
+                'badge-success': expense.status === 'Posted',
+                'badge-redraft': expense.status === 'Redraft',
+                'badge-danger': expense.status === 'Rejected'
+              }"
+              >{{
+                expense.status === "SentForApproval"
+                  ? "Awaiting Approval"
+                  : (expense.status | humanify)
+              }}</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table
+      *ngIf="!isLoading && purchaseOrders.length > 0"
+      class="table mt-5 table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Vendor</th>
+          <th>Date</th>
+          <th>
+            <span
+              >EDD
+              <i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="Expected delivery date"
+              ></i
+            ></span>
+          </th>
+          <th>Reference</th>
+          <th class="text-right">
+            ({{ ownerInformation?.currency?.currencySymbol }}) Total Amount
+          </th>
+          <th class="text-right">Status</th>
+          <th></th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let purchaseOrder of purchaseOrders">
+          <td
+            class="cursor"
+            [style.color]="currentTheme?.secondaryColor"
+            (click)="
+              onViewRelatedEntity(
+                'PurchaseOrder',
+                purchaseOrder.purchaseOrderId
+              )
+            "
+          >
+            {{ purchaseOrder?.purchaseOrderCode }}
+          </td>
+          <td>{{ purchaseOrder?.vendor?.vendorName | titlecase }}</td>
+          <td>{{ purchaseOrder?.date | date : "mediumDate" }}</td>
+          <td>
+            {{ purchaseOrder?.expectedDeliveryDate | date : "mediumDate" }}
+          </td>
+          <td>{{ purchaseOrder?.reference }}</td>
+          <td class="text-right">
+            {{ purchaseOrder?.totalAmount | number : "1.2-2" }}
+          </td>
+          <td class="text-right">
+            <span
+              *ngIf="purchaseOrder?.status === 'Open'"
+              class="badge badge-pill badge-sm mb-1 mr-1"
+              [ngClass]="
+                purchaseOrder.billedStatus === 'NotBilled'
+                  ? 'badge-warning'
+                  : 'badge-success'
+              "
+              >{{ purchaseOrder.billedStatus | humanify }}</span
+            >
+            <span
+              class="badge btn-xs mb-1 mr-1"
+              [ngClass]="{
+                'badge-warning': purchaseOrder.status === 'Draft',
+                'badge-approval': purchaseOrder.status === 'SentForApproval',
+                'badge-success': purchaseOrder.status === 'Posted',
+                'badge-redraft': purchaseOrder.status === 'Redraft',
+                'badge-danger': purchaseOrder.status === 'Rejected'
+              }"
+              >{{
+                purchaseOrder.status === "SentForApproval"
+                  ? "Awaiting Approval"
+                  : (purchaseOrder.status | humanify)
+              }}</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table
+      *ngIf="!isLoading && bills.length > 0"
+      class="table mt-5 table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Vendor</th>
+          <th>Reference</th>
+          <th>Bill Date</th>
+          <th>Due Date</th>
+          <th class="text-right">
+            Total Amount ({{ ownerInformation?.currency?.currencySymbol }})
+          </th>
+          <th class="text-right">
+            Amount Due ({{ ownerInformation?.currency?.currencySymbol }})
+          </th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of bills">
+          <td
+            [style.color]="currentTheme?.secondaryColor"
+            class="cursor"
+            (click)="onViewRelatedEntity('Bill', item.billId)"
+          >
+            {{ item?.billCode }}
+          </td>
+          <td>{{ item?.vendorName }}</td>
+          <td>{{ item?.billReference }}</td>
+          <td>{{ item?.billDate | date : "mediumDate" }}</td>
+          <td>{{ item?.billDueDate | date : "mediumDate" }}</td>
+          <td class="text-right">
+            {{ item?.totalAmount | number : "1.2-2" }}
+          </td>
+          <td class="text-right">
+            {{ item?.balanceDue | number : "1.2-2" }}
+          </td>
+          <td>
+            <span
+              class="badge badge-sm"
+              [ngClass]="{
+                'badge-warning': item?.billStatus === 'Draft',
+                'badge-approval': item?.billStatus === 'Sent For Approval',
+                'badge-success':
+                  item?.billStatus === 'Posted' &&
+                  item?.paymentStatus === 'Paid',
+                'badge-notPaid':
+                  item?.billStatus === 'Posted' &&
+                  item?.paymentStatus === 'Not Paid',
+                'badge-partiallyPaid':
+                  item?.billStatus === 'Posted' &&
+                  item?.paymentStatus === 'Partially Paid',
+                'badge-redraft': item?.billStatus === 'Redraft',
+                'badge-danger': item?.billStatus === 'Rejected',
+                'badge-overdue': item?.billStatus === 'Overdue'
+              }"
+            >
+              <span *ngIf="item?.billStatus !== 'Posted'">
+                {{
+                  item?.billStatus === "Sent For Approval"
+                    ? "Awaiting Approval"
+                    : item?.billStatus
+                }}
+              </span>
+              <span *ngIf="item?.billStatus === 'Posted'">
+                {{ item?.paymentStatus }}
+              </span>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table
+      *ngIf="!isLoading && payments.length > 0"
+      class="table mt-5 table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Vendor</th>
+          <th class="text-right">Amount</th>
+          <th>Payment Date</th>
+          <th>Paid Through</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of payments">
+          <td
+            [style.color]="currentTheme?.secondaryColor"
+            class="cursor"
+            (click)="onViewRelatedEntity('PaymentMade', item.financePaymentId)"
+          >
+            {{ item?.paymentCode }}
+          </td>
+          <td>{{ item?.peronsName }}</td>
+          <td class="text-right">
+            {{ item?.paymentAmount | number : "1.2-2" }}
+          </td>
+          <td>
+            {{ item?.paymentMadeDate | date : "mediumDate" }}
+          </td>
+          <td>{{ item?.paidThroughAccountName }}</td>
+          <td>
+            <span
+              class="badge badge-sm"
+              [ngClass]="{
+                'badge-warning': item?.status === 'Draft',
+                'badge-approval': item?.status === 'Sent For Approval',
+                'badge-success': item?.status === 'Posted',
+                'badge-redraft': item?.status === 'Redraft',
+                'badge-danger': item?.status === 'Rejected'
+              }"
+              >{{
+                item?.status === "Sent For Approval"
+                  ? "Awaiting Approval"
+                  : (item?.status | humanify)
+              }}</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table
+      *ngIf="!isLoading && vcns.length > 0"
+      class="table mt-5 table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Vendor</th>
+          <th>Date</th>
+          <th class="text-right">
+            Total Amount ({{ ownerInformation.currency.currencySymbol }})
+          </th>
+          <th class="text-right">
+            Credits Remaining ({{ ownerInformation.currency.currencySymbol }})
+          </th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let vcnote of vcns">
+          <td
+            [style.color]="currentTheme.secondaryColor"
+            class="cursor"
+            (click)="
+              onViewRelatedEntity('VendorCreditNote', vcnote.vendorCreditNoteId)
+            "
+          >
+            {{ vcnote.code }}
+          </td>
+          <td>{{ vcnote.vendor }}</td>
+          <td>
+            {{ vcnote.date | customDatePipe : "DD-MMM-YY" }}
+          </td>
+          <td class="text-right">
+            {{ vcnote.totalAmount | number : "1.2-2" }}
+          </td>
+          <td class="text-right">
+            {{ vcnote.creditsRemaining | number : "1.2-2" }}
+          </td>
+          <td>
+            <span
+              class="badge mb-1 mr-1"
+              [ngClass]="{
+                'badge-warning': vcnote.status === 'Draft',
+                'badge-light': vcnote.status === 'Redraft',
+                'badge-approval': vcnote.status === 'SentForApproval',
+                'badge-success': vcnote.status === 'Posted',
+                'badge-danger': vcnote.status === 'Rejected'
+              }"
+              >{{ vcnote.status | humanify }}</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <table
+      *ngIf="!isLoading && journals.length > 0"
+      class="table mt-5 table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Reference</th>
+          <th>Date</th>
+          <th class="text-right">
+            ({{ ownerInformation?.currency?.currencySymbol }}) Total Amount
+          </th>
+          <th>Created By</th>
+          <th>Created At</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let journal of journals">
+          <td
+            [style.color]="currentTheme?.secondaryColor"
+            class="cursor"
+            (click)="onViewRelatedEntity('Journal', journal.journalId)"
+          >
+            {{ journal.journalCode }}
+          </td>
+          <td>{{ journal.reference }}</td>
+          <td>{{ journal.date | date : "mediumDate" }}</td>
+          <td class="text-right">
+            {{ journal.totalAmount | number : "1.2-2" }}
+          </td>
+          <td>{{ journal.createdBy }}</td>
+          <td>{{ journal.createdAt | date : "mediumDate" }}</td>
+          <td>
+            <span
+              class="badge btn-xs mb-1 mr-1"
+              [ngClass]="{
+                'badge-warning': journal.status === 'Draft',
+                'badge-approval': journal.status === 'SentForApproval',
+                'badge-success': journal.status === 'Posted',
+                'badge-redraft': journal.status === 'Redraft',
+                'badge-danger': journal.status === 'Rejected'
+              }"
+              >{{
+                journal.status === "SentForApproval"
+                  ? "Awaiting Approval"
+                  : journal.status
+              }}</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <lnd-table-footer
+      [pagination]="pagination"
+      (paginationChange)="fetchTransactionDetails(type, null, $event)"
+    ></lnd-table-footer>
+  </div>
+
+  <no-data
+    *ngIf="noResultFound"
+    [currentTheme]="colorTheme"
+    [title]="'No Transactions'"
+  ></no-data>
+</div>

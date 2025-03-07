@@ -1,0 +1,60 @@
+<lnd-popup [togglePopup]="showPopup" (closePopup)="closePopup()">
+  <header
+    class="pop-header d-flex justify-content-between align-items-center w-100"
+  >
+    <h4 class="mb-0">{{ caseType ? "Update" : "Add New" }} Case</h4>
+
+    <span class="pointer" (click)="closePopup()">
+      <img src="assets/images/close.svg" alt="close" />
+    </span>
+  </header>
+
+  <form [formGroup]="form" class="pop-content">
+    <div>
+      <label>Name <b class="text-danger">*</b></label>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Enter case name"
+        formControlName="name"
+      />
+      <lnd-input-errors label="Name" [control]="form.get('name')" />
+    </div>
+
+    <div>
+      <label>Description <b class="text-danger">*</b></label>
+      <textarea
+        type="text"
+        class="form-control"
+        placeholder="Enter case description"
+        formControlName="description"
+      ></textarea>
+      <lnd-input-errors
+        label="Description"
+        [control]="form.get('description')"
+      />
+    </div>
+
+    <div class="d-flex align-items-center">
+      <lnd-switch
+        [value]="form.value.isActive"
+        (emittedValue)="setIsActive($event)"
+      />
+      <span class="ml-3"
+        >Case Type is {{ form.value.isActive ? "Active" : "Inactive" }}</span
+      >
+    </div>
+  </form>
+
+  <footer class="pop-footer">
+    <button class="btn btn-sm" (click)="closePopup()">Cancel</button>
+    <button
+      class="btn btn-sm"
+      [disabled]="form.invalid || isProcessing"
+      (click)="save()"
+    >
+      {{ isProcessing ? "Processing..." : "Save" }}
+      <i *ngIf="isProcessing" class="icon icon-spin icon-spin2"></i>
+    </button>
+  </footer>
+</lnd-popup>

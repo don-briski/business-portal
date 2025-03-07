@@ -1,0 +1,189 @@
+.nav-link {
+  &:hover {
+    color: #545454;
+  }
+}
+
+section {
+  border: 1px dashed gainsboro;
+  padding: 15px;
+  border-radius: 5px;
+  .icon {
+    color: gray;
+  }
+}
+
+#profile-section {
+  .col-md-4 {
+    margin-bottom: 20px;
+  }
+}
+
+.wrapper {
+  .sidebar {
+    width: 25%;
+    position: fixed;
+    height: calc(100vh - 200px);
+    overflow-y: auto;
+
+    ul.journal-list {
+      padding: 0px;
+      list-style: none;
+      li {
+        cursor: pointer;
+        padding: 15px 20px;
+        margin-bottom: 2px;
+        border-left: 5px solid #fff;
+        border-radius: 5px;
+        .title {
+          font-size: 14px;
+          font-weight: bold;
+        }
+        .sub-title {
+          font-size: 11px;
+        }
+        &.selected,
+        &:not(:last-child) {
+          border-bottom: 1px solid #ccc;
+        }
+      }
+    }
+  }
+  .main-content {
+    width: 68%;
+    position: relative;
+    left: 29%;
+
+    a {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.top-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  .left {
+    width: 60%;
+  }
+  .right {
+    width: 40%;
+  }
+}
+
+.col-4 {
+  margin: 10px 0 !important;
+}
+
+.detail {
+  border-top: 1px solid gainsboro;
+  border-right: 1px solid gainsboro;
+  border-bottom: 1px solid gainsboro;
+  padding: 10px 5px;
+  border-radius: 5px 0 0 5px;
+  margin-bottom: 20px;
+
+  small {
+    margin-bottom: 16px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  p {
+    margin-top: 14px;
+    font-size: 16px;
+    margin-bottom: 0;
+  }
+}
+.paper {
+  .ribbon {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    position: absolute;
+  }
+  .ribbon::before,
+  .ribbon::after {
+    position: absolute;
+    z-index: 0;
+    content: "";
+    display: block;
+  }
+  .ribbon.posted::before,
+  .ribbon.posted::after {
+    border: 5px solid #0f7a2a;
+  }
+  .ribbon.draft::before,
+  .ribbon.draft::after {
+    border: 5px solid #5f5f5f;
+  }
+  .ribbon.overdue::before,
+  .ribbon.overdue::after {
+    border: 5px solid #942323;
+  }
+  .ribbon span {
+    position: absolute;
+    display: block;
+    width: 225px;
+    padding: 10px 0;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    color: #fff;
+    font: 700 18px/1 "Lato", sans-serif;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    text-align: center;
+    &.posted {
+      background-color: #1b941b;
+    }
+    &.draft {
+      background-color: #a8a8a8;
+    }
+    &.overdue {
+      background-color: #d13232;
+    }
+  }
+
+  .head {
+    margin-top: 100px;
+    margin-bottom: 30px;
+  }
+
+  .ribbon-top-left {
+    top: -10px;
+    left: -10px;
+  }
+  .ribbon-top-left::before,
+  .ribbon-top-left::after {
+    border-top-color: transparent;
+    border-left-color: transparent;
+  }
+  .ribbon-top-left::before {
+    top: 0;
+    right: 12px;
+  }
+  .ribbon-top-left::after {
+    bottom: 12px;
+    left: 0;
+  }
+  .ribbon-top-left span {
+    right: -25px;
+    top: 30px;
+    transform: rotate(-45deg);
+    z-index: 2;
+  }
+}
+
+.comment {
+  border: 1px solid gainsboro;
+  padding: 8px;
+  width: 50%;
+  border-radius: 5px;
+}
+
+.delete {
+  padding: 10px;
+  border-radius: 5px;
+  position: relative;
+  left: 26px;
+}

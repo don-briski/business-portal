@@ -1,0 +1,343 @@
+<header class="w-100 d-flex align-items-center justify-content-between mb-3">
+  <h1 class="dt-page__title">Workflow</h1>
+  <span class="float-right role-add">
+    <div style="position: relative; right: -5px; bottom: 5px; float: right">
+      <a
+        *ngIf="user?.permission.includes('Create Request')"
+        class="btn btn-primary mr-2 orange-bg text-white"
+        [style.borderColor]="colorTheme.secondaryColor"
+        [style.backgroundColor]="colorTheme.secondaryColor"
+        (click)="onCreateRequest(createReqInitial)"
+      >
+        <i class="icon icon-add-circle mr-2"></i>Add New</a
+      >
+    </div>
+  </span>
+</header>
+<ul
+  id="active-div"
+  class="card-header-pills nav nav-pill justify-content-center w-100 mb-2"
+  role="tablist"
+>
+  <li class="nav-item">
+    <a
+      [ngClass]="{ 'active-tab': currentTabId === 'open' }"
+      class="nav-link pool-nav"
+      href="javascript:void(0)"
+      (click)="onSwitchTab('open')"
+    >
+      Open
+    </a>
+  </li>
+  <li class="nav-item">
+    <a
+      [ngClass]="{ 'active-tab': currentTabId === 'closed' }"
+      class="nav-link pool-nav"
+      href="javascript:void(0)"
+      (click)="onSwitchTab('closed')"
+    >
+      Closed
+    </a>
+  </li>
+</ul>
+<div class="dt-card w-100">
+  <div class="dt-card__body">
+    <header class="my-4">
+      <div class="form-row">
+        <div class="col-md-4">
+          <label style="display: inline-flex"
+            ><span style="padding: 8px 2px; font-size: 12px">Show </span
+            ><select
+              [(ngModel)]="pagination.pageSize"
+              [ngModelOptions]="{ standalone: true }"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height mx-2"
+              (change)="fetchRequests()"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span style="padding: 8px 2px; font-size: 12px"
+              >entries</span
+            ></label
+          >
+        </div>
+
+        <div class="text-center col-md-4">
+          <lnd-spinner *ngIf="fetching"></lnd-spinner>
+        </div>
+
+        <div class="col-md-4">
+          <label style="display: inline-flex; float: right">
+            <input
+              type="search"
+              class="form-control form-control-sm mr-3"
+              placeholder="Enter code"
+              aria-controls="data-table"
+              [(ngModel)]="searchParam"
+              (keydown.enter)="fetchRequests()"
+            />
+
+            <button
+              class="btn btn-xs text-white"
+              [style.background]="colorTheme.secondaryColor"
+              (click)="fetchRequests()"
+            >
+              <i class="icon icon-search"></i>
+            </button>
+          </label>
+        </div>
+      </div>
+      <lnd-selected-filters
+        (initialized)="onSelectedFiltersInit($event)"
+      ></lnd-selected-filters>
+      <div
+        *ngIf="!fetching && requests.length"
+        class="d-flex justify-content-between mt-4"
+      >
+        <div aria-live="polite">
+          Showing
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + 1
+              | number : "1.0-0"
+          }}
+          -
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + pagination.count
+              | number : "1.0-0"
+          }}
+          of {{ pagination.totalCount | number : "1.0-0" }} records
+        </div>
+        <div>
+          <button
+            type="button"
+            (click)="onOpenFilterModal()"
+            class="mr-1 text-white btn btn-warning btn-xs"
+          >
+            <i class="mr-2 icon icon-filter"></i>
+            Filters
+          </button>
+
+          <lnd-filter
+            [filterOptions]="filterOptions"
+            (optionSelected)="onOptionSelected($event)"
+          >
+          </lnd-filter>
+        </div>
+      </div>
+    </header>
+
+    <table
+      *ngIf="requests.length && !fetching"
+      id="data-table"
+      class="table table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Request Name</th>
+          <th>Date Created</th>
+          <th>Request Type</th>
+          <th class="text-center">Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let req of requests"
+          class="cursor"
+          (click)="onViewReq(req, dropdownToggle)"
+        >
+          <td class="copy_icon_wrapper" [style.color]="colorTheme.secondaryColor">
+            {{ req.requestCode }}
+
+            <img
+              (mouseover)="copy_hover = true"
+              (mouseleave)="copy_hover = false"
+              class="copy_icon"
+              src="assets/images/copy.png"
+              alt="copy icon"
+              width="15"
+              height="15"
+              (click)="copyCode(req?.requestCode)"
+              placement="right"
+              ngbTooltip="Copy Request Code"
+            />
+          </td>
+          <td>{{ req.requestName }}</td>
+          <td>
+            {{ req.createdAt | customDatePipe : "DD-MMM-YY" }}
+          </td>
+          <td>{{ req.requestType }}</td>
+          <td class="text-center">
+            <span
+              class="badge"
+              [ngClass]="{
+                'status-in-progress': req.status === 'InProgress',
+                'status-declined': req.status === 'Declined',
+                'status-approved': req.status === 'Approved',
+                'status-redrafted': req.status === 'Redrafted',
+                'status-pending-approval': req.status === 'PendingApproval',
+                'status-treated': req.status === 'Treated',
+                'status-open': req.status === 'Open'
+              }"
+              >{{ req.status | humanify }}</span
+            >
+          </td>
+          <td>
+            <div #dropdownToggle class="dropdown d-inline-block">
+              <button
+                class="btn btn-warning btn-xs dropdown-toggle"
+                data-toggle="dropdown"
+                type="button"
+                aria-haspopup="true"
+                aria-expanded="false"
+              ></button>
+              <div class="dropdown-menu p-0">
+                <a
+                  *ngIf="req.status !== 'Redrafted'"
+                  class="dropdown-item cursor"
+                  ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+                >
+                <a
+                  class="dropdown-item cursor"
+                  *ngIf="req.status === 'Redrafted'"
+                  (click)="
+                    onRedraftReq(
+                      customReqRedraftForm,
+                      paymentsReqRedraftForm,
+                      req
+                    )
+                  "
+                  ><i class="icon icon-edit icon-fw mr-2"></i>Edit</a
+                >
+                <a
+                  class="dropdown-item cursor"
+                  (click)="
+                    onRedraftReq(
+                      customReqRedraftForm,
+                      paymentsReqRedraftForm,
+                      req,
+                      true
+                    )
+                  "
+                  ><i class="icon icon-edit icon-fw mr-2"></i>Duplicate</a
+                >
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div
+      *ngIf="!requests.length && !fetching"
+      class="d-flex flex-column align-items-center w-100"
+    >
+      <h1 class="display-4 text-center font-weight-light pt-5">
+        No requests found
+      </h1>
+    </div>
+    <nav>
+      <ul class="pagination pagination-sm justify-content-end">
+        <li class="page-item" *ngIf="pagination.hasPreviousPage">
+          <a
+            class="page-link"
+            href="javascript:void(0)"
+            (click)="
+              pagination.pageNumber = +pagination.pageNumber - 1;
+              fetchRequests()
+            "
+            tabindex="-1"
+            >Previous</a
+          >
+        </li>
+        <li class="page-item pagination-menu-wrapper">
+          <a
+            class="page-link page-target"
+            href="javascript:void(0)"
+            (click)="itemPaginatedJumpModal()"
+          >
+            {{ pagination.pageNumber }} of {{ pagination.totalPages }}
+            {{ pagination.totalPages > 1 ? "pages" : "page" }}
+            <span class="sr-only">(current)</span>
+          </a>
+          <div
+            class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+          >
+            <div class="pagination-menu-body">
+              <div class="h-auto">
+                <span>Jump to Page</span>
+                <select
+                  aria-controls="data-table"
+                  [(ngModel)]="pagination.pageNumber"
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                  (change)="fetchRequests()"
+                >
+                  <option
+                    *ngFor="let line of pagination.jumpArray"
+                    (click)="pagination.pageNumber = line"
+                  >
+                    {{ line }}
+                  </option>
+                </select>
+                <div class="text-center mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-xs"
+                    (click)="itemPaginatedJumpModal()"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="page-item" *ngIf="pagination.hasNextPage">
+          <a
+            class="page-link"
+            href="javascript:void(0)"
+            (click)="
+              pagination.pageNumber = +pagination.pageNumber + 1;
+              fetchRequests()
+            "
+          >
+            Next
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<ng-template #createReqInitial>
+  <lnd-create-request-initial (closeForm)="onCloseModal()">
+  </lnd-create-request-initial>
+</ng-template>
+<ng-template #customReqRedraftForm>
+  <lnd-add-redraft-custom-request
+    [selectedReq]="selectedReq"
+    [duplicateReq]="duplicateReq"
+  ></lnd-add-redraft-custom-request>
+</ng-template>
+<ng-template #paymentsReqRedraftForm>
+  <lnd-add-redraft-payments-request
+    [selectedReq]="selectedReq"
+    [duplicateReq]="duplicateReq"
+  ></lnd-add-redraft-payments-request>
+</ng-template>
+<lnd-aside
+  [isOpen]="viewReq"
+  (closeAside)="viewReq = false; selectedReq = null"
+>
+  <div header *ngIf="selectedReq">
+    <h1 class="m-0">{{ selectedReq?.requestName }}</h1>
+  </div>
+  <lnd-view-request
+    *ngIf="selectedReq"
+    [viewing]="true"
+    [request]="selectedReq"
+    [user]="user"
+  ></lnd-view-request>
+</lnd-aside>

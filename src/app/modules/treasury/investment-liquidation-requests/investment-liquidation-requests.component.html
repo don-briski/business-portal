@@ -1,0 +1,318 @@
+<header class="w-100 d-flex align-items-center justify-content-between mb-3">
+  <h1 class="dt-page__title">Liquidation Requests</h1>
+</header>
+<ul
+  id="active-div"
+  class="card-header-pills nav nav-pill justify-content-center mb-2"
+  role="tablist"
+>
+  <li class="nav-item">
+    <a
+      [ngClass]="{ 'active-tab': currentTabId === 'Open' }"
+      class="nav-link pool-nav"
+      href="javascript:void(0)"
+      (click)="onSwitchTab('Open')"
+    >
+      Open
+    </a>
+  </li>
+  <li class="nav-item">
+    <a
+      [ngClass]="{ 'active-tab': currentTabId === 'Closed' }"
+      class="nav-link pool-nav"
+      href="javascript:void(0)"
+      (click)="onSwitchTab('Closed')"
+    >
+      Closed
+    </a>
+  </li>
+</ul>
+<div class="dt-card w-100">
+  <div class="dt-card__body">
+    <header class="my-4">
+      <div class="form-row">
+        <div class="col-md-4">
+          <label style="display: inline-flex"
+            ><span style="padding: 8px 2px; font-size: 12px">Show </span
+            ><select
+              [(ngModel)]="pagination.pageSize"
+              [ngModelOptions]="{ standalone: true }"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height mx-2"
+              (change)="fetchRequests()"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span style="padding: 8px 2px; font-size: 12px"
+              >entries</span
+            ></label
+          >
+        </div>
+        <div class="text-center col-md-4">
+          <lnd-spinner *ngIf="isLoading"></lnd-spinner>
+        </div>
+        <div class="col-md-4">
+          <label style="display: inline-flex; float: right">
+            <input
+              type="search"
+              class="form-control form-control-sm mr-3"
+              placeholder="Enter code"
+              aria-controls="data-table"
+              [(ngModel)]="keyword"
+              (keydown.enter)="fetchRequests()"
+            />
+            <button
+              class="btn btn-xs text-white"
+              [style.background]="colorTheme.secondaryColor"
+              (click)="fetchRequests()"
+            >
+              <i class="icon icon-search"></i>
+            </button>
+          </label>
+        </div>
+      </div>
+      <div class="mb-3">
+        <lnd-selected-filters
+          (initialized)="onSelectedFiltersInit($event)"
+        ></lnd-selected-filters>
+      </div>
+      <div
+        *ngIf="!isLoading && requests.length"
+        class="d-flex justify-content-between mt-4"
+      >
+        <div aria-live="polite">
+          Showing
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + 1
+              | number : "1.0-0"
+          }}
+          -
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + pagination.count
+              | number : "1.0-0"
+          }}
+          of {{ pagination.totalCount | number : "1.0-0" }} records
+        </div>
+        <div *ngIf="currentTabId === 'Closed'">
+          <button
+            type="button"
+            (click)="onOpenFilterModal()"
+            class="mr-1 text-white btn btn-warning btn-xs"
+          >
+            <i class="mr-2 icon icon-filter"></i>
+            Filters
+          </button>
+
+          <lnd-filter
+            [filterOptions]="filterOptions"
+            (optionSelected)="onOptionSelected($event)"
+          >
+          </lnd-filter>
+        </div>
+      </div>
+    </header>
+    <table
+      *ngIf="requests.length && !isLoading"
+      id="data-table"
+      class="table table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Request Date</th>
+          <th>Requested By</th>
+          <th>Liquidation Date</th>
+          <th class="text-right">
+            Liquidation Amount ({{ appOwner?.currency?.currencySymbol }})
+          </th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let request of requests"
+          class="cursor"
+          (click)="viewLiqRequest(request, dropdownToggle)"
+        >
+          <td
+            class="copy_icon_wrapper"
+            [style.color]="colorTheme.secondaryColor"
+          >
+            {{ request.investmentCode }}
+
+            <img
+              (mouseover)="copy_hover = true"
+              (mouseleave)="copy_hover = false"
+              class="copy_icon"
+              src="assets/images/copy.png"
+              alt="copy icon"
+              width="15"
+              height="15"
+              (click)="copyCode(request?.investmentCode)"
+              placement="right"
+              ngbTooltip="Copy Investment Code"
+            />
+          </td>
+          <td>
+            {{ request.requestDate | customDatePipe : "DD-MMM-YY" }}
+          </td>
+          <td>{{ request.liquidationRequestedBy }}</td>
+          <td>
+            {{ request?.liquidationDate | customDatePipe : "DD-MMM-YY" }}
+          </td>
+          <td class="text-right">
+            {{ request.liquidatedAmount | number : "1.2-2" }}
+          </td>
+          <td>
+            <span
+              class="badge text-white btn-xs"
+              [ngClass]="{
+                'badge-warning':
+                  request.investmentLiquidationRequestStatus ===
+                  'SentForApproval',
+                'badge-danger':
+                  request.investmentLiquidationRequestStatus === 'Rejected',
+                'badge-success':
+                  request.investmentLiquidationRequestStatus === 'Approved'
+              }"
+              >{{
+                request.investmentLiquidationRequestStatus === "SentForApproval"
+                  ? "Awaiting Approval"
+                  : request.investmentLiquidationRequestStatus
+              }}</span
+            >
+          </td>
+          <td>
+            <div #dropdownToggle class="dropdown d-inline-block">
+              <button
+                class="btn btn-warning btn-xs dropdown-toggle"
+                data-toggle="dropdown"
+                type="button"
+                aria-haspopup="true"
+                aria-expanded="false"
+              ></button>
+              <div class="dropdown-menu p-0">
+                <a class="dropdown-item cursor"
+                  ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+                >
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div
+      *ngIf="!requests.length && !isLoading"
+      class="d-flex flex-column align-items-center w-100"
+    >
+      <h1 class="display-4 text-center font-weight-light pt-5">
+        {{ noDataMessage }}
+      </h1>
+    </div>
+    <nav>
+      <ul class="pagination pagination-sm justify-content-end">
+        <li class="page-item" *ngIf="pagination.hasPreviousPage">
+          <a
+            class="page-link"
+            href="javascript:void(0)"
+            (click)="
+              pagination.pageNumber = +pagination.pageNumber - 1;
+              fetchRequests()
+            "
+            tabindex="-1"
+            >Previous</a
+          >
+        </li>
+        <li class="page-item pagination-menu-wrapper">
+          <a
+            class="page-link page-target"
+            href="javascript:void(0)"
+            (click)="itemPaginatedJumpModal()"
+          >
+            {{ pagination.pageNumber }} of {{ pagination.totalPages }}
+            {{ pagination.totalPages > 1 ? "pages" : "page" }}
+            <span class="sr-only">(current)</span>
+          </a>
+          <div
+            class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+          >
+            <div class="pagination-menu-body">
+              <div class="h-auto">
+                <span>Jump to Page</span>
+                <select
+                  aria-controls="data-table"
+                  [(ngModel)]="pagination.pageNumber"
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                  (change)="fetchRequests()"
+                >
+                  <option
+                    *ngFor="let line of pagination.jumpArray"
+                    (click)="pagination.pageNumber = line"
+                  >
+                    {{ line }}
+                  </option>
+                </select>
+                <div class="text-center mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-xs"
+                    (click)="itemPaginatedJumpModal()"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="page-item" *ngIf="pagination.hasNextPage">
+          <a
+            class="page-link"
+            href="javascript:void(0)"
+            (click)="
+              pagination.pageNumber = +pagination.pageNumber + 1;
+              fetchRequests()
+            "
+          >
+            Next
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+<lnd-aside
+  [isOpen]="viewRequest"
+  (closeAside)="viewRequest = false; selectedRequest = null"
+>
+  <div *ngIf="selectedRequest" header class="d-flex align-items-center">
+    <h1 class="m-0">{{ selectedRequest?.investmentCode }}</h1>
+    <span>
+      <span
+        class="badge text-white btn-xs ml-3"
+        [ngClass]="{
+          'badge-warning':
+            selectedRequest.investmentLiquidationRequestStatus ===
+            'SentForApproval',
+          'badge-danger':
+            selectedRequest.investmentLiquidationRequestStatus === 'Rejected',
+          'badge-success':
+            selectedRequest.investmentLiquidationRequestStatus === 'Approved'
+        }"
+        >{{ approvalStatus }}</span
+      >
+    </span>
+  </div>
+  <lnd-view-investment-liquidation-request
+    *ngIf="selectedRequest"
+    [requestId]="selectedRequest.investmentLiquidationRequestId"
+    [user]="user"
+    [colorTheme]="colorTheme"
+    [currencySymbol]="appOwner?.currency?.currencySymbol"
+    (reviewed)="onReviewedRequest($event)"
+  ></lnd-view-investment-liquidation-request>
+</lnd-aside>

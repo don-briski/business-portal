@@ -1,0 +1,38 @@
+<div
+  class="popup-menu"
+  [ngClass]="{
+    'd-none': !togglePopup,
+    'popup-menu-right': type === 'report',
+    'popup-menu-center': type === 'default',
+    'popup-menu-filter': type === 'filter',
+    'popup-aside': type === 'aside',
+    'popup-small': size === 'small',
+    'popup-medium': size === 'medium',
+    'popup-large': size === 'large',
+    'popup-max-height-600': useMaxHeight,
+    'customTableTopPosition':customTableTopPosition
+  }"
+>
+  <header *ngIf="type === 'report'" class="popup-menu-header">
+    <i *ngIf="icon" [class]="'icon icon-lg mr-2 ' + icon"></i>
+    {{ title | titlecase }}
+  </header>
+
+  <header *ngIf="type !== 'report'" class="popup-menu-header">
+    <ng-content select=".pop-header"></ng-content>
+  </header>
+
+  <div class="popup-menu-body">
+    <div class="h-auto">
+      <ng-content select=".pop-content"></ng-content>
+    </div>
+  </div>
+
+  <div *ngIf="!hideFooter" class="popup-menu-footer">
+    <div class="footer-right">
+      <ng-content select=".pop-footer"></ng-content>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="type !== 'report' && togglePopup" class="backdrop" (click)="closePopup.emit(false)"></div>

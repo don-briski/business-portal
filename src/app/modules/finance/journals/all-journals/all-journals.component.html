@@ -1,0 +1,450 @@
+<ng-container
+  *ngIf="!isSingleView && user?.permission?.includes('View Journal')"
+>
+  <header class="w-100 d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Journals</h1>
+
+    <div
+      *ngIf="user?.permission?.includes('Create Journal')"
+      class="action-btns"
+    >
+      <button class="btn" (click)="openModal(importJournal)">
+        Import <i class="icon icon-upload"></i>
+      </button>
+      <button class="btn" [routerLink]="['/finance/journals/create']">
+        Add New <i class="icon icon-add-circle"></i>
+      </button>
+    </div>
+  </header>
+  <ul
+    id="active-div"
+    class="card-header-pills nav nav-pill justify-content-center"
+    role="tablist"
+  >
+    <li class="nav-item">
+      <a
+        id="nav-open"
+        [ngClass]="{ 'active-tab': !urlFragment }"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="switchViews('open')"
+      >
+        Open
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        id="nav-closed"
+        class="nav-link pool-nav"
+        [ngClass]="{ 'active-tab': urlFragment === 'closed' }"
+        href="javascript:void(0)"
+        (click)="switchViews('closed')"
+      >
+        Closed
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        id="nav-all"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="switchViews('all')"
+      >
+        All
+      </a>
+    </li>
+  </ul>
+  <div class="dt-card w-100">
+    <div class="dt-card__body">
+      <!-- Pagination Top-->
+      <div class="row">
+        <div class="col-md-4">
+          <label style="display: inline-flex"
+            ><span style="padding: 8px 2px; font-size: 12px">Show </span>
+            <select
+              [(ngModel)]="pagination.pageSize"
+              aria-controls="data-table"
+              (change)="
+                getJournalsPaginatedSearch({
+                  pageSize: +pagination.pageSize,
+                  pageNumber: 1
+                })
+              "
+              class="custom-select custom-select-xl form-control form-control-xl mx-2 height"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span style="padding: 8px 2px; font-size: 12px">entries</span>
+          </label>
+        </div>
+        <div class="col-md-4">
+          <div
+            *ngIf="loading"
+            class="table-loader"
+            style="text-align: center; color: indianred"
+          >
+            <span>
+              <i class="icon icon-spin icon-spin2"></i> Retrieving
+              Journals...</span
+            >
+          </div>
+        </div>
+        <div class="form-group col-md-4">
+          <lnd-search-dropdown
+            [searchColumns]="pagination.searchColumns"
+            [currentTheme]="currentTheme"
+            [currentView]="tabState"
+            (searchParams)="getJournals($event)"
+          ></lnd-search-dropdown>
+        </div>
+        <div class="mb-3 col-md-12">
+          <lnd-selected-filters
+            (initialized)="onSelectedFiltersInit($event)"
+          ></lnd-selected-filters>
+        </div>
+        <div
+          class="d-flex justify-content-between w-100 align-items-center"
+          style="padding: 0 18px"
+        >
+          <div
+            class=""
+            aria-live="polite"
+            style="font-size: 13px; margin-top: -8px"
+          >
+            Showing
+            {{
+              (pagination.pageNumber - 1) * pagination.pageSize + 1
+                | number : "1.0-0"
+            }}
+            -
+            {{
+              (pagination.pageNumber - 1) * pagination.pageSize +
+                pagination.count | number : "1.0-0"
+            }}
+            of {{ pagination.totalRecords | number : "1.0-0" }} record(s)
+          </div>
+          <div>
+            <lnd-filter-btn
+              (filterModalOpen)="filterModalOpen()"
+            ></lnd-filter-btn>
+            <lnd-filter
+              *ngIf="!loading"
+              [filterOptions]="filterStatuses"
+              (optionSelected)="getJournals($event)"
+            >
+            </lnd-filter>
+          </div>
+        </div>
+      </div>
+      <!-- /pagination Top -->
+
+      <div class="table-responsive">
+        <table id="data-table" class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Reference</th>
+              <th>Date</th>
+              <th class="text-right">
+                ({{ ownerInformation?.currency?.currencySymbol }}) Total Amount
+              </th>
+              <th>Created By</th>
+              <th>Created At</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody *ngIf="!loading">
+            <tr
+              *ngFor="let journal of journals"
+              class="cursor"
+              (click)="viewJournal(journal, dropdownToggle)"
+            >
+              <td
+                class="copy_icon_wrapper"
+                [style.color]="currentTheme?.secondaryColor"
+              >
+                {{ journal.journalCode }}
+                <img
+                  (mouseover)="copy_hover = true"
+                  (mouseleave)="copy_hover = false"
+                  class="copy_icon"
+                  src="assets/images/copy.png"
+                  alt="copy icon"
+                  width="15"
+                  height="15"
+                  (click)="copyCode(journal.journalCode)"
+                  placement="right"
+                  ngbTooltip="Copy Journal Code"
+                />
+              </td>
+              <td>{{ journal.reference }}</td>
+              <td>{{ journal.date | date : "mediumDate" }}</td>
+              <td class="text-right">
+                {{ journal.totalAmount | number : "1.2-2" }}
+              </td>
+              <td>{{ journal.createdBy }}</td>
+              <td>{{ journal.createdAt | date : "mediumDate" }}</td>
+              <td>
+                <span
+                  class="badge btn-xs mb-1 mr-1"
+                  [ngClass]="{
+                    'badge-warning': journal.status === 'Draft',
+                    'badge-approval': journal.status === 'SentForApproval',
+                    'badge-success': journal.status === 'Posted',
+                    'badge-redraft': journal.status === 'Redraft',
+                    'badge-danger': journal.status === 'Rejected'
+                  }"
+                  >{{
+                    journal.status === "SentForApproval"
+                      ? "Awaiting Approval"
+                      : journal.status
+                  }}</span
+                >
+              </td>
+
+              <td>
+                <div #dropdownToggle class="dropdown mr-2 mb-2 d-inline-block">
+                  <button
+                    class="btn btn-warning btn-xs dropdown-toggle"
+                    type="button"
+                    data-toggle="dropdown"
+                  ></button>
+                  <div class="dropdown-menu" x-placement="auto">
+                    <a class="dropdown-item" href="javascript:void(0)">
+                      <i class="icon icon-forward icon-fw mr-2"></i>View
+                    </a>
+
+                    <a
+                      *ngIf="user?.permission?.includes('Edit Journal')"
+                      class="dropdown-item"
+                      [hidden]="
+                        journal.status === 'Posted' ||
+                        journal.status === 'SentForApproval' ||
+                        journal.status === 'Rejected'
+                      "
+                      [routerLink]="
+                        '/finance/journals/edit/' + journal.journalId
+                      "
+                      routerLinkActive="router-link-active"
+                      href="javascript:void(0)"
+                    >
+                      <i class="icon icon-edit icon-fw mr-2"></i>Edit
+                    </a>
+
+                    <a
+                      class="dropdown-item"
+                      [hidden]="journal.status === 'Posted'"
+                      (click)="deleteJournal($event, journal.journalId)"
+                      href="javascript:void(0)"
+                    >
+                      <i class="icon icon-trash icon-fw text-danger mr-2"></i
+                      >Delete
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div
+          *ngIf="!loading && journals.length === 0"
+          class="d-flex flex-column align-items-center w-100"
+        >
+          <p class="display-4 text-center font-weight-light mb-0">
+            No Data Available
+          </p>
+          <img
+            src="assets/images/no data.svg"
+            alt="no-data-svg"
+            width="200px"
+            class="py-5"
+          />
+          <a
+            *ngIf="user?.permission?.includes('Create Journal')"
+            class="btn btn-primary mr-2 w-25 text-white"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [routerLink]="['/finance/journals/create']"
+            routerLinkActive="router-link-active"
+            href="javascript:void(0)"
+          >
+            <i class="icon icon-add-circle mr-2"></i>Add Journal</a
+          >
+        </div>
+      </div>
+
+      <footer>
+        <nav *ngIf="!loading">
+          <ul class="pagination pagination-sm justify-content-end">
+            <li class="page-item" *ngIf="pagination.hasPreviousPage">
+              <a
+                class="page-link"
+                href="javascript:void(0)"
+                (click)="
+                  pagination.pageNumber = pagination.pageNumber - 1;
+                  getJournals()
+                "
+                tabindex="-1"
+                >Previous</a
+              >
+            </li>
+            <li class="page-item pagination-menu-wrapper">
+              <a
+                class="page-link page-target"
+                (click)="itemPaginatedJumpModal()"
+                href="javascript:void(0)"
+              >
+                {{ pagination.pageNumber }} of {{ pagination.maxPage }} page{{
+                  pagination.pageNumber > 1 ? "s" : ""
+                }}
+                <span class="sr-only">(current)</span>
+              </a>
+              <div
+                class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+              >
+                <div class="pagination-menu-body">
+                  <div class="h-auto">
+                    <span>Jump to Page</span>
+                    <select
+                      aria-controls="data-table"
+                      [(ngModel)]="pagination.pageNumber"
+                      (change)="getJournals()"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option
+                        (click)="pagination.pageNumber = line"
+                        *ngFor="let line of pagination.jumpArray"
+                      >
+                        {{ line }}
+                      </option>
+                    </select>
+                    <div class="text-center mt-3">
+                      <button type="button" class="btn btn-danger btn-xs">
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="page-item" *ngIf="pagination.hasNextPage">
+              <a
+                class="page-link"
+                href="javascript:void(0)"
+                (click)="
+                  pagination.pageNumber = pagination.pageNumber + 1;
+                  getJournals()
+                "
+              >
+                Next
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </footer>
+    </div>
+  </div>
+</ng-container>
+
+<ng-container *ngIf="isSingleView">
+  <app-journal
+    [journals]="journals"
+    [selectedJournalId]="selectedJournalId"
+    [currency]="ownerInformation?.currency?.currencySymbol"
+    [currentTheme]="currentTheme"
+    [pagination]="pagination"
+    [user]="user"
+    [isLoading]="loading"
+    (setIsSingleView)="close($event)"
+    (getJournalsPaginatedSearch)="fetchJournals($event)"
+  ></app-journal>
+</ng-container>
+
+<ng-template #importJournal>
+  <lnd-import-modal
+    title="Journals Import"
+    [downloading]="importLoader"
+    (closeModal)="closeModal()"
+    (downloadTemplate)="downloadTemplate()"
+    (selectedFile)="importPreview($event)"
+  >
+    <h4><b>Hints</b></h4>
+    <ul class="tips">
+      <li>All fields marked with (*) are required</li>
+      <li>
+        The downloaded template contains 2 main sheets that need to be filled
+        <b>(journals & journal lines)</b> as well as 3 sample sheets
+        <b>(sample journals, sample journal lines, branches and accounts)</b>
+      </li>
+      <small
+        >PS: Sheets <b>Branches</b> and <b>Accounts</b> contain the list of the
+        expected branches and account respectively</small
+      >
+      <li>Each journal should have an associated journal line</li>
+      <li>
+        Ensure the sheets <b>(journal & journal lines)</b> have no empty rows
+      </li>
+    </ul>
+  </lnd-import-modal>
+</ng-template>
+
+<ng-template #importJournalPreview>
+  <div class="p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0">Journal Imports</h3>
+      <img
+        src="assets/images/close.svg"
+        alt="cancel button"
+        (click)="closeModal()"
+        class="pointer"
+      />
+    </div>
+    <lnd-table
+      [config]="journalPreviewConfig"
+      [headers]="journalPreviewHeaders"
+      [data]="journalPreviewData"
+    />
+
+    <footer>
+      <button
+        type="button"
+        class="btn"
+        [disabled]="importLoader"
+        (click)="submitImportedJournal()"
+      >
+        Submit <i *ngIf="importLoader" class="icon icon-spin icon-spin2"></i>
+      </button>
+    </footer>
+  </div>
+</ng-template>
+
+<ng-template #importErrorsModal>
+  <header class="p-3 d-flex justify-content-between align-items-center">
+    <h3 class="mb-0 mt-4">
+      <span class="text-danger">({{ importErrors.length }})</span> Issue<span
+        *ngIf="importErrors.length > 1"
+        >s</span
+      >
+      with this import
+    </h3>
+
+    <img
+      src="assets/images/close.svg"
+      class="cursor"
+      alt="close btn"
+      (click)="closeModal()"
+    />
+  </header>
+
+  <lnd-table
+    [config]="importErrorsConfig"
+    [headers]="importErrorsHeaders"
+    [data]="importErrorsData"
+  ></lnd-table>
+</ng-template>

@@ -1,0 +1,544 @@
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">
+    Loan Offers
+    <span class="float-right role-add">
+
+      <div style="position: relative; right: -5px; bottom: 5px; float: right;"
+        *ngIf="this.currentview == 1 && currentuser?.permission?.includes('Create Loan Types')">
+        <button type="button" class="btn btn-primary mr-2 mb-2 orange-bg" (click)="openModal(addLoanOfferModal)"><i
+            class="icon icon-add-circle mr-2"></i>Set New Loan Offer</button>
+      </div>
+
+
+    </span>
+  </h1>
+</div>
+
+
+<!-- test comment -->
+
+
+<!-- Grid -->
+<div class="row">
+
+  <!-- Grid Item -->
+  <div class="col-xl-12">
+    <!-- Card -->
+    <div class="dt-card">
+
+
+
+
+      <!-- Card Body -->
+      <div class="dt-card__body">
+
+
+
+        <div *ngIf="requestLoader" class="table-loader" style="text-align:center;color:indianred">
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+
+
+
+        <div *ngIf="this.currentview == 1 && currentuser?.permission?.includes('View Loan Types')" class="tab-pane ">
+
+          <!-- Pagination Top-->
+          <div class="row">
+            <div class="col-md-8">
+              <label style="display: inline-flex;"><span style="padding: 8px 2px;font-size: 12px">Show </span><select
+                  [(ngModel)]="pagination.pageSize" aria-controls="data-table"
+                  (change)="getItemsPaginatedSearch(this.pagination.searchTerm,this.pagination.pageSize, 1)"
+                  class="custom-select custom-select-xl form-control form-control-xl height">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select> <span style="padding: 8px 2px;font-size: 12px">entries</span></label>
+            </div>
+
+            <div class="form-group col-md-4">
+              <label style="display: inline-flex;float: right"><span
+                  style="padding: 10px 2px;font-size: 12px">Search:</span><input type="search"
+                  [(ngModel)]="pagination.searchTerm"
+                  (keydown.enter)="getItemsPaginatedSearch(this.pagination.searchTerm, this.pagination.pageSize, 1)"
+                  class="form-control form-control-sm" placeholder="" aria-controls="data-table"></label>
+            </div>
+            <div class="" aria-live="polite" style="padding-left: 18px;font-size: 13px; margin-top:-8px "> Showing
+              {{ ( (pagination.pageNum - 1) * pagination.pageSize) + 1 }} -
+              {{ ( (pagination.pageNum - 1) * pagination.pageSize) + pagination.count }} of
+              {{ pagination.totalRecords }} record(s)</div>
+          </div>
+          <!-- /pagination Top -->
+
+
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table id="loanoffersstable" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th><small>Name</small></th>
+                  <th><small>Amount</small> </th>
+                  <th><small>Interest Rate</small> </th>
+                  <th><small>Tenor</small> </th>
+                  <th><small>Default</small></th>
+                  <th><small>Actions</small></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="gradeX" *ngFor="let row of loanOffers; let i = index">
+                  <td> {{ row?.loanType?.loanName  }} </td>
+                  <td> {{ row?.loanAmount | number: '1.2-2' }}</td>
+                  <td>{{ row?.interestRate }}</td>
+                  <td>{{ row?.loanDuration }}</td>
+                  <td>
+                    <span *ngIf="!row?.default" class="badge badge-success mb-1 mr-1">No</span>
+                    <span *ngIf="row?.default" class="badge badge-warning mb-1 mr-1">Yes</span>
+                  </td>
+                  <td>
+                    <a style="color:saddlebrown" href="javascript:void(0)"
+                      (click)="openEditModal(editLoanOfferModal, row)"> <i class="icon icon-xs icon-setting "></i>
+                      Manage
+                    </a> &nbsp; &nbsp;
+                    <a style="color:saddlebrown" href="javascript:void(0)"
+                      (click)="openViewModal(viewLoanOfferModal, row)"> <i class="icon icon-xs icon-forward"></i>
+                      View
+                    </a>
+                  </td>
+                </tr>
+
+
+              </tbody>
+
+            </table>
+          </div>
+          <!-- /tables -->
+
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <!-- <li  class="page-item ">
+                                                    <select  aria-controls="data-table" [(ngModel)]="pagination.pageNum" (change)="getLoanTypes(pagination.pageNum)" class="custom-select custom-select-xl form-control form-control-xl height">
+                                                        <option *ngFor="let line of pagination.jumpArray"  >{{line}}</option>
+                                                      </select>
+                                                </li> -->
+                <li class="page-item " *ngIf=" (( (pagination.pageNum - 1) * pagination.pageSize) + 1) > 10">
+                  <a class="page-link" href="javascript:void(0)"
+                    (click)="getItemsPaginatedSearch(this.pagination.searchTerm,this.pagination.pageSize,pagination.pageNum - 1)"
+                    tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a class="page-link page-target" (click)="paginationPopover()"
+                    href="javascript:void(0)">{{pagination.pageNum}} of {{this.pagination.maxPage}} page<span
+                      *ngIf="pagination.pageNum > 1">s</span><span class="sr-only">(current)</span></a>
+
+                  <div class="pagination-menu pagination-menu-right">
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <small>Jump to Page:</small>
+                        <select aria-controls="data-table" [(ngModel)]="pagination.pageNum"
+                          (change)="getLoanTypes(pagination.pageNum)"
+                          class="custom-select custom-select-xl form-control form-control-xl height">
+                          <option *ngFor="let line of pagination.jumpArray">{{line}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <!-- <li class="page-item">
+                                                  <a class="page-link" href="javascript:void(0)">{{pagination.pageNum}} of {{this.pagination.maxPage}} page<span *ngIf="pagination.pageNum > 1">s</span><span class="sr-only">(current)</span></a>
+                                                </li> -->
+                <li class="page-item" *ngIf="( this.pagination.pageNum ) < (this.pagination.maxPage) ">
+                  <a class="page-link" href="javascript:void(0)"
+                    (click)="getItemsPaginatedSearch(this.pagination.searchTerm,this.pagination.pageSize, pagination.pageNum + 1)">Next</a>
+
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+
+
+
+      </div>
+      <!-- /card body -->
+
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<!--Modals Section-->
+
+<ng-template #addLoanOfferModal>
+
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2"><i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"></i>Loan Offer Setup</h3>
+    <button type="button" class="close" (click)="closeModal()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form [formGroup]="AddLoanOfferForm" (ngSubmit)="submitLoanOfferForm(AddLoanOfferForm.value)">
+
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+
+        <div *ngIf="this.requestLoader" class="table-loader" style="text-align:center;color:indianred">
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div class="form-row mt-3">
+
+          <div class="col-sm-4 mb-3">
+            <label>Loan Type<b class="help-block"> *</b></label>
+            <slct-2 (selected)="onSelectAddLoanType($event)" [hideSelectedItems]="true" placeholder="Select One" [data]="loanTypesForSelect"></slct-2>
+            <!-- <ng-select [items]="loanTypesForSelect"
+              (selected)="onSelectAddLoanType($event)" placeholder="Select One">
+            </ng-select> -->
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Min Amount</label>
+            <div class="input-group">
+              <input type="text" class="form-control"  [readOnly]="true"
+                value="{{selectedLoanType?.minAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Max Amount</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [readOnly]="true"
+                value="{{selectedLoanType?.maxAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Interest Rate</label>
+            <div class="input-group">
+              <input type="text" class="form-control"  [readOnly]="true"
+                value="{{selectedLoanType?.interestRate?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Tenor</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [readOnly]="true" value="{{selectedLoanType?.loanTypeTenor}}">
+            </div>
+          </div>
+          <!-- <div class="col-sm-5 mb-3">
+            <label>Name</label><b class="help-block"> *</b>
+            <input type="text" formControlName="Name" class="form-control" placeholder="Name of the loan offer">
+            <span class="help-block"
+              *ngIf="AddLoanOfferForm.get('Name').errors && AddLoanOfferForm.get('Name').touched">
+              What is name of the Loan Offer?
+            </span>
+          </div> -->
+
+          <div class="col-sm-24 mb-3">
+            <label>Offer Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input type="text" class="form-control" formControlName="LoanAmount" currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="Interest rate">
+            </div>
+            <span class="help-block"
+              *ngIf="AddLoanOfferForm.get('LoanAmount').errors && AddLoanOfferForm.get('LoanAmount').touched">
+              What is the amount for this offer?
+            </span>
+            <span class="help-block"
+              *ngIf="AddLoanOfferForm.get('LoanAmount').touched && showAddFormLoanAmountError()">
+              Amount Exceeds Boundaries of loan type
+            </span>
+          </div>
+
+
+
+          <div class="col-sm-4 mb-3">
+            <label>Default<b class="help-block"> *</b></label>
+
+            <slct-2 (selected)="onSelectAddDefault($event)" placeholder="Select One" [data]="defaultSelect"></slct-2>
+
+            <!-- <ng-select [items]="defaultSelect" (selected)="onSelectAddDefault($event)"
+              placeholder="Select One">
+            </ng-select> -->
+          </div>
+
+
+          <hr style="border-top: 1px dashed #ced4da;" class="fainted">
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button type="button" class="btn btn-warning btn-sm" (click)="closeModal()" style="color: #fff">Close</button>
+      <button type="submit" class="btn btn-primary btn-sm" *ngIf="!loader" [disabled]="AddLoanOfferForm.invalid">
+        Save Settings
+      </button>
+      <button type="button" class="btn  btn-primary btn-sm" *ngIf="loader" [disabled]="true"><i
+          class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+
+
+
+
+
+</ng-template>
+
+<ng-template #editLoanOfferModal>
+
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2"><i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"></i>Edit Loan Offer</h3>
+    <button type="button" class="close" (click)="closeModal()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form [formGroup]="EditLoanOfferForm" (ngSubmit)="submitEditLoanOfferForm(EditLoanOfferForm.value)">
+
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+
+        <div *ngIf="this.requestLoader" class="table-loader" style="text-align:center;color:indianred">
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div class="form-row mt-3">
+
+          <div class="col-sm-4 mb-3">
+            <label>Loan Type<b class="help-block"> *</b></label>
+            <!-- <ng-select #editLoanTypeSelect [items]="loanTypesForSelect"
+              (selected)="onSelectEditLoanType($event)" placeholder="Select One">
+            </ng-select> -->
+            <select formControlName="LoanTypeId" aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height">
+              <option selected="selected" disabled>Select Loan Type</option>
+              <option *ngFor="let row of loanTypesForSelect" value="{{row.id}}">{{row.text}}</option>
+            </select>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Min Amount</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [readOnly]="true"
+                value="{{selectedLoanType?.minAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Max Amount</label>
+            <div class="input-group">
+              <input type="text" class="form-control"  [readOnly]="true"
+                value="{{selectedLoanType?.maxAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Interest Rate</label>
+            <div class="input-group">
+              <input type="text" class="form-control"  [readOnly]="true"
+                value="{{selectedLoanType?.interestRate?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Tenor</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [readOnly]="true" value="{{selectedLoanType?.loanTypeTenor}}">
+            </div>
+          </div>
+          <!-- <div class="col-sm-5 mb-3">
+            <label>Name</label><b class="help-block"> *</b>
+            <input type="text" formControlName="Name" class="form-control" placeholder="Name of the loan offer">
+            <span class="help-block"
+              *ngIf="EditLoanOfferForm.get('Name').errors && EditLoanOfferForm.get('Name').touched">
+              What is name of the Loan Offer?
+            </span>
+          </div> -->
+
+          <div class="col-sm-4 mb-3">
+            <label>Offer Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input type="text" class="form-control" formControlName="LoanAmount" currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="LoanAmount">
+            </div>
+            <span class="help-block"
+              *ngIf="EditLoanOfferForm.get('LoanAmount').errors && EditLoanOfferForm.get('LoanAmount').touched">
+              What is the amount for this offer?
+            </span>
+            <span class="help-block"
+              *ngIf="EditLoanOfferForm.get('LoanAmount').touched && showEditFormLoanAmountError()">
+              Amount Exceeds Boundaries of loan type
+            </span>
+          </div>
+
+
+
+          <div class="col-sm-4 mb-3">
+            <label>Default<b class="help-block"> *</b></label>
+            <select formControlName="Default" aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height">
+              <option selected="selected" disabled>Select Default</option>
+              <option *ngFor="let row of defaultSelect" value="{{row.id}}">{{row.text}}</option>
+            </select>
+          </div>
+
+
+          <hr style="border-top: 1px dashed #ced4da;" class="fainted">
+        </div>
+      </div>
+    </div>
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button type="button" class="btn btn-warning btn-sm" (click)="closeModal()" style="color: #fff">Close</button>
+      <button type="submit" class="btn btn-primary btn-sm" *ngIf="!loader" [disabled]="EditLoanOfferForm.invalid">Save
+        Settings</button>
+      <button type="button" class="btn  btn-primary btn-sm" *ngIf="loader" [disabled]="true"><i
+          class="icon icon-spin icon-spin2"></i> Processing...</button>
+
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+
+
+
+
+
+</ng-template>
+
+
+
+<ng-template #viewLoanOfferModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">View Loan Offer</h4>
+    <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <form [formGroup]="ViewLoanOfferForm">
+
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+
+        <div *ngIf="this.requestLoader" class="table-loader" style="text-align:center;color:indianred">
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div class="form-row mt-3">
+
+          <div class="col-sm-4 mb-3">
+            <label>Loan Type<b class="help-block"> *</b></label>
+            <input type="text" class="form-control"
+                 value="{{selectedLoanType?.loanName}}"
+                [readOnly]="true">
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Min Amount</label>
+            <div class="input-group">
+              <input type="text" class="form-control" currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }" value="{{selectedLoanType?.minAmount}}"
+                [readOnly]="true">
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Max Amount</label>
+            <div class="input-group">
+              <input type="text" class="form-control" currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }" [readOnly]="true"
+                value="{{selectedLoanType?.maxAmount}}">
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Interest Rate</label>
+            <div class="input-group">
+              <input type="text" class="form-control" currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }" [disabled]="true"
+                value="{{selectedLoanType?.interestRate}}">
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Tenor</label>
+            <div class="input-group">
+              <input type="text" class="form-control" [readOnly]="true" value="{{selectedLoanType?.loanTypeTenor}}">
+            </div>
+          </div>
+          <!-- <div class="col-sm-5 mb-3">
+            <label>Name</label><b class="help-block"> *</b>
+            <input type="text" formControlName="Name" class="form-control" placeholder="Name of the loan offer" [readOnly]="true">
+          </div> -->
+
+          <div class="col-sm-4 mb-3">
+            <label>Offer Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input type="text" class="form-control" formControlName="LoanAmount" currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="Interest rate" [readOnly]="true">
+            </div>
+
+          </div>
+
+
+
+          <div class="col-sm-4 mb-3">
+            <label>Default<b class="help-block"> *</b></label>
+            <input type="text" class="form-control" formControlName="Default" value="{{selectedLoanType?.minAmount}}"
+                [readOnly]="true">
+          </div>
+
+
+          <hr style="border-top: 1px dashed #ced4da;" class="fainted">
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-warning btn-sm" (click)="closeModal()" style="color: #fff">Close</button>
+
+    </div>
+  </form>
+
+  <!-- /modal footer -->
+
+
+</ng-template>

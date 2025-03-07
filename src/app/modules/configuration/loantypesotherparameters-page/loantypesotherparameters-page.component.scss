@@ -1,0 +1,28 @@
+app-sidebar {
+    width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+    app-sidebar {
+        width: auto;
+    }
+}
+
+.dt-content-wrapper {
+    margin-top: 74px;
+  }
+
+.ui-select-choices {
+    display: block;
+}
+
+.dropdown-menu{
+  a{
+    display: block;
+    margin: 10px;
+  }
+}
+
+.nav-link:hover {
+  color: var(--secondary-color) 
+}

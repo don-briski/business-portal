@@ -1,0 +1,28 @@
+header {
+  margin-bottom: 30px;
+}
+
+main {
+  padding: 30px 40px;
+
+  section {
+    border-bottom: 1px solid gainsboro;
+    padding-bottom: 50px;
+    .col-md-4 {
+      margin-bottom: 20px;
+    }
+  }
+
+  footer{
+    align-items: center;
+    gap: 10px;
+    button:first-child{
+      border-color: var(--lenda-grey);
+      color: var(--lenda-grey);
+      &:hover{
+        background-color: inherit;
+        color: inherit;
+      }
+    }
+  }
+}

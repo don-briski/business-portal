@@ -1,0 +1,217 @@
+app-sidebar {
+  width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+  app-sidebar {
+    width: auto;
+  }
+}
+
+.dt-content-wrapper {
+  margin-top: 74px;
+}
+
+.paystack-inline {
+  width: 100%;
+  background: grey;
+  margin-bottom: 20px;
+  height: 100%;
+}
+
+.select.form-control {
+  height: auto !important;
+}
+
+span.text-danger {
+  font-size: 20px;
+}
+
+span.ngx-text-highlight {
+  background: yellow !important;
+}
+
+.durationloader {
+  position: absolute;
+  right: 0;
+  top: 20px;
+}
+
+.font-weight-600 {
+  font-weight: 600 !important;
+}
+
+@keyframes lds-spinner {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@-webkit-keyframes lds-spinner {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.lds-spinner {
+  position: relative;
+}
+.lds-spinner div {
+  left: 97px;
+  top: 50px;
+  position: absolute;
+  -webkit-animation: lds-spinner linear 1s infinite;
+  animation: lds-spinner linear 1s infinite;
+  background: #f08d43;
+  width: 6px;
+  height: 28px;
+  border-radius: 78%;
+  -webkit-transform-origin: 3px 50px;
+  transform-origin: 3px 50px;
+}
+.lds-spinner div:nth-child(1) {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+  -webkit-animation-delay: -0.928571428571429s;
+  animation-delay: -0.928571428571429s;
+}
+.lds-spinner div:nth-child(2) {
+  -webkit-transform: rotate(25.714285714285715deg);
+  transform: rotate(25.714285714285715deg);
+  -webkit-animation-delay: -0.857142857142857s;
+  animation-delay: -0.857142857142857s;
+}
+.lds-spinner div:nth-child(3) {
+  -webkit-transform: rotate(51.42857142857143deg);
+  transform: rotate(51.42857142857143deg);
+  -webkit-animation-delay: -0.785714285714286s;
+  animation-delay: -0.785714285714286s;
+}
+.lds-spinner div:nth-child(4) {
+  -webkit-transform: rotate(77.14285714285714deg);
+  transform: rotate(77.14285714285714deg);
+  -webkit-animation-delay: -0.714285714285714s;
+  animation-delay: -0.714285714285714s;
+}
+.lds-spinner div:nth-child(5) {
+  -webkit-transform: rotate(102.85714285714286deg);
+  transform: rotate(102.85714285714286deg);
+  -webkit-animation-delay: -0.642857142857143s;
+  animation-delay: -0.642857142857143s;
+}
+.lds-spinner div:nth-child(6) {
+  -webkit-transform: rotate(128.57142857142858deg);
+  transform: rotate(128.57142857142858deg);
+  -webkit-animation-delay: -0.571428571428571s;
+  animation-delay: -0.571428571428571s;
+}
+.lds-spinner div:nth-child(7) {
+  -webkit-transform: rotate(154.28571428571428deg);
+  transform: rotate(154.28571428571428deg);
+  -webkit-animation-delay: -0.5s;
+  animation-delay: -0.5s;
+}
+.lds-spinner div:nth-child(8) {
+  -webkit-transform: rotate(180deg);
+  transform: rotate(180deg);
+  -webkit-animation-delay: -0.428571428571429s;
+  animation-delay: -0.428571428571429s;
+}
+.lds-spinner div:nth-child(9) {
+  -webkit-transform: rotate(205.71428571428572deg);
+  transform: rotate(205.71428571428572deg);
+  -webkit-animation-delay: -0.357142857142857s;
+  animation-delay: -0.357142857142857s;
+}
+.lds-spinner div:nth-child(10) {
+  -webkit-transform: rotate(231.42857142857142deg);
+  transform: rotate(231.42857142857142deg);
+  -webkit-animation-delay: -0.285714285714286s;
+  animation-delay: -0.285714285714286s;
+}
+.lds-spinner div:nth-child(11) {
+  -webkit-transform: rotate(257.14285714285717deg);
+  transform: rotate(257.14285714285717deg);
+  -webkit-animation-delay: -0.214285714285714s;
+  animation-delay: -0.214285714285714s;
+}
+.lds-spinner div:nth-child(12) {
+  -webkit-transform: rotate(282.85714285714283deg);
+  transform: rotate(282.85714285714283deg);
+  -webkit-animation-delay: -0.142857142857143s;
+  animation-delay: -0.142857142857143s;
+}
+.lds-spinner div:nth-child(13) {
+  -webkit-transform: rotate(308.57142857142856deg);
+  transform: rotate(308.57142857142856deg);
+  -webkit-animation-delay: -0.071428571428571s;
+  animation-delay: -0.071428571428571s;
+}
+.lds-spinner div:nth-child(14) {
+  -webkit-transform: rotate(334.2857142857143deg);
+  transform: rotate(334.2857142857143deg);
+  -webkit-animation-delay: 0s;
+  animation-delay: 0s;
+}
+.lds-spinner {
+  width: 44px !important;
+  height: 44px !important;
+  -webkit-transform: translate(-22px, -22px) scale(0.22) translate(22px, 22px);
+  transform: translate(-22px, -22px) scale(0.22) translate(22px, 22px);
+}
+
+.bank-delimeter {
+  margin-bottom: 20px;
+}
+
+.bank-delimeter h5 {
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+.bank-delimeter span {
+  text-align: left;
+  display: block;
+}
+
+.dotted-divider {
+  border-top: 1px dotted #dcdcdc;
+  margin-bottom: 20px;
+}
+
+#progressbar {
+  display: flex;
+  justify-content: center;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0;
+}
+
+#msform {
+  width: 100%;
+}
+
+.clear-repayment-method-btn {
+  background: none;
+  border: none;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.flex-2 {
+  flex: 2;
+}
+
+.remove_btn {
+  border-radius: 15px;
+}
+
+.markAsRecieved {
+  width: initial !important;
+}

@@ -1,0 +1,85 @@
+<div class="row m-0">
+  <header class="dt-page__header w-100">
+    <div class="d-flex justify-content-between align-items-center w-100 p-4">
+      <h1
+        *ngIf="currentTab === 'record'"
+        class="dt-page__title clearfix mb-0 text-center"
+      >
+        {{ isEditing ? "Edit Expense  " : "Add New Expense  " }}
+      </h1>
+
+      <h1 *ngIf="currentTab === 'bulk'" class="dt-page__title clearfix mb-0">
+        {{ isEditing ? "Edit Bulk Expense  " : "Add Bulk Expense  " }}
+      </h1>
+
+      <span [style.color]="currentTheme?.secondaryColor" class="text-center"
+        ><span>{{
+          isEditing && !expenses ? "Retrieving Expense..." : ""
+        }}</span>
+        <i class="icon icon-spin icon-spin2" *ngIf="isEditing && !expenses"></i
+      ></span>
+
+      <span class="float-right role-add">
+        <div style="position: relative; right: -5px; bottom: 5px; float: right">
+          <a
+            class="btn text-white"
+            [routerLink]="['/finance/expenses']"
+            routerLinkActive="router-link-active"
+            [style.background]="currentTheme?.secondaryColor"
+            href="javascript:void(0)"
+            >Back</a
+          >
+        </div>
+      </span>
+    </div>
+  </header>
+
+  <div class="col-12">
+    <header>
+      <ul
+        class="card-header-pills nav nav-pill justify-content-center"
+        role="tablist"
+      >
+        <li class="nav-item" (click)="switchTabs('record')">
+          <a
+            id="navRecord"
+            class="nav-link pool-nav active-tab"
+            data-toggle="tab"
+            href="#tab-record"
+            role="tab"
+            aria-controls="tab-record"
+            aria-selected="false"
+            >Record Expense</a
+          >
+        </li>
+
+        <li *ngIf="!isEditing" class="nav-item" (click)="switchTabs('bulk')">
+          <a
+            id="navBulk"
+            class="nav-link pool-nav"
+            data-toggle="tab"
+            href="#tab-bulk"
+            role="tab"
+            aria-controls="tab-bulk"
+            aria-selected="false"
+            >Add Bulk Expense
+          </a>
+        </li>
+      </ul>
+    </header>
+  </div>
+  <div class="w-100">
+    <div class="tab-content w-100">
+      <div class="tab-pane" id="tab-record">
+        <app-add-edit-expense
+          (isEditingEvent)="isEditing = $event"
+          (expensesEvent)="expenses = $event"
+        ></app-add-edit-expense>
+      </div>
+
+      <div class="tab-pane" id="tab-bulk">
+        <app-expense-bulk-add></app-expense-bulk-add>
+      </div>
+    </div>
+  </div>
+</div>

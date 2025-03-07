@@ -1,0 +1,601 @@
+<div
+  class="body h-100"
+  [style.background]="
+    currentTheme.theme === 'Dark' ? currentTheme?.dark?.primaryColor : ''
+  "
+>
+  <header>
+    <nav data-state="closed">
+      <button
+        class="navbar-burger-btn"
+        aria-expanded="false"
+        aria-label="menu toggle button"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="navbar-left">
+        <div class="brand-logo">
+          <span *ngIf="!appOwner?.logoUrl" class="font-weight-bold">{{
+            appOwner?.appOwnerName
+          }}</span>
+          <img
+            class="logo-in"
+            [src]="appOwner?.logoUrl"
+            alt="Logo"
+            *ngIf="appOwner?.logoUrl"
+          />
+        </div>
+        <li
+          *ngIf="
+            currentuser?.permission?.includes('Manage Business Information') &&
+            appOwner?.isMultiTenant
+          "
+        >
+          <a
+            class="nav-link"
+            [routerLink]="[]"
+            (click)="triggerSubcription(SubcriptionView)"
+            >Manage Subscriptions</a
+          >
+        </li>
+        <li>
+          <a
+            class="nav-link"
+            [routerLink]="['/account/login']"
+            (click)="logOut()"
+            >Logout</a
+          >
+        </li>
+      </ul>
+    </nav>
+    <div class="bg-dark submenu border-top"></div>
+  </header>
+  <section
+    [style.background]="
+      currentTheme.theme === 'Dark' ? currentTheme?.dark?.secondaryColor : ''
+    "
+  >
+    <div
+      *ngIf="requestLoader"
+      class="table-loader"
+      style="text-align: center; color: indianred"
+    >
+      <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+    </div>
+    <div *ngIf="!requestLoader" class="container mx-auto">
+      <div
+        *ngIf="
+          !appIsModular &&
+          !isAppSubscriptionActive &&
+          subscriptionMessage !== ''
+        "
+        class="alert alert-warning custom-alert"
+      >
+        <strong><i class="icon icon-alert icon-fw icon-xl"></i></strong>
+        {{ subscriptionMessage }}
+      </div>
+      <div
+        *ngIf="currentuser?.permission?.includes('Manage Business Information')"
+        class="row"
+      >
+        <div *ngIf="isAppSubscriptionActive" class="col-xl-12 col-sm-6 pt-xl-2">
+          <p *ngIf="!paystackInfo?.isActive" class="text-uppercase f-12 mb-3">
+            You need to configure your Paystack information to enable you
+            disburse loan via Lenda.
+            <a
+              class="text-orange font-weight-bold text-decoration-underline"
+              href="javascript:void(0)"
+              [routerLink]="['/configurations/settings/integrations']"
+              >Configure now</a
+            >
+          </p>
+          <div *ngIf="sumTotal > 0">
+            <p class="f-12 mb-3 main-stats-description_all-modules">
+              <i class="icon icon-notification"></i>
+              Here's what's been happening so far...
+            </p>
+            <ul
+              *ngFor="let row of appUpdates; let i = index"
+              class="list-styled"
+            >
+              <li style="list-style: circle; margin-left: 30px" class="mb-2">
+                <small>{{ row?.message }} </small>
+                <small *ngIf="row?.tag == 'payment'">
+                  <a
+                    href="javascript:void(0)"
+                    [routerLink]="['/loan/payments']"
+                    class="text-orange font-weight-bold text-decoration-underline"
+                    >&nbsp;view now</a
+                  ></small
+                >
+                <small *ngIf="row?.tag == 'customer'">
+                  <a
+                    href="javascript:void(0)"
+                    routerLink="/loan/customers"
+                    routerLinkActive="active"
+                    class="text-orange font-weight-bold text-decoration-underline"
+                    >&nbsp;view now</a
+                  ></small
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="container">
+        <div
+          class="wrapped card mb-3 w-100 bg-lendastack text-white"
+          *ngIf="isWrappedFeatureEnabled() && appOwner"
+        >
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-4">
+              <div class="texts">
+                <h2 class="font-weight-bold text-white mb-2">
+                  Your 2024 Wrapped Is Here.
+                </h2>
+                <p class="mb-4">
+                  Check out your biggest 2024 community accomplishments. Another one
+                  in the books, share the love!
+                </p>
+                <button
+                  class="btn btn-sm text-white mt-3"
+                  (click)="openUserYearActivity()"
+                >
+                  See my wrapped
+                </button>
+              </div>
+              <img class="d-block img-responsive ms-3 gift-box" src="assets/images/wrapped/gift-box.png" />
+            </div>
+             
+          </div>
+        </div>
+        <div class="row">
+          <div
+            *ngIf="
+              loanSubscriptionIsActive &&
+              currentuser?.permission?.includes('View Loan Module')
+            "
+            class="col-md-3"
+          >
+            <div
+              class="card cards cyan my-4"
+              [style.background]="
+                currentTheme.theme === 'Dark'
+                  ? currentTheme?.dark?.cardColor
+                  : ''
+              "
+            >
+              <h2
+                class="f-20"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : currentTheme.primaryColor
+                "
+              >
+                Loans
+              </h2>
+              <p
+                *ngIf="!loanSubscriptionIsActive"
+                class="red f-12 mb-3"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.primaryColor
+                    : currentTheme.primaryColor
+                "
+              >
+                <i class="icon icon-error"></i> Subscription has expired
+              </p>
+              <div class="btn-container">
+                <button
+                  routerLink="/main/dashboard"
+                  class="btn btn-sm btn-primary btn-view p-2"
+                  [style.color]="
+                    currentTheme.theme === 'Dark'
+                      ? currentTheme?.dark?.primaryColor
+                      : currentTheme.primaryColor
+                  "
+                  [style.borderColor]="currentTheme?.primaryColor"
+                  (mouseover)="hover1 = true"
+                  (mouseleave)="hover1 = false"
+                  [ngStyle]="
+                    hover1
+                      ? {
+                          background: currentTheme?.primaryColor,
+                          color: '#fff'
+                        }
+                      : { color: currentTheme?.primaryColor }
+                  "
+                  (click)="openModule(allModulesEnum.Loan)"
+                >
+                  View module
+                </button>
+              </div>
+              <div class="mx-auto w-160" id="lottie1">
+                <ng-lottie [options]="loanLottieOptions"></ng-lottie>
+              </div>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              investmentSubscriptionIsActive &&
+              currentuser?.permission?.includes('View Investment Module')
+            "
+            class="col-md-3"
+          >
+            <div
+              class="card cards red my-4"
+              [style.background]="
+                currentTheme.theme === 'Dark'
+                  ? currentTheme?.dark?.cardColor
+                  : ''
+              "
+            >
+              <h2
+                class="f-20"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : currentTheme.primaryColor
+                "
+              >
+                Investments
+              </h2>
+              <p
+                *ngIf="!investmentSubscriptionIsActive"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.primaryColor
+                    : currentTheme.primaryColor
+                "
+                class="red f-12 mb-3"
+              >
+                <i class="icon icon-error"></i> Subscription has expired
+              </p>
+              <div class="btn-container">
+                <button
+                  class="btn btn-sm btn-primary btn-view p-2"
+                  routerLink="/treasury/investment-dashboard"
+                  routerLinkActive="active"
+                  [style.color]="currentTheme?.primaryColor"
+                  [style.borderColor]="currentTheme?.primaryColor"
+                  (mouseover)="hover2 = true"
+                  (mouseleave)="hover2 = false"
+                  [ngStyle]="
+                    hover2
+                      ? {
+                          background: currentTheme?.primaryColor,
+                          color: '#fff'
+                        }
+                      : { color: currentTheme?.primaryColor }
+                  "
+                  (click)="openModule(allModulesEnum.Investment)"
+                >
+                  View module
+                </button>
+              </div>
+              <div class="lot-invest mx-auto" id="lottie2">
+                <ng-lottie [options]="investmentLottieOptions"></ng-lottie>
+              </div>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              currentuser?.permission?.includes('View User Management Module')
+            "
+            class="col-md-3"
+          >
+            <div
+              class="card cards orange my-4"
+              tourAnchor="third"
+              [style.background]="
+                currentTheme.theme === 'Dark'
+                  ? currentTheme?.dark?.cardColor
+                  : ''
+              "
+            >
+              <h2
+                class="f-20"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : currentTheme.primaryColor
+                "
+              >
+                User Management
+              </h2>
+              <div class="btn-container">
+                <button
+                  class="btn btn-sm btn-primary btn-view p-2"
+                  routerLink="/configurations/roles-and-permissions"
+                  routerLinkActive="active"
+                  [style.color]="
+                    currentTheme.theme === 'Dark'
+                      ? currentTheme?.dark?.primaryColor
+                      : currentTheme.primaryColor
+                  "
+                  [style.borderColor]="currentTheme?.primaryColor"
+                  (mouseover)="hover3 = true"
+                  (mouseleave)="hover3 = false"
+                  [ngStyle]="
+                    hover3
+                      ? {
+                          background: currentTheme?.primaryColor,
+                          color: '#fff'
+                        }
+                      : { color: currentTheme?.primaryColor }
+                  "
+                  (click)="openModule(allModulesEnum.UserManagement)"
+                >
+                  View module
+                </button>
+              </div>
+              <div class="mx-auto w-150" id="lottie3">
+                <ng-lottie [options]="userLottieOptions"></ng-lottie>
+              </div>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              checkoutSubscriptionIsActive &&
+              currentuser?.permission?.includes('View Checkout Module') &&
+              showModuleByGrowthbookFlag('checkout')
+            "
+            class="col-md-3"
+          >
+            <div class="card cards lenda-v1-primary my-4">
+              <h2
+                class="f-20"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : currentTheme.primaryColor
+                "
+              >
+                Checkout
+              </h2>
+              <div class="btn-container">
+                <button
+                  class="btn btn-sm btn-primary btn-view p-2"
+                  [routerLink]="getCheckoutDefaultPageLink()"
+                  routerLinkActive="active"
+                  [style.color]="
+                    currentTheme.theme === 'Dark'
+                      ? currentTheme?.dark?.primaryColor
+                      : currentTheme.primaryColor
+                  "
+                  [style.borderColor]="currentTheme?.primaryColor"
+                  (mouseover)="hoverCheckout = true"
+                  (mouseleave)="hoverCheckout = false"
+                  [ngStyle]="
+                    hoverCheckout
+                      ? {
+                          background: currentTheme?.primaryColor,
+                          color: '#fff'
+                        }
+                      : { color: currentTheme?.primaryColor }
+                  "
+                  (click)="openModule(allModulesEnum.CheckoutAdmin)"
+                >
+                  View module
+                </button>
+              </div>
+              <div class="mx-auto w-150">
+                <ng-lottie [options]="checkoutLottieOptions"></ng-lottie>
+              </div>
+            </div>
+          </div>
+          <div
+            class="col-md-3"
+            *ngIf="
+              financeSubscriptionIsActive &&
+              currentuser?.permission?.includes('View Finance Module') &&
+              showModuleByGrowthbookFlag('finance')
+            "
+          >
+            <div
+              class="card cards wine my-4"
+              [style.background]="
+                currentTheme.theme === 'Dark'
+                  ? currentTheme?.dark?.cardColor
+                  : ''
+              "
+            >
+              <h2
+                class="f-20"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : currentTheme.primaryColor
+                "
+              >
+                Finance
+              </h2>
+              <div class="btn-container">
+                <button
+                  routerLink="/finance/dashboard"
+                  [style.color]="
+                    currentTheme.theme === 'Dark'
+                      ? currentTheme?.dark?.primaryColor
+                      : currentTheme.primaryColor
+                  "
+                  [style.borderColor]="currentTheme?.primaryColor"
+                  class="btn btn-sm btn-primary btn-view p-2"
+                  (mouseover)="hover5 = true"
+                  (mouseleave)="hover5 = false"
+                  [ngStyle]="
+                    hover5
+                      ? {
+                          background: currentTheme?.primaryColor,
+                          color: '#fff'
+                        }
+                      : { color: currentTheme?.primaryColor }
+                  "
+                  (click)="openModule(allModulesEnum.Finance)"
+                >
+                  View module
+                </button>
+              </div>
+              <div class="mx-auto w-140" id="lottie1">
+                <ng-lottie [options]="financeLottieOptions"></ng-lottie>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="col-md-3"
+            *ngIf="
+              crmSubscriptionIsActive &&
+              currentuser?.permission?.includes('View Prospect') &&
+              showModuleByGrowthbookFlag('crm')
+            "
+          >
+            <lnd-module-card [moduleCard]="moduleCards[0]" />
+          </div>
+
+          <div
+            class="col-md-3"
+            *ngIf="
+              crmSubscriptionIsActive &&
+              showModuleByGrowthbookFlag('wacs') &&
+              currentuser?.permission?.includes('View Wacs Module')
+            "
+          >
+            <lnd-module-card [moduleCard]="moduleCards[1]" />
+          </div>
+
+          <div
+            class="col-md-3"
+            *ngIf="
+              depositSubscriptionIsActive &&
+              currentuser?.permission?.includes('View Deposit Module') &&
+              showModuleByGrowthbookFlag('deposit')
+            "
+          >
+            <div
+              class="card cards blue my-4"
+              [style.background]="
+                currentTheme.theme === 'Dark'
+                  ? currentTheme?.dark?.cardColor
+                  : ''
+              "
+            >
+              <h2
+                class="f-20"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : currentTheme.primaryColor
+                "
+              >
+                Deposits
+              </h2>
+              <div class="btn-container">
+                <button
+                  routerLink="/deposits"
+                  [style.color]="
+                    currentTheme.theme === 'Dark'
+                      ? currentTheme?.dark?.primaryColor
+                      : currentTheme.primaryColor
+                  "
+                  [style.borderColor]="currentTheme?.primaryColor"
+                  class="btn btn-sm btn-primary btn-view p-2"
+                  (mouseover)="hover4 = true"
+                  (mouseleave)="hover4 = false"
+                  [ngStyle]="
+                    hover4
+                      ? {
+                          background: currentTheme?.primaryColor,
+                          color: '#fff'
+                        }
+                      : { color: currentTheme?.primaryColor }
+                  "
+                  (click)="openModule(allModulesEnum.Deposit)"
+                >
+                  View module
+                </button>
+              </div>
+              <div class="lot-deposit mx-auto w-150">
+                <ng-lottie [options]="depositLottieOptions"></ng-lottie>
+              </div>
+            </div>
+          </div>
+          <div
+            class="col-md-3"
+            *ngIf="
+              workflowSubscriptionIsActive &&
+              currentuser?.permission?.includes('View Workflow Module') &&
+              showModuleByGrowthbookFlag('workflow')
+            "
+          >
+            <div
+              class="card cards green my-4"
+              [style.background]="
+                currentTheme.theme === 'Dark'
+                  ? currentTheme?.dark?.cardColor
+                  : ''
+              "
+            >
+              <h2
+                class="f-20"
+                [style.color]="
+                  currentTheme.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : currentTheme.primaryColor
+                "
+              >
+                Workflow
+              </h2>
+
+              <div class="btn-container">
+                <button
+                  routerLink="/workflow/dashboard"
+                  [style.color]="
+                    currentTheme.theme === 'Dark'
+                      ? currentTheme?.dark?.primaryColor
+                      : currentTheme.primaryColor
+                  "
+                  [style.borderColor]="currentTheme?.primaryColor"
+                  class="btn btn-sm btn-primary btn-view p-2"
+                  (mouseover)="hover6 = true"
+                  (mouseleave)="hover6 = false"
+                  [ngStyle]="
+                    hover6
+                      ? {
+                          background: currentTheme?.primaryColor,
+                          color: '#fff'
+                        }
+                      : { color: currentTheme?.primaryColor }
+                  "
+                  (click)="openModule(allModulesEnum.Workflow)"
+                >
+                  View module
+                </button>
+              </div>
+              <div class="mx-auto w-150">
+                <ng-lottie [options]="workFlowLottieOptions"></ng-lottie>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+<ng-template #SubcriptionView>
+  <iframe
+    [src]="subscriptionUrl"
+    frameborder="0"
+    height="600px"
+    width="100%"
+  ></iframe>
+  <button
+    type="button"
+    class="btn btn-warning btn-xs text-white"
+    (click)="closeModal()"
+  >
+    Dismiss View
+  </button>
+</ng-template>

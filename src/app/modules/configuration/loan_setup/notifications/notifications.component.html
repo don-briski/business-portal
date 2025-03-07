@@ -1,0 +1,90 @@
+<section class="row">
+  <div class="col-xl-10 offset-md-1">
+    <div class="card p-4">
+      <h1>Notifications</h1>
+
+      <div class="card-body">
+        <header>
+          <p>Event Notification</p>
+          <p>Setup webhook notifications</p>
+        </header>
+
+        <div
+          *ngIf="isLoading && !config"
+          class="d-flex justify-content-center my-4"
+        >
+          <lnd-spinner text="Retrieving notification settings..."></lnd-spinner>
+        </div>
+
+        <form
+          [formGroup]="webhookForm"
+          class="p-4"
+        >
+          <div>
+            <lnd-switch
+              *ngIf="!isLoading"
+              text="Receive event notifications"
+              (emittedValue)="activateDeactivateNotifications($event)"
+              [value]="config?.activated"
+            ></lnd-switch>
+
+            <div *ngIf="webhookForm.value.activate" class="my-4">
+              <div class="d-flex align-items-center url mb-2">
+                <p class="mb-0">Enter URL</p>
+                <lnd-tooltip
+                  placement="top"
+                  text="URL to send notifications to"
+                ></lnd-tooltip>
+              </div>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter Webhook URL"
+                formControlName="webhookUrl"
+              />
+            </div>
+          </div>
+
+          <div *ngIf="webhookForm.value.webhookUrl" class="events">
+            <div class="d-flex align-items-center mb-2">
+              <p class="mb-0">Events</p>
+              <lnd-tooltip
+                placement="top"
+                text="All events that require notification"
+              ></lnd-tooltip>
+            </div>
+
+            <slct-2
+              (click)="dropdownToggled = true"
+              [multiple]="true"
+              [allowSelectAll]="true"
+              [allowClear]="true"
+              [customSearchEnabled]="true"
+              [data]="availableEvents"
+              [active]="selectedEvents"
+              formControlName="selectedEvents"
+              placeholder="Select Event"
+            ></slct-2>
+          </div>
+          <footer class="d-flex justify-content-end">
+            <button
+              [disabled]="!this.webhookForm.value?.webhookUrl && !this.webhookForm.value.selectedEvents && !this.webhookForm.value?.activate"
+              (click)="submit()"
+              [style.backgroundColor]="primaryColor"
+              class="btn btn-sm float-right text-white"
+            >
+              <span *ngIf="!isLoading">{{
+                config?.webhookUrl ? "Save Changes" : "Save"
+              }}</span>
+              <lnd-spinner
+                *ngIf="isLoading"
+                text="Processing..."
+                color="#fff"
+              ></lnd-spinner>
+            </button>
+          </footer>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

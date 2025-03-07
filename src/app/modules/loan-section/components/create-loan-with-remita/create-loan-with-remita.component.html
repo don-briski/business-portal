@@ -1,0 +1,378 @@
+<header class="px-4 py-3 d-flex justify-content-between align-items-center">
+  <h3>Create Loan Via Remita</h3>
+  <button
+    type="button"
+    class="close-btn"
+    aria-label="Close"
+    (click)="onClose()"
+  >
+    <i class="icon icon-close"></i>
+  </button>
+</header>
+<hr class="m-0" />
+<section class="p-4">
+  <form
+    [formGroup]="getCustomerDetailsForm"
+    (ngSubmit)="onGetCustomerDetails()"
+  >
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="acc-number">Account Number</label>
+          <input
+            id="acc-number"
+            type="text"
+            formControlName="accountNumber"
+            class="form-control"
+            placeholder="Enter account number"
+          />
+          <lnd-input-errors
+            label="Account Number"
+            [control]="getCustomerDetailsForm.get('accountNumber')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="form-group">
+          <label>Bank</label>
+          <slct-2
+            *ngIf="!isFetchingRemitaBanks"
+            [data]="remitaBanks"
+            [customSearchEnabled]="true"
+            placeholder="Select Bank"
+            (selected)="onSelectBank($event, 'Remita')"
+            (removed)="onDeselectBank('Remita')"
+          ></slct-2>
+          <lnd-spinner
+            *ngIf="isFetchingRemitaBanks"
+            class="d-block"
+          ></lnd-spinner>
+        </div>
+      </div>
+    </div>
+    <div class="mb-4" *ngIf="!customerDetailsFromRemita">
+      <button
+        *ngIf="!isFetchingCustomerDetails"
+        type="submit"
+        class="btn btn-success btn-xs"
+        [disabled]="getCustomerDetailsForm.invalid"
+      >
+        Get Customer's Details From Remita
+      </button>
+      <button
+        *ngIf="isFetchingCustomerDetails"
+        class="btn btn-warning btn-xs"
+        disabled
+      >
+        <i class="icon icon-spin icon-spin2 mr-2"></i>Fetching customer's
+        details...
+      </button>
+    </div>
+  </form>
+  <div class="dotted-divider"></div>
+  <section
+    *ngIf="!isFetchingCustomerDetails && customerDetailsFromRemita"
+    class="mt-3"
+  >
+    <h2>Customer's Details From Remita</h2>
+    <ul class="dt-list dt-list-one-second">
+      <li class="dt-list__item mr-3">
+        <div class="media">
+          <i
+            class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+          ></i>
+          <div class="media-body">
+            <span class="d-block text-light-gray f-12 mb-1"
+              >Customer's Name</span
+            >
+            <h5 class="mb-0">
+              {{ customerDetailsFromRemita?.customerName }}
+            </h5>
+          </div>
+        </div>
+      </li>
+      <li class="dt-list__item mr-3">
+        <div class="media">
+          <i
+            class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+          ></i>
+          <div class="media-body">
+            <span class="d-block text-light-gray f-12 mb-1"
+              >Account Number</span
+            >
+            <h5 class="mb-0">
+              {{ customerDetailsFromRemita?.accountNumber }}
+            </h5>
+          </div>
+        </div>
+      </li>
+      <li class="dt-list__item mr-3">
+        <div class="media">
+          <i
+            class="mr-3 icon icon-company icon-2x align-self-center text-warning"
+          ></i>
+          <div class="media-body">
+            <span class="d-block text-light-gray f-12 mb-1">Company Name</span>
+            <h5 class="mb-0">
+              {{ customerDetailsFromRemita?.companyName }}
+            </h5>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <div id="accordion">
+      <div class="card-header d-flex justify-content-between">
+        <h3 class="mb-0">Salary History</h3>
+        <span
+          (click)="selectedRemitaInfo = 'Salary'"
+          [ngClass]="selectedRemitaInfo === 'Salary' ? 'open' : 'close'"
+          class="cursor"
+          data-toggle="collapse"
+          data-target="#salary"
+          ><i class="icon icon-chevron-down icon-lg"></i
+        ></span>
+      </div>
+      <div class="content">
+        <div
+          id="salary"
+          class="collapse show"
+          aria-labelledby="headingOne"
+          data-parent="#accordion"
+        >
+          <lnd-remita-salary-info
+            [salaryHistory]="
+              customerDetailsFromRemita?.salaryPaymentDetails
+            "
+            [colorTheme]="colorTheme"
+          >
+          </lnd-remita-salary-info>
+        </div>
+      </div>
+      <div class="card-header d-flex justify-content-between">
+        <h3 class="mb-0">Loan History</h3>
+        <span
+          (click)="selectedRemitaInfo = 'Loan'"
+          [ngClass]="selectedRemitaInfo === 'Loan' ? 'open' : 'close'"
+          class="cursor"
+          data-toggle="collapse"
+          data-target="#loan"
+          ><i class="icon icon-chevron-down icon-lg"></i
+        ></span>
+      </div>
+      <div class="content">
+        <div
+          id="loan"
+          class="collapse show"
+          aria-labelledby="headingOne"
+          data-parent="#accordion"
+        >
+          <lnd-remita-loan-info
+            [loanHistory]="
+              customerDetailsFromRemita?.loanHistoryDetails
+            "
+          >
+          </lnd-remita-loan-info>
+        </div>
+      </div>
+    </div>
+    <div class="dotted-divider my-5"></div>
+    <form [formGroup]="loanApplicationForm">
+      <h3>Provide the Following Details</h3>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="employment-date"
+              >Date of Employment <span class="red">*</span></label
+            >
+            <input
+            lndInvalidDateChecker
+              id="employment-date"
+              type="date"
+              formControlName="DateOfEmployment"
+              class="form-control"
+            />
+            <lnd-input-errors
+              label="Date of employment"
+              [control]="loanApplicationForm.get('DateOfEmployment')"
+            ></lnd-input-errors>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="phone-no"
+              >Phone Number <span class="red">*</span></label
+            >
+            <input
+              id="phone-no"
+              type="text"
+              formControlName="CustomerPhoneNumber"
+              class="form-control"
+              placeholder="Enter phone number"
+            />
+            <lnd-input-errors
+              label="Phone number"
+              [control]="loanApplicationForm.get('CustomerPhoneNumber')"
+            ></lnd-input-errors>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8">
+          <label for="resid-addr"
+            >Residential Address <span class="red">*</span></label
+          >
+          <textarea
+            id="resid-addr"
+            class="form-control"
+            formControlName="ResidentialAddress"
+            placeholder="Enter residential address"
+          ></textarea>
+          <lnd-input-errors
+            label="Residential address"
+            [control]="loanApplicationForm.get('ResidentialAddress')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+      <div class="dotted-divider my-5"></div>
+      <h3>Disbursement Bank Account</h3>
+      <div>
+        <p
+          class="text-danger mb-5"
+          *ngIf="!isPaystackDisburseable && !usePaystackDisburseableBankAcc"
+        >
+          Can't be disbursed to using Paystack
+        </p>
+        <div class="mb-5" *ngIf="!isPaystackDisburseable">
+          <lnd-switch
+            text="Use a Paystack Disburseable Bank"
+            [value]="usePaystackDisburseableBankAcc"
+            (emittedValue)="usePaystackDisburseableBankAcc = $event"
+          ></lnd-switch>
+        </div>
+        <ul
+          *ngIf="!usePaystackDisburseableBankAcc"
+          class="dt-list dt-list-one-second"
+        >
+          <li class="dt-list__item mr-3">
+            <div class="media">
+              <i
+                class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Account Number</span
+                >
+                <h5 class="mb-0">
+                  {{ customerDetailsFromRemita?.accountNumber }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li class="dt-list__item mr-3">
+            <div class="media">
+              <i
+                class="mr-3 icon icon-company icon-2x align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1">Bank Name</span>
+                <h5 class="mb-0">
+                  {{ selectedRemitaBankName }}
+                </h5>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <div class="row" *ngIf="usePaystackDisburseableBankAcc">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="acc-number"
+              >Account Number <span class="red">*</span></label
+            >
+            <input
+              id="acc-number"
+              type="text"
+              formControlName="BankAccountNumber"
+              class="form-control"
+              placeholder="Enter account number"
+            />
+            <lnd-input-errors
+              label="Account Number"
+              [control]="loanApplicationForm.get('BankAccountNumber')"
+            ></lnd-input-errors>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label>Bank <span class="red">*</span></label>
+            <slct-2
+              [data]="paystackBanks"
+              [customSearchEnabled]="true"
+              placeholder="Select bank"
+              (selected)="onSelectBank($event, 'Paystack')"
+              (removed)="onDeselectBank('Paystack')"
+            ></slct-2>
+          </div>
+        </div>
+      </div>
+      <div class="dotted-divider my-5"></div>
+      <div class="row">
+        <div
+          class="form-group col-md-4"
+          *ngIf="user?.permission?.includes('Set Branch On Loan')"
+        >
+          <label for="branch" class="left-aligned"
+            >Applicable Branch <span class="red">*</span></label
+          >
+          <div>
+            <select
+              for="branch"
+              formControlName="BranchId"
+              class="custom-select custom-select-xl form-control form-control-xl height"
+            >
+              <option *ngFor="let item of branches" value="{{ item.branchId }}">
+                {{ item.branchName }}
+              </option>
+            </select>
+            <lnd-input-errors
+              label="Branch"
+              [control]="loanApplicationForm.get('BranchId')"
+            ></lnd-input-errors>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-8">
+          <label for="comment">Comment For Reviewer (Optional)</label>
+          <textarea
+            id="comment"
+            class="form-control"
+            formControlName="AdditionalComment"
+            placeholder="Enter comment"
+          ></textarea>
+        </div>
+      </div>
+    </form>
+    <div class="dotted-divider my-5"></div>
+    <div class="d-flex justify-content-end">
+      <button
+        *ngIf="
+          !isSubmittingLoanApplication &&
+          user?.permission?.includes('Submit Application to Pool')
+        "
+        class="btn btn-success btn-xs"
+        (click)="onSubmitLoanApplicationForm('Pool')"
+        [disabled]="loanApplicationForm.invalid"
+      >
+        Submit Application To Pool
+      </button>
+      <button
+        *ngIf="isSubmittingLoanApplication"
+        class="btn btn-warning btn-xs"
+        disabled
+      >
+        <i class="icon icon-spin icon-spin2 mr-2"></i>Submitting Application...
+      </button>
+    </div>
+  </section>
+</section>

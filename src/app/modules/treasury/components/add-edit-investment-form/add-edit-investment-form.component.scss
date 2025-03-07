@@ -1,0 +1,40 @@
+section {
+  margin-top: 20px;
+  margin-bottom: 40px;
+  .col-md-4,
+  .col-md-6 {
+    margin-bottom: 20px;
+  }
+
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid gainsboro;
+}
+
+.w-90 {
+  width: 90%;
+}
+
+.badge-success {
+  padding: 3px 8px;
+}
+
+.supporting-doc {
+  max-width: 30%;
+  border: 1px solid var(--border-grey);
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  span {
+    margin-left: 10px;
+    color: var(--border-grey);
+  }
+
+  input{
+    display: none;
+  }
+}
+
+.footer{
+  gap: 10px;
+}

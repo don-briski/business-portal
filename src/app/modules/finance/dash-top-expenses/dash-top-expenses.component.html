@@ -1,0 +1,72 @@
+<div class="card p-5">
+  <header class="d-flex justify-content-between align-items-center pb-3">
+    <h1 class="mb-0">Top Expenses</h1>
+    <div class="d-flex align-items-center date-range-btns">
+      <button
+        [style.borderColor]="currentTheme?.secondaryColor"
+        [style.backgroundColor]="
+          selectedRange === 'today' ? currentTheme?.secondaryColor : ''
+        "
+        class="btn btn-xs"
+        [ngClass]="selectedRange === 'today' ? 'text-white' : ''"
+        type="button"
+        (click)="getMetricData('today')"
+      >
+        Today
+      </button>
+      <button
+        [style.borderColor]="currentTheme?.secondaryColor"
+        class="btn btn-xs"
+        [style.backgroundColor]="
+          selectedRange === 'mtd' ? currentTheme?.secondaryColor : ''
+        "
+        class="btn btn-xs"
+        [ngClass]="selectedRange === 'mtd' ? 'text-white' : ''"
+        type="button"
+        (click)="getMetricData('mtd')"
+      >
+        MTD
+      </button>
+      <button
+        [style.borderColor]="currentTheme?.secondaryColor"
+        class="btn btn-xs"
+        [style.backgroundColor]="
+          selectedRange === 'ytd' ? currentTheme?.secondaryColor : ''
+        "
+        class="btn btn-xs"
+        [ngClass]="selectedRange === 'ytd' ? 'text-white' : ''"
+        type="button"
+        (click)="getMetricData('ytd')"
+      >
+        YTD
+      </button>
+    </div>
+  </header>
+
+  <div class="d-flex justify-content-center py-3" *ngIf="isLoading">
+    <i
+      class="icon icon-spin icon-spin2"
+      [style.color]="currentTheme?.secondaryColor"
+    ></i>
+  </div>
+
+  <div
+    *ngIf="topExpenses?.length === 0"
+    class="d-flex flex-column align-items-center w-100 no-data"
+  >
+   
+    <img
+      src="assets/images/no data.svg"
+      alt="no-data-svg"
+      width="150px"
+      class="py-5"
+    />
+    <p class=" text-center  mb-0">
+      No Records Available
+    </p>
+  </div>
+  <div
+    id="chartdiv"
+    [ngClass]="topExpenses?.length > 0 ? 'fill' : 'no-fill'"
+  ></div>
+</div>

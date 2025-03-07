@@ -1,0 +1,1120 @@
+<div class="p-2">
+  <main class="card p-5">
+    <header class="d-flex justify-content-between align-items-center pb-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <img
+          src="assets/images/male-default-profile.png"
+          alt="profile-pic"
+          width="50"
+        />
+        <div class="ml-4">
+          <h3>{{ profileInfo?.name }}</h3>
+          <p>
+            <i class="icon icon-link"></i>
+            {{ profileInfo?.bvn }}
+          </p>
+        </div>
+      </div>
+      <button
+        class="btn btn-outline-light"
+        routerLink="/checkout-admin/customers"
+      >
+        Back
+      </button>
+    </header>
+    <section *ngIf="!isLoading" class="mt-5">
+      <ul class="dt-list dt-list-one-second">
+        <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.riskCategory"
+          title="Risk Category"
+          [value]="profileInfo?.affordProfile?.riskCategory"
+        />
+        <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.applicationLoanAmount"
+          title="Requested Amount"
+          [value]="profileInfo?.affordProfile?.applicationLoanAmount"
+          type="amount"
+        />
+        <lnd-dt-list-item
+          title="Loan Limit Amount"
+          [value]="profileInfo?.affordProfile?.loanLimitAmount"
+          type="amount"
+        />
+        <lnd-dt-list-item
+          title="Most Repayment Amount Per Month"
+          [value]="profileInfo?.affordProfile?.mostRepaymentAmountPerMonth"
+          type="amount"
+        />
+        <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.estimateMonthlyRepayments"
+          title="Estimate Monthly Repayments (EMR)"
+          [value]="profileInfo?.affordProfile?.estimateMonthlyRepayments"
+          type="amount"
+        />
+        <lnd-dt-list-item
+          title="Quick Check"
+          [value]="profileInfo?.affordProfile?.quikCheck ? 'Yes' : 'No'"
+        />
+        <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.narrationCipherOutcome"
+          title="Narration Cipher Outcome"
+          [value]="profileInfo?.affordProfile?.narrationCipherOutcome"
+        >
+          <div
+            *ngIf="
+              profileInfo?.affordProfile?.narrationCipherOutcome === 'Pass'
+            "
+            class="ml-2 p-1 bg-success rounded"
+          >
+            <i
+              class="icon icon-check text-white"
+              [style.fontSize]="checkIconSize"
+            ></i>
+          </div>
+          <div
+            *ngIf="
+              profileInfo?.affordProfile?.narrationCipherOutcome === 'Fail'
+            "
+            class="ml-2 p-1 bg-danger rounded"
+          >
+            <i
+              class="icon icon-close text-white"
+              [style.fontSize]="checkIconSize"
+            ></i>
+          </div>
+        </lnd-dt-list-item>
+        <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.accountCipherOutcome"
+          title="Account Cipher Outcome"
+          [value]="profileInfo?.affordProfile?.accountCipherOutcome"
+        >
+          <div
+            *ngIf="profileInfo?.affordProfile?.accountCipherOutcome === 'Pass'"
+            class="ml-2 p-1 bg-success rounded"
+          >
+            <i
+              class="icon icon-check text-white"
+              [style.fontSize]="checkIconSize"
+            ></i>
+          </div>
+          <div
+            *ngIf="profileInfo?.affordProfile?.accountCipherOutcome === 'Fail'"
+            class="ml-2 p-1 bg-danger rounded"
+          >
+            <i
+              class="icon icon-close text-white"
+              [style.fontSize]="checkIconSize"
+            ></i>
+          </div>
+        </lnd-dt-list-item>
+        <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.incomeCipherOutcome"
+          title="Income Cipher Outcome"
+          [value]="profileInfo?.affordProfile?.incomeCipherOutcome"
+        >
+          <div
+            *ngIf="profileInfo?.affordProfile?.incomeCipherOutcome === 'Pass'"
+            class="ml-2 p-1 bg-success rounded"
+          >
+            <i
+              class="icon icon-check text-white"
+              [style.fontSize]="checkIconSize"
+            ></i>
+          </div>
+          <div
+            *ngIf="profileInfo?.affordProfile?.incomeCipherOutcome === 'Fail'"
+            class="ml-2 p-1 bg-danger rounded"
+          >
+            <i
+              class="icon icon-close text-white"
+              [style.fontSize]="checkIconSize"
+            ></i>
+          </div>
+        </lnd-dt-list-item>
+        <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.sweeperCipherOutcome"
+          title="Sweeper Cipher Outcome"
+          [value]="profileInfo?.affordProfile?.sweeperCipherOutcome"
+        >
+          <div
+            *ngIf="profileInfo?.affordProfile?.sweeperCipherOutcome === 'Pass'"
+            class="ml-2 p-1 bg-success rounded"
+          >
+            <i class="icon icon-check text-white"></i>
+          </div>
+          <div
+            *ngIf="profileInfo?.affordProfile?.sweeperCipherOutcome === 'Fail'"
+            class="ml-2 p-1 bg-danger rounded"
+          >
+            <i class="icon icon-close text-white"></i>
+          </div>
+        </lnd-dt-list-item>
+        <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.loanLimitOutcome"
+          title="Loan Limit Outcome"
+          [value]="profileInfo?.affordProfile?.loanLimitOutcome"
+        >
+          <div
+            *ngIf="profileInfo?.affordProfile?.loanLimitOutcome === 'Pass'"
+            class="ml-2 p-1 bg-success rounded"
+          >
+            <i
+              class="icon icon-check text-white"
+              [style.fontSize]="checkIconSize"
+            ></i>
+          </div>
+
+          <div
+            *ngIf="profileInfo?.affordProfile?.loanLimitOutcome === 'Fail'"
+            class="ml-2 p-1 bg-danger rounded"
+          >
+            <i
+              class="icon icon-close text-white"
+              [style.fontSize]="checkIconSize"
+            ></i>
+          </div>
+        </lnd-dt-list-item>
+        <lnd-dt-list-item
+          title="Secondary Route Used"
+          [value]="
+            profileInfo?.affordProfile?.secondaryRouteDetails != null
+              ? 'Yes'
+              : 'No'
+          "
+        />
+        <lnd-dt-list-item
+          title="Last Updated Time"
+          [value]="profileInfo?.affordProfile?.lastUpdatedTime"
+          type="date"
+          [showDateTime]="true"
+        />
+      </ul>
+      <div class="mt-5">
+        <ul
+          class="nav nav-underline flex-row border-bottom nav-card-tabs mt-1"
+          role="tablist"
+        >
+          <li
+            *ngIf="profileInfo?.affordProfile?.bank"
+            class="nav-item"
+            (click)="currentTabIndex = 1"
+          >
+            <a
+              class="nav-link active"
+              data-toggle="tab"
+              href="#bank-spool"
+              role="tab"
+              aria-controls="bank-spool"
+              aria-selected="true"
+              >Bank Spool</a
+            >
+          </li>
+          <li
+            *ngIf="profileInfo?.affordProfile?.analysedBankStatement"
+            class="nav-item"
+            (click)="currentTabIndex = 2"
+          >
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#bank-analysis"
+              role="tab"
+              aria-controls="bank-analysis"
+              aria-selected="true"
+              >Bank Analysis</a
+            >
+          </li>
+          <li
+            *ngIf="
+              profileInfo?.affordProfile?.narrationCipherOutcomeDetails &&
+              profileInfo?.affordProfile?.narrationCipherOutcomeDetails
+                ?.checkOutcome
+            "
+            class="nav-item"
+            (click)="currentTabIndex = 3"
+          >
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#narration-cipher"
+              role="tab"
+              aria-controls="narration-cipher"
+              aria-selected="true"
+              >Narration Cipher</a
+            >
+          </li>
+          <li
+            *ngIf="
+              profileInfo?.affordProfile?.accountActivityCipherOutcomeDetails
+            "
+            class="nav-item"
+            (click)="currentTabIndex = 7"
+          >
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#accactivity-cipher"
+              role="tab"
+              aria-controls="accactivity-cipher"
+              aria-selected="true"
+              >Account Activity</a
+            >
+          </li>
+          <li
+            *ngIf="profileInfo?.affordProfile?.incomeCipherOutcomeDetails"
+            class="nav-item"
+            (click)="currentTabIndex = 4"
+          >
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#income-cipher"
+              role="tab"
+              aria-controls="income-cipher"
+              aria-selected="true"
+              >Income Cipher</a
+            >
+          </li>
+          <li
+            *ngIf="profileInfo?.affordProfile?.sweeperCipherOutcomeDetails"
+            class="nav-item"
+            (click)="currentTabIndex = 5"
+          >
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#sweeper-cipher"
+              role="tab"
+              aria-controls="sweeper-cipher"
+              aria-selected="true"
+              >Sweeper Cipher</a
+            >
+          </li>
+          <li
+            *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails"
+            class="nav-item"
+            (click)="currentTabIndex = 6"
+          >
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#secondary-route"
+              role="tab"
+              aria-controls="secondary-route"
+              aria-selected="true"
+              >Secondary Route Details</a
+            >
+          </li>
+          <li
+            *ngIf="profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails"
+            class="nav-item"
+            (click)="currentTabIndex = 8"
+          >
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#loan-limit"
+              role="tab"
+              aria-controls="loan-limit"
+              aria-selected="true"
+              >Loan Limit</a
+            >
+          </li>
+        </ul>
+        <div class="tab-content mt-5">
+          <div
+            *ngIf="profileInfo?.affordProfile?.bank"
+            id="bank-spool"
+            class="tab-pane active"
+          >
+            <ul class="dt-list dt-list-one-second">
+              <lnd-dt-list-item
+                title="Bank"
+                [value]="profileInfo?.affordProfile?.bank?.bankName"
+              />
+
+              <lnd-dt-list-item
+                title="Account Number"
+                [value]="profileInfo?.affordProfile?.bank?.accountNumber"
+              />
+
+              <lnd-dt-list-item
+                title="Bank Statement Spool Date"
+                [value]="profileInfo?.affordProfile?.bankStatementSpoolDate"
+                type="date"
+              />
+              <lnd-dt-list-item
+                title="Bank Statement Spool Start Date"
+                [value]="
+                  profileInfo?.affordProfile?.rawBankSpoolData?.spoolStartDate
+                "
+                type="date"
+              />
+              <lnd-dt-list-item
+                title="First Date In Bank Statement"
+                [value]="profileInfo?.affordProfile?.firstDateInBankStatement"
+                type="date"
+              />
+
+              <lnd-dt-list-item
+                title="Last Date In Bank Statement"
+                [value]="profileInfo?.affordProfile?.lastDateInBankStatement"
+                type="date"
+              />
+              <lnd-dt-list-item
+                title="Bank Statement Length Months"
+                [value]="profileInfo?.affordProfile?.bankStatementLengthMonths"
+              />
+            </ul>
+            <ul
+              class="nav nav-underline flex-row border-bottom nav-card-tabs mt-1"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  data-toggle="tab"
+                  href="#transactions1"
+                  role="tab"
+                  aria-controls="transactions1"
+                  aria-selected="true"
+                  >Transactions</a
+                >
+              </li>
+            </ul>
+            <div class="tab-content mt-5">
+              <lnd-table
+                [isLoading]="isLoading"
+                [config]="tableConfig"
+                [allowSearch]="true"
+                [headers]="rawBankTransactionsTableHeaders"
+                [data]="rawBankTransactionsData"
+                [pagination]="rawBankTransactionsPagination"
+                [searchColumns]="rawBankTransactionsPagination.searchColumns"
+                [useRelativePosition]="true"
+                (paginationChange)="onPaginationChange($event)"
+                (searchParams)="onSearchParams($event)"
+                noDataTitle="No result(s) found for your search"
+              ></lnd-table>
+            </div>
+          </div>
+          <div
+            *ngIf="profileInfo?.affordProfile?.analysedBankStatement"
+            id="bank-analysis"
+            class="tab-pane"
+          >
+            <ul class="dt-list dt-list-one-second">
+                  <lnd-dt-list-item
+                  *ngIf="profileInfo?.affordProfile?.analysedBankStatement?.partner"
+                  title="Partner"
+                  [value]="
+                    profileInfo?.affordProfile?.analysedBankStatement
+                      ?.partner
+                  "
+                />
+                <lnd-dt-list-item
+                *ngIf="profileInfo?.affordProfile?.analysedBankStatement?.analysisId"
+                title="Partner Analysis Identifier"
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.analysisId
+                "
+              />
+              <lnd-dt-list-item
+                *ngIf="profileInfo?.affordProfile?.analysedBankStatement?.customerId"
+                title="Partner Customer Identifier"
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.customerId
+                "
+              />
+              <lnd-dt-list-item
+                title="Earning Class"
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.earningClass
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Gambling Rate (%)"
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.gamblingRate
+                "
+              />
+              <lnd-dt-list-item
+                title="Expected Salary Day"
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.expectedSalaryDay
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Confidence Interval On Salary Detection (%)"
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.confidenceIntervalOnSalaryDetection
+                "
+              />
+
+              <lnd-dt-list-item
+                *ngIf="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.monthlyAverageBankChargeAmount
+                "
+                title="Monthly Average Bank Charge Amount"
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.monthlyAverageBankChargeAmount
+                "
+                type="amount"
+              />
+
+              <lnd-dt-list-item
+                *ngIf="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.estimateMonthlyInstallment
+                "
+                title="Estimate Monthly Installment Amount (EMI) "
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.estimateMonthlyInstallment
+                "
+                type="amount"
+              />
+
+              <lnd-dt-list-item
+                *ngIf="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.estimateMonthlyInstallmentConfidenceScore
+                "
+                title="Estimate Monthly Installment Confidence Score (%)"
+                [value]="
+                  profileInfo?.affordProfile?.analysedBankStatement
+                    ?.estimateMonthlyInstallmentConfidenceScore
+                "
+              />
+            </ul>
+            <ul
+              class="nav nav-underline flex-row border-bottom nav-card-tabs mt-1"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  data-toggle="tab"
+                  href="#transactions2"
+                  role="tab"
+                  aria-controls="#transactions2"
+                  aria-selected="true"
+                  >Salary Transactions</a
+                >
+              </li>
+            </ul>
+            <div class="tab-content mt-5">
+              <div
+                id="transactions2"
+                class="tab-pane active table-container pt-5"
+              >
+                <lnd-table
+                  *ngIf="tableData.length > 0"
+                  [isLoading]="isLoading"
+                  [config]="tableConfig"
+                  [headers]="tableHeaders"
+                  [data]="tableData"
+                ></lnd-table>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="profileInfo?.affordProfile?.narrationCipherOutcomeDetails"
+            id="narration-cipher"
+            class="tab-pane"
+          >
+            <ul class="dt-list dt-list-one-second">
+              <lnd-dt-list-item
+                title="Fail Point"
+                [value]="
+                  profileInfo?.affordProfile?.narrationCipherOutcomeDetails
+                    ?.checkOutcome
+                "
+              >
+                <div
+                  *ngIf="
+                    profileInfo?.affordProfile?.narrationCipherOutcomeDetails
+                      ?.checkOutcome != 1
+                  "
+                  class="ml-2 p-1 bg-danger rounded"
+                >
+                  <i class="icon icon-close text-white"></i>
+                </div>
+              </lnd-dt-list-item>
+              <lnd-dt-list-item
+                title="Word Found"
+                [value]="
+                  profileInfo?.affordProfile?.narrationCipherOutcomeDetails
+                    ?.checkData?.word
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Bank Row Information"
+                [value]="
+                  profileInfo?.affordProfile?.narrationCipherOutcomeDetails
+                    ?.checkData?.statementRowInformation
+                "
+              />
+            </ul>
+          </div>
+
+          <div
+            *ngIf="
+              profileInfo?.affordProfile?.accountActivityCipherOutcomeDetails
+            "
+            id="accactivity-cipher"
+            class="tab-pane"
+          >
+            <ul class="dt-list dt-list-one-second">
+              <lnd-dt-list-item
+                title="Fail Point"
+                [value]="
+                  profileInfo?.affordProfile
+                    ?.accountActivityCipherOutcomeDetails?.failPoint
+                "
+              >
+                <div
+                  *ngIf="
+                    profileInfo?.affordProfile
+                      ?.accountActivityCipherOutcomeDetails?.failPoint != 'None'
+                  "
+                  class="ml-2 p-1 bg-danger rounded"
+                >
+                  <i class="icon icon-close text-white"></i>
+                </div>
+              </lnd-dt-list-item>
+              <lnd-dt-list-item
+                title="TMI"
+                [value]="
+                  (profileInfo?.affordProfile?.accountActivityCipherOutcomeDetails?.tmi)
+                "
+                type="amount"
+              />
+
+              <lnd-dt-list-item
+                title="Pass Rate"
+                [value]="
+                  profileInfo?.affordProfile
+                    ?.accountActivityCipherOutcomeDetails?.passRate
+                "
+                type="percent"
+              />
+
+              <lnd-dt-list-item
+                title="Three Months Pass Count"
+                [value]="
+                  profileInfo?.affordProfile
+                    ?.accountActivityCipherOutcomeDetails?.threeMonthsPassCount
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Monthly Average Bank Charge Amount"
+                [value]="
+                  profileInfo?.affordProfile
+                    ?.accountActivityCipherOutcomeDetails
+                    ?.monthlyAverageBankChargeAmount
+                "
+                type="amount"
+              />
+            </ul>
+
+            <ul class="nav nav-underline border-bottom">
+              <li class="nav-item">
+                <a
+                  [ngStyle]="{
+                    color: currentTheme?.secondaryColor,
+                    borderBottom: '2px solid ' + currentTheme?.secondaryColor
+                  }"
+                  class="nav-link"
+                  data-toggle="tab"
+                  href="#transactions"
+                  role="tab"
+                  aria-controls="tab-pane1"
+                  aria-selected="true"
+                  >Bank Account Transactions</a
+                >
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              <div class="tab-pane active w-50 pt-5">
+                <lnd-table
+                  *ngIf="accActivityTableData.length > 0"
+                  [isLoading]="isLoading"
+                  [config]="tableConfig"
+                  [headers]="accActTableHeaders"
+                  [data]="accActivityTableData"
+                ></lnd-table>
+              </div>
+            </div>
+          </div>
+
+          <div
+            *ngIf="profileInfo?.affordProfile?.incomeCipherOutcomeDetails"
+            id="income-cipher"
+            class="tab-pane"
+          >
+            <ul class="dt-list dt-list-one-second">
+              <lnd-dt-list-item
+                title="Fail Point"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.failPoint
+                "
+              >
+                <div
+                  *ngIf="
+                    profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                      ?.failPoint != 'None'
+                  "
+                  class="ml-2 p-1 bg-danger rounded"
+                >
+                  <i class="icon icon-close text-white"></i>
+                </div>
+              </lnd-dt-list-item>
+
+              <lnd-dt-list-item
+                title="Confidence Interval (%)"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.confidenceInterval
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Salary Calculation Type"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.salaryCalculationType
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Salary Reduction PCT"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.salaryReductionPCT
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Expected Salary Day"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.expectedSalaryDay
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Derived Salary Day"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.derivedSalaryDay
+                "
+              />
+
+              <lnd-dt-list-item
+                title="Expected Salary"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.expectedSalary
+                "
+                type="amount"
+              />
+
+              <lnd-dt-list-item
+                title="Derived Salary"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.derivedSalary
+                "
+                type="amount"
+              />
+
+              <lnd-dt-list-item
+                title="Salary Variance"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.salaryVariance
+                "
+                type="amount"
+              />
+
+              <lnd-dt-list-item
+                title="Detected Salaries"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.detectedSalaries
+                "
+              />
+
+              <lnd-dt-list-item
+                title="All X Months Have Same Salary Day"
+                [value]="
+                  profileInfo?.affordProfile?.incomeCipherOutcomeDetails
+                    ?.allXMonthsHaveSameSalarayDay
+                    ? 'Yes'
+                    : 'No'
+                "
+              />
+            </ul>
+            <ul
+              class="nav nav-underline flex-row border-bottom nav-card-tabs mt-1"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  data-toggle="tab"
+                  href="#incomesalarytransactions"
+                  role="tab"
+                  aria-controls="#incomesalarytransactions"
+                  aria-selected="true"
+                  >Salary Transactions</a
+                >
+              </li>
+            </ul>
+            <div class="tab-content mt-5">
+              <div class="table-container">
+                <lnd-table
+                  *ngIf="tableData.length > 0"
+                  [isLoading]="isLoading"
+                  [config]="tableConfig"
+                  [headers]="incTableHeaders"
+                  [data]="incTableData"
+                ></lnd-table>
+              </div>
+            </div>
+          </div>
+          <div
+            *ngIf="profileInfo?.affordProfile?.sweeperCipherOutcomeDetails"
+            id="sweeper-cipher"
+            class="tab-pane"
+          >
+            <ul class="dt-list dt-list-one-second">
+              <lnd-dt-list-item
+                title="Fail Point"
+                [value]="
+                  profileInfo?.affordProfile?.sweeperCipherOutcomeDetails
+                    ?.failPoint
+                "
+              >
+                <div
+                  *ngIf="
+                    profileInfo?.affordProfile?.sweeperCipherOutcomeDetails
+                      ?.failPoint != 'None'
+                  "
+                  class="ml-2 p-1 bg-danger rounded"
+                >
+                  <i class="icon icon-close text-white"></i>
+                </div>
+              </lnd-dt-list-item>
+              <lnd-dt-list-item
+                title="Configured Balance Threshold (%)"
+                [value]="
+                  profileInfo?.affordProfile?.sweeperCipherOutcomeDetails
+                    ?.sweeperCipherCalculatedValues?.configBalanceThreshold
+                "
+              />
+              <lnd-dt-list-item
+                title="Customer Sweep Score (%)"
+                [value]="
+                  (
+                    profileInfo?.affordProfile?.sweeperCipherOutcomeDetails
+                      ?.sweepScore * 100
+                  ).toFixed(2)
+                "
+              />
+              <lnd-dt-list-item
+                title="Customer is a Sweeper"
+                [value]="
+                  profileInfo?.affordProfile?.sweeperCipherOutcomeDetails
+                    ?.isSweeper
+                    ? 'Yes'
+                    : 'No'
+                "
+              />
+              <lnd-dt-list-item
+                title="Customer is a Recent Sweeper"
+                [value]="
+                  profileInfo?.affordProfile?.sweeperCipherOutcomeDetails
+                    ?.isRecentSweeper
+                    ? 'Yes'
+                    : 'No'
+                "
+              />
+            </ul>
+            <ul
+              class="nav nav-underline flex-row border-bottom nav-card-tabs mt-1"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  data-toggle="tab"
+                  href="#sweeptransactions"
+                  role="tab"
+                  aria-controls="#sweeptransactions"
+                  aria-selected="true"
+                  >Salary Transactions Showing Sweep Checks</a
+                >
+              </li>
+            </ul>
+            <div class="tab-content mt-5">
+              <div>
+                <lnd-table
+                  *ngIf="sweeperTableData?.length > 0"
+                  [isLoading]="isLoading"
+                  [config]="tableConfig"
+                  [headers]="sweeperTableHeaders"
+                  [data]="sweeperTableData"
+                ></lnd-table>
+              </div>
+            </div>
+          </div>
+          <div
+            *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails"
+            id="secondary-route"
+            class="tab-pane"
+          >
+            <ul class="dt-list dt-list-one-second">
+              <lnd-dt-list-item
+                title="First Fail Point"
+                [value]="
+                  profileInfo?.affordProfile?.secondaryRouteDetails
+                    ?.originalFailurePoint
+                "
+              >
+                <div
+                  *ngIf="
+                    profileInfo?.affordProfile?.secondaryRouteDetails
+                      ?.originalFailurePoint != 'None'
+                  "
+                  class="ml-2 p-1 bg-danger rounded"
+                >
+                  <i class="icon icon-close text-white"></i>
+                </div>
+              </lnd-dt-list-item>
+              <lnd-dt-list-item
+                title="Secondary Route Used"
+                [value]="
+                  profileInfo?.affordProfile?.secondaryRouteDetails
+                    ?.usedSecondaryRoute
+                "
+              />
+
+              <lnd-dt-list-item
+              *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+              ?.usedSecondaryRoute == 'EMI'"
+              title="Calculated EMI"
+              [value]="
+                profileInfo?.affordProfile?.analysedBankStatement
+                  ?.calulatedEstimateMonthlyInstallment
+              "
+              type="amount"
+            />
+
+              <lnd-dt-list-item
+              *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+              ?.usedSecondaryRoute == 'EMI'"
+              title="Total Credit Turnover"
+              [value]="
+                profileInfo?.affordProfile?.analysedBankStatement
+                  ?.totalCreditTurnover
+              "
+              type="amount"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+              ?.usedSecondaryRoute == 'EMI'"
+              title="Total Reccuring Expense"
+              [value]="
+                profileInfo?.affordProfile?.analysedBankStatement
+                  ?.totalReccuringExpense
+              "
+              type="amount"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+              ?.usedSecondaryRoute == 'EMI'"
+              title="Average Credit"
+              [value]="
+                profileInfo?.affordProfile?.analysedBankStatement
+                  ?.averageCredit
+              "
+              type="amount"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+              ?.usedSecondaryRoute == 'EMI'"
+              title="Average Reccuring Expense"
+              [value]="
+                profileInfo?.affordProfile?.analysedBankStatement
+                  ?.averageReccuringExpense
+              "
+              type="amount"
+            />
+
+            <lnd-dt-list-item
+            *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+            ?.usedSecondaryRoute == 'EMI'"
+            title="EMI Eligibility Status"
+            [value]="
+              profileInfo?.affordProfile?.analysedBankStatement
+                ?.calculatedEligibilityResult?.emiEligibilityStatus
+            "
+          />
+
+          <lnd-dt-list-item
+          *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+          ?.usedSecondaryRoute == 'EMI'"
+          title="Minimum Loan Offered"
+          [value]="
+            profileInfo?.affordProfile?.secondaryRouteDetails
+              ?.minimumLoanOffered
+          "
+        />
+            </ul>
+
+            
+            <ul 
+            *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+              ?.usedSecondaryRoute == 'EMI'"
+            class="nav nav-underline border-bottom">
+              <li class="nav-item">
+                <a
+                  [ngStyle]="{
+                    color: currentTheme?.secondaryColor,
+                    borderBottom: '2px solid ' + currentTheme?.secondaryColor
+                  }"
+                  class="nav-link"
+                  data-toggle="tab"
+                  href="#eligibilitytransactions"
+                  role="tab"
+                  aria-controls="tab-pane1"
+                  aria-selected="true"
+                  >Eligibility Transactions</a
+                >
+              </li>
+            </ul>
+
+            <div
+            *ngIf="profileInfo?.affordProfile?.secondaryRouteDetails
+              ?.usedSecondaryRoute == 'EMI'"
+            class="tab-content">
+              <div class="tab-pane active w-50 pt-5">
+                <lnd-table
+                  *ngIf="eligibilityTransactionsTableData.length > 0"
+                  [isLoading]="isLoading"
+                  [config]="tableConfig"
+                  [headers]="eligibilityTransactionsTableHeaders"
+                  [data]="eligibilityTransactionsTableData"
+                ></lnd-table>
+              </div>
+            </div>
+
+
+          </div>
+          <div
+            *ngIf="profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails"
+            id="loan-limit"
+            class="tab-pane"
+          >
+            <ul class="dt-list dt-list-one-second">
+              <lnd-dt-list-item
+                title="Fail Point"
+                [value]="
+                  profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails
+                    ?.loanLimitFailPoint
+                "
+              >
+                <div
+                  *ngIf="
+                    profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails
+                      ?.loanLimitFailPoint != 'None'
+                  "
+                  class="ml-2 p-1 bg-danger rounded"
+                >
+                  <i class="icon icon-close text-white"></i>
+                </div>
+              </lnd-dt-list-item>
+              <lnd-dt-list-item
+                title="Repayment"
+                [value]="
+                  profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails
+                    ?.loanLimitCipherCalculationParameters?.repayment
+                "
+                type="amount"
+              />
+              <lnd-dt-list-item
+                title="Loan Limit Cipher Calculated Limit Amount"
+                [value]="
+                  profileInfo?.affordProfile
+                    ?.loanLimitCipherCalculatedLimitAmount
+                "
+                type="amount"
+              />
+
+              <lnd-dt-list-item
+                title="TMI"
+                [value]="
+                  (profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails?.loanLimitCipherCalculationParameters?.tmi)
+                "
+                type="amount"
+              />
+              <lnd-dt-list-item
+                title="Interest Rate Used (%)"
+                [value]="
+                  profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails
+                    ?.loanLimitCipherCalculationParameters?.interestRate
+                "
+              />
+
+              <lnd-dt-list-item
+                title="DTI (%)"
+                [value]="
+                  profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails
+                    ?.loanLimitCipherCalculationParameters?.dti
+                "
+              />
+              <lnd-dt-list-item
+                title="Max Tenor"
+                [value]="
+                  profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails
+                    ?.loanLimitCipherCalculationParameters?.maxTenor
+                "
+              />
+              <lnd-dt-list-item
+                title="Min Loan Amount"
+                [value]="
+                  profileInfo?.affordProfile?.loanLimitCipherOutcomeDetails
+                    ?.loanLimitCipherCalculationParameters?.minLoanAmount
+                "
+                type="amount"
+              />
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div *ngIf="isLoading" class="d-flex justify-content-center mt-5">
+      <lnd-spinner text="Retrieving Details" />
+    </div>
+  </main>
+</div>

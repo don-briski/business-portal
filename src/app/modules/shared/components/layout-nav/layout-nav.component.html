@@ -1,0 +1,31 @@
+<ng-container *ngFor="let menu of layoutNavs">
+  <li *ngIf="menu?.parent" class="dt-side-nav__item dt-side-nav__header">
+    <span
+      class="dt-side-nav__text cursor titles "
+      title="External Business Operations"
+      >{{ menu?.parent }}</span
+    >
+  </li>
+  <ng-container *ngFor="let child of menu?.children">
+    <li *ngIf="child.canView" class="dt-side-nav__item">
+      <a
+        [routerLink]="child?.routerLink"
+        routerLinkActive="active"
+        class="dt-side-nav__link cursor"
+        [title]="child?.title"
+      >
+        <i
+          [ngClass]="
+            child?.icon && 'icon icon-fw icon-xl icontext-white ' + child?.icon
+          "
+          [style.color]="currentTheme?.textColor"
+        ></i>
+        <span
+          class="dt-side-nav__text"
+          [style.color]="currentTheme?.textColor"
+          >{{ child?.text }}</span
+        >
+      </a>
+    </li>
+  </ng-container>
+</ng-container>

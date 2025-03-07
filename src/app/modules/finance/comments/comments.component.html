@@ -1,0 +1,30 @@
+<div
+  *ngIf="comments?.length > 0"
+  [ngClass]="caller === 'addEdit' ? 'addEditCommentsTable' : ''"
+>
+  <p *ngIf="caller === 'addEdit'">Approval Comments</p>
+  <table
+    *ngIf="comments.length > 0"
+    class="table table-striped mb-0"
+    style="font-size: 11px"
+  >
+    <thead class="thead-light">
+      <tr>
+        <th class="text-uppercase" scope="col">Username</th>
+        <th class="text-uppercase" scope="col">Comment</th>
+        <th class="text-uppercase" scope="col">Date Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of comments">
+        <td *ngIf="item?.comment">{{ item?.name }}</td>
+        <td *ngIf="item?.comment">{{ item?.comment }}</td>
+        <td *ngIf="item?.comment">
+          {{ item?.dateCreated | customDatePipe }}
+          <i class="icon icon-timepicker ml-3"></i>
+          {{ item?.dateCreated | date: "shortTime" }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

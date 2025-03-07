@@ -1,0 +1,111 @@
+<div class="p-3">
+  <header class="d-flex justify-content-between align-items-center mb-5">
+    <span>Transaction Pin</span>
+    <button class="close" (click)="closeModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </header>
+  <table
+    *ngIf="comments?.length > 0"
+    class="table table-striped"
+    style="font-size: 11px"
+  >
+    <thead class="thead-light">
+      <tr>
+        <th class="text-uppercase" scope="col">Username</th>
+        <th class="text-uppercase" scope="col">Comment</th>
+        <th class="text-uppercase" scope="col">Date Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let comment of comments">
+        <td *ngIf="comment?.comment">{{ comment?.name }}</td>
+        <td *ngIf="comment?.comment">{{ comment?.comment }}</td>
+        <td *ngIf="comment?.comment">
+          {{ comment?.dateCreated | customDatePipe }}
+          <i class="icon icon-timepicker ml-3"></i>
+          {{ comment?.dateCreated | date : "shortTime" }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <form [formGroup]="approvalForm">
+    <div *ngIf="feature" class="form-row my-4">
+      <div class="col-12">
+        <textarea
+          class="form-control"
+          placeholder="Approval Comments"
+          formControlName="comment"
+        ></textarea>
+      </div>
+    </div>
+    <div class="form-group">
+      <input
+        type="password"
+        class="form-control"
+        formControlName="transactionPin"
+        placeholder="Transaction Pin"
+        autocomplete="off"
+      />
+    </div>
+    <div
+      class="d-flex justify-content-end align-items-center"
+      *ngIf="canApprove"
+    >
+      <span *ngIf="feature">
+        <button
+          class="btn py-1 btn-success"
+          (click)="submit('Posted')"
+          [disabled]="approvalForm.invalid || isLoading"
+        >
+          {{
+            isLoading && approvalStatus === "Posted" ? "Approving" : "Approve"
+          }}
+          <i
+            *ngIf="isLoading && approvalStatus === 'Posted'"
+            class="icon icon-spin icon-spin2"
+          ></i>
+        </button>
+        <button
+          class="btn py-1 btn-light mx-1"
+          (click)="submit('Redraft')"
+          type="submit"
+          [disabled]="approvalForm.invalid || isLoading"
+        >
+          {{
+            isLoading && approvalStatus === "Redraft" ? "Redrafting" : "Redraft"
+          }}
+          <i
+            *ngIf="isLoading && approvalStatus === 'Redraft'"
+            class="icon icon-spin icon-spin2"
+          ></i>
+        </button>
+        <button
+          class="btn py-1 btn-danger"
+          (click)="submit('Rejected')"
+          type="submit"
+          [disabled]="approvalForm.invalid || isLoading"
+        >
+          {{
+            isLoading && approvalStatus === "Rejected" ? "Rejecting" : "Reject"
+          }}
+          <i
+            *ngIf="isLoading && approvalStatus === 'Rejected'"
+            class="icon icon-spin icon-spin2"
+          ></i>
+        </button>
+      </span>
+
+      <span *ngIf="!feature">
+        <button
+          class="btn py-1 btn-success"
+          (click)="submit('Posted')"
+          [disabled]="approvalForm.invalid"
+        >
+          {{ btnValue }}
+        </button>
+      </span>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,24 @@
+<div class="card">
+  <div class="card-body">
+    <h6 class="mb-4 display-4">Uploaded Files</h6>
+    <div class="d-flex flex-wrap">
+      <div class="file-wrapper" *ngFor="let file of files">
+        <div class="d-flex align-items-center justify-content-between">
+          <p class="m-0" [title]="file?.fileName">
+            <i class="icon icon-editor icon-2x mr-2 align-self-center"></i
+            >{{ truncateLongName(file?.fileName) }}
+          </p>
+          <a
+            [href]="file?.filePath"
+            target="_blank"
+            class="btn btn-xs btn-primary ml-3"
+            >Open</a
+          >
+        </div>
+      </div>
+    </div>
+    <div class="text-center" *ngIf="!files?.length">
+      <p class="display-3 text-light">No files were uploaded.</p>
+    </div>
+  </div>
+</div>

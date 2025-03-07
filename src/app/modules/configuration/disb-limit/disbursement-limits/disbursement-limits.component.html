@@ -1,0 +1,262 @@
+<lnd-setup-wrapper customCols="col-12">
+  <header header>
+    <h1 class="mb-0">Disbursement Limits</h1>
+    <button
+      *ngIf="currentTab === DISBURSEMENT_LIMIT_TAB.group && permissions?.includes('Manage Loan Disbursement Group')"
+      class="btn"
+      (click)="addNewGroup()"
+    >
+      Add New
+    </button>
+
+    <button
+      *ngIf="currentTab === DISBURSEMENT_LIMIT_TAB.disbursementLimit && permissions?.includes('Manage Loan Disbursement Limit')"
+      id="btnGroupDrop1"
+      type="button"
+      class="btn dropdown-toggle ml-1"
+      data-toggle="dropdown"
+      aria-expanded="false"
+    >
+      Add New
+    </button>
+    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+      <a
+        *ngFor="let dropdownItem of disbursementCategories"
+        class="dropdown-item pointer"
+        (click)="openModal(dropdownItem)"
+        >{{ dropdownItem }}</a
+      >
+    </div>
+  </header>
+
+  <main>
+    <nav>
+      <span
+        *ngIf="permissions.includes('View Loan Disbursement Group')"
+        (click)="switchTab(DISBURSEMENT_LIMIT_TAB.group)"
+        [ngClass]="{ active: currentTab === DISBURSEMENT_LIMIT_TAB.group }"
+      >
+        Groups
+      </span>
+      <span
+        *ngIf="permissions.includes('View Loan Disbursement Limit')"
+        (click)="switchTab(DISBURSEMENT_LIMIT_TAB.disbursementLimit)"
+        [ngClass]="{
+          active: currentTab === DISBURSEMENT_LIMIT_TAB.disbursementLimit
+        }"
+      >
+        Disbursement Limit
+      </span>
+      <span
+      *ngIf="permissions.includes('View Loan Disbursement Limit Notification')"
+        (click)="switchTab(DISBURSEMENT_LIMIT_TAB.limitAlert)"
+        [ngClass]="{ active: currentTab === DISBURSEMENT_LIMIT_TAB.limitAlert }"
+      >
+        Limit Alerts
+      </span>
+    </nav>
+
+    <section>
+      <ng-container
+        *ngIf="
+          currentTab === DISBURSEMENT_LIMIT_TAB.disbursementLimit ||
+          currentTab === DISBURSEMENT_LIMIT_TAB.group
+        "
+      >
+        <lnd-table
+          [config]="config"
+          [isLoading]="isLoading"
+          [headers]="headers"
+          [data]="data"
+          [pagination]="pagination"
+          [addTopRule]="false"
+          [searchColumns]="pagination.searchColumns"
+          (searchParams)="paginationChange($event)"
+          (paginationChange)="paginationChange($event)"
+          (retrieveRowDetails)="view($event)"
+        />
+      </ng-container>
+
+      <ng-container *ngIf="currentTab === DISBURSEMENT_LIMIT_TAB.limitAlert">
+        <lnd-limit-alert [canManageAlerts]="permissions?.includes('Manage Loan Disbursement Limit Notification')" />
+      </ng-container>
+    </section>
+  </main>
+</lnd-setup-wrapper>
+
+<lnd-add-edit-disb-limit
+  [showPopup]="showPopup"
+  [selectedResource]="selectedResource"
+  [limitDetail]="limitDetail"
+  (closePopup)="onClosePopup()"
+  (reloadLimit)="getDisbursementLimits()"
+/>
+
+<lnd-popup
+  [togglePopup]="selectedPopup?.length > 0"
+  [useMaxHeight]="selectedPopup === DISBURSEMENT_LIMIT_POPUP.groupMembers"
+  (closePopup)="closePopup()"
+>
+  <header
+    class="pop-header d-flex justify-content-between align-items-center w-100"
+  >
+    <h4
+      *ngIf="selectedPopup === DISBURSEMENT_LIMIT_POPUP.limitDetail"
+      class="mb-0"
+    >
+      Disbursement Limit View
+    </h4>
+    <h4 *ngIf="selectedPopup === DISBURSEMENT_LIMIT_POPUP.addEditGroup">
+      {{ disbursementLimitGroupId ? "Edit" : "Create" }} Group
+    </h4>
+
+    <h4 *ngIf="selectedPopup === DISBURSEMENT_LIMIT_POPUP.groupMembers">
+      Group Members ({{ groupMembers.length }})
+    </h4>
+
+    <img
+      *ngIf="selectedPopup === 'addEditGroup'"
+      src="assets/images/close.svg"
+      alt="close"
+      class="cursor"
+      (click)="closePopup()"
+    />
+  </header>
+  <div class="pop-content">
+    <ng-container *ngIf="selectedPopup === DISBURSEMENT_LIMIT_POPUP.limitDetail">
+      <div
+        *ngIf="isRetrievingLimitDetail"
+        class="d-flex justify-content-center"
+      >
+        <lnd-spinner text="Retrieving Details" />
+      </div>
+      <ng-container *ngIf="!isRetrievingLimitDetail">
+        <div class="info">
+          <span>Disbursement Category</span>
+          <p>{{ limitDetail?.category }}</p>
+        </div>
+
+        <div class="info">
+          <span>Entity</span>
+          <p>{{ limitDetail?.entityName }}</p>
+        </div>
+
+        <div class="info">
+          <span>Limit Amount</span>
+          <p>{{ limitDetail?.limitAmount | number : "1.2-2" }}</p>
+        </div>
+
+        <div class="info">
+          <span>Limit Cycle</span>
+          <p>{{ limitDetail?.resetFrequency }}</p>
+        </div>
+
+        <div class="info">
+          <span>Start Date</span>
+          <p>{{ limitDetail?.frequencyStartDate | date:"d-MM-YYYY" }}</p>
+        </div>
+
+        <div class="info">
+          <span>Constraint Toggle</span>
+          <p>{{ limitDetail?.preventDisbursement }}</p>
+        </div>
+
+        <div
+          class="info"
+          *ngFor="let threshold of limitDetail?.alertThresholds; let i = index"
+        >
+          <span>
+            <span *ngIf="i === 0">First</span>
+            <span *ngIf="i === 1">Second</span>
+            <span *ngIf="i === 2">Last</span>
+            <span class="ml-1">Alert</span>
+          </span>
+          <p *ngIf="threshold?.type === 'Percentage'">
+            {{ threshold?.amount }}%
+          </p>
+          <p *ngIf="threshold?.type === 'Flat'">
+            {{ threshold?.amount | number : "1.2-2" }}
+          </p>
+        </div>
+      </ng-container>
+    </ng-container>
+
+    <form
+      [formGroup]="disbursementGroupForm"
+      *ngIf="selectedPopup === 'addEditGroup'"
+      class="addEditGroup"
+    >
+      <div>
+        <label>Group Name <b class="text-danger">*</b></label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Enter group name"
+          formControlName="name"
+        />
+        <lnd-input-errors
+          label="Group Name"
+          [control]="disbursementGroupForm.get('name')"
+        />
+      </div>
+
+      <div>
+        <label
+          >Category <b class="text-danger">*</b>
+          <span *ngIf="isLoading" class="ml-3"
+            >Fetching... <i class="ml-3 icon icon-spin icon-spin2"></i
+          ></span>
+        </label>
+        <slct-2
+          [data]="limitCategories"
+          placeholder="Select Category"
+          formControlName="category"
+        />
+      </div>
+
+      <div *ngIf="disbursementGroupForm.get('category').valid && !isLoading">
+        <label>Members <b class="text-danger">*</b></label>
+        <slct-2
+          [data]="members"
+          [customSearchEnabled]="true"
+          [multiple]="true"
+          [allowSelectAll]="true"
+          [allowClear]="true"
+          placeholder="Select Members"
+          formControlName="members"
+        />
+      </div>
+    </form>
+
+    <ng-container
+      *ngIf="selectedPopup === DISBURSEMENT_LIMIT_POPUP.groupMembers"
+    >
+      <div class="group-members">
+        <p *ngFor="let member of groupMembers">{{ member?.entityName }}</p>
+      </div>
+    </ng-container>
+  </div>
+
+  <div
+    class="pop-footer"
+    [ngClass]="selectedPopup === 'addEditGroup' && 'd-flex justify-content-end'"
+  >
+    <button
+      *ngIf="selectedPopup !== 'addEditGroup'"
+      class="btn close-btn"
+      (click)="closePopup()"
+    >
+      Close
+    </button>
+
+    <button
+      *ngIf="selectedPopup === 'addEditGroup'"
+      [disabled]="disbursementGroupForm.invalid || isProcessing"
+      class="btn submit-btn"
+      (click)="submitGroup()"
+    >
+      {{ isProcessing ? "Processing..." : "Submit" }}
+      <i *ngIf="isProcessing" class="ml-3 icon icon-spin icon-spin2"></i>
+    </button>
+  </div>
+</lnd-popup>

@@ -1,0 +1,35 @@
+header {
+  .btn-outline-light {
+    border: 1px solid var(--lenda-grey);
+    color: var(--lenda-grey);
+  }
+
+  border-bottom: 1px solid gainsboro;
+}
+
+.tab-content{
+  lnd-dt-list-item{
+    width: 30%;
+  }
+}
+
+.table-container{
+  width: 30%;
+}
+
+.rounded{
+  border-radius: 100% !important;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  i{
+    font-weight: 900;
+  }
+}
+
+.nav-link:hover {
+  color: var(--secondary-color) 
+}

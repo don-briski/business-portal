@@ -1,0 +1,64 @@
+<section>
+  <header class="mb-5">
+    <h1 class="dt-page__title m-0">Customers</h1>
+  </header>
+  <ul
+    id="active-div"
+    class="card-header-pills nav nav-pill justify-content-center mb-2"
+    role="tablist"
+  >
+    <li class="nav-item">
+      <a
+        [ngClass]="{ 'active-tab': currentTab === 'customers' }"
+        class="nav-link pool-nav active-tab"
+        href="javascript:void(0)"
+        (click)="onSwitchTab('customers')"
+      >
+        Customers
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        [ngClass]="{ 'active-tab': currentTab === 'feedback-response' }"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="onSwitchTab('feedback-response')"
+      >
+        Feedback Response
+      </a>
+    </li>
+  </ul>
+  <div class="dt-card w-100">
+    <div class="dt-card__body">
+      <ng-container *ngIf="currentTab === 'customers'">
+        <lnd-table
+          [config]="customersTableConfig"
+          [isLoading]="isLoading"
+          [headers]="customersTableHeaders"
+          [data]="customersTableData"
+          [pagination]="pagination"
+          [searchColumns]="pagination?.searchColumns"
+          [filters]="filterStatuses"
+          [rowClickable]="false"
+          [selectedFilters]="selectedFilters"
+          filerLabel="Filter by Category"
+          (paginationChange)="onPaginationChange($event)"
+          (retrieveRowDetails)="viewCustomer($event)"
+          (searchParams)="onSearchParams($event, 'customers')"
+          (filter)="onFilter($event[0])"
+        />
+      </ng-container>
+      <ng-container *ngIf="currentTab === 'feedback-response'">
+        <lnd-table
+          [isLoading]="isLoading"
+          [headers]="feedbackResponseTableHeaders"
+          [data]="feedbackResponseTableData"
+          [pagination]="feedbackResponsePagination"
+          [searchColumns]="feedbackResponsePagination?.searchColumns"
+          [rowClickable]="false"
+          (searchParams)="onSearchParams($event, 'feedback-response')"
+        />
+      </ng-container>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,21 @@
+<div>
+  <div
+    class="top-bar"
+    [ngClass]="{
+      'pending-bg': status === 'Pending',
+      'approved-bg': status === 'Approved'
+    }"
+  ></div>
+  <p class="my-1">
+    {{ level }}
+  </p>
+  <p
+    class="status-text"
+    [ngClass]="{
+      'pending-color': status === 'Pending',
+      'approved-color': status === 'Approved'
+    }"
+  >
+    {{ status }}
+  </p>
+</div>

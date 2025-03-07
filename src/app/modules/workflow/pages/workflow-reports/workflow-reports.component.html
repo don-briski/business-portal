@@ -1,0 +1,295 @@
+<header class="w-100 mb-3">
+  <h1 class="dt-page__title">Reports</h1>
+</header>
+<div class="dt-card w-100">
+  <div class="dt-card__body">
+    <header class="my-4">
+      <div class="form-row">
+        <div class="col-md-4">
+          <label style="display: inline-flex"
+            ><span style="padding: 8px 2px; font-size: 12px">Show </span
+            ><select
+              [(ngModel)]="pagination.pageSize"
+              [ngModelOptions]="{ standalone: true }"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height mx-2"
+              (change)="fetchReports()"
+            >
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="500">500</option>
+              <option value="1000">1000</option>
+            </select>
+            <span style="padding: 8px 2px; font-size: 12px"
+              >entries</span
+            ></label
+          >
+        </div>
+
+        <div class="text-center col-md-4">
+          <lnd-spinner *ngIf="fetching"></lnd-spinner>
+        </div>
+        <div class="col-md-4">
+          <label style="display: inline-flex; float: right">
+            <input
+              type="search"
+              class="form-control form-control-sm mr-3"
+              placeholder="Enter code"
+              aria-controls="data-table"
+              [(ngModel)]="keyword"
+              (keydown.enter)="fetchReports()"
+            />
+            <button
+              class="btn btn-xs text-white"
+              [style.background]="colorTheme.secondaryColor"
+              (click)="fetchReports()"
+            >
+              <i class="icon icon-search"></i>
+            </button>
+          </label>
+        </div>
+      </div>
+      <lnd-selected-filters
+        (initialized)="onSelectedFiltersInit($event)"
+      ></lnd-selected-filters>
+      <div *ngIf="!fetching" class="d-flex justify-content-between mt-4">
+        <div aria-live="polite">
+          Showing
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + 1
+              | number : "1.0-0"
+          }}
+          -
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + pagination.count
+              | number : "1.0-0"
+          }}
+          of {{ pagination.totalCount | number : "1.0-0" }} records
+        </div>
+        <div>
+          <button
+            type="button"
+            (click)="onToggleFilterModal()"
+            class="text-white btn btn-warning btn-xs"
+          >
+            <i class="mr-2 icon icon-filter"></i>
+            Filters
+          </button>
+          <div class="filter-menu filter-menu-right">
+            <div class="filter-menu-header">
+              <h4 class="title">
+                <i class="mr-2 icon icon-ckeditor"></i>Filter
+              </h4>
+            </div>
+            <div class="filter-menu-body">
+              <div class="h-auto">
+                <div class="form-row">
+                  <br />
+                  <div class="mb-3 col-sm-12">
+                    <div>
+                      <slct-2
+                        [data]="filterStatuses"
+                        [active]="selectedFilter?.id ? [selectedFilter] : null"
+                        [multiple]="false"
+                        placeholder="Select Status"
+                        (selected)="selectedFilter = $event"
+                        (removed)="selectedFilter = null"
+                        [hideSelectedItems]="true"
+                      >
+                      </slct-2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="h-auto">
+                <div class="form-row">
+                  <div class="col-sm-6 mb-3">
+                    <label for="start-date">Start Date</label>
+                    <div class="input-group date" data-target-input="nearest">
+                      <input
+                      lndInvalidDateChecker
+                        id="start-date"
+                        type="date"
+                        [(ngModel)]="startDate"
+                        class="form-control"
+                      />
+                      <div class="input-group-append">
+                        <div class="input-group-text">
+                          <i class="icon icon-calendar"></i>
+                        </div>
+                      </div>
+                    </div>
+                    <small style="text-align: center; color: indianred"
+                      >Leave empty to spool as at the <b>End date</b></small
+                    >
+                  </div>
+                  <div class="col-sm-6 mb-3">
+                    <label for="end-date">End Date</label>
+                    <div class="input-group date" data-target-input="nearest">
+                      <input
+                      lndInvalidDateChecker
+                        type="date"
+                        id="end-date"
+                        [(ngModel)]="endDate"
+                        class="form-control"
+                      />
+                      <div class="input-group-append">
+                        <div class="input-group-text">
+                          <i class="icon icon-calendar"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end">
+                <button
+                  type="button"
+                  (click)="onToggleFilterModal(); fetchReports()"
+                  class="mr-3 btn btn-primary btn-xs"
+                  [disabled]="(startDate && !endDate) || !endDate"
+                >
+                  Filter
+                </button>
+                <button
+                  type="button"
+                  (click)="onToggleFilterModal()"
+                  class="btn btn-danger btn-xs"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+    <table
+      *ngIf="reports.length && !fetching"
+      id="data-table"
+      class="table table-striped"
+    >
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Request Name</th>
+          <th class="text-center">Date Created</th>
+          <th class="text-center">Approval Date</th>
+          <th class="text-center">Approving Category</th>
+          <th class="text-center">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let report of reports">
+          <td [style.color]="colorTheme.secondaryColor">
+            {{ report.requestCode }}
+          </td>
+          <td>{{ report.requestName }}</td>
+          <td class="text-center">
+            {{ report.requestDate | customDatePipe : "DD-MMM-YY" }}
+          </td>
+          <td class="text-center" *ngIf="report.approvalDate">
+            {{ report.approvalDate | customDatePipe : "DD-MMM-YY" }}
+          </td>
+          <td class="text-center" *ngIf="!report.approvalDate">-</td>
+          <td class="text-center">{{ report.approvingCategory }}</td>
+          <td class="text-center">
+            <span
+              class="badge"
+              [ngClass]="{
+                'status-in-progress': report.status === 'InProgress',
+                'status-declined': report.status === 'Declined',
+                'status-approved': report.status === 'Approved',
+                'status-redrafted': report.status === 'Redrafted',
+                'status-pending-approval': report.status === 'PendingApproval',
+                'status-treated': report.status === 'Treated',
+                'status-open': report.status === 'Open'
+              }"
+              >{{ report.status | humanify }}</span
+            >
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div
+      *ngIf="!reports.length && !fetching"
+      class="d-flex flex-column align-items-center w-100"
+    >
+      <h1 class="display-4 text-center font-weight-light pt-5">
+        No records found
+      </h1>
+    </div>
+    <nav>
+      <ul class="pagination pagination-sm justify-content-end">
+        <li class="page-item" *ngIf="pagination.hasPreviousPage">
+          <a
+            class="page-link"
+            href="javascript:void(0)"
+            (click)="
+              pagination.pageNumber = +pagination.pageNumber - 1; fetchReports()
+            "
+            tabindex="-1"
+            >Previous</a
+          >
+        </li>
+        <li class="page-item pagination-menu-wrapper">
+          <a
+            class="page-link page-target"
+            href="javascript:void(0)"
+            (click)="itemPaginatedJumpModal()"
+          >
+            {{ pagination.pageNumber }} of {{ pagination.totalPages }}
+            {{
+              pagination.totalPages > 1 || pagination.totalPages === 0
+                ? "pages"
+                : "page"
+            }}
+            <span class="sr-only">(current)</span>
+          </a>
+          <div
+            class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+          >
+            <div class="pagination-menu-body">
+              <div class="h-auto">
+                <span>Jump to Page</span>
+                <select
+                  aria-controls="data-table"
+                  [(ngModel)]="pagination.pageNumber"
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                  (change)="fetchReports()"
+                >
+                  <option
+                    *ngFor="let line of pagination.jumpArray"
+                    (click)="pagination.pageNumber = line"
+                  >
+                    {{ line }}
+                  </option>
+                </select>
+                <div class="text-center mt-3">
+                  <button
+                    type="button"
+                    class="btn btn-danger btn-xs"
+                    (click)="itemPaginatedJumpModal()"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="page-item" *ngIf="pagination.hasNextPage">
+          <a
+            class="page-link"
+            href="javascript:void(0)"
+            (click)="
+              pagination.pageNumber = +pagination.pageNumber + 1; fetchReports()
+            "
+          >
+            Next
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

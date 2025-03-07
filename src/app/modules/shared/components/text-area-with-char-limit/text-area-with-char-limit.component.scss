@@ -1,0 +1,14 @@
+.desc-wrapper{
+  border: 1px solid #ced4da;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: text;
+  .desc{
+    border: none;
+  }
+  p{
+    text-align: right;
+    margin-bottom: 0;
+    color: #8c8c8c;
+  }
+}

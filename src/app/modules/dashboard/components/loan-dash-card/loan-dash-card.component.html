@@ -1,0 +1,120 @@
+<div class="dt-card dt-card__full-height">
+  <div class="dt-card__header">
+    <div class="dt-card__heading">
+      <h3
+        class="dt-card__title orange"
+        [style.color]="colorTheme?.primaryColor"
+      >
+        <i *ngIf="data?.tag == 'Pool'" class="icon icon-apps mr-2"></i>
+        <i
+          *ngIf="data?.tag == 'Verification'"
+          class="icon icon-circle-check mr-2"
+        ></i>
+        <i
+          *ngIf="data?.tag == 'Disbursement'"
+          class="icon icon-revenue-new mr-2"
+        ></i>
+        <i *ngIf="data?.tag == 'Review'" class="icon icon-tasks mr-2"></i>
+        <i
+          *ngIf="data?.tag === 'BatchedLoans'"
+          class="icon icon-tasks mr-2"
+        ></i>
+        {{ data?.tag | humanify }}
+      </h3>
+    </div>
+    <div class="dt-card__tools">
+      <div class="btn-group btn-group-xs mb-2 tabs-container" role="group">
+        <ul class="nav" role="tablist">
+          <li class="nav-item">
+            <button
+              type="button"
+              class="btn btn-xs gray-outline nav-link active f-9"
+              data-toggle="tab"
+              [attr.href]="'#recent_' + id"
+              role="tab"
+              aria-controls="recent"
+              aria-selected="true"
+              (click)="onGetMetrics('Today')"
+              [ngClass]="selectedRange === 'Today' ? 'white' : 'black'"
+              [ngStyle]="{
+                background:
+                  selectedRange === 'Today' ? colorTheme?.primaryColor : '',
+                'border-color': colorTheme?.primaryColor
+              }"
+            >
+              Today
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              type="button"
+              class="btn btn-xs gray-outline nav-link f-9"
+              data-toggle="tab"
+              [attr.href]="'#mtd_' + id"
+              role="tab"
+              aria-controls="mtd"
+              aria-selected="true"
+              (click)="onGetMetrics('MTD')"
+              [ngClass]="selectedRange === 'MTD' ? 'white' : 'black'"
+              [ngStyle]="{
+                background:
+                  selectedRange === 'MTD' ? colorTheme?.primaryColor : '',
+                'border-color': colorTheme?.primaryColor
+              }"
+            >
+              MTD
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              type="button"
+              class="btn btn-xs gray-outline nav-link f-9"
+              data-toggle="tab"
+              [attr.href]="'#ytd_' + id"
+              role="tab"
+              aria-controls="ytd"
+              aria-selected="true"
+              (click)="onGetMetrics('YTD')"
+              [ngClass]="selectedRange === 'YTD' ? 'white' : 'black'"
+              [ngStyle]="{
+                background:
+                  selectedRange === 'YTD' ? colorTheme?.primaryColor : '',
+                'border-color': colorTheme?.primaryColor
+              }"
+            >
+              YTD
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="dt-card__body">
+    <div class="tab-content">
+      <div *ngIf="!isLoading" attr.id="recent_{{ id }}" class="tab-pane active">
+        <div class="row no-gutters">
+          <div class="col-sm-12 pr-sm-2 mb-6 mb-sm-0">
+            <h3 class="dt-card__title mb-2 text-light-gray f-12">
+              {{ data?.description }}
+            </h3>
+            <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+              {{ appOwnerInfo?.currency?.currencySymbol }}
+              {{ data?.value | number : "1.2-2" }}
+            </h2>
+            <a
+              href="javascript:void(0)"
+              class="d-inline-block text-black-50 f-10"
+              style="float: right"
+            >
+              <span class="f-20 font-weight-semibold">{{ data?.count }}</span
+              >&nbsp; {{ data?.name }}<span *ngIf="data?.count > 1">s</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="text-center">
+        <lnd-spinner *ngIf="isLoading"></lnd-spinner>
+      </div>
+    </div>
+  </div>
+</div>

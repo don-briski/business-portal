@@ -1,0 +1,11 @@
+.check-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--check-icon-bg);
+  border-radius: 100%;
+}
+
+.check-container i {
+  font-weight: bold;
+}

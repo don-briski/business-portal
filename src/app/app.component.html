@@ -1,0 +1,15 @@
+<div class="dt-sidebar--fixed dt-header--fixed" [ngClass]="{'dt-sidebar--folded': isSidebarClosed}">
+  <div class="bg-danger animated fadeInDown" *ngIf="!isConnected">
+    <p class="text-center p-2 text-light m-0">
+      You are currently not connected to the internet.
+    </p>
+  </div>
+  <div class="bg" *ngIf="isShowingRouteLoadIndicator">
+    <div class="center">
+      <img src="assets/images/favicon.png" class="animated fadeIn infinite slow d-block mx-auto">
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+  <ngx-guided-tour></ngx-guided-tour>
+</div>
+

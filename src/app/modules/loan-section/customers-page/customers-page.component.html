@@ -1,0 +1,2212 @@
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">
+    Customer Management
+    <span class="float-right role-add"> </span>
+  </h1>
+</div>
+<div class="row">
+  <div class="col-xl-12">
+    <ul
+      id="active-div"
+      class="card-header-pills nav nav-pill justify-content-center"
+      role="tablist"
+    >
+      <li
+        class="nav-item"
+        *ngIf="currentUser?.permission?.includes('View Customers')"
+      >
+        <a
+          (mouseover)="hover_cs = true"
+          (mouseleave)="hover_cs = false"
+          [ngStyle]="hover_cs ? { color: currentTheme?.secondaryColor } : {}"
+          class="nav-link pool-nav active-tab"
+          href="javascript:void(0)"
+          (click)="switchView('Customers')"
+        >
+          Customers
+        </a>
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="currentUser?.permission?.includes('View Customers')"
+      >
+        <a
+          (mouseover)="hover_ps = true"
+          (mouseleave)="hover_ps = false"
+          [ngStyle]="hover_ps ? { color: currentTheme?.secondaryColor } : {}"
+          class="nav-link pool-nav"
+          href="javascript:void(0)"
+          (click)="switchView('Prospects')"
+        >
+          Prospects
+        </a>
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="currentUser?.permission?.includes('View Customers')"
+      >
+        <a
+          (mouseover)="hover_bl = true"
+          (mouseleave)="hover_bl = false"
+          [ngStyle]="hover_bl ? { color: currentTheme?.secondaryColor } : {}"
+          class="nav-link pool-nav"
+          href="javascript:void(0)"
+          (click)="switchView('Blacklist')"
+        >
+          Blacklist
+        </a>
+      </li>
+    </ul>
+    <div class="dt-card w-100">
+      <div class="dt-card__body">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+        <lnd-table
+          *ngIf="
+            currentView === 'Customers' &&
+            currentUser?.permission?.includes('View Customers')
+          "
+          [isLoading]="isLoadingCustomers"
+          [config]="customerTableConfig"
+          [pagination]="customersPagination"
+          [headers]="customerTableHeaders"
+          [data]="customersTableData"
+          [searchColumns]="customersPagination?.searchColumns"
+          [filters]="branches"
+          [selectedFilters]="selectedFilters"
+          (retrieveRowDetails)="viewCustomer($event)"
+          (paginationChange)="onCustomersPaginationChange($event)"
+          (searchParams)="onSearchParams($event)"
+          (filter)="onFilter($event[0])"
+          filterLabel="Select Branch"
+        ></lnd-table>
+        <div
+          class="tab-pane"
+          *ngIf="
+            currentView === 'Prospects' &&
+            currentUser?.permission?.includes('View Customers')
+          "
+        >
+          <div class="row">
+            <div class="col-md-8">
+              <label style="display: inline-flex"
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [(ngModel)]="pagination2.pageSize"
+                  aria-controls="data-table"
+                  (change)="
+                    getItemsPaginatedSearch2(
+                      this.pagination2.searchTerm,
+                      this.pagination2.pageSize,
+                      1
+                    )
+                  "
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+            <div class="form-group col-md-4">
+              <label style="display: inline-flex; float: right"
+                ><span style="padding: 10px 2px; font-size: 12px"></span
+                ><input
+                  type="search"
+                  [(ngModel)]="pagination2.searchTerm"
+                  (keydown.enter)="
+                    getItemsPaginatedSearch2(
+                      this.pagination2.searchTerm,
+                      this.pagination2.pageSize,
+                      1
+                    )
+                  "
+                  class="form-control form-control-sm"
+                  placeholder="Code Or Name"
+                  aria-controls="data-table"
+                />
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.background]="currentTheme.secondaryColor"
+                  (click)="
+                    getItemsPaginatedSearch2(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </label>
+            </div>
+            <div
+              class=""
+              aria-live="polite"
+              style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+            >
+              Showing
+              {{
+                (pagination2.pageNum - 1) * pagination2.pageSize + 1
+                  | number : "1.0-0"
+              }}
+              -
+              {{
+                (pagination2.pageNum - 1) * pagination2.pageSize +
+                  pagination2.count | number : "1.0-0"
+              }}
+              of {{ pagination2.totalRecords | number : "1.0-0" }} record(s)
+            </div>
+          </div>
+          <!-- /pagination Top -->
+
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table id="table1" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phonenumber</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let row of prospectiveCustomers">
+                  <td
+                    [style.color]="currentTheme?.secondaryColor"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    {{ row.personCode }}
+                  </td>
+                  <td>{{ row.firstName }} {{ row.lastName }}</td>
+                  <td>{{ row.emailAddress }}</td>
+                  <td>{{ row.phoneNumber }}</td>
+                  <td>
+                    <a
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="d-inline-block"
+                      (click)="getCustomerMetricsByPersonId(row.personId)"
+                      href="javascript:void(0)"
+                      ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="
+                    (pagination2.pageNum - 1) * pagination2.pageSize + 1 > 10
+                  "
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch2(
+                        this.pagination2.searchTerm,
+                        this.pagination2.pageSize,
+                        pagination2.pageNum - 1
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="getItemsPaginatedPageJumpModal()"
+                    href="javascript:void(0)"
+                    >{{ pagination2.pageNum }} of
+                    {{ this.pagination2.maxPage }} page<span
+                      *ngIf="pagination2.pageNum > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+
+                  <div class="pagination-menu pagination-menu-right">
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="pagination2.pageNum"
+                          (change)="
+                            getProspectiveCustomers(pagination2.pageNum)
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option *ngFor="let line of pagination2.jumpArray">
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="getItemsPaginatedPageJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="this.pagination2.pageNum < this.pagination2.maxPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch2(
+                        this.pagination2.searchTerm,
+                        this.pagination2.pageSize,
+                        pagination2.pageNum + 1
+                      )
+                    "
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <div
+          class="tab-pane"
+          *ngIf="
+            currentView === 'Blacklist' &&
+            currentUser?.permission?.includes('View Customers')
+          "
+        >
+          <div class="d-flex justify-content-between align-items-center">
+            <label class="d-flex align-items-center"
+              ><span class="mx-1" style="font-size: 12px">Show </span
+              ><select
+                [(ngModel)]="blacklistedCustomersPagination.pageSize"
+                aria-controls="data-table"
+                (change)="getBlacklistedCustomers()"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span class="mx-1" style="font-size: 12px">entries</span></label
+            >
+            <div class="form-group">
+              <label class="d-flex">
+                <input
+                  type="search"
+                  [(ngModel)]="searchParam"
+                  (keydown.enter)="getBlacklistedCustomers()"
+                  class="form-control form-control-sm"
+                  placeholder="Code Or Name"
+                  aria-controls="data-table"
+                />
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.background]="currentTheme.secondaryColor"
+                  (click)="getBlacklistedCustomers()"
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </label>
+            </div>
+          </div>
+          <div class="my-2">
+            <lnd-selected-filters
+              (initialized)="onSelectedFiltersInit($event)"
+            ></lnd-selected-filters>
+          </div>
+          <div class="d-flex justify-content-between">
+            <div aria-live="polite" style="font-size: 13px">
+              Showing
+              {{
+                (blacklistedCustomersPagination.pageNumber - 1) *
+                  blacklistedCustomersPagination.pageSize +
+                  1 | number : "1.0-0"
+              }}
+              -
+              {{
+                (blacklistedCustomersPagination.pageNumber - 1) *
+                  blacklistedCustomersPagination.pageSize +
+                  blacklistedCustomersPagination.count | number : "1.0-0"
+              }}
+              of
+              {{ blacklistedCustomersPagination.totalCount | number : "1.0-0" }}
+              records
+            </div>
+            <div *ngIf="!requestLoader">
+              <lnd-filter-btn
+                (filterModalOpen)="onOpenFilterModal()"
+              ></lnd-filter-btn>
+              <lnd-filter
+                [filterOptions]="filterOptions"
+                (optionSelected)="onOptionSelected($event)"
+              >
+              </lnd-filter>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table id="table1" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th *ngIf="filter === 'Blacklisted'">Reviewed by</th>
+                  <th *ngIf="filter === 'Blacklisted'">Reviewed at</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let row of blacklistedCustomers"
+                  class="cursor"
+                  (click)="onViewCustomerForBlacklist(row)"
+                >
+                  <td
+                    class="copy_icon_wrapper"
+                    [style.color]="currentTheme?.secondaryColor"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    {{ row.customerCode }}
+                    <img
+                      (mouseover)="copy_hover = true"
+                      (mouseleave)="copy_hover = false"
+                      class="copy_icon"
+                      src="assets/images/copy.png"
+                      alt="copy icon"
+                      width="15"
+                      height="15"
+                      (click)="copyCode(row?.customerCode)"
+                      placement="right"
+                      ngbTooltip="Copy Customer Code"
+                    />
+                  </td>
+                  <td>{{ row.fullName }}</td>
+                  <td
+                    *ngIf="row?.isBlacklistApproved && filter === 'Blacklisted'"
+                  >
+                    {{ row.reviewedBy }}
+                  </td>
+                  <td
+                    *ngIf="row?.isBlacklistApproved && filter === 'Blacklisted'"
+                  >
+                    {{ row.reviewedAt | date }}
+                  </td>
+                  <td>
+                    <a
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="d-inline-block"
+                      href="javascript:void(0)"
+                      ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="blacklistedCustomersPagination.hasPreviousPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      blacklistedCustomersPagination.pageNumber =
+                        +blacklistedCustomersPagination.pageNumber - 1;
+                      getBlacklistedCustomers()
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    href="javascript:void(0)"
+                    (click)="itemPaginatedJumpModal()"
+                  >
+                    {{ blacklistedCustomersPagination.pageNumber }} of
+                    {{ blacklistedCustomersPagination.totalPages }}
+                    {{
+                      blacklistedCustomersPagination.totalPages > 1
+                        ? "pages"
+                        : "page"
+                    }}
+                    <span class="sr-only">(current)</span>
+                  </a>
+                  <div
+                    class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                  >
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="
+                            blacklistedCustomersPagination.pageNumber
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                          (change)="getBlacklistedCustomers()"
+                        >
+                          <option
+                            *ngFor="
+                              let line of blacklistedCustomersPagination.jumpArray
+                            "
+                            (click)="
+                              blacklistedCustomersPagination.pageNumber = line
+                            "
+                          >
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            class="btn btn-danger btn-xs"
+                            (click)="itemPaginatedJumpModal()"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="blacklistedCustomersPagination.hasNextPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      blacklistedCustomersPagination.pageNumber =
+                        +blacklistedCustomersPagination.pageNumber + 1;
+                      getBlacklistedCustomers()
+                    "
+                  >
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<aside style="display: block" class="dt-customizer dt-drawer position-right">
+  <div
+    *ngIf="requestLoader"
+    class="table-loader"
+    style="text-align: center; color: indianred"
+  >
+    <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+  </div>
+  <div *ngIf="customerMetricsData != null" class="dt-customizer__inner">
+    <div class="dt-customizer__header">
+      <div class="dt-avatar-wrapper">
+        <img
+          class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+          src="assets/images/male-default-profile.png"
+          alt="Default"
+        />
+        <div class="dt-avatar-info">
+          <span class="display-5 mb-2 font-weight-light">
+            {{ customerMetricsData?.displayName }} &nbsp;
+            <span class="badge badge-success btn-xs mb-1 mr-1">{{
+              customerMetricsData?.personCode
+            }}</span>
+          </span>
+          <span>
+            <span *ngIf="customerMetricsData?.emailAddress != null">
+              <i class="icon icon-email icon-xl mr-5"></i>&nbsp;
+              {{ customerMetricsData?.emailAddress }}</span
+            >
+            <br />
+            <span *ngIf="customerMetricsData?.phoneNumber">
+              <i class="icon icon-phone icon-xl mr-5"></i> &nbsp;{{
+                customerMetricsData?.phoneNumber
+              }}
+            </span>
+            &nbsp; &nbsp;&nbsp;
+          </span>
+        </div>
+      </div>
+      <button type="button" class="close" onClick="viewLoan()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <div class="row">
+        <div class="col-md-12" style="padding: 20px">
+          <!-- List -->
+          <ul class="dt-list dt-list-one-second padded-left">
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1">
+                    Customer Portal Access</span
+                  >
+                  <h5
+                    class="mb-0"
+                    *ngIf="customerMetricsData.customerPortalAccess"
+                  >
+                    Yes
+                  </h5>
+                  <h5
+                    class="mb-0"
+                    *ngIf="!customerMetricsData.customerPortalAccess"
+                  >
+                    No
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li
+              class="dt-list__item"
+              *ngIf="customerMetricsData?.lastLoginTime != null"
+            >
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-datepicker icon-2x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Last Login Time</span
+                  >
+                  <h5 class="mb-0">
+                    {{ customerMetricsData?.lastLoginTime | date : "medium" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+
+            <!-- List Item -->
+            <li
+              class="dt-list__item"
+              *ngIf="customerMetricsData?.loginEmail != null"
+            >
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Customer Portal Email</span
+                  >
+                  <h5 class="mb-0">{{ customerMetricsData?.loginEmail }}</h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Active Loan</span
+                  >
+                  <h5 class="mb-0">
+                    <span *ngIf="!customerMetricsData?.hasActiveLoan">No</span>
+                    <span *ngIf="customerMetricsData?.hasActiveLoan">{{
+                      customerMetricsData?.activeLoanCode
+                    }}</span>
+                  </h5>
+                </div>
+              </div>
+            </li>
+            <li class="dt-list__item">
+              <div class="media">
+                <i
+                  class="icon icon-editor icon-3x ml-5 mr-3 align-self-center text-warning"
+                ></i>
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Total Loan Applications</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      customerMetricsData?.totalLoanApplicationCount | number
+                    }}
+                  </h5>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <br />
+        <div class="dt-card__body">
+          <ul
+            class="nav nav-underline flex-row border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                (mouseover)="hover_bi = true"
+                (mouseleave)="hover_bi = false"
+                [ngStyle]="
+                  hover_bi ? { color: currentTheme?.secondaryColor } : {}
+                "
+                class="nav-link active"
+                data-toggle="tab"
+                href="#tab-pane1"
+                role="tab"
+                aria-controls="tab-pane1"
+                aria-selected="true"
+                >Basic Info</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                (mouseover)="hover_his = true"
+                (mouseleave)="hover_his = false"
+                [ngStyle]="
+                  hover_his ? { color: currentTheme?.secondaryColor } : {}
+                "
+                class="nav-link"
+                data-toggle="tab"
+                href="#tab-pane2"
+                role="tab"
+                aria-controls="tab-pane2"
+                aria-selected="true"
+                >History</a
+              >
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div id="tab-pane1" class="tab-pane active">
+              <div class="row">
+                <div class="col-xl-10">
+                  <div class="card">
+                    <div
+                      class="card-header card-nav bg-transparent d-flex justify-content-between"
+                    >
+                      <ul
+                        class="card-header-links nav nav-underline"
+                        role="tablist"
+                      >
+                        <li class="nav-item">
+                          <a
+                            (mouseover)="hover_pi = true"
+                            (mouseleave)="hover_pi = false"
+                            [ngStyle]="
+                              hover_pi
+                                ? { color: currentTheme?.secondaryColor }
+                                : {}
+                            "
+                            class="nav-link active"
+                            data-toggle="tab"
+                            href="#account-tab"
+                            role="tab"
+                            aria-controls="account-tab"
+                            aria-selected="true"
+                            >Personal Information</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="card-body pb-2">
+                      <div class="tab-content mt-5">
+                        <div id="account-tab" class="tab-pane active">
+                          <ul
+                            class="dt-list dt-list-one-third"
+                            *ngIf="!isEditingCustomer"
+                          >
+                            <li
+                              class="dt-list__item"
+                              *ngIf="customerMetricsData?.firstName != null"
+                            >
+                              <div class="media">
+                                <i
+                                  class="icon icon-user-o icon-2x mr-3 align-self-center text-warning"
+                                ></i>
+                                <div class="media-body">
+                                  <span
+                                    class="d-block text-light-gray f-12 mb-1"
+                                    >Firstname</span
+                                  >
+                                  <h5 class="mb-0">
+                                    {{ customerMetricsData?.firstName }}
+                                  </h5>
+                                </div>
+                              </div>
+                            </li>
+                            <li
+                              class="dt-list__item"
+                              *ngIf="customerMetricsData?.lastName != null"
+                            >
+                              <div class="media">
+                                <i
+                                  class="icon icon-user-o icon-2x mr-3 align-self-center text-warning"
+                                ></i>
+                                <div class="media-body">
+                                  <span
+                                    class="d-block text-light-gray f-12 mb-1"
+                                    >Lastname</span
+                                  >
+                                  <h5 class="mb-0">
+                                    {{ customerMetricsData?.lastName }}
+                                  </h5>
+                                </div>
+                              </div>
+                            </li>
+                            <li
+                              class="dt-list__item"
+                              *ngIf="customerMetricsData?.sex != null"
+                            >
+                              <div class="media">
+                                <i
+                                  class="icon icon-user-o icon-2x mr-3 align-self-center text-warning"
+                                ></i>
+                                <div class="media-body">
+                                  <span
+                                    class="d-block text-light-gray f-12 mb-1"
+                                    >Sex</span
+                                  >
+                                  <h5 class="mb-0">
+                                    {{ customerMetricsData?.sex }}
+                                  </h5>
+                                </div>
+                              </div>
+                            </li>
+                            <li
+                              class="dt-list__item"
+                              *ngIf="customerMetricsData?.bvn != null"
+                            >
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="icon icon-link icon-2x mr-3 align-self-center text-warning"
+                                ></i>
+                                <div class="media-body">
+                                  <div class="d-flex">
+                                    <span
+                                      class="d-block text-light-gray f-12 mb-1 mr-2"
+                                      >BVN</span
+                                    >
+                                    <lnd-check-icon
+                                      *ngIf="
+                                        customerMetricsData?.isBvnValidated
+                                      "
+                                      tooltip="BVN was validated during loan creation."
+                                    >
+                                    </lnd-check-icon>
+                                  </div>
+                                  <h5 class="mb-0">
+                                    {{ customerMetricsData?.bvn }}
+                                  </h5>
+                                </div>
+                              </div>
+                            </li>
+                            <li
+                              class="dt-list__item"
+                              *ngIf="customerMetricsData?.dateOfBirth != null"
+                            >
+                              <div class="media">
+                                <i
+                                  class="icon icon-birthday-new icon-2x mr-3 align-self-center text-warning"
+                                ></i>
+                                <div class="media-body">
+                                  <span
+                                    class="d-block text-light-gray f-12 mb-1"
+                                    >DOB
+                                  </span>
+                                  <h5 class="mb-0">
+                                    {{
+                                      customerMetricsData?.dateOfBirth
+                                        | date : "mediumDate"
+                                    }}
+                                  </h5>
+                                </div>
+                              </div>
+                            </li>
+                            <li
+                              class="dt-list__item"
+                              *ngIf="customerMetricsData?.phoneNumber != null"
+                            >
+                              <div class="media">
+                                <i
+                                  class="icon icon-phone icon-2x mr-3 align-self-center text-warning"
+                                ></i>
+                                <div class="media-body">
+                                  <span
+                                    class="d-block text-light-gray f-12 mb-1"
+                                    >Phone</span
+                                  >
+                                  <h5 class="mb-0">
+                                    {{ customerMetricsData?.phoneNumber }}
+                                  </h5>
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                          <form
+                            [formGroup]="customerForm"
+                            *ngIf="isEditingCustomer"
+                          >
+                            <div class="row">
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label>First Name</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    formControlName="firstName"
+                                  />
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label>Last Name</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    formControlName="lastName"
+                                  />
+                                </div>
+                              </div>
+                              <div class="col-md-2">
+                                <div class="form-group">
+                                  <label>Date of Birth</label>
+                                  <input
+                                  lndInvalidDateChecker
+                                    type="date"
+                                    class="form-control"
+                                    formControlName="dateOfBirth"
+                                  />
+                                </div>
+                              </div>
+                              <div class="col-md-2">
+                                <div class="form-group">
+                                  <label>Sex</label>
+                                  <slct-2
+                                    [multiple]="false"
+                                    [active]="[
+                                      {
+                                        id: customerMetricsData.sex,
+                                        text: customerMetricsData.sex
+                                      }
+                                    ]"
+                                    [data]="gender"
+                                    (selected)="selected('sex', $event)"
+                                    (removed)="removed('sex', $event)"
+                                    placeholder="Select Gender"
+                                  ></slct-2>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-2">
+                                <div class="form-group">
+                                  <label>Employment Code</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    formControlName="employmentCode"
+                                  />
+                                </div>
+                              </div>
+                              <div class="col-md-2">
+                                <div class="form-group">
+                                  <label>BVN</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    formControlName="bvn"
+                                  />
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label>Email</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    formControlName="email"
+                                  />
+                                </div>
+                              </div>
+                              <div class="col-md-4">
+                                <div class="form-group">
+                                  <label>Phone Number</label>
+                                  <input
+                                    type="text"
+                                    class="form-control"
+                                    formControlName="phoneNumber"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-3">
+                                <div class="form-group">
+                                  <label for="">Branch</label>
+                                  <slct-2
+                                    [multiple]="false"
+                                    [customSearchEnabled]="true"
+                                    [active]="[
+                                      {
+                                        id: customerMetricsData.branchId,
+                                        text: customerMetricsData.branchName
+                                      }
+                                    ]"
+                                    [data]="branchesAccessibleArray"
+                                    (selected)="selected('branchId', $event)"
+                                    (removed)="removed('branchId', $event)"
+                                    placeholder="Select Branch"
+                                  ></slct-2>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label for="">Residential Address</label>
+                                  <textarea
+                                    class="form-control"
+                                    formControlName="residentialAddress"
+                                    cols="30"
+                                    rows="10"
+                                  ></textarea>
+                                </div>
+                              </div>
+                            </div>
+                          </form>
+
+                          <div class="d-flex justify-content-end">
+                            <button
+                              class="btn orange-bg text-white"
+                              *ngIf="!isEditingCustomer && currentView !== 3"
+                              (click)="editCustomer()"
+                              [style.background]="currentTheme?.secondaryColor"
+                              [style.borderColor]="currentTheme?.secondaryColor"
+                            >
+                              Edit Info
+                            </button>
+
+                            <div
+                              class="action-buttons"
+                              *ngIf="isEditingCustomer"
+                            >
+                              <button
+                                class="btn btn-light mr-3"
+                                (click)="editCustomer()"
+                              >
+                                Cancel
+                              </button>
+
+                              <button
+                                class="btn orange-bg text-white"
+                                [disabled]="updateLoader"
+                                (click)="updateCustomer()"
+                                [style.background]="
+                                  currentTheme?.secondaryColor
+                                "
+                                [style.borderColor]="
+                                  currentTheme?.secondaryColor
+                                "
+                              >
+                                <i
+                                  class="icon icon-spin icon-spin2"
+                                  *ngIf="updateLoader"
+                                ></i>
+                                {{ updateLoader ? "Updating..." : "Update" }}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /tab panel -->
+                      </div>
+                      <!-- /tab content-->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- /grid item -->
+              </div>
+            </div>
+
+            <!-- tab 2-->
+            <div id="tab-pane2" class="tab-pane">
+              <div class="row">
+                <div class="col-xl-12">
+                  <div class="dt-entry__header">
+                    <div class="dt-entry__heading">
+                      <small>Previous Loan Applications</small>
+                    </div>
+                  </div>
+                  <lnd-previous-loan-applications
+                    *ngIf="customerMetricsData?.loanHistory != null"
+                    [colorTheme]="currentTheme"
+                    [loanApplications]="customerMetricsData.loanHistory"
+                    (viewLoan)="getLoanDetailsById($event, loanViewerModal)"
+                  >
+                  </lnd-previous-loan-applications>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="viewBlacklistedCustomer" class="dt-customizer__inner">
+    <div class="dt-customizer__header">
+      <div class="dt-avatar-wrapper">
+        <img
+          class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+          src="assets/images/male-default-profile.png"
+          alt="Default"
+        />
+        <div class="dt-avatar-info">
+          <span class="display-5 mb-2 font-weight-light d-block">
+            {{ selectedBlacklistedCustomer?.fullName }}
+          </span>
+          <span class="badge badge-success btn-xs mb-1 mr-1">{{
+            selectedBlacklistedCustomer?.customerCode
+          }}</span>
+        </div>
+      </div>
+      <button type="button" class="close" onClick="viewLoan()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <section class="p-5">
+        <ul class="dt-list dt-list-one-second">
+          <li
+            class="dt-list__item mr-3"
+            *ngIf="selectedBlacklistedCustomer?.requestedBy"
+          >
+            <div class="media">
+              <i
+                class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Requested By</span
+                >
+                <h5 class="mb-0">
+                  {{ selectedBlacklistedCustomer.requestedBy }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li
+            class="dt-list__item"
+            *ngIf="selectedBlacklistedCustomer?.blacklistedRequestedAt"
+          >
+            <div class="media">
+              <i
+                class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Requested At</span
+                >
+                <h5 class="mb-0">
+                  {{
+                    selectedBlacklistedCustomer.blacklistedRequestedAt
+                      | customDatePipe : "DD-MMM-YY"
+                  }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li
+            class="dt-list__item mr-3"
+            *ngIf="selectedBlacklistedCustomer?.reviewedBy"
+          >
+            <div class="media">
+              <i
+                class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Reviewed By</span
+                >
+                <h5 class="mb-0">
+                  {{ selectedBlacklistedCustomer.reviewedBy }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li
+            class="dt-list__item"
+            *ngIf="selectedBlacklistedCustomer?.reviewedAt"
+          >
+            <div class="media">
+              <i
+                class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Reviewed At</span
+                >
+                <h5 class="mb-0">
+                  {{
+                    selectedBlacklistedCustomer.reviewedAt
+                      | customDatePipe : "DD-MMM-YY"
+                  }}
+                </h5>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </section>
+      <section class="p-5">
+        <lnd-tab-bar [tabs]="tabs" [currentTabId]="currentTabId"></lnd-tab-bar>
+        <div *ngIf="currentTabId === 'blacklist-info'">
+          <div class="card p-3">
+            <p>{{ selectedBlacklistedCustomer?.reason }}</p>
+          </div>
+          <div
+            class="d-flex"
+            *ngIf="
+              !isBlacklistingCustomer &&
+              currentUser?.permission?.includes('Approve Blacklist Request')
+            "
+          >
+            <button
+              *ngIf="!selectedBlacklistedCustomer.isBlacklistApproved"
+              class="btn btn-danger mr-3"
+              (click)="
+                blacklistCustomer(false, selectedBlacklistedCustomer.customerId)
+              "
+            >
+              Reject</button
+            ><button
+              *ngIf="!selectedBlacklistedCustomer.isBlacklistApproved"
+              class="btn btn-success"
+              (click)="
+                confirmCustomerBlacklisting(
+                  selectedBlacklistedCustomer.customerId
+                )
+              "
+            >
+              Approve
+            </button>
+            <button
+              *ngIf="selectedBlacklistedCustomer.isBlacklistApproved"
+              class="btn btn-light mr-3"
+              (click)="
+                confirmCustomerWhitelist(selectedBlacklistedCustomer.customerId)
+              "
+            >
+              Whitelist Customer
+            </button>
+          </div>
+          <button
+            *ngIf="isBlacklistingCustomer"
+            class="btn btn-warning"
+            disabled
+          >
+            <i class="icon icon-spin icon-spin2"></i> Processing...
+          </button>
+        </div>
+        <div *ngIf="currentTabId === 'loan-history'">
+          <div
+            *ngIf="fetchCustomerMetricsForBlacklist"
+            class="d-flex justify-content-center"
+          >
+            <lnd-spinner [color]="currentTheme?.secondaryColor"></lnd-spinner>
+          </div>
+          <lnd-previous-loan-applications
+            *ngIf="customerMetricsDataForBlacklisting?.loanHistory != null"
+            [colorTheme]="currentTheme"
+            [loanApplications]="customerMetricsDataForBlacklisting.loanHistory"
+            (viewLoan)="getLoanDetailsById($event, loanViewerModal)"
+          >
+          </lnd-previous-loan-applications>
+        </div>
+      </section>
+    </div>
+  </div>
+</aside>
+<!-- /customizer sidebar -->
+
+<ng-template #loanViewerModal>
+  <!-- Modal -->
+  <!-- Modal Body -->
+  <div class="modal-body" id="printSelectedLoanInformationwithHeader">
+    <div class="modal-header border-0">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mt-3 ml-3">
+            <img
+              *ngIf="ownerInformation?.logoUrl"
+              class="dt-brand__logo-img mb-3"
+              width="100px"
+              [src]="ownerInformation.logoUrl"
+              alt="Logo"
+            />
+            <h3 class="dt-card__title mb-2">
+              {{ ownerInformation?.appOwnerName | uppercase }}
+            </h3>
+
+            <span
+              class="dt-card__title mb-2 text-light-gray ft-12"
+              *ngIf="!isEmpty(ownerInformation?.appOwnerEmail)"
+            >
+              <i class="icon icon-email mr-2"></i
+              >{{ ownerInformation?.appOwnerEmail }}</span
+            ><br />
+            <span
+              class="dt-card__title mb-2 text-light-gray ft-12"
+              *ngIf="!isEmpty(ownerInformation?.appOwnerPhone)"
+            >
+              <i class="icon icon-phone mr-2"></i
+              >{{ ownerInformation?.appOwnerPhone }}</span
+            ><br />
+            <span
+              class="dt-card__title mb-2 text-light-gray ft-12"
+              *ngIf="!isEmpty(ownerInformation?.appOwnerBillingAddress)"
+            >
+              <i class="icon icon-company mr-2"></i
+              >{{ ownerInformation?.appOwnerBillingAddress }} </span
+            ><br />
+          </div>
+        </div>
+        <div class="col-md-4 pull-right text-right"></div>
+      </div>
+    </div>
+
+    <div class="modal-body m-2" id="printSelectedLoanInformation">
+      <h4 class="mb-7 f-18 mt-2 text-center">
+        <span class="align-middle black text-uppercase"> Loan Details</span>
+      </h4>
+      <div class="row">
+        <div class="col-md-6">
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            class="mb-1 orange f-12"
+            *ngIf="!isEmpty(loanhistoryperson?.displayName)"
+            ><span class="black">Name: </span>
+            {{ loanhistoryperson?.displayName }}</span
+          ><br />
+          <span
+            class="mb-1 text-light-gray f-12"
+            *ngIf="!isEmpty(loanhistoryperson?.emailAddress)"
+            ><span class="black">Email: </span
+            >{{ loanhistoryperson?.emailAddress }}</span
+          ><br />
+          <span
+            class="mb-1 text-light-gray f-12"
+            *ngIf="
+              !isEmpty(
+                getFromJson(loanhistoryinformation?.bvnInfo, 'bvnPhoneNumber')
+              )
+            "
+            ><span class="black">Phone: </span
+            >{{
+              getFromJson(loanhistoryinformation?.bvnInfo, "bvnPhoneNumber")
+            }}</span
+          ><br />
+          <span
+            class="mb-1 text-light-gray f-12"
+            *ngIf="
+              !isEmpty(
+                getFromJson(loanhistoryinformation?.residentialInfo, 'address')
+              )
+            "
+            ><span class="black">Address: </span
+            >{{
+              getFromJson(loanhistoryinformation?.residentialInfo, "address")
+            }}</span
+          ><br />
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            class="mb-1 f-12"
+            style="color: red"
+            *ngIf="!isEmpty(loanhistoryinformation?.loanAmount)"
+            ><span class="black">Repayment Outstanding: </span>
+            {{ ownerInformation?.currency?.currencySymbol
+            }}{{
+              loanhistoryinformation?.amountOutstanding | number : "1.2-2"
+            }}</span
+          ><br />
+        </div>
+
+        <div class="col-md-6" style="text-align: right">
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            class="mb-1 orange f-12"
+            *ngIf="!isEmpty(loanhistoryinformation?.loanAmount)"
+            ><span class="black">Loan Amount: </span>
+            {{ ownerInformation?.currency?.currencySymbol
+            }}{{ loanhistoryinformation?.loanAmount | number : "1.2-2" }}</span
+          ><br />
+
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            class="mb-1 orange f-12"
+            *ngIf="!isEmpty(loanhistoryinformation?.loanTenor)"
+            ><span class="black">Duration: </span
+            >{{ loanhistoryinformation?.loanTenor }}
+            {{ loanhistoryinformation?.repaymentScheduleType
+            }}{{ loanhistoryinformation?.loanTenor === 1 ? "" : "s" }}</span
+          ><br />
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            class="mb-1 orange f-12"
+            *ngIf="
+              !isEmpty(
+                getFromJson(
+                  loanhistoryinformation?.repaymentInfo,
+                  'repaymentMethod'
+                )
+              )
+            "
+            ><span class="black">Repayment Method: </span
+            >{{
+              getFromJson(
+                loanhistoryinformation?.repaymentInfo,
+                "repaymentMethod"
+              )
+            }}</span
+          ><br />
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            class="mb-1 orange f-12"
+            *ngIf="!isEmpty(loanhistoryinformation?.loanType?.loanName)"
+            ><span class="black">Loan Type: </span
+            >{{ loanhistoryinformation?.loanType?.loanName }}</span
+          ><br />
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            class="mb-1 orange f-12"
+            *ngIf="!isEmpty(loanhistoryinformation?.applicationCode)"
+            ><span class="black">Code: </span>
+            {{ loanhistoryinformation?.applicationCode }}</span
+          ><br />
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            class="mb-1 orange f-12"
+            ><span class="black"> Stage: </span
+            >{{ loanhistoryinformation?.loanStage
+            }}<span
+              *ngIf="
+                loanhistoryinformation?.loanCode != null &&
+                loanhistoryinformation?.loanCode != ''
+              "
+            >
+              - {{ loanhistoryinformation?.loanCode }}
+            </span></span
+          >
+        </div>
+      </div>
+      <br />
+      <h5
+        [style.color]="currentTheme?.secondaryColor"
+        class="text-center mt-2 orange"
+      >
+        Customer's Information
+      </h5>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="dt-card dt-card__full-height">
+            <span class="black mt-3 text-center">Personal Information</span>
+            <ul class="ml--20 f-12 td-0">
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(loanhistoryinformation?.bvnInfo, 'bvnNumber')
+                  )
+                "
+              >
+                <span class="black">BVN: </span
+                >{{ getFromJson(loanhistoryinformation?.bvnInfo, "bvnNumber") }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(loanhistoryinformation?.bvnInfo, 'bvnDOB')
+                  )
+                "
+              >
+                <span class="black">DOB: </span
+                >{{
+                  getFromJson(loanhistoryinformation?.bvnInfo, "bvnDOB")
+                    | date : "mediumDate"
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.bvnInfo,
+                      'bvnPhoneNumber'
+                    )
+                  )
+                "
+              >
+                <span class="black">BVN Phone: </span
+                >{{
+                  getFromJson(loanhistoryinformation?.bvnInfo, "bvnPhoneNumber")
+                }}
+              </li>
+              <li class="mb-2" *ngIf="!isEmpty(loanhistoryperson?.sex)">
+                <span class="black">Gender: </span>{{ loanhistoryperson?.sex }}
+              </li>
+
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(loanhistoryinformation?.bankInfo, 'bankName')
+                  )
+                "
+              >
+                <span class="black">Bank: </span
+                >{{ getFromJson(loanhistoryinformation?.bankInfo, "bankName") }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.bankInfo,
+                      'bankAccountNumber'
+                    )
+                  )
+                "
+              >
+                <span class="black">Account Number: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.bankInfo,
+                    "bankAccountNumber"
+                  )
+                }}
+              </li>
+              <!-- <li class="mb-2"><span class="black">Address: </span>{{ getFromJson(loanhistoryinformation?.residentialInfo,'address') }}</li>   -->
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.residentialInfo,
+                      'nextOfKinName'
+                    )
+                  )
+                "
+              >
+                <span class="black">Next of Kin Name: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.residentialInfo,
+                    "nextOfKinName"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.residentialInfo,
+                      'nextOfKinPhoneNumber'
+                    )
+                  )
+                "
+              >
+                <span class="black">Next of Kin Phone Number: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.residentialInfo,
+                    "nextOfKinPhoneNumber"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.residentialInfo,
+                      'nextOfKinAddress'
+                    )
+                  )
+                "
+              >
+                <span class="black">Next of Kin Address: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.residentialInfo,
+                    "nextOfKinAddress"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.loanTypeInfo,
+                      'loanReasonCode'
+                    )
+                  ) &&
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.loanTypeInfo,
+                      'loanReasonName'
+                    )
+                  )
+                "
+              >
+                <span class="black">Loan Reason: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.loanTypeInfo,
+                    "loanReasonCode"
+                  )
+                }}:
+                {{
+                  getFromJson(
+                    loanhistoryinformation?.loanTypeInfo,
+                    "loanReasonName"
+                  )
+                }}
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="dt-card dt-card__full-height">
+            <span class="black mt-3 text-center">Employment Information</span>
+            <ul class="ml--20 f-12 td-0">
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'netIncome'
+                    )
+                  )
+                "
+              >
+                <span class="black">Net Income: </span
+                >{{ ownerInformation?.currency?.currencySymbol }}
+                {{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "netIncome"
+                  ) | number : "1.2-2"
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'employmentStatus'
+                    )
+                  )
+                "
+              >
+                <span class="black">Employment Status: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "employmentStatus"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'employmentIndustry'
+                    )
+                  )
+                "
+              >
+                <span class="black">Industry: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "employmentIndustry"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'employerName'
+                    )
+                  )
+                "
+              >
+                <span class="black">Works At: </span>
+                {{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "employerName"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFullDateDiff(
+                      loanhistoryinformation?.createdAt,
+                      getFromJson(
+                        loanhistoryinformation?.employmentInfo,
+                        'employmentYears'
+                      )
+                    )
+                  )
+                "
+              >
+                <span class="black">Years Of Employment: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "employmentYears"
+                  )
+                }}
+                ({{
+                  getFullDateDiff(
+                    loanhistoryinformation?.createdAt,
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      "employmentYears"
+                    )
+                  )
+                }})
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'employmentLevel'
+                    )
+                  )
+                "
+              >
+                <span class="black">Grade Level: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "employmentLevel"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'employerPayDate'
+                    )
+                  )
+                "
+              >
+                <span class="black">Paydate: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "employerPayDate"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'employerAddress'
+                    )
+                  )
+                "
+              >
+                <span class="black">Address:</span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "employerAddress"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'WorkPhone'
+                    )
+                  )
+                "
+              >
+                <span class="black">Work Phone: </span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "WorkPhone"
+                  )
+                }}
+              </li>
+              <li
+                class="mb-2"
+                *ngIf="
+                  !isEmpty(
+                    getFromJson(
+                      loanhistoryinformation?.employmentInfo,
+                      'WorkEmail'
+                    )
+                  )
+                "
+              >
+                <span class="black">Work Email:</span
+                >{{
+                  getFromJson(
+                    loanhistoryinformation?.employmentInfo,
+                    "WorkEmail"
+                  )
+                }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <hr style="border-top: 1px dashed rgba(0, 0, 0, 0.1)" />
+      <div class="col-md-12">
+        <div class="dt-card dt-card__full-height">
+          <div class="row">
+            <div
+              class="col-sm-4 text-center"
+              *ngIf="
+                loanhistoryinformation?.approversInfo != null &&
+                loanhistoryinformation?.approversInfo != ''
+              "
+            >
+              <h6
+                [style.color]="currentTheme?.secondaryColor"
+                class="orange mt-3"
+              >
+                Review Information
+              </h6>
+              <ul class="ml--20 f-12 td-0">
+                <li
+                  *ngIf="
+                    getFromJson(
+                      getFromJson(
+                        loanhistoryinformation?.approversInfo,
+                        'loanappplication'
+                      ),
+                      'InternalNote'
+                    ) != null &&
+                    getFromJson(
+                      getFromJson(
+                        loanhistoryinformation?.approversInfo,
+                        'loanappplication'
+                      ),
+                      'InternalNote'
+                    ) != ''
+                  "
+                  class="mb-2"
+                >
+                  <span class="black">Internal Note: </span
+                  >{{
+                    getFromJson(
+                      getFromJson(
+                        loanhistoryinformation?.approversInfo,
+                        "loanappplication"
+                      ),
+                      "InternalNote"
+                    )
+                  }}
+                </li>
+                <li
+                  class="mb-2"
+                  *ngIf="
+                    !isEmpty(
+                      getFromJson(
+                        getFromJson(
+                          loanhistoryinformation?.approversInfo,
+                          'loanappplication'
+                        ),
+                        'DateCreated'
+                      )
+                    )
+                  "
+                >
+                  <span class="black">Date Reviewed: </span
+                  >{{
+                    getFromJson(
+                      getFromJson(
+                        loanhistoryinformation?.approversInfo,
+                        "loanappplication"
+                      ),
+                      "DateCreated"
+                    )
+                  }}
+                </li>
+                <li
+                  class="mb-2"
+                  *ngIf="
+                    !isEmpty(
+                      getFromJson(
+                        getFromJson(
+                          loanhistoryinformation?.approversInfo,
+                          'loanappplication'
+                        ),
+                        'CommentBy'
+                      )
+                    )
+                  "
+                >
+                  <span class="black">Reviewed By: </span
+                  >{{
+                    getFromJson(
+                      getFromJson(
+                        loanhistoryinformation?.approversInfo,
+                        "loanappplication"
+                      ),
+                      "CommentBy"
+                    )
+                  }}
+                </li>
+              </ul>
+            </div>
+            <div
+              class="col-sm-4 text-center"
+              *ngIf="
+                loaninformation?.statusString != 'Claimed' &&
+                loanhistoryinformation?.verificationInfo != null &&
+                loanhistoryinformation?.verificationInfo != ''
+              "
+            >
+              <h6 class="orange mt-3">Repayment Verification Information</h6>
+              <ul class="ml--20 f-12 td-0">
+                <li class="mb-2">
+                  <span class="black">Internal Note: </span
+                  >{{
+                    getFromJson(
+                      getFromJson(
+                        loanhistoryinformation?.verificationInfo,
+                        "loanverification"
+                      ),
+                      "InternalNote"
+                    )
+                  }}
+                </li>
+                <li class="mb-2">
+                  <span class="black">Date Verified: </span
+                  >{{
+                    getFromJson(
+                      getFromJson(
+                        loanhistoryinformation?.verificationInfo,
+                        "loanverification"
+                      ),
+                      "DateCreated"
+                    )
+                  }}
+                </li>
+                <li class="mb-2">
+                  <span class="black">Verified By: </span
+                  >{{
+                    getFromJson(
+                      getFromJson(
+                        loanhistoryinformation?.verificationInfo,
+                        "loanverification"
+                      ),
+                      "CommentBy"
+                    )
+                  }}
+                </li>
+              </ul>
+            </div>
+
+            <div
+              class="col-sm-4 text-center"
+              *ngIf="loaninformation?.loanDisbursementId != null"
+            >
+              <h6
+                [style.color]="currentTheme?.secondaryColor"
+                class="orange mt-3"
+              >
+                Disbursement Information
+              </h6>
+              <ul class="ml--20 f-12 td-0">
+                <li
+                  class="mb-2"
+                  *ngIf="!isEmpty(loanhistoryinformation?.dateDisbursed)"
+                >
+                  <span class="black">Date Disbursed: </span
+                  >{{
+                    loanhistoryinformation?.dateDisbursed | date : "mediumDate"
+                  }}
+                </li>
+                <li
+                  class="mb-2"
+                  *ngIf="
+                    !isEmpty(
+                      loanhistoryinformation?.disbursementClaimer?.person
+                        ?.displayName
+                    )
+                  "
+                >
+                  <span class="black">Disbursed By: </span
+                  >{{
+                    loanhistoryinformation?.disbursementClaimer?.person
+                      ?.displayName
+                  }}
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br />
+      <hr style="border-top: 1px dashed rgba(0, 0, 0, 0.1)" />
+
+      <div class="row" *ngIf="loanhistoryinformation?.repaymentSchedule">
+        <div
+          class="col-md-4"
+          *ngIf="loanhistoryinformation?.repaymentSchedule.length > 0"
+        >
+          <h5
+            [style.color]="currentTheme?.secondaryColor"
+            class="text-center mt-3 orange"
+          >
+            Repayment Schedule
+          </h5>
+          <!-- Tables -->
+          <div class="table bd-1">
+            <table
+              class="table table-bordered table-hover"
+              style="font-size: 12px"
+            >
+              <thead class="thead-light">
+                <tr>
+                  <th class="text-center">Date Expected</th>
+                  <th class="text-right amount-field" scope="col">
+                    ({{ ownerInformation?.currency?.currencySymbol }}) Amount
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- <tbody> {{ loanhistoryinformation?.repaymentSchedule }} -->
+                <tr
+                  *ngFor="
+                    let row of loanhistoryinformation?.repaymentSchedule;
+                    let i = index
+                  "
+                >
+                  <td class="text-center">
+                    {{ row?.paymentDueDate | date : "mediumDate" }}
+                  </td>
+                  <td class="text-right amount-field">
+                    {{ row?.paymentAmount | number : "1.2-2" }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+        </div>
+
+        <div
+          class="col-md-8"
+          *ngIf="loanhistoryinformation?.payment.length > 0"
+        >
+          <h5 class="text-center mt-3 orange">Payments</h5>
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table
+              class="table table-bordered table-hover"
+              style="font-size: 11px"
+            >
+              <thead class="thead-light">
+                <tr>
+                  <th class="text-center" scope="col">Payment Code</th>
+                  <th class="text-center" scope="col">Date</th>
+                  <th class="text-center" scope="col">Type</th>
+                  <th class="text-center" scope="col">Mode</th>
+                  <th class="text-right" scope="col">
+                    ({{ ownerInformation?.currency?.currencySymbol }}) Amnt
+                  </th>
+                  <th class="text-center" scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="
+                    let row of loanhistoryinformation?.payment;
+                    let i = index
+                  "
+                >
+                  <td
+                    class="text-center code"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    {{ row?.paymentCode }}
+                  </td>
+                  <td class="text-center">
+                    {{ row?.paymentDate | date : "mediumDate" }}
+                  </td>
+                  <td class="text-center">
+                    {{ row?.paymentTypeString | titlecase }}
+                  </td>
+                  <td class="text-center">
+                    {{ row?.paymentModeString | titlecase }}
+                  </td>
+                  <td class="amount-field">
+                    {{ row?.paymentAmount | number : "1.2-2" }}
+                  </td>
+                  <td class="text-center">
+                    <span
+                      *ngIf="row?.status == 'Reconciled'"
+                      style="color: #6faa8f"
+                      >{{ row?.status }}
+                    </span>
+                    <span
+                      *ngIf="row?.status != 'Reconciled'"
+                      style="color: rebeccapurple"
+                      >{{ row?.status }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <td colspan="4" class="amount-field small">
+                  Total Repayment Made:
+                </td>
+                <td class="amount-field small">
+                  <b>{{
+                    getTotalSection(
+                      "repayments",
+                      loanhistoryinformation?.payment,
+                      ""
+                    ) | number : "1.2-2"
+                  }}</b>
+                </td>
+                <td></td>
+              </tfoot>
+            </table>
+          </div>
+          <!-- /tables -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modal body -->
+
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-warning btn-xs text-white"
+      (click)="closeModal()"
+    >
+      Dismiss
+    </button>
+
+    <button
+      type="button"
+      class="btn btn-claim btn-xs text-white"
+      (click)="
+        printThisDocument('printSelectedLoanInformation', 'to_be_printed')
+      "
+    >
+      Print without header
+    </button>
+    <button
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      type="button"
+      class="btn orange-bg btn-xs text-white"
+      (click)="
+        printThisDocument(
+          'printSelectedLoanInformationwithHeader',
+          'to_be_printed'
+        )
+      "
+    >
+      Print with header
+    </button>
+  </div>
+  <!-- /modal footer -->
+</ng-template>

@@ -1,0 +1,217 @@
+<div class="dt-customizer__header">
+  <h3><i [style.color]="currentTheme.secondaryColor" class="icon icon-revenue-new orange"></i> Merge Investment</h3>
+  <button type="button" class="close" (click)="closeAside()" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="dt-customizer__body ps-custom-scrollbar">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div>
+          <header *ngIf="!mergeState" class="d-flex justify-content-center py-4">
+            <form class="d-flex justify-content-between align-items-center w-50" [formGroup]="searchInvestorForm" (ngSubmit)="searchInvestor()">
+              <div class="input-group mb-3">
+                <input id="searchInvestor" type="text" class="form-control" (focus)="onFocus()" (focusout)="onFocusOut()" placeholder="Enter Investors's Email" [ngStyle]="{'border-color':focused ? currentTheme?.secondaryColor : ''}" formControlName="searchValue">
+
+                <div class="input-group-append">
+                  <button [style.borderColor]="currentTheme?.secondaryColor" [style.backgroundColor]="currentTheme.secondaryColor" type="submit" class="btn btn-primary mr-2 mb-2" [disabled]="searchInvestorForm.invalid"><i class="icon icon-search mr-2"></i>Search</button>
+                </div>
+              </div>
+            </form>
+          </header>
+
+          <p *ngIf="!loading" class="text-center font-weight-light">{{msg}}</p>
+          <p *ngIf="loading" class="text-center font-weight-light">{{msg}} <i [style.color]="currentTheme.secondaryColor" class="icon icon-spin icon-spin2"></i></p>
+
+          <div [ngSwitch]="mergeState">
+            <div *ngSwitchCase=1>
+              <div class="row">
+                <header *ngIf="!loading" class="col-md-12 py-4">
+                  <h3 class="modal-title" id="model-1"><i [style.color]="currentTheme.secondaryColor" class="icon icon-user orange"></i>{{' ' + selectedInvestor.firstName + " " + selectedInvestor.lastName + "'s Investments" }}</h3>
+                </header>
+              </div>
+              <div class="row">
+                <div class="col-md-8">
+                  <table id="data-table" class="table table-striped table-hover px-3 shadow-sm p-3 mb-5 bg-white rounded">
+                    <thead>
+                    <!-- fetch-investor-investments -->
+                    <tr>
+                      <th scope="col">
+                        <span>
+                          <input type="checkbox" (change)="onMasterSelect($event.target.checked)">
+                        </span>
+                      </th>
+                      <th>Code</th>
+                      <th class="text-right">({{ ownerInformation?.currency?.currencySymbol }}) Amount Invested</th>
+                      <th>Date Created</th>
+                      <th>End Date</th>
+                      <th class="text-right"> ({{ ownerInformation?.currency?.currencySymbol }})Interest Accrued</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                      <ng-container *ngIf="!tabLoader">
+                        <ng-container *ngIf="selectedInvestorInv?.length > 0">
+                          <tr class="gradeX" *ngFor="let item of selectedInvestorInv">
+                            <td>
+                              <input type="checkbox" [checked]="masterChecked" (change)="onSelectInv(item,$event.target.checked)">
+                            </td>
+                            <td>{{item?.investmentCode}}</td>
+                            <td class="text-right">{{item?.initialDeposit | number : '1.2-2'}}</td>
+                            <td>{{item?.createdAt | customDatePipe: 'DD/MMM/YYYY'}}</td>
+                            <td>{{item?.investmentExpiryDate | customDatePipe: 'DD/MMM/YYYY'}}</td>
+                            <td class="text-right">
+                              {{item?.currentAccruedAmount | number : '1.2-2'}}
+                            </td>
+                          </tr>
+                        </ng-container>
+                      </ng-container>
+                    </tbody>
+                  </table>
+
+                  <button [style.backgroundColor]="currentTheme.secondaryColor" (click)="changeInvestor()" type="button" class="btn m-4 text-white">Change Investor</button>
+                </div>
+                <div class="col-md-4">
+                  <form class="shadow-sm p-3 mb-5 bg-white rounded" *ngIf="selectedInvestments.length > 1"  [formGroup]="mergeInvestmentForm" (ngSubmit)="mergeInvestments(confirmMerge)">
+                    <div>
+                      <div [style.color]="currentTheme?.secondaryColor" class="mb-3 col-sm-12 orange">
+                        Investment Information
+                      </div>
+                      <div class="mb-3 col">
+                        <label for="InvestmentType">Type of Investment <b class="text-danger">*</b></label>
+                        <select formControlName="investmentTypeId"
+                          class="custom-select custom-select-xl form-control form-control-xl height" id="InvestmentType">
+                          <option value="">Select Investment</option>
+                          <option *ngFor="let item of investmentTypeList" value="{{item?.investmentTypeId}}">{{item?.investmentName}}
+                          </option>
+                        </select>
+                        <span [style.color]="currentTheme?.secondaryColor" class="help-block f-12"
+                          *ngIf="(mergeInvestmentForm.get('investmentTypeId').errors && mergeInvestmentForm.get('investmentTypeId').touched) || formSubmitted">
+
+                          <span [style.color]="currentTheme?.secondaryColor"
+                            *ngIf="mergeInvestmentForm.get('investmentTypeId').getError('required')">
+                            This field is required
+                          </span>
+                        </span>
+                      </div>
+                      <div class="mb-3 col">
+                        <label for="Amount">Investment Amount {{amountTextInfo}} <b class="text-danger">*</b></label>
+                        <input type="text" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                          formControlName="accumulatedAmount" class="form-control" id="Amount" placeholder="Enter investment amount" />
+                        <span [style.color]="currentTheme?.secondaryColor" class="help-block  f-12"
+                          [style.color]="currentTheme?.secondaryColor" *ngIf="outOfRange">
+                          <small>The accumulated amount is out of range</small>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="mergeInvestmentForm.get('investmentTypeId').value">
+                      <div class="mb-3 col">
+                        <label for="InvestmentRate">Investment Rate <b class="text-danger">*</b></label>
+                        <input type="number"
+                          formControlName="investmentRate" class="form-control" id="InvestmentRate" />
+                        <span [style.color]="currentTheme?.secondaryColor" class="help-block f-12"
+                          *ngIf="(mergeInvestmentForm.get('investmentRate').errors  && mergeInvestmentForm.get('investmentRate').touched) || formSubmitted">
+
+                          <span [style.color]="currentTheme?.secondaryColor" *ngIf="mergeInvestmentForm.get('investmentRate').getError('OutOfRange')">
+                            {{ mergeInvestmentForm.get('investmentRate').getError('OutOfRange') }}
+                          </span>
+                        </span>
+                      </div>
+
+                      <div class="mb-3 col">
+                        <label for="InvestmentTenor">Investment Tenor <b class="text-danger">*</b></label>
+                        <input (blur)="onTenorChange()" type="number"
+                          formControlName="investmentTenor" class="form-control" id="InvestmentTenor" />
+                        <span [style.color]="currentTheme?.secondaryColor" class="help-block f-12"
+                          *ngIf="(mergeInvestmentForm.get('investmentTenor').errors  && mergeInvestmentForm.get('investmentTenor').touched) || formSubmitted">
+
+                          <span [style.color]="currentTheme?.secondaryColor" *ngIf="mergeInvestmentForm.get('investmentTenor').getError('OutOfRange')">
+                            {{ mergeInvestmentForm.get('investmentTenor').getError('OutOfRange') }}
+                          </span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="mergeInvestmentForm.get('investmentTypeId').value">
+                      <div class="mb-3 col">
+                        <ng-template #tipContent>How Often You Want To Collect Your Earnings ?<br/>
+                          Monthly : Enter (30) To Collect Your Earnings Every Month <br/>
+                          Quarterly : Enter (90) To Collect Your Earnings Every Quarter <br>
+                          Annually : Enter (365) To Collect Your Earnings Every Year <br>
+                          Bi-Anually : Enter (730) To Collect Your Earnings Two Years <br>
+                        </ng-template>
+
+                        <label for="CollectionPeriod">Collection Period (In Days) <b class="text-danger">* </b>
+                          <span>
+                             <i
+                              class="icon icon-question-circle"
+                              placement="top"
+                              [ngbTooltip]="tipContent">
+                            </i>
+                            </span></label>
+
+                        <input id="collectionPeriod" formControlName="collectionPeriod"  class="form-control" type="number" placeholder="Collection Period">
+
+                        <span [style.color]="currentTheme?.secondaryColor" class="help-block f-12"
+                          *ngIf="(mergeInvestmentForm.get('collectionPeriod').errors && mergeInvestmentForm.get('collectionPeriod').touched) || formSubmitted">
+
+                          <span [style.color]="currentTheme?.secondaryColor"
+                            *ngIf="mergeInvestmentForm.get('collectionPeriod').getError('required')">
+                            This field is required
+                          </span>
+
+                          <span [style.color]="currentTheme?.secondaryColor"
+                      *ngIf="mergeInvestmentForm.get('collectionPeriod').getError('OutOfRange') && !mergeInvestmentForm.get('collectionPeriod').getError('required')">{{ mergeInvestmentForm.get('collectionPeriod').getError('OutOfRange') }}</span>
+                        </span>
+                      </div>
+                      <div class="mb-3 col">
+                        <label for="start_date">Investment Start Date <b class="text-danger">*</b></label>
+                        <input lndInvalidDateChecker type="date" formControlName="startDate" class="form-control" id="start_date"
+                          placeholder="Enter investment start date" />
+                        <span [style.color]="currentTheme?.secondaryColor" class="help-block text-info f-12"
+                          *ngIf="(mergeInvestmentForm.get('startDate').errors  && mergeInvestmentForm.get('startDate').touched) || formSubmitted">
+                          <span class="text-danger" *ngIf="mergeInvestmentForm.get('startDate').getError('required')">This field is
+                            required</span>
+                          <br /></span>
+                        <span [style.color]="currentTheme?.secondaryColor" class="help-block text-info f-12">
+                          {{ StartDateNotification }}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div *ngIf="mergeInvestmentForm.get('investmentTypeId').value">
+                      <div class="mb-3 col">
+                        <label for="pin">Transaction Pin <b class="text-danger">*</b></label>
+                        <input type="password" formControlName="transactionPin" class="form-control" id="pin" placeholder="********" />
+                        <span [style.color]="currentTheme?.secondaryColor" class="help-block text-info f-12"
+                        *ngIf="(mergeInvestmentForm.get('transactionPin').errors  && mergeInvestmentForm.get('transactionPin').touched) || formSubmitted">
+                        <span class="text-danger" *ngIf="mergeInvestmentForm.get('transactionPin').getError('required')">This field is
+                          required</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div class="mb-3 col d-flex justify-content-end">
+                      <button [disabled]="mergeInvestmentForm.invalid || loading" class="btn text-white" type="submit" [style.backgroundColor]="currentTheme?.secondaryColor">{{loading ? 'Merging...' : 'Merge'}}<i *ngIf="loading" class="icon icon-spin icon-spin2"></i></button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div *ngSwitchDefault>
+              <div class="d-flex flex-column justify-content-center align-items-center">
+                <div id="investor" class="shadow-sm w-50" *ngFor = "let investor of investors; let i = index" [style.border-left]="'2px solid '+ currentTheme.secondaryColor">
+                  <p>{{investor?.firstName + " " + investor?.lastName}}</p>
+                  <small>{{investor.emailAddress}}</small>
+                  <button [style.backgroundColor]="currentTheme.secondaryColor" class="btn text-white" (click)="fetchInvestments(investor.personId,i)">Select</button>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

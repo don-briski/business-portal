@@ -1,0 +1,1694 @@
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">
+    Employers & Industries
+    <span class="float-right role-add">
+      <div class="btn-group mr-2 mb-2">
+        <div class="btn-group dropleft" role="group">
+          <!-- Dropdown Button -->
+          <button
+            type="button"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            class="btn white orange-bg dropdown-toggle dropdown-toggle-split"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            <span class="sr-only">Add New</span>
+          </button>
+          <!-- /dropdown button -->
+
+          <!-- Dropdown Menu -->
+          <div
+            class="dropdown-menu"
+            x-placement="left-start"
+            style="
+              position: absolute;
+              will-change: transform;
+              top: 0px;
+              left: 0px;
+              transform: translate3d(-5px, 0px, 0px);
+            "
+          >
+            <a
+              *ngIf="currentuser?.permission?.includes('Create Employers')"
+              class="dropdown-item"
+              href="javascript:void(0)"
+              (click)="openModal(addEmployerModal)"
+              >Add New Employer</a
+            >
+            <a
+              *ngIf="
+                currentuser?.permission?.includes(
+                  'Create Employment Industries'
+                )
+              "
+              class="dropdown-item"
+              href="javascript:void(0)"
+              (click)="openModal(addEmploymentIndustryModal)"
+              >Add New Industry</a
+            >
+            <a
+              *ngIf="
+                currentuser?.permission?.includes('Create Lending Institutions')
+              "
+              class="dropdown-item"
+              href="javascript:void(0)"
+              (click)="openModal(addLendingInstitutionModal)"
+              >Add New Lending Institution</a
+            >
+          </div>
+          <!-- /dropdown menu -->
+        </div>
+
+        <!-- Dropdown Button -->
+        <button
+          type="button"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          class="btn btn-primary orange-bg"
+        >
+          Add New
+        </button>
+        <!-- /dropdown button -->
+      </div>
+    </span>
+  </h1>
+</div>
+
+<!-- Grid -->
+<div class="row">
+  <!-- Grid Item -->
+  <div class="col-xl-12">
+    <ul id="active-div" class="nav justify-content-center">
+      <li
+        *ngIf="currentuser?.permission?.includes('View Employers')"
+        class="nav-item"
+      >
+        <a
+          (mouseover)="hover_sp = true"
+          (mouseleave)="hover_sp = false"
+          [ngStyle]="hover_sp ? { color: currentTheme?.secondaryColor } : {}"
+          class="nav-link pool-nav active-tab"
+          (click)="switchviews(1)"
+          >Employers</a
+        >
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="currentuser?.permission?.includes('View Employment Industries')"
+      >
+        <a
+          (mouseover)="hover_si = true"
+          (mouseleave)="hover_si = false"
+          [ngStyle]="hover_si ? { color: currentTheme?.secondaryColor } : {}"
+          class="nav-link pool-nav"
+          (click)="switchviews(2)"
+          >Industries</a
+        >
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="currentuser?.permission?.includes('View Lending Institutions')"
+      >
+        <a
+          (mouseover)="hover_sli = true"
+          (mouseleave)="hover_sli = false"
+          [ngStyle]="hover_sli ? { color: currentTheme?.secondaryColor } : {}"
+          class="nav-link pool-nav"
+          (click)="switchviews(3)"
+          >Lending Institutions</a
+        >
+      </li>
+    </ul>
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <!-- Views Pane -->
+        <div
+          *ngIf="
+            this.currentview == 1 &&
+            currentuser?.permission?.includes('View Employers')
+          "
+          class="tab-pane"
+        >
+          <!-- Pagination Top-->
+          <div class="row">
+            <div class="col-md-8">
+              <label style="display: inline-flex"
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [(ngModel)]="pagination2.pageSize"
+                  aria-controls="data-table"
+                  (change)="
+                    getItemsPaginatedSearch2(
+                      this.pagination2.searchTerm,
+                      this.pagination2.pageSize,
+                      1
+                    )
+                  "
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+            <div class="form-group col-md-4">
+              <label style="display: inline-flex; float: right"
+                ><span style="padding: 10px 2px; font-size: 12px"></span
+                ><input
+                  type="search"
+                  [(ngModel)]="pagination2.searchTerm"
+                  (keydown.enter)="
+                    getItemsPaginatedSearch2(
+                      this.pagination2.searchTerm,
+                      this.pagination2.pageSize,
+                      1
+                    )
+                  "
+                  class="form-control form-control-sm"
+                  placeholder="Enter Name"
+                  aria-controls="data-table"
+                />
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.background]="currentTheme.secondaryColor"
+                  (click)="
+                    getItemsPaginatedSearch2(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </label>
+            </div>
+            <div
+              class=""
+              aria-live="polite"
+              style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+            >
+              Showing
+              {{ (pagination2.pageNum - 1) * pagination2.pageSize + 1 }} -
+              {{
+                (pagination2.pageNum - 1) * pagination2.pageSize +
+                  pagination2.count
+              }}
+              of {{ pagination2.totalRecords }} record(s)
+            </div>
+          </div>
+          <!-- /pagination Top -->
+
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table id="employerstable" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Employer Name</th>
+                  <th>Industry</th>
+                  <th>Address</th>
+                  <th>Pay Date</th>
+                  <th>Created By</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="gradeX" *ngFor="let row of employers; let i = index">
+                  <td>{{ row?.employerName }}</td>
+                  <td>{{ row?.employmentIndustry?.employmentIndustryName }}</td>
+                  <td>{{ row?.employerAddress }}</td>
+                  <td>{{ row?.employerPayDate }}</td>
+                  <td>
+                    <!--  {{row?.externalCreator}} -->
+                    <span *ngIf="row?.externalCreator != null">{{
+                      row?.externalCreator
+                    }}</span>
+                    <span *ngIf="row?.externalCreator === null">{{
+                      row?.person?.displayName
+                    }}</span>
+                  </td>
+
+                  <!-- <td>{{ row?.createdAt | date:'dd/MM/yyyy' }}</td> -->
+
+                  <td>
+                    <span
+                      *ngIf="row?.status == 'Active'"
+                      class="badge badge-success btn-xs mb-1 mr-1"
+                    >
+                      {{ row?.status }}</span
+                    >
+                    <span
+                      *ngIf="row?.status == 'NonActive'"
+                      class="badge badge-warning mb-1 mr-1"
+                    >
+                      {{ row?.status }}</span
+                    >
+                  </td>
+                  <td>
+                    <a
+                      style="color: saddlebrown"
+                      href="javascript:void(0)"
+                      (click)="openEditModal(editEmployerModal, row, 1)"
+                    >
+                      <i class="icon icon-xs icon-setting"></i> Manage
+                    </a>
+
+                    <!---  <div class="btn-group btn-xs dropleft mr-2 mb-2">
+
+
+                                                     <button class="btn btn-warning btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+
+                                                    </button>
+                                                    <div class="dropdown-menu" x-placement="left-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-156px, 4px, 0px);">
+                                                      <a class="dropdown-item" href="javascript:void(0)" (click)="openEditModal(editEmploymentIndustryModal, row)">Edit Industry</a>
+                                                    </div>
+
+
+                                                  </div>-->
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="
+                    (pagination2.pageNum - 1) * pagination2.pageSize + 1 > 10
+                  "
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch2(
+                        this.pagination2.searchTerm,
+                        this.pagination2.pageSize,
+                        pagination2.pageNum - 1
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="javascript:void(0)"
+                    >{{ pagination2.pageNum }} of
+                    {{ this.pagination2.maxPage }} page<span
+                      *ngIf="pagination2.pageNum > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="this.pagination2.pageNum < this.pagination2.maxPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch2(
+                        this.pagination2.searchTerm,
+                        this.pagination2.pageSize,
+                        pagination2.pageNum + 1
+                      )
+                    "
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+
+        <div
+          *ngIf="
+            this.currentview == 2 &&
+            currentuser?.permission?.includes('View Employment Industries')
+          "
+          class="tab-pane"
+        >
+          <!-- Pagination Top-->
+          <div class="row">
+            <div class="col-md-8">
+              <label style="display: inline-flex"
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [(ngModel)]="pagination.pageSize"
+                  aria-controls="data-table"
+                  (change)="
+                    getItemsPaginatedSearch(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+            <div class="form-group col-md-4">
+              <label style="display: inline-flex; float: right"
+                ><span style="padding: 10px 2px; font-size: 12px"></span
+                ><input
+                  type="search"
+                  [(ngModel)]="pagination.searchTerm"
+                  (keydown.enter)="
+                    getItemsPaginatedSearch(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                  class="form-control form-control-sm"
+                  placeholder="Enter Name"
+                  aria-controls="data-table"
+                />
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.background]="currentTheme.secondaryColor"
+                  (click)="
+                    getItemsPaginatedSearch(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </label>
+            </div>
+            <div
+              class=""
+              aria-live="polite"
+              style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+            >
+              Showing {{ (pagination.pageNum - 1) * pagination.pageSize + 1 }} -
+              {{
+                (pagination.pageNum - 1) * pagination.pageSize +
+                  pagination.count
+              }}
+              of {{ pagination.totalRecords }} record(s)
+            </div>
+          </div>
+          <!-- /pagination Top -->
+
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table id="industriestable" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Industry Name</th>
+                  <th>Created By</th>
+                  <th>Date Created</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  class="gradeX"
+                  *ngFor="let row of employmentIndustries; let i = index"
+                >
+                  <td>{{ row?.employmentIndustryName }}</td>
+                  <td>
+                    {{ row?.externalCreator }}
+                    <!-- <span *ngIf="row?.createdBy == null">{{row?.externalCreator}}</span>
+                                                    <span *ngIf="row?.createdBy != null">{{ row?.person?.displayName }}</span> -->
+                  </td>
+                  <td>{{ row?.createdAt | date: "dd/MM/yyyy" }}</td>
+                  <td>
+                    <span
+                      *ngIf="row?.status == 'Active'"
+                      class="badge badge-success mb-1 mr-1"
+                    >
+                      {{ row?.status }}</span
+                    >
+                    <span
+                      *ngIf="row?.status == 'NonActive'"
+                      class="badge badge-warning mb-1 mr-1"
+                    >
+                      {{ row?.status }}</span
+                    >
+                  </td>
+                  <td>
+                    <!-- <div class="btn-group btn-xs dropleft mr-2 mb-2"> -->
+
+                    <!-- <button class="btn btn-warning btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            Actions
+                                                          </button> -->
+
+                    <!-- <div  *ngIf="currentuser?.permission?.includes('Update Employment Industries')" class="dropdown-menu" x-placement="left-start" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-156px, 4px, 0px);"> -->
+                    <!-- <a class="dropdown-item" href="javascript:void(0)" (click)="openEditModal(editEmploymentIndustryModal, row,2)">Edit Industry</a> -->
+                    <a
+                      *ngIf="
+                        currentuser?.permission?.includes(
+                          'Update Employment Industries'
+                        )
+                      "
+                      style="color: saddlebrown"
+                      href="javascript:void(0)"
+                      (click)="
+                        openEditModal(editEmploymentIndustryModal, row, '2')
+                      "
+                    >
+                      <i class="icon icon-xs icon-setting"></i> Manage
+                    </a>
+
+                    <!-- </div> -->
+
+                    <!-- </div> -->
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="
+                    (pagination.pageNum - 1) * pagination.pageSize + 1 > 10
+                  "
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        pagination.pageNum - 1
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="javascript:void(0)"
+                    >{{ pagination.pageNum }} of
+                    {{ this.pagination.maxPage }} page<span
+                      *ngIf="pagination.pageNum > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="this.pagination.pageNum < this.pagination.maxPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        pagination.pageNum + 1
+                      )
+                    "
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+
+        <div
+          *ngIf="
+            this.currentview == 3 &&
+            currentuser?.permission?.includes('View Lending Institutions')
+          "
+          class="tab-pane"
+        >
+          <!-- Pagination Top-->
+          <div class="row">
+            <div class="col-md-8">
+              <label style="display: inline-flex"
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [(ngModel)]="pagination3.pageSize"
+                  aria-controls="data-table"
+                  (change)="
+                    getItemsPaginatedSearch3(
+                      this.pagination3.searchTerm,
+                      this.pagination3.pageSize,
+                      1
+                    )
+                  "
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+            <div class="form-group col-md-4">
+              <label style="display: inline-flex; float: right"
+                ><span style="padding: 10px 2px; font-size: 12px"></span
+                ><input
+                  type="search"
+                  [(ngModel)]="pagination3.searchTerm"
+                  (keydown.enter)="
+                    getItemsPaginatedSearch3(
+                      this.pagination3.searchTerm,
+                      this.pagination3.pageSize,
+                      1
+                    )
+                  "
+                  class="form-control form-control-sm"
+                  placeholder="Enter Name"
+                  aria-controls="data-table"
+                />
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.background]="currentTheme.secondaryColor"
+                  (click)="
+                    getItemsPaginatedSearch3(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </label>
+            </div>
+            <div
+              class=""
+              aria-live="polite"
+              style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+            >
+              Showing
+              {{ (pagination3.pageNum - 1) * pagination3.pageSize + 1 }} -
+              {{
+                (pagination3.pageNum - 1) * pagination3.pageSize +
+                  pagination3.count
+              }}
+              of {{ pagination3.totalRecords }} record(s)
+            </div>
+          </div>
+          <!-- /pagination Top -->
+
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Created By</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  class="gradeX"
+                  *ngFor="let row of lendingInstitutions; let i = index"
+                >
+                  <td>{{ row?.lendingInstitutionName }}</td>
+                  <td>{{ row?.phoneNumber }}</td>
+                  <td>{{ row?.email }}</td>
+                  <td>{{ row?.user }}</td>
+                  <td>
+                    <span
+                      *ngIf="row?.status == 'Active'"
+                      class="badge badge-success btn-xs mb-1 mr-1"
+                    >
+                      {{ row?.status }}</span
+                    >
+                    <span
+                      *ngIf="row?.status == 'NonActive'"
+                      class="badge badge-warning mb-1 mr-1"
+                    >
+                      {{ row?.status }}</span
+                    >
+                  </td>
+                  <td>
+                    <a
+                      style="color: saddlebrown"
+                      href="javascript:void(0)"
+                      (click)="
+                        openEditModal(editLendingInstitutionModal, row, '3')
+                      "
+                    >
+                      <i class="icon icon-xs icon-setting"></i> Manage
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="
+                    (pagination3.pageNum - 1) * pagination3.pageSize + 1 > 10
+                  "
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch3(
+                        this.pagination3.searchTerm,
+                        this.pagination3.pageSize,
+                        pagination3.pageNum - 1
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="javascript:void(0)"
+                    >{{ pagination3.pageNum }} of
+                    {{ this.pagination3.maxPage }} page<span
+                      *ngIf="pagination3.pageNum > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="this.pagination3.pageNum < this.pagination3.maxPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch3(
+                        this.pagination3.searchTerm,
+                        this.pagination3.pageSize,
+                        pagination3.pageNum + 1
+                      )
+                    "
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+<!--Modals Section-->
+
+<ng-template #addEmployerModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      Add Employer
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="AddEmployerForm"
+    (ngSubmit)="submitEmployerForm(AddEmployerForm.value)"
+  >
+    <div class="modal-body">
+      <div class="form-row mt-3">
+        <div
+          class="col-sm-12 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              AddEmployerForm.get('EmployerName').errors &&
+              AddEmployerForm.get('EmployerName').touched
+          }"
+        >
+          <label>Employer Name </label><b class="help-block">*</b>
+          <input
+            type="text"
+            placeholder="Business Name"
+            class="form-control"
+            formControlName="EmployerName"
+            id="EmployerName"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              AddEmployerForm.get('EmployerName').errors &&
+              AddEmployerForm.get('EmployerName').touched
+            "
+          >
+            What is name of the Business?
+          </span>
+        </div>
+
+        <div
+          class="col-sm-5 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              AddEmployerForm.get('EmployerName').errors &&
+              AddEmployerForm.get('EmployerName').touched
+          }"
+        >
+          <label
+            >Pay Date <small><b class="help-block">*</b></small>
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="31"
+            placeholder="e.g 24"
+            class="form-control"
+            formControlName="EmployerPayDate"
+            id="EmployerName"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              AddEmployerForm.get('EmployerPayDate').errors &&
+              AddEmployerForm.get('EmployerPayDate').touched
+            "
+          >
+            What is day are salaries typically paid?
+          </span>
+        </div>
+        <div class="col-sm-7 mb-3 form-group">
+          <label>Select Industry <b class="help-block">*</b></label>
+          <slct-2
+            [allowClear]="true"
+            [data]="employmentIndustriesArray"
+            (selected)="selected('Industry', $event)"
+            placeholder="No Industry selected"
+          >
+          </slct-2>
+          <!-- <ng-select [allowClear]="true" [items]="employmentIndustriesArray" (selected)="selected('Industry',$event)"
+            placeholder="No Industry selected">
+          </ng-select> -->
+        </div>
+
+        <div
+          class="col-sm-12 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              AddEmployerForm.get('EmployerAddress').errors &&
+              AddEmployerForm.get('EmployerAddress').touched
+          }"
+        >
+          <label>Business Address <b class="help-block">*</b></label>
+          <textarea
+            class="form-control"
+            formControlName="EmployerAddress"
+            id="text-area-1"
+            rows="3"
+            placeholder="Textarea"
+          ></textarea>
+        </div>
+
+        <div class="col-sm-6 mb-3 form-group">
+          <label>Status</label>
+          <select
+            formControlName="Status"
+            aria-controls="data-table"
+            class="custom-select custom-select-xl form-control form-control-xl height"
+          >
+            <option selected="selected" disabled>Select Status</option>
+            <option value="Active">Active</option>
+            <option value="NonActive">Inactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="AddEmployerForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #addEmploymentIndustryModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      New Industry
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <form
+    [formGroup]="AddEmploymentIndustryForm"
+    (ngSubmit)="submitEmploymentIndustryForm(AddEmploymentIndustryForm.value)"
+  >
+    <div class="modal-body">
+      <div
+        class="form-group"
+        [ngClass]="{
+          'has-error':
+            AddEmploymentIndustryForm.get('EmploymentIndustryName').errors &&
+            AddEmploymentIndustryForm.get('EmploymentIndustryName').touched
+        }"
+      >
+        <label>Industry Name</label>
+        <input
+          type="text"
+          placeholder="Industry Name"
+          class="form-control"
+          formControlName="EmploymentIndustryName"
+          id="EmploymentIndustryName"
+        />
+        <span
+          class="help-block"
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="
+            AddEmploymentIndustryForm.get('EmploymentIndustryName').errors &&
+            AddEmploymentIndustryForm.get('EmploymentIndustryName').touched
+          "
+        >
+          What is name of the Industry?
+        </span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="AddEmploymentIndustryForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #editEmploymentIndustryModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      Edit Employment Industry
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <form
+    [formGroup]="EditEmploymentIndustryForm"
+    (ngSubmit)="
+      submitEditEmploymentIndustryForm(EditEmploymentIndustryForm.value)
+    "
+  >
+    <div class="modal-body">
+      <div
+        class="form-group"
+        [ngClass]="{
+          'has-error':
+            EditEmploymentIndustryForm.get('EmploymentIndustryName').errors &&
+            EditEmploymentIndustryForm.get('EmploymentIndustryName').touched
+        }"
+      >
+        <label for="EmploymentIndustryName">Industry Name</label>
+        <input
+          type="text"
+          placeholder="Industry Name"
+          class="form-control"
+          formControlName="EmploymentIndustryName"
+          id="EmploymentIndustryName"
+        />
+        <span
+          class="help-block"
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="
+            EditEmploymentIndustryForm.get('EmploymentIndustryName').errors &&
+            EditEmploymentIndustryForm.get('EmploymentIndustryName').touched
+          "
+        >
+          Please Enter Industry Name?
+        </span>
+      </div>
+      <div
+        class="form-group"
+        [ngClass]="{
+          'has-error':
+            EditEmploymentIndustryForm.get('Status').errors &&
+            EditEmploymentIndustry.get('Status').touched
+        }"
+      >
+        <label for="permission">Status</label>
+
+        <select
+          formControlName="Status"
+          aria-controls="data-table"
+          class="custom-select custom-select-xl form-control form-control-xl height"
+        >
+          <option value="Active">Active</option>
+          <option value="NonActive">Inactive</option>
+        </select>
+
+        <span
+          class="help-block"
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="
+            EditEmploymentIndustryForm.get('Status').errors &&
+            EditEmploymentIndustryForm.get('Status').touched
+          "
+        >
+          Select Status
+        </span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="EditEmploymentIndustryForm.invalid"
+      >
+        Update
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #editEmployerModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      Edit Employer
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <form
+    [formGroup]="EditEmployerForm"
+    (ngSubmit)="submitEditEmployerForm()"
+  >
+    <div class="modal-body">
+      <div class="form-row mt-3">
+        <div
+          class="col-sm-12 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              EditEmployerForm.get('EmployerName').errors &&
+              EditEmployerForm.get('EmployerName').touched
+          }"
+        >
+          <label for="EmployerName">Employer Name</label>
+          <input
+            type="text"
+            placeholder="Employer Name"
+            class="form-control"
+            formControlName="EmployerName"
+            id="EmployerName"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              EditEmployerForm.get('EmployerName').errors &&
+              EditEmployerForm.get('EmployerName').touched
+            "
+          >
+            Please Enter Employer Name?
+          </span>
+        </div>
+
+        <div
+          class="col-sm-5 mb-3form-group"
+          [ngClass]="{
+            'has-error':
+              EditEmployerForm.get('EmployerPayDate').errors &&
+              EditEmployerForm.get('EmployerPayDate').touched
+          }"
+        >
+          <label
+            >Pay Date <small><b class="help-block">*</b></small>
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="31"
+            placeholder="e.g 24"
+            class="form-control"
+            formControlName="EmployerPayDate"
+            id="EmployerPayDate"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              EditEmployerForm.get('EmployerPayDate').errors &&
+              EditEmployerForm.get('EmployerPayDate').touched
+            "
+          >
+            What day are salaries typically paid?
+          </span>
+        </div>
+        <div class="col-sm-7 mb-3 form-group">
+          <label>Select Industry <b class="help-block">*</b></label>
+          <slct-2
+            [allowClear]="true"
+            [data]="employmentIndustriesArray"
+            (selected)="selected('Industry', $event)"
+            placeholder="No Industry selected"
+            [value]="selectedIndustryArray"
+            [active]="selectedIndustryArray.length ? selectedIndustryArray : null"
+          >
+          </slct-2>
+        </div>
+        <div
+          class="col-sm-12 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              EditEmployerForm.get('EmployerAddress').errors &&
+              EditEmployerForm.get('EmployerAddress').touched
+          }"
+        >
+          <label>Business Address <b class="help-block">*</b></label>
+          <textarea
+            class="form-control"
+            formControlName="EmployerAddress"
+            id="text-area-1"
+            rows="3"
+            placeholder="e.g ...Nigeria"
+          ></textarea>
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              EditEmployerForm.get('Status').errors &&
+              EditEmployerForm.get('Status').touched
+          }"
+        >
+          <label for="permission">Status</label>
+
+          <select
+            formControlName="Status"
+            aria-controls="data-table"
+            class="custom-select custom-select-xl form-control form-control-xl height"
+          >
+            <option value="Active">Active</option>
+            <option value="NonActive">Inactive</option>
+          </select>
+
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              EditEmployerForm.get('Status').errors &&
+              EditEmployerForm.get('Status').touched
+            "
+          >
+            Select Status
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="EditEmployerForm.invalid"
+      >
+        Update
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #addLendingInstitutionModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      Add Lending Institution
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="AddLendingInstitutionForm"
+    (ngSubmit)="submitLendingInstitutionForm()"
+  >
+    <div class="modal-body">
+      <div class="form-row mt-3">
+        <div
+          class="col-sm-12 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              AddLendingInstitutionForm.get('LendingInstitutionName').errors &&
+              AddLendingInstitutionForm.get('LendingInstitutionName').touched
+          }"
+        >
+          <label>Lending Institution Name </label><b class="help-block">*</b>
+          <input
+            type="text"
+            placeholder="Enter Name"
+            class="form-control"
+            formControlName="LendingInstitutionName"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              AddLendingInstitutionForm.get('LendingInstitutionName').errors &&
+              AddLendingInstitutionForm.get('LendingInstitutionName').touched
+            "
+          >
+            What is name of the Lendinig Institution?
+          </span>
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              AddLendingInstitutionForm.get('Email').errors &&
+              AddLendingInstitutionForm.get('Email').touched
+          }"
+        >
+          <label
+            >Email <small><b class="help-block">*</b></small>
+          </label>
+          <input
+            type="email"
+            placeholder="Enter Email"
+            class="form-control"
+            formControlName="Email"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              AddLendingInstitutionForm.get('Email').errors &&
+              AddLendingInstitutionForm.get('Email').touched
+            "
+          >
+            How can they be reached?
+          </span>
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              AddLendingInstitutionForm.get('PhoneNumber').errors &&
+              AddLendingInstitutionForm.get('PhoneNumber').touched
+          }"
+        >
+          <label
+            >Phone Number <small><b class="help-block">*</b></small>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter Number "
+            class="form-control"
+            formControlName="PhoneNumber"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              AddLendingInstitutionForm.get('PhoneNumber').errors &&
+              AddLendingInstitutionForm.get('PhoneNumber').touched
+            "
+          >
+            How can they be reached?
+          </span>
+        </div>
+
+        <div class="col-sm-6 mb-3 form-group">
+          <label>Select Bank <b class="help-block">*</b></label>
+          <slct-2
+            [allowClear]="true"
+            [data]="banksArray"
+            (selected)="selected('Bank', $event)"
+            placeholder="No Bank selected"
+          >
+          </slct-2>
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              AddLendingInstitutionForm.get('AccountName').errors &&
+              AddLendingInstitutionForm.get('AccountName').touched
+          }"
+        >
+          <label>Account Name <b class="help-block">*</b></label>
+          <input
+            type="text"
+            placeholder="Enter Name"
+            class="form-control"
+            formControlName="AccountName"
+          />
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              AddLendingInstitutionForm.get('AccountNumber').errors &&
+              AddLendingInstitutionForm.get('AccountNumber').touched
+          }"
+        >
+          <label>Account Number <b class="help-block">*</b></label>
+          <input
+            type="text"
+            placeholder="Enter Number"
+            class="form-control"
+            formControlName="AccountNumber"
+          />
+        </div>
+
+        <div class="col-sm-6 mb-3 form-group">
+          <label>Status</label>
+          <select
+            formControlName="Status"
+            aria-controls="data-table"
+            class="custom-select custom-select-xl form-control form-control-xl height"
+          >
+            <option selected="selected" disabled>Select Status</option>
+            <option value="Active">Active</option>
+            <option value="NonActive">Nonactive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="AddLendingInstitutionForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #editLendingInstitutionModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      Edit Lending Institution
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="EditLendingInstitutionForm"
+    (ngSubmit)="
+      submitEditLendingInstitutionForm(EditLendingInstitutionForm.value)
+    "
+  >
+    <div class="modal-body">
+      <div class="form-row mt-3">
+        <div
+          class="col-sm-12 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              EditLendingInstitutionForm.get('LendingInstitutionName').errors &&
+              EditLendingInstitutionForm.get('LendingInstitutionName').touched
+          }"
+        >
+          <label>Lending Institution Name </label><b class="help-block">*</b>
+          <input
+            type="text"
+            placeholder="Enter Name"
+            class="form-control"
+            formControlName="LendingInstitutionName"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              EditLendingInstitutionForm.get('LendingInstitutionName').errors &&
+              EditLendingInstitutionForm.get('LendingInstitutionName').touched
+            "
+          >
+            What is name of the Lendinig Institution?
+          </span>
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              EditLendingInstitutionForm.get('Email').errors &&
+              EditLendingInstitutionForm.get('Email').touched
+          }"
+        >
+          <label
+            >Email <small><b class="help-block">*</b></small>
+          </label>
+          <input
+            type="email"
+            placeholder="Enter Email"
+            class="form-control"
+            formControlName="Email"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              EditLendingInstitutionForm.get('Email').errors &&
+              EditLendingInstitutionForm.get('Email').touched
+            "
+          >
+            How can they be reached?
+          </span>
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              EditLendingInstitutionForm.get('PhoneNumber').errors &&
+              EditLendingInstitutionForm.get('PhoneNumber').touched
+          }"
+        >
+          <label
+            >Phone Number <small><b class="help-block">*</b></small>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter Number "
+            class="form-control"
+            formControlName="PhoneNumber"
+          />
+          <span
+            class="help-block"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              EditLendingInstitutionForm.get('PhoneNumber').errors &&
+              EditLendingInstitutionForm.get('PhoneNumber').touched
+            "
+          >
+            How can they be reached?
+          </span>
+        </div>
+
+        <div class="col-sm-6 mb-3 form-group">
+          <label>Select Bank <b class="help-block">*</b></label>
+          <slct-2
+            [allowClear]="true"
+            [data]="banksArray"
+            (selected)="selected('Bank', $event)"
+            placeholder="No Bank selected"
+            [active]="selectedBankArray"
+          >
+          </slct-2>
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              EditLendingInstitutionForm.get('AccountName').errors &&
+              EditLendingInstitutionForm.get('AccountName').touched
+          }"
+        >
+          <label>Account Name <b class="help-block">*</b></label>
+          <input
+            type="text"
+            placeholder="Enter Name"
+            class="form-control"
+            formControlName="AccountName"
+          />
+        </div>
+
+        <div
+          class="col-sm-6 mb-3 form-group"
+          [ngClass]="{
+            'has-error':
+              EditLendingInstitutionForm.get('AccountNumber').errors &&
+              EditLendingInstitutionForm.get('AccountNumber').touched
+          }"
+        >
+          <label>Account Number <b class="help-block">*</b></label>
+          <input
+            type="text"
+            placeholder="Enter Number"
+            class="form-control"
+            formControlName="AccountNumber"
+          />
+        </div>
+
+        <div class="col-sm-6 mb-3 form-group">
+          <label>Status</label>
+          <select
+            formControlName="Status"
+            aria-controls="data-table"
+            class="custom-select custom-select-xl form-control form-control-xl height"
+          >
+            <option selected="selected" disabled>Select Status</option>
+            <option value="Active">Active</option>
+            <option value="NonActive">NonActive</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="EditLendingInstitutionForm.invalid"
+      >
+        Update
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>

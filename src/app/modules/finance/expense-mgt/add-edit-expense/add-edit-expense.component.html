@@ -1,0 +1,427 @@
+<div class="row m-0">
+  <div class="col-12">
+    <div
+      class="dt-card w-100"
+      *ngIf="((isEditing || cloning) && singleExpense) || !isEditing"
+    >
+      <div class="dt-card__body">
+        <form [formGroup]="expenseForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-row my-5">
+                <div class="col-md-6">
+                  <label for="date">Date <b class="text-danger">*</b></label>
+                  <input
+                    formControlName="date"
+                    type="date"
+                    id="date"
+                    class="form-control"
+                  />
+
+                  <span
+                    class="help-block f-12"
+                    *ngIf="
+                      expenseForm.get('date').errors &&
+                      expenseForm.get('date').touched
+                    "
+                  >
+                    <span *ngIf="expenseForm.get('date').getError('required')"
+                      >This field is required</span
+                    >
+                  </span>
+                </div>
+                <div class="col-md-6">
+                  <label for="accounts"
+                    >Paid through <b class="text-danger">*</b></label
+                  >
+                  <slct-2
+                    *ngIf="bankAccounts.length > 0"
+                    [data]="bankAccounts"
+                    (selected)="setValue($event, 'paidThroughAccountId')"
+                    [customSearchEnabled]="true"
+                    placeholder="Select an account"
+                    [active]="
+                      (isEditing || cloning)
+                        ? [
+                            {
+                              id: expenseForm.get('paidThroughAccountId')
+                                ?.value,
+                              text: singleExpense?.paidThroughAccount
+                            }
+                          ]
+                        : null
+                    "
+                  ></slct-2>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-6">
+                  <label for="reference">Reference </label>
+                  <input
+                    formControlName="reference"
+                    type="text"
+                    id="reference"
+                    class="form-control"
+                    placeholder="Enter reference"
+                  />
+                </div>
+              </div>
+              <p
+                *ngIf="!isEditing"
+                (click)="toggleItemize()"
+                class="mt-5 text-primary cursor"
+              >
+                <i *ngIf="!itemize" class="icon icon-add"></i>
+                <i *ngIf="itemize" class="icon icon-arrow-left"></i>
+                {{ itemize ? "Single Expense View" : "Itemize" }}
+              </p>
+              <div *ngIf="!itemize" class="form-row my-5">
+                <div class="col-md-6">
+                  <label>Expense Account <b class="text-danger">*</b></label>
+                  <account-slct
+                    *ngIf="accounts.length > 0"
+                    [data]="accounts"
+                    (selectedAccount)="setValue($event, 'accountSingle')"
+                  ></account-slct>
+                </div>
+
+                <div class="col-md-6">
+                  <label>Amount <b class="text-danger">*</b></label>
+                  <input
+                    type="text"
+                    formControlName="amount"
+                    class="form-control"
+                    currencyMask
+                    [options]="{
+                      prefix: '',
+                      thousands: ',',
+                      decimal: '.'
+                    }"
+                  />
+                </div>
+                <div class="col-md-6 mt-5">
+                  <label>Tax </label>
+                  <slct-2
+                    [data]="taxesDropdata"
+                    [customSearchEnabled]="true"
+                    (selected)="setTaxes($event, 0)"
+                    [placeholder]="'Select A Tax'"
+                    [active]="
+                      expenses.length > 0
+                        ? [
+                            {
+                              id: expenses[i]?.tax?.accountId,
+                              text: expenses[i]?.tax?.name
+                            }
+                          ]
+                        : [{ id: null, text: 'No Tax' }]
+                    "
+                  ></slct-2>
+                </div>
+              </div>
+
+              <div class="form-row my-5">
+                <div class="col-md-6">
+                  <label for="vendor">Vendor</label>
+                  <div>
+                    <slct-2
+                      [data]="vendors"
+                      [customSearchEnabled]="true"
+                      placeholder="Search Vendors"
+                      id="vendor"
+                      [active]="
+                        (isEditing || cloning) && singleExpense?.vendorId
+                          ? [
+                              {
+                                id: singleExpense?.vendorId,
+                                text: singleExpense?.vendor
+                              }
+                            ]
+                          : null
+                      "
+                      (selected)="setValue($event, 'vendorId')"
+                      [searchService]="getSearchVendorService()"
+                      (searchResult)="updateDropdown($event, 'vendor')"
+                    ></slct-2>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="customer">Customer Name</label>
+                  <div>
+                    <slct-2
+                      [data]="customers"
+                      [customSearchEnabled]="true"
+                      [placeholder]="'Search Customer'"
+                      id="customer"
+                      (selected)="setValue($event, 'customerId')"
+                      [active]="
+                        (isEditing || cloning) && singleExpense?.customerId
+                          ? [
+                              {
+                                id: singleExpense?.customerId,
+                                text: singleExpense?.customer
+                              }
+                            ]
+                          : null
+                      "
+                      [searchService]="getSearchCustomerService()"
+                      (searchResult)="updateDropdown($event, 'customer')"
+                    ></slct-2>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <lnd-approval-comments
+                *ngIf="isEditing && singleExpense?.comments.length > 0"
+                [comments]="singleExpense.comments"
+              ></lnd-approval-comments>
+            </div>
+          </div>
+          <div *ngIf="!itemize" class="form-row my-5">
+            <div class="col-md-6">
+              <label for="notes">Notes </label>
+              <textarea
+                id="notes"
+                class="form-control"
+                placeholder="Enter a note"
+                (blur)="setValue($event.target.value, 'notesSingle')"
+              ></textarea>
+
+              <span
+                class="help-block f-12"
+                *ngIf="
+                  expenseForm.get('notes').errors &&
+                  expenseForm.get('notes').touched
+                "
+              >
+                <span *ngIf="expenseForm.get('notes').getError('required')"
+                  >This field is required</span
+                >
+              </span>
+            </div>
+          </div>
+          <div>
+            <table
+              *ngIf="itemize"
+              id="data-table"
+              class="table table-bordered table-sm shadow-sm px-3 mb-5 bg-white rounded"
+            >
+              <thead>
+                <tr>
+                  <th>EXPENSE ACCOUNT</th>
+                  <th>NOTES</th>
+                  <th>TAX</th>
+                  <th>AMOUNT</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <ng-container
+                  class="form-row my-5"
+                  formArrayName="expenseLines"
+                >
+                  <ng-container
+                    *ngFor="
+                      let expenseControl of expense().controls;
+                      let i = index
+                    "
+                    [formGroup]="expenseControl"
+                  >
+                    <tr [formGroup]="expenseControl">
+                      <td>
+                        <account-slct
+                          *ngIf="accounts.length && expense().controls.length"
+                          [data]="accounts"
+                          (selectedAccount)="
+                            setValue($event, 'expenseAccount', i)
+                          "
+                          [preselectedAccount]="
+                            (isEditing || cloning)
+                              ? {
+                                  accountId:
+                                    expenses[i]?.expenseAccount?.accountId,
+                                  name: expenses[i]?.expenseAccount?.name
+                                }
+                              : null
+                          "
+                          (selected)="setValue()"
+                        ></account-slct>
+                      </td>
+
+                      <td>
+                        <textarea
+                          formControlName="notes"
+                          class="form-control"
+                          placeholder="Enter Notes"
+                        ></textarea>
+                      </td>
+
+                      <td class="slct-2" [hidden]="taxes.length === 0">
+                        <slct-2
+                          [data]="taxesDropdata"
+                          [customSearchEnabled]="true"
+                          (selected)="setTaxes($event, i)"
+                          [placeholder]="'Select A Tax'"
+                          [active]="
+                            expenses[i]?.tax
+                              ? [
+                                  {
+                                    id: expenses[i]?.tax?.accountId,
+                                    text: expenses[i]?.tax?.name
+                                  }
+                                ]
+                              : [{ id: null, text: 'No Tax' }]
+                          "
+                        ></slct-2>
+                      </td>
+
+                      <td class="d-flex">
+                        <input
+                          type="text"
+                          formControlName="amount"
+                          class="form-control"
+                          (blur)="calculateTax()"
+                          currencyMask
+                          [options]="{
+                            prefix: '',
+                            thousands: ',',
+                            decimal: '.'
+                          }"
+                        />
+
+                        <div
+                          *ngIf="expense().length > 1"
+                          class="remove-btn"
+                          (click)="removeExpense(i)"
+                        >
+                          <i class="icon icon-trash text-danger icon-lg"></i>
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+              </tbody>
+              <button
+                class="btn add-btn btn-xs text-white my-5 mx-1"
+                (click)="addExpense()"
+              >
+                <i class="icon icon-add"></i>Add new line
+              </button>
+            </table>
+          </div>
+          <div class="form-row my-5">
+            <div class="col-md-6">
+              <small>Attach relevant files</small> <br />
+              <button
+                class="btn btn-xs btn-secondary text-white"
+                (click)="files.click()"
+              >
+                <i class="icon icon-upload"></i>
+                {{ !fileDelete ? "Attach File" : "Deleting file..." }}
+                <i *ngIf="fileDelete" class="icon icon-spin icon-spin2"></i>
+              </button>
+              <input
+                #files
+                type="file"
+                multiple
+                (change)="handleFile($event.target.files)"
+                style="display: none"
+              />
+              <span
+                *ngFor="let file of expenseViewFiles; let fileIndex = index"
+                class="badge badge-pill badge-outline m-2 px-4"
+                >{{ file.name || file.originalName }}
+                <i
+                  class="icon icon-trash ml-2 cursor text-danger"
+                  (click)="removeFile(fileIndex)"
+                ></i>
+              </span>
+            </div>
+            <div class="col-md-6" id="summary" *ngIf="itemize">
+              <div class="bg-custom p-5" style="background-color: #fbfafa">
+                <div class="row">
+                  <div class="col-md-3">
+                    <p>Sub Total</p>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="d-flex justify-content-end">
+                      <p>{{ currency }}{{ subTotal | number : "1.2-2" }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="row py-1" *ngFor="let tax of taxesObj">
+                  <div class="col-md-3">
+                    <p>{{ tax.name }}</p>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="d-flex justify-content-end">
+                      <p>{{ currency }}{{ tax.value | number : "1.2-2" }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-3">
+                    <p class="font-weight-bold">
+                      Total ({{ ownerInformation?.currency?.currencySymbol }})
+                    </p>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="d-flex justify-content-end">
+                      <p class="font-weight-bold">
+                        {{ expenseTotal | number : "1.2-2" }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <footer class="d-flex justify-content-end">
+          <div *ngIf="!isLoading; else processing">
+            <button
+              [disabled]="expenseForm.invalid || zeroItems.length > 0"
+              class="btn btn-xs btn-light"
+              (click)="submit('Draft')"
+            >
+              Save as Draft
+            </button>
+
+            <button
+              [disabled]="expenseForm.invalid || zeroItems.length > 0"
+              type="submit"
+              (click)="submit('SentForApproval')"
+              d
+              class="btn btn-xs btn-primary mx-2"
+            >
+              Send For Approval
+            </button>
+
+            <button
+              [disabled]="expenseForm.invalid || zeroItems.length > 0"
+              type="submit"
+              (click)="openModal(approval)"
+              d
+              class="btn btn-xs btn-success"
+            >
+              Post
+            </button>
+          </div>
+
+          <ng-template #processing>
+            <button class="btn btn-xs btn-warning mx-1" disabled>
+              <i class="icon icon-spin icon-spin2"></i> Processing..
+            </button>
+          </ng-template>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [canApprove]="user?.permission?.includes('Approve Finance Payment')"
+    (sendPayload)="submit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>

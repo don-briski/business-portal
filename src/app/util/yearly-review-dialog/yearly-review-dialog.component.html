@@ -1,0 +1,1065 @@
+<div class="wrapper bg-lendastack text-white" *ngIf="!showPreview && showCasual">
+    <div class="header d-flex justify-content-between align-items-center p-2">
+      <div class="logo img-responsive pl-3">
+        <img class="d-block img-responsive logo" [src]="lendaLogo" alt="Logo" />
+      </div>
+      <div class="close" [mat-dialog-close]="true">
+        <i
+          class="icon icon-close icon-fw icon-xl"
+          [ngClass]="showPreview ? 'text-dark' : 'text-white'"
+        ></i>
+      </div>
+    </div>
+    <div class="steps">
+      <!--   -->
+      <div class="step-2" [hidden]="currentStep !== 2">
+        <div class="top-icon" >
+            <img
+              src="assets/images/wrapped/step-2.svg"
+              alt=""
+              class="major img-responsive"
+            />
+          </div>
+          <div class="info-area p-4">
+              <p class="h2">You logged in <br> <span class="logged-in-text">{{loginCount | numberFormat : 'short'}}</span>  times in <br> {{year}}. Way to go!</p>
+        
+            <p class="text-muted">
+              You are always here... trust us, there is <br> no Trophy for most logins.
+            </p>
+            <div class="action-wrapper">
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                  (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 next-btn"
+                  (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+          </div>
+      </div>
+      <div class="step-3" [hidden]="currentStep !== 3">
+        <div class="side-img-wrapper" >
+            <img
+              src="assets/images/wrapped/step-3.svg"
+              alt=""
+              class="major img-responsive "
+            />
+        </div>
+          <div class="info-area p-4">
+              <p class="h2">YOU RECEIVED <span class="logged-in-text">{{loanApplications | number }}</span> <br> APPLICATIONS.</p>
+        
+            <p class="text-muted">
+              We can hook you up with a premium <br> decluttering service for your desk.
+            </p>
+            <div class="action-wrapper">
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                  (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 next-btn"
+                  (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+          </div>
+      </div>
+      <div
+        class="step-4"
+        [hidden]="currentStep !== 4"
+      >
+        <div class="top-icon" >
+                <img
+                src="assets/images/wrapped/step-4.svg"
+                alt=""
+                class="major img-responsive "
+                />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">You approved  <span class="logged-in-text">{{approvedLoansCount | number}}</span> <br> loans, That's <br> amazing!!!</p>
+            <p class="text-muted">
+            It's hard to tell the difference between <br> you and the treasurer of charity <br> organizations.
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+        </div>
+      </div>
+      <div
+        class="step-5"
+        [hidden]="currentStep !== 5"
+        > 
+        <div class="side-img-wrapper" >
+            <img
+            src="assets/images/wrapped/step-5.svg"
+            alt=""
+            class="major img-responsive "
+            />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">In {{year}}, You <br> declined  <span class="logged-in-text">{{rejectedLoansCount | number}}</span> loans.</p>
+
+            <p class="text-muted">
+                We're sure you had good your reasons. You <br> will make a good judge on "Nigeria's <br> Got Talent".
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+       
+        </div>
+      </div>
+      <div
+        class="step-6"
+        [hidden]="currentStep !== 6"
+      >
+        <div class="money-roll-wrapper">
+            <img
+                src="assets/images/wrapped/money-roll.svg"
+                alt="Money Image"
+                class="major img-responsive"
+            />
+        </div>
+        <div class="side-img-wrapper" >
+            <img
+            src="assets/images/wrapped/step-6.svg"
+            alt=""
+            class="major img-responsive "
+            />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">You disbursed <br> <span class="logged-in-text">{{currencySymbol}}{{disbursementAmount | numberFormat : 'short'}}</span> in loans.</p>
+
+            <p class="text-muted">
+               This definitely contributed to making <br> your employers purse lighter. Are you <br> sure they're cool with this? 
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+       
+        </div>
+
+        <div class="money-roll-wrapper-2">
+            <img
+                src="assets/images/wrapped/money-roll.svg"
+                alt="Money Image"
+                class="major img-responsive"
+            />
+        </div>
+      </div>
+
+      <div class="step-7" [hidden]="currentStep !== 7">
+        <div class="side-img-wrapper-lg" >
+            <img
+              src="assets/images/wrapped/young-people-standing.svg"
+              alt=""
+              class="major img-responsive "
+            />
+        </div>
+          <div class="info-area p-4">
+              <p class="h2">You created <br> <span class="logged-in-text">{{customersCreated | number }}</span> customers.</p>
+        
+            <p class="text-muted">
+              Are you sure you weren't just creating <br> new customers for fun?
+            </p>
+            <div class="action-wrapper">
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                  (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 next-btn"
+                  (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+          </div>
+      </div>
+
+      <div class="step-7" [hidden]="currentStep !== 8">
+        <div class="side-img-wrapper-lg" >
+            <img
+              src="assets/images/wrapped/step-7-new.svg"
+              alt=""
+              class="major img-responsive "
+            />
+        </div>
+          <div class="info-area p-4">
+              <p class="h2">You approved <br> <span class="logged-in-text">{{approvedInvestmentCount | number }}</span> investment.</p>
+        
+            <p class="text-muted">
+              Your colleagues are probably <br> wondering if you ever say no.
+            </p>
+            <div class="action-wrapper">
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                  (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 next-btn"
+                  (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+          </div>
+      </div>
+
+      <div
+        class="step-11"
+        [hidden]="currentStep !== 11"
+        >
+        <div class="star-3">
+            <img
+                src="assets/images/wrapped/star-3.svg"
+                alt="Star Image"
+                class="major img-responsive"
+            />
+        </div>
+        <div class="star-1">
+                <img
+                    src="assets/images/wrapped/star-1.svg"
+                    alt="Star Image"
+                    class="major img-responsive"
+                />
+        </div>
+    
+        <div class="new-year-logo" >
+            <img
+            src="assets/images/wrapped/step-7.svg"
+            alt=""
+            class="major img-responsive "
+            />
+        </div>
+        <div class="star-2">
+            <img
+                src="assets/images/wrapped/star-2.svg"
+                alt="Star Image"
+                class="major img-responsive"
+            />
+        </div>
+        <div class="info-area p-4">
+
+            <p class="h2">We had such a <br> great time with <br> you in {{ year }}</p>
+            <p class="text-muted">
+                Let's go bigger this New Year  
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previewSocial()"
+                >
+                Preview social version
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="shareOnLinkedIn()"
+                >
+                Share on LinkedIn
+                <img class="linked-logo" src="assets/images/wrapped/linked-in.svg" alt="LinkedIn logo"/>
+                </button>
+
+            </div>
+    
+        </div>
+
+        <div class="star-4">
+            <img
+                src="assets/images/wrapped/star-4.svg"
+                alt="Money Image"
+                class="major img-responsive"
+            />
+        </div>
+      
+        <div class="star-5">
+            <img
+                src="assets/images/wrapped/star-5.svg"
+                alt="Money Image"
+                class="major img-responsive"
+            />
+        </div>
+      
+      </div>
+      
+      <div
+        class="step-8"
+        *ngIf="currentStep === 9"
+        >
+        
+        <div class="side-img-wrapper-lg" >
+          <img
+          src="assets/images/wrapped/step-8-new.svg"
+          alt=""
+          class="major img-responsive "
+          />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">There is <span class="logged-in-text">{{currencySymbol}}{{runningInvestmentsApprovedAmount | numberFormat: 'short'}}</span> <br> in investments <br> because of you. </p>
+            <p class="text-muted">
+                With this amount, your customers will <br> understand if you were on the run too
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+      
+        </div>
+    
+        
+      
+      </div>
+
+      <div
+        class="step-9"
+        [hidden]="currentStep !== 10"
+        >
+        
+        <div class="side-img-wrapper-lg" >
+          <img
+          src="assets/images/wrapped/step-9.svg"
+          alt=""
+          class="major img-responsive "
+          />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">You liquidated <span class="logged-in-text">{{liquidatedInvestmentCount | number}}</span> <br> investments.</p>
+
+            <p class="text-muted">
+                We know it was the customer's choice <br> but did you even try to dissuade <br> them??
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+      
+        </div>
+    
+        
+      
+      </div>
+
+      <div
+      class="step-11"
+      [hidden]="currentStep !== 11"
+      >
+      <div class="star-3">
+          <img
+              src="assets/images/wrapped/star-3.svg"
+              alt="Star Image"
+              class="major img-responsive"
+          />
+      </div>
+      <div class="star-1">
+              <img
+                  src="assets/images/wrapped/star-1.svg"
+                  alt="Star Image"
+                  class="major img-responsive"
+              />
+      </div>
+  
+      <div class="new-year-logo" >
+          <img
+          src="assets/images/wrapped/step-7.svg"
+          alt=""
+          class="major img-responsive "
+          />
+      </div>
+      <div class="star-2">
+          <img
+              src="assets/images/wrapped/star-2.svg"
+              alt="Star Image"
+              class="major img-responsive"
+          />
+      </div>
+      <div class="info-area p-4">
+
+          <p class="h2">We had such a <br> great time with <br> you in {{ year }}</p>
+          <p class="text-muted">
+              Let's go bigger this New Year  
+          </p>
+          <div class="action-wrapper">
+              <button
+              class="btn btn-sm text-blue btn-white px-5 prev-btn"
+              (click)="previewSocial()"
+              >
+              Preview social version
+              </button>
+              <button
+              class="btn btn-sm text-blue btn-white px-5 next-btn"
+              (click)="shareOnLinkedIn()"
+              >
+              Share on LinkedIn
+              <img class="linked-logo" src="assets/images/wrapped/linked-in.svg" alt="LinkedIn logo"/>
+              </button>
+
+          </div>
+  
+      </div>
+
+      <div class="star-4">
+          <img
+              src="assets/images/wrapped/star-4.svg"
+              alt="Money Image"
+              class="major img-responsive"
+          />
+      </div>
+    
+      <div class="star-5">
+          <img
+              src="assets/images/wrapped/star-5.svg"
+              alt="Money Image"
+              class="major img-responsive"
+          />
+      </div>
+    
+    </div>
+
+    </div>
+</div>
+
+<div class="wrapper-formal bg-lendastack text-white" *ngIf="showFormal && !showPreview">
+    <div class="header d-flex justify-content-between align-items-center p-2">
+      <div class="logo img-responsive pl-3">
+        <img class="d-block img-responsive logo" [src]="lendaLogo" alt="Logo" />
+      </div>
+      <div class="close" [mat-dialog-close]="true">
+        <i
+          class="icon icon-close icon-fw icon-xl"
+          [ngClass]="showPreview ? 'text-dark' : 'text-white'"
+        ></i>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step-1" [hidden]="currentStep !== 1">
+        <div class="top-icon" >
+          <img
+            src="assets/images/wrapped/step-1.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>  
+        <div class="info-area p-4">
+            <p class="h2">YOUR {{ year }} WRAPPED IS <br> HERE.</p>
+          
+            <img 
+                class="love-img"
+                src="assets/images/wrapped/love-orange.svg" 
+                alt="With love"
+            />
+          <p class="text-muted">
+            Ready to review your year in numbers on Lendastack?
+          </p>
+          <p class="text-muted">
+            Choose how you would want to see your Wrapped.
+          </p>
+          <button
+            class="btn btn-lg text-blue btn-white px-5 next-btn formal-btn"
+            (click)="toggleViewMode('formal')"
+          >
+          View Formal Version
+          </button>
+          <button
+            class="btn btn-lg text-blue btn-white px-5 next-btn casual-btn"
+            (click)="toggleViewMode('casual')"
+          >
+          Humor Me
+          </button>
+        </div>
+      </div>
+      <div class="step-2" [hidden]="currentStep !== 2">
+        <div class="bg-orange-icon" >
+            <img
+              src="assets/images/wrapped/bg-formal.svg"
+              alt=""
+              class="major img-responsive"
+            />
+        </div>
+        <div class="top-icon" >
+            <img
+              src="assets/images/wrapped/step-2-formal.svg"
+              alt=""
+              class="major img-responsive"
+            />
+          </div>
+          <div class="info-area p-4">
+              <p class="h2">You logged in <br> <span class="logged-in-text">{{loginCount | numberFormat : 'short'}}</span>  times in <br> {{year}}. Way to go!</p>
+        
+            <p class="text-muted">
+              You have been a very busy bee. The<br> hive. surely appreciates your work.
+            </p>
+            <div class="action-wrapper">
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                  (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 next-btn"
+                  (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+          </div>
+      </div>
+      <div class="step-3" [hidden]="currentStep !== 3">
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+        <div class="side-img-wrapper" >
+            <img
+              src="assets/images/wrapped/step-3.svg"
+              alt=""
+              class="major img-responsive "
+            />
+        </div>
+          <div class="info-area p-4">
+              <p class="h2">You received <span class="logged-in-text">{{loanApplications | number }}</span> <br> loan applications.</p>
+        
+            <p class="text-muted">
+              Your Ph.D in laws of attraction is <br> working overtime.
+            </p>
+            <div class="action-wrapper">
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                  (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 next-btn"
+                  (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+          </div>
+      </div>
+      <div
+        class="step-4"
+        [hidden]="currentStep !== 4"
+      >
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+        <div class="top-icon" >
+                <img
+                src="assets/images/wrapped/business-man.svg"
+                alt=""
+                class="major img-responsive "
+                />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">You approved  <span class="logged-in-text">{{approvedLoansCount | number}}</span> <br> loans, That's <br> amazing!!!</p>
+        
+            <p class="text-muted">
+              Your approval rate is better than some <br> countries visa approval.
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+        </div>
+      </div>
+      <div
+        class="step-5"
+        [hidden]="currentStep !== 5"
+        > 
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+
+        <div class="side-img-wrapper" >
+            <img
+            src="assets/images/wrapped/step-5-formal.svg"
+            alt=""
+            class="major img-responsive "
+            />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2"> You've declined <br> <span class="logged-in-text">{{rejectedLoansCount | number}}</span> loans. You <br> have a keen eye  </p>
+
+            <p class="text-muted">
+                If you worked at an Embassy, you <br> would be the visa officer no one wants <br> to cross.
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+       
+        </div>
+      </div>
+      <div
+        class="step-6"
+        [hidden]="currentStep !== 6"
+      >
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+        <div class="money-roll-wrapper">
+            <img
+                src="assets/images/wrapped/money-roll.svg"
+                alt="Money Image"
+                class="major img-responsive"
+            />
+        </div>
+        <div class="side-img-wrapper" >
+            <img
+            src="assets/images/wrapped/step-6.svg"
+            alt=""
+            class="major img-responsive "
+            />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">You disbursed <br> <span class="logged-in-text">{{currencySymbol}}{{disbursementAmount | numberFormat : 'short'}}</span> in loans.</p>
+
+            <p class="text-muted">
+               Three hearty cheers to you for making <br> dreams true!!! 
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+       
+        </div>
+
+        <div class="money-roll-wrapper-2">
+            <img
+                src="assets/images/wrapped/money-roll.svg"
+                alt="Money Image"
+                class="major img-responsive"
+            />
+        </div>
+      </div>
+
+      <div class="step-7" [hidden]="currentStep !== 7">
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+
+        <div class="side-img-wrapper-lg" >
+            <img
+              src="assets/images/wrapped/young-people-standing.svg"
+              alt=""
+              class="major img-responsive "
+            />
+        </div>
+          <div class="info-area p-4">
+              <p class="h2">You created <span class="logged-in-text">{{customersCreated | number }}</span> <br> customers.</p>
+        
+            <p class="text-muted">
+              You have been a very busy bee. The <br> hive surely appreciates your work.
+            </p>
+            <div class="action-wrapper">
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                  (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 next-btn"
+                  (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+          </div>
+      </div>
+      <div class="step-7" [hidden]="currentStep !== 8">
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+
+        <div class="side-img-wrapper-lg" >
+            <img
+              src="assets/images/wrapped/step-7-new.svg"
+              alt=""
+              class="major img-responsive "
+            />
+        </div>
+          <div class="info-area p-4">
+              <p class="h2">You approved <span class="logged-in-text">{{approvedInvestmentCount | number }}</span> <br>  investments.</p>
+        
+            <p class="text-muted">
+              Overall best in helping others set up<br> their financial goals.
+            </p>
+            <div class="action-wrapper">
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                  (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                  class="btn btn-sm text-blue btn-white px-5 next-btn"
+                  (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+          </div>
+      </div>
+
+      <div
+        class="step-11"
+        [hidden]="currentStep !== 11"
+        >
+
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+
+        <div class="star-3">
+            <img
+                src="assets/images/wrapped/star-3.svg"
+                alt="Star Image"
+                class="major img-responsive"
+            />
+        </div>
+        <div class="star-1">
+                <img
+                    src="assets/images/wrapped/star-1.svg"
+                    alt="Star Image"
+                    class="major img-responsive"
+                />
+        </div>
+    
+        <div class="new-year-logo" >
+            <img
+            src="assets/images/wrapped/new-year-formal.svg"
+            alt=""
+            class="major img-responsive "
+            />
+        </div>
+        <div class="star-2">
+            <img
+                src="assets/images/wrapped/star-2.svg"
+                alt="Star Image"
+                class="major img-responsive"
+            />
+        </div>
+        <div class="info-area p-4">
+
+            <p class="h2">We had such a <br> great time with <br> you in {{ year }}</p>
+            <p class="text-muted">
+                Let's go bigger this New Year  
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previewSocial()"
+                >
+                Preview social version
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="shareOnLinkedIn()"
+                >
+                Share on LinkedIn
+                <img class="linked-logo" src="assets/images/wrapped/linkedIn-white.svg" alt="LinkedIn logo"/>
+                </button>
+
+            </div>
+    
+        </div>
+
+        <div class="star-4">
+            <img
+                src="assets/images/wrapped/star-4.svg"
+                alt="Money Image"
+                class="major img-responsive"
+            />
+        </div>
+      
+        <div class="star-5">
+            <img
+                src="assets/images/wrapped/star-grey.svg"
+                alt="Money Image"
+                class="major img-responsive"
+            />
+        </div>
+      
+      </div>
+      
+      <div
+        class="step-8"
+        [hidden]="currentStep !== 9"
+        >
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+        <div class="side-img-wrapper-lg" >
+          <img
+          src="assets/images/wrapped/step-8-new.svg"
+          alt=""
+          class="major img-responsive "
+          />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">There is <span class="logged-in-text">{{currencySymbol}}{{runningInvestmentsApprovedAmount | numberFormat: 'short'}}</span> <br> in investments <br> because of you. </p>
+
+            <p class="text-muted">
+                Is there a record you're trying to <br> break? Because that figure is not a <br> small feat!
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+      
+        </div>
+    
+        
+      
+      </div>
+
+      <div
+        class="step-9"
+        *ngIf="currentStep === 10"
+        >
+        <div class="bg-orange-icon" >
+          <img
+            src="assets/images/wrapped/bg-formal.svg"
+            alt=""
+            class="major img-responsive"
+          />
+        </div>
+        <div class="side-img-wrapper-lg" >
+          <img
+          src="assets/images/wrapped/step-9.svg"
+          alt=""
+          class="major img-responsive "
+          />
+        </div>
+        <div class="info-area p-4">
+            <p class="h2">You helped liquidate <br> <span class="logged-in-text">{{liquidatedInvestmentCount | number}}</span> investments.</p>
+
+            <p class="text-muted">
+                Your customers must love you <br> because you make liquidation <br> seamless.
+            </p>
+            <div class="action-wrapper">
+                <button
+                class="btn btn-sm text-blue btn-white px-5 prev-btn"
+                (click)="previousStep()"
+                >
+                Previous
+                </button>
+                <button
+                class="btn btn-sm text-blue btn-white px-5 next-btn"
+                (click)="nextStep()"
+                >
+                Next
+                </button>
+
+            </div>
+      
+        </div>
+    
+        
+      
+      </div>
+
+    </div>
+</div>
+  
+<div class="prev" *ngIf="showPreview">
+
+  <div class="header d-flex justify-content-between align-items-center p-2">
+      <div class="logo img-responsive pl-3">
+        <img class="d-block img-responsive logo" src="assets/images/wrapped/lendastack-logo-blue.svg" alt="Logo" />
+      </div>
+      <div class="close" [mat-dialog-close]="true">
+        <i
+          class="icon icon-close icon-fw icon-xl text-white"
+        ></i>
+      </div>
+  </div>
+
+  <div class="top-icon badge-bg" >
+      <img
+      src="assets/images/wrapped/step-final.svg"
+      alt=""
+      class="major img-responsive "
+      />
+  </div>
+    
+    <div class="prev-info-area p-4">
+
+        <p class="h1">Exciting News!</p>
+        <p class="text-muted">
+            You just earned my "<span class="fw-bold">{{ year }}</span> Year at Lendastack" badge 
+        </p>
+    
+      <div class="badge-img">
+        <ng-container *ngIf="determineBadges().length > 0; else noBadges">
+          <div class="grid-badges">
+            <div class="badge-item" *ngFor="let badge of determineBadges()">
+              <img [src]="'assets/images/wrapped/' + badge" [alt]="badge" class="badge-medal">
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #noBadges>
+          <div class="no-badges">
+            <p>Oops! you do not have a badge</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  
+</div>
+  

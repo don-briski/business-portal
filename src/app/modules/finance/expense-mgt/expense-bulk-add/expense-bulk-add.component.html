@@ -1,0 +1,192 @@
+<div class="row m-0">
+  <div class="col-12 d-flex justify-content-center">
+    <div class="dt-card w-100">
+      <div class="dt-card__body">
+        <form [formGroup]="bulkExpenseForm">
+          <table
+            id="data-table"
+            class="table table-bordered table-sm shadow-sm p-3 mb-5 bg-white rounded"
+          >
+            <thead>
+              <tr>
+                <th>DATE <b class="text-danger">*</b></th>
+                <th>EXPENSE ACCOUNT <b class="text-danger">*</b></th>
+                <th>AMOUNT <b class="text-danger">*</b></th>
+                <th>PAID THROUGH <b class="text-danger">*</b></th>
+                <th>VENDOR</th>
+                <th>CUSTOMER</th>
+                <th>Reference</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <ng-container class="form-row my-5" formArrayName="data">
+                <ng-container
+                  *ngFor="
+                    let expenseControl of expense().controls;
+                    let i = index
+                  "
+                  [formGroup]="expenseControl"
+                >
+                  <tr [formGroup]="expenseControl">
+                    <td>
+                      <input
+                      lndInvalidDateChecker
+                        type="date"
+                        formControlName="date"
+                        class="form-control"
+                      />
+                    </td>
+                    <td class="slct-2">
+                      <account-slct
+                        *ngIf="accounts.length > 0"
+                        [data]="accounts"
+                        (selectedAccount)="
+                          setValue($event, 'expenseAccount', i)
+                        "
+                        [preselectedAccount]="
+                          isEditing
+                            ? {
+                                accountId:
+                                  expenses[i]?.expenseAccount?.accountId,
+                                name: expenses[i]?.expenseAccount?.name
+                              }
+                            : null
+                        "
+                        (selected)="setValue()"
+                      ></account-slct>
+                    </td>
+                    <td class="slct-2">
+                      <input
+                        type="text"
+                        formControlName="amount"
+                        class="form-control"
+                        placeholder="Amount"
+                        currencyMask
+                        [options]="{
+                          prefix: '',
+                          thousands: ',',
+                          decimal: '.'
+                        }"
+                      />
+                    </td>
+                    <td class="slct-2">
+                      <slct-2
+                        placeholder="Select"
+                        [data]="bankAccounts"
+                        [active]="
+                          isEditing
+                            ? [
+                                {
+                                  id: expenseForm.get('paidThroughAccountId')
+                                    ?.value,
+                                  text: singleExpense?.paidThroughAccount
+                                }
+                              ]
+                            : null
+                        "
+                        (selected)="setValue($event, 'paidThroughAccountId', i)"
+                        [customSearchEnabled]="true"
+                        [searchService]="getPaidThroughService()"
+                        (searchResult)="updateDropdown($event, 'paidThrough')"
+                      ></slct-2>
+                    </td>
+
+                    <td class="slct-2">
+                      <slct-2
+                        id="vendor"
+                        [data]="vendors"
+                        formControlName="vendor"
+                        [customSearchEnabled]="true"
+                        [placeholder]="'Search Vendor'"
+                        (click)="setVendor()"
+                        [searchService]="getSearchVendorService()"
+                        (searchResult)="updateDropdown($event, 'vendor')"
+                      ></slct-2>
+                    </td>
+
+                    <td class="slct-2">
+                      <slct-2
+                        id="customer"
+                        [data]="customers"
+                        formControlName="customer"
+                        [customSearchEnabled]="true"
+                        [placeholder]="'Search Customer'"
+                        (click)="setCustomer()"
+                        [searchService]="getSearchCustomerService()"
+                        (searchResult)="updateDropdown($event, 'customer')"
+                      ></slct-2>
+                    </td>
+                    <td>
+                      <input
+                        type="text"
+                        placeholder="reference"
+                        class="form-control"
+                      />
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </tbody>
+
+            <button
+              class="btn btn-xs m-1 text-white add-btn mt-2"
+              (click)="addExpense()"
+            >
+              <i class="icon icon-add"></i> Add new line
+            </button>
+          </table>
+          <div class="d-flex justify-content-end">
+            <button
+              [disabled]="bulkExpenseForm.invalid || isLoading"
+              type="submit"
+              (click)="submit('SentForApproval')"
+              class="btn btn-xs btn-primary m-1 text-white"
+            >
+              {{
+                isLoading &&
+                this.bulkExpenseForm.get("status").value === "SentForApproval"
+                  ? "Sending For Approval..."
+                  : "Send For Approval"
+              }}
+              <i
+                *ngIf="
+                  isLoading &&
+                  this.bulkExpenseForm.get('status').value === 'SentForApproval'
+                "
+                class="icon icon-spin icon-spin2"
+              ></i>
+            </button>
+
+            <button
+              [disabled]="bulkExpenseForm.invalid || isLoading"
+              type="submit"
+              (click)="openModal(approvalView)"
+              class="btn btn-xs btn-success m-1 text-white"
+            >
+              {{
+                isLoading &&
+                this.bulkExpenseForm.get("status").value === "Posted"
+                  ? "Posting..."
+                  : "Post"
+              }}
+              <i
+                *ngIf="
+                  isLoading &&
+                  this.bulkExpenseForm.get('status').value === 'Posted'
+                "
+                class="icon icon-spin icon-spin2"
+              ></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #approvalView>
+  <lnd-trans-pin-modal
+    [canApprove]="user?.permission?.includes('Approve Expense')"
+    (sendPayload)="submit($event?.status, $event?.transactionPin)"
+  ></lnd-trans-pin-modal>
+</ng-template>

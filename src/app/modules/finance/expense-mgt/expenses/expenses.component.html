@@ -1,0 +1,387 @@
+<ng-container
+  *ngIf="!isSingleView && user?.permission?.includes('View Expense')"
+>
+  <div class="row m-0">
+    <header
+      class="w-100 d-flex align-items-center justify-content-between mb-3"
+    >
+      <h1 class="dt-page__title">Expenses</h1>
+      <span class="float-right role-add">
+        <div style="position: relative; right: -5px; bottom: 5px; float: right">
+          <a
+            *ngIf="user?.permission?.includes('Create Expense')"
+            class="btn btn-primary mr-2 text-white"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [routerLink]="['/finance/expenses/create']"
+            routerLinkActive="router-link-active"
+            href="javascript:void(0)"
+          >
+            <i class="icon icon-add-circle mr-2"></i>Add New</a
+          >
+        </div>
+      </span>
+    </header>
+    <div class="col-xl-12">
+      <ul
+        id="active-div"
+        class="card-header-pills nav nav-pill justify-content-center"
+        role="tablist"
+      >
+        <li class="nav-item">
+          <a
+            id="nav-open"
+            class="nav-link pool-nav active-tab"
+            href="javascript:void(0)"
+            (click)="
+              switchviews('open', ['Draft', 'ReDraft', 'SentForApproval'])
+            "
+          >
+            Open
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            id="nav-closed"
+            class="nav-link pool-nav"
+            href="javascript:void(0)"
+            (click)="switchviews('closed', ['Posted', 'Rejected'])"
+          >
+            Closed
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            id="nav-all"
+            class="nav-link pool-nav"
+            href="javascript:void(0)"
+            (click)="switchviews('all', [])"
+          >
+            All
+          </a>
+        </li>
+      </ul>
+      <div class="dt-card w-100">
+        <div class="dt-card__body">
+          <div class="row">
+            <div class="col-md-4">
+              <label style="display: inline-flex"
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span>
+                <select
+                  [(ngModel)]="pagination.pageSize"
+                  aria-controls="data-table"
+                  (change)="
+                    getExpensesPaginatedSearch({
+                      pageSize: +pagination.pageSize,
+                      pageNumber: 1
+                    })
+                  "
+                  class="custom-select custom-select-xl form-control form-control-xl mx-2 height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px">entries</span>
+              </label>
+            </div>
+            <div class="col-md-4">
+              <div
+                *ngIf="isLoading"
+                class="table-loader"
+                style="text-align: center; color: indianred"
+              >
+                <span>
+                  <i class="icon icon-spin icon-spin2"></i> Retrieving
+                  Expenses...</span
+                >
+              </div>
+            </div>
+            <lnd-search-dropdown
+              [searchColumns]="pagination.searchColumns"
+              [currentTheme]="currentTheme"
+              (searchParams)="onSearchParams($event)"
+            ></lnd-search-dropdown>
+            <div class="col-md-12 mb-3">
+              <lnd-selected-filters
+                (initialized)="onSelectedFiltersInit($event)"
+              ></lnd-selected-filters>
+            </div>
+            <div
+              class="d-flex justify-content-between w-100 align-items-center"
+              style="padding: 0 18px"
+            >
+              <div
+                class=""
+                aria-live="polite"
+                style="font-size: 13px; margin-top: -8px"
+              >
+                Showing
+                {{
+                  (pagination.pageNumber - 1) * pagination.pageSize + 1
+                    | number : "1.0-0"
+                }}
+                -
+                {{
+                  (pagination.pageNumber - 1) * pagination.pageSize +
+                    pagination.count | number : "1.0-0"
+                }}
+                of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+              </div>
+              <div>
+                <lnd-filter-btn
+                  (filterModalOpen)="filterModalOpen()"
+                ></lnd-filter-btn>
+                <lnd-filter
+                  *ngIf="!isLoading"
+                  [filterOptions]="filterStatuses"
+                  (optionSelected)="getExpenses($event)"
+                ></lnd-filter>
+              </div>
+            </div>
+          </div>
+          <!-- /pagination Top -->
+
+          <div class="table-responsive">
+            <table id="data-table" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Customer</th>
+                  <th>Reference</th>
+                  <th>Date</th>
+                  <th class="text-right">
+                    ({{ ownerInformation?.currency?.currencySymbol }}) Total
+                    Amount
+                  </th>
+                  <th>Created By</th>
+                  <th>Created At</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody *ngIf="!isLoading">
+                <tr
+                  *ngFor="let expense of expenses"
+                  class="cursor"
+                  (click)="setSingleView(expense, dropdownToggle)"
+                >
+                  <td
+                    class="copy_icon_wrapper"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    {{ expense.expenseCode }}
+
+                    <img
+                      (mouseover)="copy_hover = true"
+                      (mouseleave)="copy_hover = false"
+                      class="copy_icon"
+                      src="assets/images/copy.png"
+                      alt="copy icon"
+                      width="15"
+                      height="15"
+                      (click)="copyCode(expense.expenseCode)"
+                      placement="right"
+                      ngbTooltip="Copy Expense Code"
+                    />
+                  </td>
+                  <td>{{ expense?.customer }}</td>
+                  <td class="text-center">
+                    {{ expense.reference ? expense.reference : "-" }}
+                  </td>
+                  <td>{{ expense.date | date : "mediumDate" }}</td>
+                  <td class="text-right">
+                    {{ expense.totalAmount | number : "1.2-2" }}
+                  </td>
+                  <td>{{ expense.createdBy }}</td>
+                  <td>{{ expense.createdAt | date : "mediumDate" }}</td>
+                  <td>
+                    <span
+                      class="badge btn-xs mb-1 mr-1"
+                      [ngClass]="{
+                        'badge-warning': expense.status === 'Draft',
+                        'badge-approval': expense.status === 'SentForApproval',
+                        'badge-success': expense.status === 'Posted',
+                        'badge-redraft': expense.status === 'ReDraft',
+                        'badge-danger': expense.status === 'Rejected'
+                      }"
+                      >{{
+                        expense.status === "SentForApproval"
+                          ? "Awaiting Approval"
+                          : expense.status
+                      }}</span
+                    >
+                  </td>
+
+                  <td>
+                    <div class="dropdown mr-2 mb-2 d-inline-block">
+                      <button
+                        class="btn btn-warning btn-xs dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                      ></button>
+                      <div
+                        #dropdownToggle
+                        class="dropdown-menu"
+                        x-placement="auto"
+                      >
+                        <a
+                          *ngIf="user?.permission?.includes('Edit Expense')"
+                          class="dropdown-item"
+                          [hidden]="
+                            expense.status === 'Posted' ||
+                            expense.status === 'SentForApproval' ||
+                            expense.status === 'Rejected'
+                          "
+                          [routerLink]="
+                            '/finance/expenses/edit/' + expense.expenseId
+                          "
+                          routerLinkActive="router-link-active"
+                          href="javascript:void(0)"
+                        >
+                          <i class="icon icon-edit icon-fw mr-2"></i>Edit
+                        </a>
+
+                        <a
+                          *ngIf="user?.permission?.includes('View Expense')"
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                        >
+                          <i class="icon icon-forward icon-fw mr-2"></i>View
+                        </a>
+
+                        <a
+                          class="dropdown-item"
+                          [hidden]="
+                            expense.status === 'Posted' ||
+                            expense.status === 'SentForApproval'
+                          "
+                          href="javascript:void(0)"
+                          (click)="deleteExpense(expense.expenseId)"
+                        >
+                          <i
+                            class="icon icon-trash icon-fw text-danger mr-2"
+                          ></i
+                          >Delete
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div
+              *ngIf="!isLoading && expenses.length === 0"
+              class="d-flex flex-column align-items-center w-100"
+            >
+              <h1 class="display-4 text-center font-weight-light p-5">
+                No Data Available
+              </h1>
+
+              <a
+                *ngIf="user?.permission?.includes('Create Expense')"
+                class="btn btn-primary mr-2 w-25 text-white"
+                [style.borderColor]="currentTheme?.secondaryColor"
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                [routerLink]="['/finance/expenses/create']"
+                routerLinkActive="router-link-active"
+                href="javascript:void(0)"
+              >
+                <i class="icon icon-add-circle mr-2"></i>Add Expense</a
+              >
+            </div>
+          </div>
+
+          <footer>
+            <nav *ngIf="!loading">
+              <ul class="pagination pagination-sm justify-content-end">
+                <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      pagination.pageNumber = pagination.pageNumber - 1;
+                      getExpenses()
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="itemPaginatedJumpModal()"
+                    href="javascript:void(0)"
+                  >
+                    {{ pagination.pageNumber }} of
+                    {{ pagination.totalPages }} page{{
+                      pagination.pageNumber > 1 ? "s" : ""
+                    }}
+                    <span class="sr-only">(current)</span>
+                  </a>
+                  <div
+                    class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                  >
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="pagination.pageNumber"
+                          (change)="getExpenses()"
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option
+                            (click)="pagination.pageNumber = line"
+                            *ngFor="let line of pagination.jumpArray"
+                          >
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            class="btn btn-danger btn-xs"
+                            (click)="itemPaginatedJumpModal()"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="page-item" *ngIf="pagination.hasNextPage">
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      pagination.pageNumber = pagination.pageNumber + 1;
+                      getExpenses()
+                    "
+                  >
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </footer>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<ng-container *ngIf="isSingleView">
+  <app-expense
+    [currentTheme]="currentTheme"
+    [expenses]="expenses"
+    [user]="user"
+    [currency]="ownerInformation?.currency?.currencySymbol"
+    [selectedExpenseId]="selectedExpenseId"
+    [pagination]="pagination"
+    (getExpenses)="getExpenses()"
+    (setIsSingleView)="closeView()"
+  ></app-expense>
+</ng-container>

@@ -1,0 +1,89 @@
+.add {
+  &:hover {
+    background-color: #ff015b !important;
+  }
+}
+
+.tr-border {
+  border: 3px solid #fff;
+}
+
+.nav-link {
+  &:hover {
+    color: #545454;
+  }
+}
+
+.nav-item a {
+  margin-bottom: 0;
+}
+
+.single-view {
+  .left {
+    width: 25%;
+    position: fixed;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+    border-right: 2.5px solid #b3b3b3;
+    ul.payment-list {
+      padding: 0px;
+      list-style: none;
+      li {
+        cursor: pointer;
+        padding: 15px 20px;
+        margin-bottom: 2px;
+        border-left: 5px solid #fff;
+        border-radius: 5px;
+        .title {
+          font-size: 14px;
+          font-weight: bold;
+        }
+        .sub-title {
+          font-size: 11px;
+        }
+
+        &:hover {
+          box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        &:not(:last-child) {
+          border-bottom: 1px solid #ccc;
+        }
+      }
+    }
+  }
+
+  .right {
+    width: 73%;
+    position: relative;
+    left: 28%;
+
+    .paper {
+      .card {
+        box-shadow: none !important;
+        .content {
+          margin-top: 80px;
+
+          .img-container {
+            max-width: 150px;
+          }
+        }
+      }
+    }
+  }
+
+  .w-65 {
+    width: 65%;
+  }
+  .w-10 {
+    width: 10%;
+  }
+}
+
+.logo {
+  width: 150px;
+  height: 150px;
+}
+
+.items-table th {
+  color: #fff;
+}

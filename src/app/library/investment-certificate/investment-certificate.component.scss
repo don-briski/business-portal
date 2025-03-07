@@ -1,0 +1,131 @@
+// .wrapper {
+//     padding: 20px;
+//     margin: 20px;
+//     border: 4px dashed #ccc;
+//     border-radius: 15px;
+//     .bg-logo {
+//         position: absolute;
+//         top: 50%;
+//         left: 50%;
+//         transform: translate(-50%, -50%);
+//         opacity: .1;
+//     }
+//     .logo {
+//         max-width: 120px;
+//     }
+//     .title {
+//         margin-top: 80px;
+//         font-size: 32px;
+//         font-weight: 600;
+//     }
+//     .grey {
+//         color: rgb(170, 170, 170);
+//     }
+//     .bg-gray {
+//         background-color: #eee;
+//     }
+
+//     .footer {
+//         background-color: rgb(196, 196, 196);
+//     }
+
+//     .br-10 {
+//         border-radius: 10px;
+//     }
+// }
+
+section {
+  main {
+    border: 1px dashed var(--border-grey);
+    border-radius: 8px;
+
+    header {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      h1 {
+        font-size: 32px;
+        font-weight: 600;
+      }
+
+      #info {
+        width: 100%;
+        #inv-info {
+          margin-bottom: 20px;
+          p {
+            &:first-child {
+              font-size: 14px;
+              font-weight: 400px;
+              color: var(--lenda-grey);
+            }
+            &:last-child {
+              font-size: 18px;
+              font-weight: 500px;
+              color: var(--text-color);
+            }
+          }
+        }
+      }
+    }
+
+    #inv-breakdown {
+      margin-top: 30px;
+      h1 {
+        font-weight: 400;
+        color: var(--text-color);
+      }
+    }
+  }
+
+  #total {
+    margin: 50px 0 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    p {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--lenda-grey);
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 500;
+      color: var(--text-color);
+    }
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    color: var(--lenda-grey);
+    p {
+      margin-bottom: 5px;
+    }
+  }
+
+  .signature {
+    font-family: "Dancing Script", cursive;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
+    font-size: 2rem;
+    color: var(--text-color);
+    transform: rotate(-5deg);
+  }
+
+  .termsAndConditions {
+    margin-bottom: 45px;
+    ul {
+      color: var(--lenda-grey);
+    }
+  }
+}
+
+.print-button {
+  background-color: var(--lenda-blue);
+  color: #fff;
+  margin-bottom: 20px;
+}

@@ -1,0 +1,361 @@
+<div *ngIf="isLoadingRequest" class="text-center p-5">
+  <h3 class="m-0">
+    <i class="icon icon-spin icon-spin2"></i> Loading Request...
+  </h3>
+</div>
+<div *ngIf="!isLoadingRequest && request" class="my-5">
+  <section class="px-5">
+    <ul class="dt-list dt-list-one-second">
+      <li class="dt-list__item mr-3">
+        <div class="media">
+          <i
+            class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+          ></i>
+          <div class="media-body">
+            <span class="d-block text-light-gray f-12 mb-1">Request Date</span>
+            <h5 class="mb-0">
+              {{ request?.requestDate | customDatePipe : "DD-MMM-YY" }}
+            </h5>
+          </div>
+        </div>
+      </li>
+      <li class="dt-list__item mr-3">
+        <div class="media">
+          <i
+            class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+          ></i>
+          <div class="media-body">
+            <span class="d-block text-light-gray f-12 mb-1">Requested By</span>
+            <h5 class="mb-0">
+              {{ request?.liquidationRequestedBy }}
+            </h5>
+          </div>
+        </div>
+      </li>
+    </ul>
+    <lnd-tab-bar [tabs]="tabs" [currentTabId]="currentTabId"></lnd-tab-bar>
+    <section
+      *ngIf="
+        currentTabId === 'req-details' ||
+        currentTabId === 'new-investment-details'
+      "
+    >
+      <ul class="dt-list dt-list-one-second">
+        <li class="dt-list__item mr-3" *ngIf="currentTabId === 'req-details'">
+          <div class="media">
+            <i
+              class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Liquidation Date</span
+              >
+              <h5 class="mb-0">
+                {{ request?.liquidationDate | customDatePipe : "DD-MMM-YY" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item" *ngIf="currentTabId === 'req-details'">
+          <div class="media">
+            <i
+              class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Liquidation Amount</span
+              >
+              <h5 class="mb-0">
+                {{ currencySymbol
+                }}{{ request?.liquidatedAmount | number : "1.2-2" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item" *ngIf="currentTabId === 'req-details'">
+          <div class="media">
+            <i
+              class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Penal Charge</span
+              >
+              <h5 class="mb-0">
+                {{ currencySymbol
+                }}{{ request?.penalCharge | number : "1.2-2" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li
+          class="dt-list__item mr-3"
+          *ngIf="
+            (currentTabId === 'new-investment-details' ||
+              currentTabId === 'req-details') &&
+            request?.rollOverAmount
+          "
+        >
+          <div class="media">
+            <i
+              class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1">{{
+                currentTabId === "req-details" ? "Rollover Date" : "Start Date"
+              }}</span>
+              <h5 class="mb-0">
+                {{ request?.startDate | customDatePipe : "DD-MMM-YY" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li
+          class="dt-list__item mr-3"
+          *ngIf="
+            (currentTabId === 'new-investment-details' ||
+              currentTabId === 'req-details') &&
+            request?.rollOverAmount
+          "
+        >
+          <div class="media">
+            <i
+              class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1">{{
+                currentTabId === "req-details" ? "Rollover Amount" : "Amount"
+              }}</span>
+              <h5 class="mb-0">
+                {{ currencySymbol
+                }}{{ request?.rollOverAmount | number : "1.2-2" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li
+          class="dt-list__item mr-3"
+          *ngIf="currentTabId === 'new-investment-details'"
+        >
+          <div class="media">
+            <i
+              class="icon icon-editor icon-3x mr-3 align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Investment Rate</span
+              >
+              <h5 class="mb-0">
+                {{ request?.investmentRate }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li
+          class="dt-list__item"
+          *ngIf="currentTabId === 'new-investment-details'"
+        >
+          <div class="media">
+            <i
+              class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12">Duration</span>
+              <h5 class="mb-0">{{ request?.investmentTenor }} days</h5>
+            </div>
+          </div>
+        </li>
+        <li
+          class="dt-list__item"
+          *ngIf="currentTabId === 'new-investment-details'"
+        >
+          <div class="media">
+            <i
+              class="mr-5 icon icon-editor icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12"
+                >Investment Type</span
+              >
+              <h5 class="mb-0">
+                {{ request?.investmentType }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li
+          class="dt-list__item mr-3"
+          *ngIf="currentTabId === 'new-investment-details'"
+        >
+          <div class="media">
+            <i
+              class="icon icon-editor icon-3x mr-3 align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Period Till Termination</span
+              >
+              <h5 class="mb-0">
+                {{ request?.periodTillTermination }}
+              </h5>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <section
+        class="card p-3 mt-5"
+        *ngIf="
+          request?.reviewComments?.length && currentTabId === 'req-details'
+        "
+      >
+        <h3>Review Comments</h3>
+        <table class="table mb-0">
+          <thead class="table-striped">
+            <tr>
+              <th class="header-text" scope="col">Reviewer</th>
+              <th class="header-text" scope="col">Comment</th>
+              <th class="header-text" scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of request.reviewComments">
+              <td>{{ item?.name }}</td>
+              <td>
+                {{ item?.comment }}
+              </td>
+              <td>
+                {{ item?.dateCreated | date }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+      <section
+        *ngIf="
+          request.investmentLiquidationRequestStatus === 'SentForApproval' &&
+          user?.permission?.includes('Review Investment Liquidation Request') &&
+          currentTabId === 'req-details'
+        "
+      >
+        <form
+          class="mt-5"
+          *ngIf="user?.permission?.includes('Approve Liquidation')"
+          [formGroup]="form"
+        >
+          <header
+            class="cursor mb-2 d-flex align-items-center"
+            (click)="showCommentField = !showCommentField"
+          >
+            <i
+              [style.color]="colorTheme?.secondaryColor"
+              class="icon icon-add icon-fw mr-1"
+            ></i>
+            <h5 [style.color]="colorTheme?.secondaryColor" class="mb-0">
+              Add Review Comment
+            </h5>
+          </header>
+          <hr class="mt-0" />
+          <div *ngIf="showCommentField">
+            <label for="comment">Review Comment</label>
+            <textarea
+              class="form-control"
+              formControlName="comment"
+              rows="3"
+              placeholder="Enter your comment"
+            ></textarea>
+          </div>
+          <div class="row mt-4 mb-5">
+            <div class="col-md-6">
+              <label for="txPin">Enter Transaction Pin</label>
+              <input
+                id="txPin"
+                type="password"
+                formControlName="transactionPin"
+                class="form-control"
+                placeholder="Transaction pin"
+                (keydown.enter)="$event.preventDefault()"
+              />
+            </div>
+          </div>
+          <hr />
+          <div class="d-flex" *ngIf="!isSubmitting">
+            <button
+              class="btn btn-danger mr-3"
+              (click)="isApproved = false; onSubmit()"
+              [disabled]="form.invalid"
+              type="submit"
+            >
+              Deny
+            </button>
+            <button
+              class="btn btn-success"
+              (click)="isApproved = true; onSubmit()"
+              [disabled]="form.invalid"
+              type="submit"
+            >
+              Approve
+            </button>
+          </div>
+          <button *ngIf="isSubmitting" class="btn btn-warning" disabled>
+            <i class="icon icon-spin icon-spin2"></i> Submitting...
+          </button>
+        </form>
+      </section>
+    </section>
+    <section *ngIf="currentTabId === 'old-investment-details'">
+      <div *ngIf="isFetchingInvestment" class="text-center mt-5">
+        <lnd-spinner text="Loading..."></lnd-spinner>
+      </div>
+      <div *ngIf="!isFetchingInvestment && investment" class="table-responsive">
+        <table class="table mb-0 table-striped">
+          <thead class="thead-light">
+            <tr>
+              <th class="text-uppercase" scope="col">Start Date</th>
+              <th class="text-uppercase" scope="col">End Date</th>
+              <th class="text-right text-uppercase" scope="col">
+                Principal {{ currencySymbol }}
+              </th>
+              <th class="text-uppercase" scope="col">Tenor</th>
+              <th class="text-uppercase text-center" scope="col">Rate(%)</th>
+              <th class="text-right text-uppercase" scope="col">
+                Gross Interest {{ currencySymbol }}
+              </th>
+              <th class="text-right text-uppercase" scope="col">
+                WHT {{ currencySymbol }}
+              </th>
+              <th class="text-right text-uppercase" scope="col">
+                Net Interest {{ currencySymbol }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of investment?.cycleSchedules">
+              <td>
+                {{ item?.cycleStartDate | date : "mediumDate" }}
+              </td>
+              <td>
+                {{ item?.cycleEndDate | date : "mediumDate" }}
+              </td>
+              <td class="text-right">
+                {{ item?.principal | number : "1.2-2" }}
+              </td>
+              <td>{{ item?.tenor }}</td>
+              <td class="text-center">
+                {{ investment?.investmentRate }}
+              </td>
+              <td class="text-right">
+                {{ item?.grossInterest | number : "1.2-2" }}
+              </td>
+              <td class="text-right">
+                {{ item?.withHoldingTax | number : "1.2-2" }}
+              </td>
+              <td class="text-right">
+                <span>{{ item?.totalInterest | number : "1.2-2" }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+</div>

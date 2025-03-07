@@ -1,0 +1,32 @@
+<section class="d-flex">
+  <li class="dt-list__item" *ngIf="loanDeposit">
+    <div class="media">
+      <i
+        class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+      ></i>
+      <div class="media-body">
+        <span class="mb-1 d-block text-light-gray f-12"
+          >Deposit Amount
+          <sup
+            *ngIf="loanDeposit?.IsLoanDepositRecieved"
+            class="badge badge-pill badge-dep badge-success"
+            >Received</sup
+          >
+          <sup
+            *ngIf="!loanDeposit?.IsLoanDepositRecieved"
+            class="badge badge-pill badge-dep badge-warning"
+            >Pending</sup
+          >
+        </span>
+        <h5
+          [style.color]="
+            currentTheme?.theme === 'Dark' ? currentTheme?.dark?.textColor : ''
+          "
+          class="mb-0"
+        >
+          {{ loanDeposit?.DepositAmount | number : "1.2-2" }}
+        </h5>
+      </div>
+    </div>
+  </li>
+</section>

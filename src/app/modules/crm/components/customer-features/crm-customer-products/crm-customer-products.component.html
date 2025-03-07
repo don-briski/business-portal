@@ -1,0 +1,33 @@
+<main>
+  <header>
+    <h3 class="mb-0">Products</h3>
+
+    <button *ngIf="permissions.includes('Create Loan Application') || permissions.includes('Add Investment')" class="btn-sm" class="dropdown-toggle" data-toggle="dropdown">
+      Add Product
+    </button>
+
+    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+      <span *ngIf="permissions.includes('Create Loan Application')" class="dropdown-item" (click)="gotoProduct(MODULES.Loan)"
+        >Loan</span
+      >
+      <span
+      *ngIf="permissions.includes('Add Investment')"
+        class="dropdown-item"
+        (click)="gotoProduct(MODULES.Investment, 'individual')"
+        >Investment (Individual)</span
+      >
+    </div>
+  </header>
+
+  <nav>
+    <span (click)="switchTab(MODULES.Loan)" [ngClass]="{'active': currentTabId === MODULES.Loan}">Loans</span>
+    <span (click)="switchTab(MODULES.Investment)" [ngClass]="{'active': currentTabId === MODULES.Investment}">Investments</span>
+  </nav>
+
+  <lnd-table
+    [config]="config"
+    [headers]="headers"
+    [data]="data"
+    [isLoading]="isLoading"
+  />
+</main>

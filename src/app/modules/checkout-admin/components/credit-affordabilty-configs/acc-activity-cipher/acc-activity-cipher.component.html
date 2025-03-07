@@ -1,0 +1,139 @@
+<section >
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h3 class="m-0">Account Activity Cipher Service</h3>
+      <button
+        *ngIf="
+          user.permission.includes('Edit Risk Engine Configuration') &&
+          (mode === creditAffordModeEnum.View ||
+            mode === creditAffordModeEnum.None)
+        "
+        class="btn btn-sm px-6 text-white mr-1"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        (click)="
+          onModeChange(
+            mode === creditAffordModeEnum.None
+              ? creditAffordModeEnum.Configure
+              : creditAffordModeEnum.Edit
+          )
+        "
+      >
+        {{ config ? "Edit" : "Configure" }}
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <no-data
+      *ngIf="mode === creditAffordModeEnum.None"
+      title="Not Yet Configured"
+      desc="Click on the button above to set the configuration"
+    ></no-data>
+    <p
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+    >
+      This service is to be used by Credit Affordability Engine to check if a
+      customer's account has enough transaction activity levels in their bank
+      account as required to be considered for a loan.
+    </p>
+    <div *ngIf="mode !== creditAffordModeEnum.None" id="tips">
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="cursor text-underline"
+        (click)="hideHints = !hideHints"
+      >
+        {{ hideHints ? "Show" : "Hide" }} Hints
+      </p>
+
+      <ul *ngIf="!hideHints">
+        <li>
+          <b>Pass Rate: </b>
+          <span class="hint-color"
+            >This configuration sets a threshold for the account activity
+            pass-rate.</span
+          >
+        </li>
+        <li>
+          <b>Minimum Inflows Count: </b
+          ><span class="hint-color"
+            >This configuration defines minimum number of valid credit
+            transactions that should be in each month on a customer's bank
+            statement.</span
+          >
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="mode === creditAffordModeEnum.View" class="row">
+      <div class="col-md-4">
+        <p class="title-text mb-1">Pass Rate</p>
+        <p class="subtitle-text">{{ config.passRate }}%</p>
+      </div>
+      <div class="col-md-6">
+        <p class="title-text mb-1">Mininum Inflows Count in the Month</p>
+        <p class="subtitle-text">
+          {{ config.minInflowsCount }}
+        </p>
+      </div>
+    </div>
+    <div
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+      id="accordions"
+    >
+      <div class="d-flex flex-wrap mt-3">
+        <form class="w-100" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-row">
+            <div class="col-md-6">
+              <label>Pass Rate (%)</label>
+
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Enter pass rate"
+                formControlName="passRate"
+              />
+              <lnd-input-errors
+                label="Pass Rate"
+                [control]="form.get('passRate')"
+              ></lnd-input-errors>
+            </div>
+            <div class="col-md-6">
+              <label>Minimum Inflows Count </label>
+
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Set number of days"
+                formControlName="minInflowsCount"
+              />
+
+              <lnd-input-errors
+                label="Min Inflows Count"
+                [control]="form.get('minInflowsCount')"
+              ></lnd-input-errors>
+            </div>
+          </div>
+          <button
+            class="btn btn-danger mt-6 mr-3"
+            [disabled]="isLoading"
+            (click)="onModeChange(creditAffordModeEnum.View)"
+          >
+            Cancel
+          </button>
+          <button
+            class="btn mt-6"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [disabled]="form.invalid"
+          >
+            {{ isLoading ? "Processing..." : "Update" }}
+            <i *ngIf="isLoading" class="icon icon-spin2 icon-spin"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

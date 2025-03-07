@@ -1,0 +1,66 @@
+<div class="dt-page__header">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Create Savings Plan</h1>
+    <button
+      class="btn btn-primary orange-bg text-white"
+      [routerLink]="['/deposits/accounts']"
+    >
+      Back
+    </button>
+  </div>
+</div>
+
+<!-- Grid -->
+<div class="row">
+  <div class="col-md-6 offset-md-3">
+    <div class="dt-card__body tabs-container tabs-vertical">
+      <!-- Tab Navigation -->
+      <ul class="nav nav-tabs flex-column" role="tablist">
+        <li class="nav-item">
+          <a
+            class="nav-link active pool-nav p-4"
+            data-toggle="tab"
+            href="#tab-pane-1"
+            role="tab"
+            aria-controls="tab-pane-3"
+            aria-selected="true"
+            >Account Details
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link pool-nav p-4"
+            #step2
+            data-toggle="tab"
+            href="#tab-pane-2"
+            role="tab"
+            aria-controls="tab-pane-4"
+            aria-selected="true"
+            >Contact Details
+          </a>
+        </li>
+      </ul>
+      <!-- /tab navigation -->
+
+      <!-- Tab Content -->
+      <div class="tab-content shadow border-0">
+        <!-- Tab Pane -->
+        <div id="tab-pane-1" class="tab-pane active">
+          <div class="card-body bg-white shadow">
+            <account-details [customerInfo]="savingsPlan" (nextStep)="step2.click()" (data)="setSavingsPlan($event)"></account-details>
+          </div>
+        </div>
+        <!-- /tab pane-->
+
+        <!-- Tab Pane -->
+        <div id="tab-pane-2" class="tab-pane">
+          <div class="card-body bg-white shadow">
+            <contact-details [customerInfo]="savingsPlan" (save)="submitForm($event)" [isLoading]="loader"></contact-details>
+          </div>
+        </div>
+        <!-- /tab pane-->
+      </div>
+      <!-- /tab content -->
+    </div>
+  </div>
+</div>

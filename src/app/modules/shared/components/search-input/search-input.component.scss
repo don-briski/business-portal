@@ -1,0 +1,19 @@
+.search {
+  display: flex;
+  align-items: center;
+  width: 400px;
+  padding-left: 22px;
+  .magnifier {
+    position: relative;
+    z-index: 2;
+    right: -25px;
+  }
+  input {
+    background-color: var(--lenda-grey-bg);
+    padding-left: 30px;
+  }
+  button {
+    background-color: var(--secondary-color);
+    color: #fff;
+  }
+}

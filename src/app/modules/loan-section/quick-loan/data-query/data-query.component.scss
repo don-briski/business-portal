@@ -1,0 +1,70 @@
+#search-header {
+  padding: 30px;
+  p {
+    font-size: 18px;
+    color: #000;
+  }
+
+  #input-wrapper {
+    width: 70%;
+    img {
+      position: relative;
+      z-index: 20;
+      margin: 0 0 -54px 10px;
+    }
+
+    input {
+      position: relative;
+      z-index: 1;
+      background-color: #8692A61A;
+      padding-left: 35px;
+    }
+  }
+
+  #dropdown-wrapper {
+    width: 30%;
+
+    #dropdown{
+      width: 60%;
+      margin-right:10px;
+    }
+  }
+}
+
+#divider {
+  width: 50px;
+  height: 2px;
+}
+
+main{
+  margin-top: 30px;
+  min-height: 450px;
+
+  div{
+
+    img{
+      margin-bottom: 30px;
+      width: 300px;
+    }
+
+    p{
+      text-align: center;
+    }
+    span{
+      p:first-child{
+        font-size: 16px;
+        color: #000;
+      }
+      p:last-child{
+        font-size: 14px;
+        color: #979797;
+      }
+    }
+
+    .not-found{
+      color: #000;
+      font-size: 16px;
+    }
+  }
+
+}

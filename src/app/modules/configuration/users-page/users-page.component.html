@@ -1,0 +1,2076 @@
+<ng-container>
+  <div class="dt-page__header">
+    <h1 class="dt-page__title clearfix">
+      Users & Teams
+      <span
+        class="float-right role-add"
+        *ngIf="
+          user?.permission?.includes('Create Team') ||
+          user?.permission?.includes('Create User') ||
+          user?.permission?.includes('Add Branch')
+        "
+      >
+        <div class="btn-group mr-2 mb-2">
+          <div class="btn-group dropleft" role="group">
+            <!-- Dropdown Button -->
+            <button
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              type="button"
+              class="btn float-right btn-danger dropdown-toggle dropdown-toggle-split"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Add New
+            </button>
+            <!-- /dropdown button -->
+            <!-- Dropdown Menu -->
+            <div
+              class="dropdown-menu"
+              x-placement="left-start"
+              style="
+                position: absolute;
+                will-change: transform;
+                top: 0px;
+                left: 0px;
+                transform: translate3d(-5px, 0px, 0px);
+              "
+            >
+              <a
+                class="dropdown-item"
+                href="javascript:void(0)"
+                (click)="openModal(addModal)"
+                *ngIf="user?.permission?.includes('Create User')"
+                >Add User</a
+              >
+              <a
+                class="dropdown-item"
+                href="javascript:void(0)"
+                (click)="openTeamModal(addTeam)"
+                *ngIf="user?.permission?.includes('Create Team')"
+                >Add Team</a
+              >
+              <a
+                class="dropdown-item"
+                href="javascript:void(0)"
+                (click)="addBranch(addBranchModal)"
+                *ngIf="user?.permission?.includes('Add Branch')"
+                >Add Branch</a
+              >
+            </div>
+          </div>
+        </div>
+      </span>
+    </h1>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="clearfix mb-2">
+        <ul id="active-div" class="nav justify-content-center">
+          <li class="nav-item">
+            <a
+              class="nav-link pool-nav"
+              [ngClass]="{ 'active-tab': active === 'USERS' }"
+              (click)="switchView('USERS')"
+              *ngIf="user?.permission?.includes('View Users')"
+              >Users</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link pool-nav"
+              (click)="switchView('TEAMS')"
+              [ngClass]="{ 'active-tab': active === 'TEAMS' }"
+              *ngIf="user?.permission?.includes('View Teams')"
+              >Teams</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link pool-nav"
+              (click)="switchView('BRANCHES')"
+              [ngClass]="{ 'active-tab': active === 'BRANCHES' }"
+              *ngIf="user?.permission?.includes('View Branch')"
+              >Branches</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="dt-card">
+        <div class="dt-card__body">
+          <div class="table-responsive">
+            <ng-container
+              *ngIf="
+                user?.permission?.includes('View Users') && active == 'USERS'
+              "
+            >
+              <div
+                class="clearfix text-center"
+                *ngIf="user?.permission?.includes('View Global')"
+              >
+                <br /><br />
+              </div>
+              <div class="row mx-0 my-4">
+                <div class="col-md-4 px-0">
+                  <label style="display: inline-flex"
+                    ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                    ><select
+                      [(ngModel)]="pagination.pageSize"
+                      (change)="filterUsers($event.target.value)"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                    <span style="padding: 8px 2px; font-size: 12px"
+                      >entries</span
+                    ></label
+                  >
+                </div>
+
+                <div class="col-md-4">
+                  <div
+                    *ngIf="defaultloader"
+                    class="table-loader"
+                    style="text-align: center; color: indianred"
+                  >
+                    <span>
+                      <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-4 pr-0">
+                  <label style="display: inline-flex; float: right"
+                    ><span style="padding: 10px 2px; font-size: 12px"></span
+                    ><input
+                      type="text"
+                      #box
+                      (keyup.enter)="SearchTable(box.value)"
+                      class="form-control"
+                      placeholder="name"
+                    />
+                    <button
+                      class="btn btn-xs text-white ml-3"
+                      [style.background]="currentTheme.secondaryColor"
+                      (click)="SearchTable(box.value)"
+                    >
+                      <i class="icon icon-search"></i>
+                    </button>
+                  </label>
+                </div>
+              </div>
+
+              <div>
+                <lnd-selected-filters
+                  [useFilterModel]="false"
+                ></lnd-selected-filters>
+              </div>
+
+              <div
+                class="d-flex justify-content-between mb-4 w-100 align-items-center"
+              >
+                <div
+                  class=""
+                  aria-live="polite"
+                  style="font-size: 13px; margin-top: -8px"
+                >
+                  Showing
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1
+                      | number : "1.0-0"
+                  }}
+                  -
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize +
+                      pagination.count | number : "1.0-0"
+                  }}
+                  of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+                </div>
+                <div
+                  class="btn-group mr-2 mb-2"
+                  role="group"
+                  aria-label="Basic example"
+                  style="float: right"
+                >
+                  <div class="mr-3">
+                    <button
+                      type="button"
+                      (click)="onToggleFilterModal()"
+                      class="mr-1 text-white btn btn-warning btn-xs"
+                    >
+                      <i class="mr-2 icon icon-filter"></i> Filters
+                    </button>
+                  </div>
+                  <div class="generate-menu generate-menu-right">
+                    <div class="generate-menu-header">
+                      <h4 class="title">
+                        <i class="icon icon-filter mr-2"></i> Filter Users
+                      </h4>
+                    </div>
+                    <form
+                      [formGroup]="usersFilterForm"
+                      (ngSubmit)="onFilterUsers()"
+                    >
+                      <div class="generate-menu-body">
+                        <div class="h-auto">
+                          <div class="col-sm-12 mb-3">
+                            <label>Select branch</label>
+                            <div>
+                              <slct-2
+                                [multiple]="false"
+                                placeholder="Select Branch"
+                                [data]="branchList"
+                                [customSearchEnabled]="true"
+                                (selected)="onSelectFilter('branch', $event)"
+                                (removed)="onRemoveFilter('branch', $event)"
+                              ></slct-2>
+                            </div>
+                          </div>
+                          <div class="col-sm-12 mb-3">
+                            <label>Select Role</label>
+                            <div>
+                              <slct-2
+                                [multiple]="false"
+                                placeholder="Select Role"
+                                [data]="roles"
+                                [customSearchEnabled]="true"
+                                (selected)="onSelectFilter('role', $event)"
+                                (removed)="onRemoveFilter('role', $event)"
+                              ></slct-2>
+                            </div>
+                          </div>
+                          <div class="col-sm-12 mb-3">
+                            <label>Select Team</label>
+                            <div>
+                              <slct-2
+                                [multiple]="false"
+                                placeholder="Select Team"
+                                [data]="teamList"
+                                [customSearchEnabled]="true"
+                                (selected)="onSelectFilter('team', $event)"
+                                (removed)="onRemoveFilter('team', $event)"
+                              ></slct-2>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="generate-menu-footer">
+                        <div class="footer-right">
+                          <button
+                            type="submit"
+                            class="btn btn-primary btn-xs mr-2"
+                            [disabled]="
+                              usersFilterForm.value.branchId === '' &&
+                              usersFilterForm.value.roleId === '' &&
+                              usersFilterForm.value.teamId === ''
+                            "
+                          >
+                            Get Users
+                          </button>
+                          <button
+                            type="button"
+                            (click)="onToggleFilterModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Team</th>
+                    <th>Branch</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="users?.length > 0">
+                    <tr *ngFor="let item of users">
+                      <td>
+                        {{ item?.person?.firstName }}
+                        {{ item?.person?.lastName }}
+                      </td>
+                      <td>
+                        {{ item?.roleName }}
+                      </td>
+                      <td>
+                        <span
+                          *ngFor="let ans of item?.teams"
+                          class="badge badge-light mb-1 mr-1"
+                          >{{ ans.text }}</span
+                        >
+                      </td>
+                      <td>
+                        {{ item?.branchName }}
+                      </td>
+                      <td>
+                        <span
+                          *ngIf="item?.status == 0"
+                          class="badge badge-success mb-1 mr-1"
+                          >Active</span
+                        >
+                        <span
+                          *ngIf="item?.status == 1"
+                          class="badge badge-warning mb-1 mr-1"
+                          >Inactive</span
+                        >
+                      </td>
+                      <td>
+                        <div class="btn-group btn-xs dropleft" role="group">
+                          <!-- Dropdown Button -->
+                          <button
+                            type="button"
+                            class="btn btn-xs btn-primary dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                          >
+                            Action
+                          </button>
+                          <!-- /dropdown button -->
+                          <!-- Dropdown Menu -->
+                          <div
+                            class="dropdown-menu"
+                            x-placement="left-start"
+                            style="
+                              position: absolute;
+                              will-change: transform;
+                              top: 0px;
+                              left: 0px;
+                              transform: translate3d(-5px, 0px, 0px);
+                            "
+                          >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              (click)="openEditFormInit(item, editModal)"
+                              *ngIf="user?.permission?.includes('Update User')"
+                              >Edit User</a
+                            >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              (click)="rolesFormInit(assignRole, item)"
+                              *ngIf="user?.permission?.includes('Assign Role')"
+                              >Manage Role</a
+                            >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              *ngIf="
+                                item?.status == 0 &&
+                                user?.permission?.includes('Deactivate Account')
+                              "
+                              (click)="disableUserAccount(item?.userId, 1)"
+                              >Deactivate Account</a
+                            >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              *ngIf="
+                                item?.status == 1 &&
+                                user?.permission?.includes('Activate Account')
+                              "
+                              (click)="enableUserAccount(item?.userId, 0)"
+                              >Activate Account</a
+                            >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              (click)="disableUserAccount(item?.userId, 2)"
+                              *ngIf="
+                                user?.permission?.includes('Delete Account')
+                              "
+                              >Delete Account</a
+                            >
+                          </div>
+                          <!-- /dropdown menu -->
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
+                  <ng-container *ngIf="users?.length == 0">
+                    <tr>
+                      <td
+                        colspan="6"
+                        class="text-center"
+                        *ngIf="!defaultloader"
+                      >
+                        No record found
+                        <span *ngIf="searchTerm != ''"
+                          >that matches your search</span
+                        >
+                      </td>
+                      <td colspan="6" class="text-center" *ngIf="defaultloader">
+                        <i class="fa fa-spinner fa-4x"></i>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+
+                <tbody></tbody>
+              </table>
+            </ng-container>
+            <ng-container
+              *ngIf="
+                active == 'TEAMS' && user?.permission?.includes('View Teams')
+              "
+            >
+              <div class="row mx-0 my-4">
+                <div class="col-md-4 px-0">
+                  <label style="display: inline-flex"
+                    ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                    ><select
+                      [(ngModel)]="pagination.pageSize"
+                      (change)="filterUsers($event.target.value)"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                    <span style="padding: 8px 2px; font-size: 12px"
+                      >entries</span
+                    ></label
+                  >
+                </div>
+
+                <div class="col-md-4">
+                  <div
+                    *ngIf="defaultloader"
+                    class="table-loader"
+                    style="text-align: center; color: indianred"
+                  >
+                    <span>
+                      <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <label style="display: inline-flex; float: right"
+                    ><span style="padding: 10px 2px; font-size: 12px"></span
+                    ><input
+                      type="text"
+                      #box
+                      (keyup.enter)="SearchTable(box.value)"
+                      class="form-control"
+                      placeholder="name"
+                    />
+                    <button
+                      class="btn btn-xs text-white ml-3"
+                      [style.background]="currentTheme.secondaryColor"
+                      (click)="SearchTable(box.value)"
+                    >
+                      <i class="icon icon-search"></i>
+                    </button>
+                  </label>
+                </div>
+              </div>
+
+              <div
+                class="d-flex justify-content-between mb-4 w-100 align-items-center"
+              >
+                <div
+                  aria-live="polite"
+                  style="font-size: 13px; margin-top: -8px"
+                >
+                  Showing
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1
+                      | number : "1.0-0"
+                  }}
+                  -
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize +
+                      pagination.count | number : "1.0-0"
+                  }}
+                  of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+                </div>
+                <div></div>
+              </div>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Members</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="teams?.length > 0">
+                    <tr *ngFor="let item of teams">
+                      <td>{{ item?.teamName }}</td>
+                      <td>
+                        {{ item?.members }}
+                      </td>
+                      <td>
+                        <div class="btn-group btn-xs dropleft" role="group">
+                          <!-- Dropdown Button -->
+                          <button
+                            type="button"
+                            class="btn btn-xs btn-primary dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                          >
+                            Action
+                          </button>
+                          <!-- /dropdown button -->
+                          <!-- Dropdown Menu -->
+                          <div
+                            class="dropdown-menu"
+                            x-placement="left-start"
+                            style="
+                              position: absolute;
+                              will-change: transform;
+                              top: 0px;
+                              left: 0px;
+                              transform: translate3d(-5px, 0px, 0px);
+                            "
+                          >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              (click)="teamEditFormInit(editTeam, item)"
+                              *ngIf="user?.permission?.includes('Update Team')"
+                              >Edit Team</a
+                            >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              (click)="deleteTeam(item)"
+                              *ngIf="user?.permission?.includes('Delete Team')"
+                              >Delete Team</a
+                            >
+                          </div>
+                          <!-- /dropdown menu -->
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
+                  <ng-container *ngIf="teams?.length == 0">
+                    <tr>
+                      <td
+                        colspan="3"
+                        class="text-center"
+                        *ngIf="!defaultloader"
+                      >
+                        No record found
+                        <span *ngIf="searchTerm != ''"
+                          >that matches your search</span
+                        >
+                      </td>
+                      <td colspan="3" class="text-center" *ngIf="defaultloader">
+                        <i class="fa fa-spinner fa-4x"></i>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+
+                <tbody></tbody>
+              </table>
+            </ng-container>
+            <ng-container
+              *ngIf="
+                active == 'BRANCHES' &&
+                user?.permission?.includes('View Branch')
+              "
+            >
+              <div class="row mx-0 my-4">
+                <div class="col-md-4 px-0">
+                  <label style="display: inline-flex"
+                    ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                    ><select
+                      [(ngModel)]="pagination.pageSize"
+                      (change)="filterUsers($event.target.value)"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                    <span style="padding: 8px 2px; font-size: 12px"
+                      >entries</span
+                    ></label
+                  >
+                </div>
+
+                <div class="col-md-4">
+                  <div
+                    *ngIf="defaultloader"
+                    class="table-loader"
+                    style="text-align: center; color: indianred"
+                  >
+                    <span>
+                      <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                    >
+                  </div>
+                </div>
+
+                <div class="col-md-4">
+                  <label style="display: inline-flex; float: right"
+                    ><span style="padding: 10px 2px; font-size: 12px"></span
+                    ><input
+                      type="text"
+                      #box
+                      (keyup.enter)="SearchTable(box.value)"
+                      class="form-control"
+                      placeholder="name"
+                    />
+                    <button
+                      class="btn btn-xs text-white ml-3"
+                      [style.background]="currentTheme.secondaryColor"
+                      (click)="SearchTable(box.value)"
+                    >
+                      <i class="icon icon-search"></i>
+                    </button>
+                  </label>
+                </div>
+              </div>
+
+              <div
+                class="d-flex justify-content-between mb-4 w-100 align-items-center"
+              >
+                <div
+                  aria-live="polite"
+                  style="font-size: 13px; margin-top: -8px"
+                >
+                  Showing
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1
+                      | number : "1.0-0"
+                  }}
+                  -
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize +
+                      pagination.count | number : "1.0-0"
+                  }}
+                  of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+                </div>
+                <div></div>
+              </div>
+              <table class="table table-striped">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Branch Code</th>
+                    <th>Members</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="branch?.length > 0">
+                    <tr *ngFor="let item of branch">
+                      <td>{{ item?.branchName }}</td>
+                      <td>{{ item?.branchCode }}</td>
+                      <td>
+                        {{ item?.members }}
+                      </td>
+                      <td>
+                        <div class="btn-group btn-xs dropleft" role="group">
+                          <!-- Dropdown Button -->
+                          <button
+                            type="button"
+                            class="btn btn-xs btn-primary dropdown-toggle dropdown-toggle-split"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                          >
+                            Action
+                          </button>
+                          <!-- /dropdown button -->
+                          <!-- Dropdown Menu -->
+                          <div
+                            class="dropdown-menu"
+                            x-placement="left-start"
+                            style="
+                              position: absolute;
+                              will-change: transform;
+                              top: 0px;
+                              left: 0px;
+                              transform: translate3d(-5px, 0px, 0px);
+                            "
+                          >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              (click)="branchEditFormInit(editBranch, item)"
+                              *ngIf="user?.permission?.includes('Edit Branch')"
+                              >Edit Branch</a
+                            >
+                            <a
+                              class="dropdown-item"
+                              href="javascript:void(0)"
+                              (click)="deleteBranch(item)"
+                              *ngIf="
+                                user?.permission?.includes('Disable Branch')
+                              "
+                              >Disable Branch</a
+                            >
+                          </div>
+                          <!-- /dropdown menu -->
+                        </div>
+                      </td>
+                    </tr>
+                  </ng-container>
+                  <ng-container *ngIf="branch?.length == 0">
+                    <tr>
+                      <td
+                        colspan="3"
+                        class="text-center"
+                        *ngIf="!defaultloader"
+                      >
+                        No record found
+                        <span *ngIf="searchTerm != ''"
+                          >that matches your search</span
+                        >
+                      </td>
+                      <td colspan="3" class="text-center" *ngIf="defaultloader">
+                        <i class="fa fa-spinner fa-4x"></i>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+
+                <tbody></tbody>
+              </table>
+            </ng-container>
+
+            <footer>
+              <nav>
+                <ul class="pagination pagination-sm justify-content-end">
+                  <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        pagination.pageNumber = pagination.pageNumber - 1;
+                        fetchAllUsers()
+                      "
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item pagination-menu-wrapper">
+                    <a
+                      class="page-link page-target"
+                      href="javascript:void(0)"
+                      (click)="itemPaginatedJumpModal()"
+                    >
+                      {{ pagination.pageNumber }} of
+                      {{ pagination.maxPage }} page{{
+                        pagination.pageNumber > 1 ? "s" : ""
+                      }}
+                      <span class="sr-only">(current)</span>
+                    </a>
+                    <div
+                      class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                    >
+                      <div class="pagination-menu-body">
+                        <div class="h-auto">
+                          <span>Jump to Page</span>
+                          <select
+                            aria-controls="data-table"
+                            [(ngModel)]="pagination.pageNumber"
+                            (change)="filterUsers($event.target.value)"
+                            class="custom-select custom-select-xl form-control form-control-xl height"
+                          >
+                            <option
+                              (click)="pagination.pageNumber = line"
+                              *ngFor="let line of pagination.jumpArray"
+                            >
+                              {{ line }}
+                            </option>
+                          </select>
+                          <div class="text-center mt-3">
+                            <button type="button" class="btn btn-danger btn-xs">
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="page-item" *ngIf="pagination.hasNextPage">
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        pagination.pageNumber = pagination.pageNumber + 1;
+                        fetchAllUsers()
+                      "
+                    >
+                      Next
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #addModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">New User</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form [formGroup]="AddUserForm" (ngSubmit)="checkPwValidity()">
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('StaffId').errors &&
+                AddUserForm.get('StaffId').touched
+            }"
+          >
+            <label for="staff">Staff ID<sup class="text-danger">*</sup></label>
+            <input
+              type="text"
+              placeholder="Unique Staff ID"
+              class="form-control"
+              formControlName="StaffId"
+              id="staff"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('StaffId').errors &&
+                AddUserForm.get('StaffId').touched
+              "
+            >
+              Unique staff ID is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('FirstName').errors &&
+                AddUserForm.get('FirstName').touched
+            }"
+          >
+            <label for="FirstName"
+              >First Name <sup class="text-danger">*</sup></label
+            >
+            <input
+              type="text"
+              placeholder="First Name"
+              class="form-control"
+              formControlName="FirstName"
+              id="FirstName"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('FirstName').errors &&
+                AddUserForm.get('FirstName').touched
+              "
+            >
+              User's first name is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('MiddleName').errors &&
+                AddUserForm.get('MiddleName').touched
+            }"
+          >
+            <label for="MiddleName">Middle Name </label>
+            <input
+              type="text"
+              placeholder="Middle Name"
+              class="form-control"
+              formControlName="MiddleName"
+              id="MiddleName"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('MiddleName').errors &&
+                AddUserForm.get('MiddleName').touched
+              "
+            >
+              User's middle name is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('LastName').errors &&
+                AddUserForm.get('LastName').touched
+            }"
+          >
+            <label for="LastName"
+              >Last Name <sup class="text-danger">*</sup></label
+            >
+            <input
+              type="text"
+              placeholder="Last Name"
+              class="form-control"
+              formControlName="LastName"
+              id="LastName"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('LastName').errors &&
+                AddUserForm.get('LastName').touched
+              "
+            >
+              User's last name is required.
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('Sex').errors && AddUserForm.get('Sex').touched
+            }"
+          >
+            <label for="Sex">Gender<sup class="text-danger">*</sup></label>
+            <slct-2
+              class="w-100"
+              [customSearchEnabled]="true"
+              [data]="genders"
+              formControlName="gender"
+              placeholder="Select Gender"
+            ></slct-2>
+
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('Sex').errors && AddUserForm.get('Sex').touched
+              "
+            >
+              User's gender is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('Teams').errors &&
+                AddUserForm.get('Teams').touched
+            }"
+          >
+            <label for="team">Team <sup class="text-danger">*</sup></label>
+            <slct-2
+              [multiple]="true"
+              [customSearchEnabled]="true"
+              [allowSelectAll]="true"
+              [data]="teamList"
+              placeholder="No team selected"
+              (selected)="selectedTeamEvent($event)"
+              (selectedAll)="selectedTeamEvent($event, true)"
+              (removed)="removedTeamEvent($event)"
+              (deselectedAll)="removedTeamEvent($event, true)"
+            >
+            </slct-2>
+
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('Teams').errors &&
+                AddUserForm.get('Teams').touched
+              "
+            >
+              User's team is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('PhoneNumber').errors &&
+                AddUserForm.get('PhoneNumber').touched
+            }"
+          >
+            <label for="PhoneNumber"
+              >Phone Number <sup class="text-danger">*</sup></label
+            >
+            <input
+              type="text"
+              placeholder="Phone Number"
+              class="form-control"
+              formControlName="PhoneNumber"
+              id="PhoneNumber"
+            />
+
+            <lnd-input-errors
+              label="Phone number"
+              [control]="AddUserForm.get('PhoneNumber')"
+            ></lnd-input-errors>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('DateOfBirth').errors &&
+                AddUserForm.get('DateOfBirth').touched
+            }"
+          >
+            <label for="DateOfBirth">Date Of Birth</label>
+            <div class="input-group">
+              <input
+                lndInvalidDateChecker
+                type="date"
+                [minDate]="{ year: 1900, month: 1, day: 1 }"
+                placeholder="yyyy-mm-dd"
+                class="form-control"
+                formControlName="Dob"
+                id="DateOfBirth"
+              />
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('Dob').errors && AddUserForm.get('Dob').touched
+              "
+            >
+              User's date of birth is required.
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('BranchId').errors &&
+                AddUserForm.get('BranchId').touched
+            }"
+          >
+            <label for="branch">Branch <sup class="text-danger">*</sup></label>
+            <div class="input-group">
+              <slct-2
+                class="w-100"
+                [customSearchEnabled]="true"
+                [data]="branchList"
+                formControlName="Branch"
+                placeholder="Select Branch"
+              ></slct-2>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('BranchId').errors &&
+                AddUserForm.get('BranchId').touched
+              "
+            >
+              User's branch is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                AddUserForm.get('EmailAddress').errors &&
+                AddUserForm.get('EmailAddress').touched
+            }"
+          >
+            <label for="EmailAddress"
+              >Email Address<sup class="text-danger">*</sup></label
+            >
+            <input
+              type="email"
+              placeholder="Email Address"
+              class="form-control"
+              formControlName="EmailAddress"
+              id="EmailAddress"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('EmailAddress').errors &&
+                AddUserForm.get('EmailAddress').touched
+              "
+            >
+              User's email address is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="Password">Default Password</label>
+            <input
+              type="password"
+              placeholder="Password"
+              class="form-control"
+              formControlName="Password"
+              id="Password"
+              autocomplete="off"
+              placement="top"
+              [ngbPopover]="pwRequiredParams"
+              [popoverTitle]="pwParamsTitle"
+            />
+            <ng-template #pwParamsTitle>
+              <h4 class="m-0">
+                Password should meet the following requirements:
+              </h4>
+            </ng-template>
+            <ng-template #pwRequiredParams>
+              <lnd-required-pw-params
+                [enteredPw]="AddUserForm.get('Password').value"
+              ></lnd-required-pw-params>
+            </ng-template>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddUserForm.get('Password').errors &&
+                AddUserForm.get('Password').touched
+              "
+            >
+              Default password for this user is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="customFile">Profile Picture</label>
+            <div class="custom-file">
+              <input
+                type="file"
+                (change)="onFileSelect($event, 'add')"
+                class="custom-file-input"
+                id="customFile"
+              />
+              <label class="custom-file-label" for="customFile"
+                >Profile Picture</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="can-sell">
+              <input type="checkbox" formControlName="CanSell" id="can-sell" />
+              Can Sell
+            </label>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="verification">
+              <input
+                type="checkbox"
+                formControlName="SendVerificationLink"
+                id="verification"
+              />
+              Send verification link
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+        [disabled]="loader || validatingPw"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary"
+        *ngIf="!loader && !validatingPw"
+        style="color: #fff"
+        [disabled]="AddUserForm.invalid"
+      >
+        Add User
+      </button>
+      <button
+        class="btn btn-sm btn-warning mx-1 text-white"
+        disabled
+        *ngIf="validatingPw"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Validating Password...
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-warning mx-1"
+        *ngIf="loader"
+        style="color: #fff"
+        disabled
+      >
+        <i class="icon icon-spin icon-spin2"></i> Adding User...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #editModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Edit User</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="EditUserForm"
+    (ngSubmit)="submitEditUserForm(EditUserForm.value)"
+    enctype="multipart/form-data"
+  >
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('StaffId').errors &&
+                EditUserForm.get('StaffId').touched
+            }"
+          >
+            <label for="staff">Staff ID<sup class="text-danger">*</sup></label>
+            <input
+              type="text"
+              placeholder="Unique Staff ID"
+              class="form-control"
+              formControlName="StaffId"
+              id="staff"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('StaffId').errors &&
+                EditUserForm.get('StaffId').touched
+              "
+            >
+              Unique staff ID is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('FirstName').errors &&
+                EditUserForm.get('FirstName').touched
+            }"
+          >
+            <label for="FirstName"
+              >First Name <sup class="text-danger">*</sup></label
+            >
+            <input
+              type="text"
+              placeholder="First Name"
+              class="form-control"
+              formControlName="FirstName"
+              id="FirstName"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('FirstName').errors &&
+                EditUserForm.get('FirstName').touched
+              "
+            >
+              User's first name is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('MiddleName').errors &&
+                EditUserForm.get('MiddleName').touched
+            }"
+          >
+            <label for="MiddleName">Middle Name </label>
+            <input
+              type="text"
+              placeholder="Middle Name"
+              class="form-control"
+              formControlName="MiddleName"
+              id="MiddleName"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('MiddleName').errors &&
+                EditUserForm.get('MiddleName').touched
+              "
+            >
+              User's middle name is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('LastName').errors &&
+                EditUserForm.get('LastName').touched
+            }"
+          >
+            <label for="LastName"
+              >Last Name <sup class="text-danger">*</sup></label
+            >
+            <input
+              type="text"
+              placeholder="Last Name"
+              class="form-control"
+              formControlName="LastName"
+              id="LastName"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('LastName').errors &&
+                EditUserForm.get('LastName').touched
+              "
+            >
+              User's last name is required.
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('Sex').errors &&
+                EditUserForm.get('Sex').touched
+            }"
+          >
+            <label for="Sex">Gender<sup class="text-danger">*</sup></label>
+            <slct-2
+              class="w-100"
+              [customSearchEnabled]="true"
+              [data]="genders"
+              formControlName="gender"
+              placeholder="Select Gender"
+            ></slct-2>
+
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('Sex').errors &&
+                EditUserForm.get('Sex').touched
+              "
+            >
+              User's gender is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('Teams').errors &&
+                EditUserForm.get('Teams').touched
+            }"
+          >
+            <label for="team">Team<sup class="text-danger">*</sup></label>
+            <slct-2
+              [multiple]="true"
+              [active]="teamListSelection"
+              [data]="teamList"
+              placeholder="No team selected"
+              (selected)="selectedTeam($event)"
+              (removed)="removedTeam($event)"
+            >
+            </slct-2>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('Teams').errors &&
+                EditUserForm.get('Teams').touched
+              "
+            >
+              User's team is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('PhoneNumber').errors &&
+                EditUserForm.get('PhoneNumber').touched
+            }"
+          >
+            <label for="PhoneNumber"
+              >Phone Number <sup class="text-danger">*</sup></label
+            >
+            <input
+              type="text"
+              placeholder="Phone Number"
+              class="form-control"
+              formControlName="PhoneNumber"
+              id="PhoneNumber"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('PhoneNumber').errors &&
+                EditUserForm.get('PhoneNumber').touched
+              "
+            >
+              User's phone number is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('DateOfBirth').errors &&
+                EditUserForm.get('DateOfBirth').touched
+            }"
+          >
+            <label for="DateOfBirth">Date Of Birth</label>
+            <div class="input-group">
+              <input
+                type="text"
+                #d="ngbDatepicker"
+                [minDate]="{ year: 1900, month: 1, day: 1 }"
+                ngbDatepicker
+                placeholder="yyyy-mm-dd"
+                class="form-control"
+                formControlName="DateOfBirth"
+                id="DateOfBirth"
+              />
+              <div class="input-group-append">
+                <button
+                  #buttonEl
+                  class="btn btn-outline-secondary calendar"
+                  (click)="d.toggle()"
+                  type="button"
+                >
+                  <i class="icon icon-calendar"></i>
+                </button>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('DateOfBirth').errors &&
+                EditUserForm.get('DateOfBirth').touched
+              "
+            >
+              User's date of birth is required.
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('BranchId').errors &&
+                EditUserForm.get('BranchId').touched
+            }"
+          >
+            <label for="branch">Branch <sup class="text-danger">*</sup></label>
+            <div class="input-group">
+              <slct-2
+                class="w-100"
+                [customSearchEnabled]="true"
+                [data]="branchList"
+                formControlName="Branch"
+                placeholder="Select Branch"
+              ></slct-2>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('BranchId').errors &&
+                EditUserForm.get('BranchId').touched
+              "
+            >
+              User's branch is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div
+            class="form-group"
+            [ngClass]="{
+              'has-error':
+                EditUserForm.get('EmailAddress').errors &&
+                EditUserForm.get('EmailAddress').touched
+            }"
+          >
+            <label for="EmailAddress"
+              >Email Address<sup class="text-danger">*</sup></label
+            >
+            <input
+              type="email"
+              placeholder="Email Address"
+              class="form-control"
+              formControlName="EmailAddress"
+              id="EmailAddress"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditUserForm.get('EmailAddress').errors &&
+                EditUserForm.get('EmailAddress').touched
+              "
+            >
+              User's email address is required.
+            </span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="Password">Default Password </label>
+            <input
+              type="password"
+              placeholder="Password"
+              class="form-control"
+              formControlName="Password"
+              id="Password"
+              autocomplete="off"
+            />
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="customFile">Profile Picture</label>
+            <div class="custom-file">
+              <input
+                (change)="onFileSelect($event, 'edit')"
+                type="file"
+                class="custom-file-input"
+                id="customFile"
+              />
+              <label class="custom-file-label" for="customFile"
+                >Profile Picture</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="can-sell">
+              <input type="checkbox" formControlName="CanSell" id="can-sell" />
+              Can Sell
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary"
+        *ngIf="!loader"
+        style="color: #fff"
+        [disabled]="EditUserForm.invalid"
+      >
+        Edit User
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        *ngIf="loader"
+        style="color: #fff"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #assignRole>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Assign A Role</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="rolesForm"
+    (ngSubmit)="SubmitRoleForm(rolesForm.value)"
+    action=""
+  >
+    <div class="modal-body">
+      <div class="form-group">
+        <slct-2
+          [allowClear]="true"
+          [customSearchEnabled]="true"
+          [data]="roles"
+          [active]="activeRole"
+          (selected)="selectedRole($event)"
+          placeholder="No role selected"
+        >
+        </slct-2>
+      </div>
+      <div
+        *ngIf="rolesForm.get('BranchShow').value"
+        class="form-group"
+        [ngClass]="{
+          'has-error':
+            rolesForm.get('BranchView').errors &&
+            rolesForm.get('BranchView').touched
+        }"
+      >
+        <label for="BranchView">Branch (View Global)</label>
+        <slct-2
+          [multiple]="true"
+          [data]="branchList"
+          [customSearchEnabled]="true"
+          placeholder="No branch selected"
+          formControlName="BranchView"
+          (selected)="selectedBranch($event)"
+          (removed)="removedBranch($event)"
+        >
+        </slct-2>
+        <!-- <ng-select [multiple]="true" [items]="branchList" placeholder="No branch selected" formControlName="BranchView"
+          (selected)="selectedBranch($event)" (removed)="removedBranch($event)">
+        </ng-select> -->
+        <span
+          class="help-block"
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="
+            rolesForm.get('BranchView').errors &&
+            rolesForm.get('BranchView').touched
+          "
+        >
+          Select global view branches.
+        </span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <span *ngIf="branchShowLoad">
+        <i class="icon icon-spin icon-spin2"></i> Wait processing...
+      </span>
+      <ng-container *ngIf="!branchShowLoad">
+        <button
+          type="submit"
+          class="btn btn-sm btn-primary"
+          *ngIf="!loader"
+          style="color: #fff"
+          [disabled]="rolesForm.get('RoleId').invalid"
+        >
+          Assign Role
+        </button>
+        <button
+          type="button"
+          class="btn btn-sm btn-primary"
+          *ngIf="loader"
+          style="color: #fff"
+          [disabled]="true"
+        >
+          <i class="icon icon-spin icon-spin2"></i> Processing...
+        </button>
+      </ng-container>
+    </div>
+  </form>
+</ng-template>
+
+<!-- Team Management -->
+<ng-template #addTeam>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Create A Team</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="teamForm"
+    (ngSubmit)="SubmitTeamForm(teamForm.value)"
+    action=""
+  >
+    <div class="modal-body">
+      <div class="form-group">
+        <input
+          type="text"
+          placeholder="Team Name"
+          formControlName="TeamName"
+          class="form-control"
+        />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary"
+        *ngIf="!loader"
+        style="color: #fff"
+        [disabled]="teamForm.invalid"
+      >
+        Add Team
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        *ngIf="loader"
+        style="color: #fff"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #editTeam>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Edit Team</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="teamEditForm"
+    (ngSubmit)="SubmitEditTeamForm(teamEditForm.value)"
+    action=""
+  >
+    <div class="modal-body">
+      <div class="form-group">
+        <input
+          type="text"
+          placeholder="Team Name"
+          formControlName="TeamName"
+          class="form-control"
+        />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary"
+        *ngIf="!loader"
+        style="color: #fff"
+        [disabled]="teamEditForm.invalid"
+      >
+        Update Team
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        *ngIf="loader"
+        style="color: #fff"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #addBranchModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Add A Branch</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="branchForm"
+    (ngSubmit)="SubmitBranchForm(branchForm.value)"
+    action=""
+  >
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="branch">Branch Name</label>
+        <input
+          type="text"
+          id="branch"
+          formControlName="BranchName"
+          placeholder="Add branch name"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="branchCode">Branch Code</label>
+        <input
+          type="text"
+          id="branchCode"
+          formControlName="branchCode"
+          placeholder="Add branch Code"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="state">State</label>
+        <slct-2
+          [customSearchEnabled]="true"
+          [data]="states"
+          formControlName="State"
+          placeholder="Select State"
+        />
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <textarea
+          rows="3"
+          cols="3"
+          formControlName="Address"
+          id="address"
+          class="form-control"
+        >
+        </textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary"
+        *ngIf="!loader"
+        style="color: #fff"
+        [disabled]="branchForm.invalid"
+      >
+        Add Branch
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        *ngIf="loader"
+        style="color: #fff"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #editBranch>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Edit A Branch</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="editBranchForm"
+    (ngSubmit)="submitEditBranchForm(editBranchForm.value)"
+    action=""
+  >
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="branch">Branch Name</label>
+        <input
+          type="text"
+          id="branch"
+          formControlName="BranchName"
+          placeholder="Edit branch name"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="branchCode">Branch Code</label>
+        <input
+          type="text"
+          id="branchCode"
+          formControlName="branchCode"
+          placeholder="Edit branch Code"
+          class="form-control"
+        />
+      </div>
+      <div class="form-group">
+        <label for="state">State</label>
+        <slct-2
+          [customSearchEnabled]="true"
+          [data]="states"
+          formControlName="State"
+          placeholder="Select State"
+        />
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <textarea
+          rows="3"
+          cols="3"
+          formControlName="Address"
+          id="address"
+          class="form-control"
+        >
+        </textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-sm btn-primary"
+        *ngIf="!loader"
+        style="color: #fff"
+        [disabled]="editBranchForm.invalid"
+      >
+        Edit Branch
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm btn-primary"
+        *ngIf="loader"
+        style="color: #fff"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>

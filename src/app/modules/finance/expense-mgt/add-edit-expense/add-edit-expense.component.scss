@@ -1,0 +1,34 @@
+footer {
+  background-color: #fff;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.icon-btn {
+  border-radius: 5px 0 5px 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px;
+  margin-left: 1px;
+}
+
+.add-btn {
+  border-radius: 16px;
+  background-color: #558e80;
+  min-width: 120px;
+}
+
+.remove-btn {
+  margin-top: 8px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+table {
+  margin-top: 50px;
+}
+
+.slct-2 {
+  min-width: 154px;
+}

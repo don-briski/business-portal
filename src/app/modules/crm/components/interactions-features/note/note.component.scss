@@ -1,0 +1,30 @@
+main {
+  header {
+    margin-bottom: 50px;
+  }
+
+  .text-dark {
+    color: #181818 !important;
+  }
+
+  .text {
+    color: #393a3b;
+  }
+
+  .text-footer{
+    color: #979797;
+  }
+
+  .notes-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .note {
+    border-bottom: 1px solid gainsboro;
+  }
+  .btn-outline-dark {
+    border-color: var(--lenda-grey);
+    color: var(--lenda-grey);
+  }
+}

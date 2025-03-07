@@ -1,0 +1,18 @@
+<div class="mt-3">
+  <h5 class="mb-2">{{review.role}}</h5>
+  <p class="mb-2 comment">
+    {{ review.comment }}
+  </p>
+  <p class="caption-text">
+    <span
+      class="approval-prefix"
+      [ngClass]="{
+        'approved-color': review.action === 'Approved',
+        'rejected-color': review.action === 'Rejected',
+       }"
+      >{{ review.action }} by</span
+    ><span class="ml-1 mr-3">{{ review.reviewedBy }}</span
+    ><span class="date">{{ review.createdAt | date : "mediumDate" }}</span>
+  </p>
+  <div class="dashed mt-3"></div>
+</div>

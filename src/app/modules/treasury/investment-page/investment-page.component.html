@@ -1,0 +1,595 @@
+<div *ngIf="!InvestmentForm" class="text-primary text-center p-4">
+  <lnd-spinner></lnd-spinner>
+</div>
+<form
+  *ngIf="InvestmentForm"
+  [formGroup]="InvestmentForm"
+  (submit)="checkApprovalStatus()"
+>
+  <p
+    *ngIf="invTypeSelected?.approvalRequired === false"
+    class="text-danger mb-5"
+  >
+    An Investment created with this investment type will not require approval,
+    thus investment will be set to active upon creation.
+  </p>
+  <div class="form-row">
+    <div class="form-group col" style="position: relative">
+      <label for="emailaddress"
+        >Email Address <b class="text-danger">*</b></label
+      >
+      <input
+        type="email"
+        placeholder="Enter email to begin"
+        formControlName="EmailAddress"
+        id="emailaddress"
+        class="form-control"
+        (blur)="verifyEmailAddress()"
+      />
+      <span
+        [style.color]="currentTheme?.secondaryColor"
+        class="help-block f-12"
+        *ngIf="
+          (InvestmentForm.get('EmailAddress').errors &&
+            InvestmentForm.get('EmailAddress').touched) ||
+          formSubmitted
+        "
+      >
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="InvestmentForm.get('EmailAddress').getError('required')"
+        >
+          This field is required
+        </span>
+      </span>
+
+      <div class="loader" *ngIf="verifyingBVN">
+        <div class="lds-css ng-scope">
+          <div class="lds-spinner" style="width: 100%; height: 100%">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group col">
+      <label for="firstName">First Name <b class="text-danger">*</b></label>
+      <input
+        type="text"
+        formControlName="FirstName"
+        id="firstName"
+        class="form-control"
+      />
+      <span
+        [style.color]="currentTheme?.secondaryColor"
+        class="help-block f-12"
+        *ngIf="
+          (InvestmentForm.get('FirstName').errors &&
+            InvestmentForm.get('FirstName').touched) ||
+          formSubmitted
+        "
+      >
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="InvestmentForm.get('FirstName').getError('required')"
+        >
+          This field is required
+        </span>
+      </span>
+    </div>
+    <div class="form-group col">
+      <label for="lastName">Last Name <b class="text-danger">*</b></label>
+      <input
+        type="text"
+        formControlName="LastName"
+        id="lastName"
+        class="form-control"
+      />
+      <span
+        [style.color]="currentTheme?.secondaryColor"
+        class="help-block f-12"
+        *ngIf="
+          (InvestmentForm.get('LastName').errors &&
+            InvestmentForm.get('LastName').touched) ||
+          formSubmitted
+        "
+      >
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="InvestmentForm.get('LastName').getError('required')"
+        >
+          This field is required
+        </span>
+      </span>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="col form-group">
+      <label for="phoneNumber">Phone Number <b class="text-danger">*</b></label>
+      <input
+        type="text"
+        [dropSpecialCharacters]="false"
+        mask="9*"
+        formControlName="PhoneNumber"
+        id="phoneNumber"
+        class="form-control"
+      />
+      <span
+        class="text-danger"
+        *ngIf="
+          (InvestmentForm.get('PhoneNumber').errors &&
+            InvestmentForm.get('PhoneNumber').touched) ||
+          formSubmitted
+        "
+      >
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="InvestmentForm.get('PhoneNumber').getError('required')"
+        >
+          This field is required
+        </span>
+      </span>
+    </div>
+    <div class="col form-group">
+      <label for="validationDefault01" class="left-aligned"
+        >Alternative Phone Number</label
+      >
+      <input
+        type="text"
+        [dropSpecialCharacters]="false"
+        mask="9*"
+        formControlName="AltPhoneNumber"
+        id="validationDefault01"
+        class="form-control"
+      />
+    </div>
+    <div class="col form-group">
+      <label for="validationDefault02" class="left-aligned"
+        >Investor's Residential Address <b class="text-danger">*</b></label
+      >
+      <textarea
+        style="min-height: 40px"
+        formControlName="CustomerAddress"
+        id="validationDefault02"
+        class="form-control"
+        >{{ investmentDetails?.additionals?.InvestorCustomAddress }}</textarea
+      >
+      <span
+        class="text-danger"
+        *ngIf="
+          (InvestmentForm.get('CustomerAddress').errors &&
+            InvestmentForm.get('CustomerAddress').touched) ||
+          formSubmitted
+        "
+      >
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="InvestmentForm.get('CustomerAddress').getError('required')"
+        >
+          This field is required
+        </span>
+      </span>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="col form-group">
+      <label for="bank">Investor's Bank</label>
+      <select
+        class="custom-select custom-select-xl form-control form-control-xl height"
+        formControlName="BankSortCode"
+        id="bank"
+        (change)="getBankSelected($event)"
+      >
+        <option value="">Select Bank</option>
+        <option *ngFor="let item of bankList" value="{{ item.code }}">
+          {{ item.name }}
+        </option>
+      </select>
+      <span
+        [style.color]="currentTheme?.secondaryColor"
+        class="help-block f-12"
+        *ngIf="!InvestmentForm.get('BankSortCode').errors"
+      >
+        {{ accountErrorMessage }}
+      </span>
+    </div>
+    <div class="col form-group" style="position: relative">
+      <label for="account">Bank Account Number</label>
+      <input
+        (blur)="validateAccount($event)"
+        type="text"
+        id="account"
+        [dropSpecialCharacters]="false"
+        mask="9*"
+        max="11"
+        class="form-control"
+        formControlName="BankAccountNumber"
+      />
+
+      <span
+        [style.color]="currentTheme?.secondaryColor"
+        class="help-block f-12"
+        *ngIf="accountVerificationMessage != ''"
+      >
+        {{ accountVerificationMessage }}
+      </span>
+      <div class="loader" *ngIf="verifyingAccount">
+        <div class="lds-css ng-scope">
+          <div class="lds-spinner" style="width: 100%; height: 100%">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="text-center col form-group"
+      *ngIf="InvestmentForm.get('AccountVerification').value"
+    >
+      <div class="text-left alert alert-warning">
+        Account Name:
+        <span class="text-light-gray">{{ bankInfo?.accountName }}</span
+        ><br />
+        Account Number:
+        <span class="text-light-gray">{{ bankInfo?.accountNumber }}</span
+        ><br />
+        Bank:
+        <span class="text-light-gray">{{
+          InvestmentForm.get("BankName").value
+        }}</span>
+      </div>
+    </div>
+  </div>
+  <hr class="mb-3 border-dashed" />
+
+  <div class="form-row">
+    <div
+      [style.color]="currentTheme?.secondaryColor"
+      class="mb-3 col-sm-12 orange"
+    >
+      Investment Information
+    </div>
+    <div class="mb-3 col">
+      <label for="InvestmentType"
+        >Type of Investment <b class="text-danger">*</b></label
+      >
+      <select
+        formControlName="InvestmentTypeId"
+        class="custom-select custom-select-xl form-control form-control-xl height"
+        id="InvestmentType"
+      >
+        <option value="">Select Investment</option>
+        <option
+          *ngFor="let item of investmentTypeList"
+          value="{{ item?.investmentTypeId }}"
+        >
+          {{ item?.investmentName }}
+        </option>
+      </select>
+      <span
+        [style.color]="currentTheme?.secondaryColor"
+        class="help-block f-12"
+        *ngIf="
+          (InvestmentForm.get('InvestmentTypeId').errors &&
+            InvestmentForm.get('InvestmentTypeId').touched) ||
+          formSubmitted
+        "
+      >
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="InvestmentForm.get('InvestmentTypeId').getError('required')"
+        >
+          This field is required
+        </span>
+      </span>
+    </div>
+    <div class="mb-3 col">
+      <label for="Amount"
+        >Investment Amount {{ amountTextInfo }}
+        <b class="text-danger">*</b></label
+      >
+      <input
+        type="text"
+        currencyMask
+        [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+        formControlName="InvestmentAmount"
+        class="form-control"
+        id="Amount"
+        placeholder="Enter investment amount"
+      />
+      <span
+        [style.color]="currentTheme?.secondaryColor"
+        class="help-block f-12"
+        [style.color]="currentTheme?.secondaryColor"
+        *ngIf="
+          (InvestmentForm.get('InvestmentAmount').errors &&
+            InvestmentForm.get('InvestmentAmount').touched) ||
+          formSubmitted
+        "
+      >
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="InvestmentForm.get('InvestmentAmount').getError('required')"
+          >This field is required</span
+        >
+        {{ InvestmentForm.get("InvestmentAmount").getError("AmountChanged") }}
+        {{ InvestmentForm.get("InvestmentAmount").getError("OutOfRange") }}
+        {{ InvestmentForm.get("InvestmentAmount").getError("GreaterThanZero") }}
+      </span>
+    </div>
+  </div>
+  <div *ngIf="InvestmentForm.get('InvestmentTypeId').value">
+    <div class="form-row">
+      <div class="mb-3 col">
+        <label for="InvestmentRate"
+          >Investment Rate <b class="text-danger">*</b></label
+        >
+        <input
+          type="text"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+          formControlName="InvestmentRate"
+          class="form-control"
+          id="InvestmentRate"
+        />
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          class="help-block f-12"
+          *ngIf="
+            (InvestmentForm.get('InvestmentRate').errors &&
+              InvestmentForm.get('InvestmentRate').touched) ||
+            formSubmitted
+          "
+        >
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="InvestmentForm.get('InvestmentRate').getError('required')"
+            >This field is required</span
+          >
+          {{ InvestmentForm.get("InvestmentRate").getError("OutOfRange") }}
+        </span>
+      </div>
+      <div class="mb-3 col">
+        <label for="InvestmentTenor"
+          >Investment Tenor <b class="text-danger">*</b></label
+        >
+        <input
+          type="number"
+          min="1"
+          step="1"
+          formControlName="InvestmentTenor"
+          class="form-control"
+          id="InvestmentTenor"
+          placeholder="Enter investment tenor"
+        />
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          class="help-block f-12"
+          *ngIf="
+            (InvestmentForm.get('InvestmentTenor').errors &&
+              InvestmentForm.get('InvestmentTenor').touched) ||
+            formSubmitted
+          "
+        >
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="InvestmentForm.get('InvestmentTenor').getError('required')"
+            >This field is required</span
+          >
+          <span
+            class="d-block mt-1"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="InvestmentForm.get('InvestmentTenor').errors?.pattern"
+            >Can't be a decimal number</span
+          >
+          {{ InvestmentForm.get("InvestmentTenor").getError("OutOfRange") }}
+        </span>
+      </div>
+      <div class="mb-3 col">
+        <label for="start_date"
+          >Investment Start Date <b class="text-danger">*</b></label
+        >
+        <input
+        lndInvalidDateChecker
+          type="date"
+          formControlName="StartDate"
+          class="form-control"
+          id="start_date"
+          placeholder="Enter investment start date"
+        />
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          class="help-block text-info f-12"
+          *ngIf="
+            (InvestmentForm.get('StartDate').errors &&
+              InvestmentForm.get('StartDate').touched) ||
+            formSubmitted
+          "
+        >
+          <span
+            class="text-danger"
+            *ngIf="InvestmentForm.get('StartDate').getError('required')"
+            >This field is required</span
+          >
+          <br
+        /></span>
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          class="help-block text-info f-12"
+        >
+          {{ StartDateNotification }}
+        </span>
+      </div>
+      <div class="mb-3 col">
+        <ng-template #tipContent
+          >How Often You Want To Collect Your Earnings ?<br />
+          Monthly : Enter (30) To Collect Your Earnings Every Month <br />
+          Quarterly : Enter (90) To Collect Your Earnings Every Quarter <br />
+          Annually : Enter (365) To Collect Your Earnings Every Year <br />
+          Bi-Anually : Enter (730) To Collect Your Earnings Two Years <br />
+        </ng-template>
+
+        <label for="collectionPeriod"
+          >Collection Period (In Days) <b class="text-danger">* </b>
+          <span>
+            <i
+              class="icon icon-question-circle"
+              placement="top"
+              [ngbTooltip]="tipContent"
+            >
+            </i> </span
+        ></label>
+
+        <input
+          id="collectionPeriod"
+          formControlName="collectionPeriod"
+          class="form-control"
+          type="number"
+          placeholder="Collection Period"
+        />
+
+        <span
+          [style.color]="currentTheme?.secondaryColor"
+          class="help-block f-12"
+          [style.color]="currentTheme?.secondaryColor"
+          *ngIf="
+            (InvestmentForm.get('collectionPeriod').errors &&
+              InvestmentForm.get('collectionPeriod').touched) ||
+            formSubmitted
+          "
+        >
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="InvestmentForm.get('collectionPeriod').getError('required')"
+            >This field is required</span
+          >
+          <span
+            class="d-block mt-1"
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="InvestmentForm.get('collectionPeriod').errors?.pattern"
+            >Can't be a decimal number</span
+          >
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            *ngIf="
+              InvestmentForm.get('collectionPeriod').getError('OutOfRange') &&
+              !InvestmentForm.get('collectionPeriod').getError('required')
+            "
+            >{{
+              InvestmentForm.get("collectionPeriod").getError("OutOfRange")
+            }}</span
+          >
+        </span>
+      </div>
+    </div>
+
+    <div
+      *ngIf="appOwner?.financeInteractionData?.investmentInitialIsActive"
+      class="my-6"
+    >
+      <hr />
+      <h1 class="fin-int-text" [style.color]="currentTheme?.secondaryColor">
+        Finance Interaction
+      </h1>
+      <div class="col-md-6 px-0">
+        <label for="account"
+          >Select Cash Or Bank Account <b class="text-danger">* </b>
+          <span>
+            <i
+              class="icon icon-question-circle"
+              placement="top"
+              [ngbTooltip]="cashBank"
+            >
+            </i>
+          </span>
+        </label>
+        <ng-template #cashBank>
+          Bank Account where the investment amount was/is to be received
+        </ng-template>
+        <slct-2
+          formControlName="financeInteractionCashOrBankAccountIdObj"
+          id="type"
+          [data]="accounts"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Account'"
+        ></slct-2>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mb-3 mt-6">
+    <button
+      type="button"
+      class="btn btn-outline-warning"
+      (click)="previewInvestmentCert()"
+      [disabled]="
+        InvestmentForm.get('InvestmentTypeId').invalid ||
+        InvestmentForm.get('InvestmentAmount').invalid ||
+        InvestmentForm.get('EmailAddress').invalid ||
+        loadingCert ||
+        InvestmentForm.invalid
+      "
+    >
+      <span *ngIf="loadingCert"><i class="icon icon-spin icon-spin2"></i></span>
+      {{
+        loadingCert
+          ? "Generating certificate..."
+          : "Preview Investment Certificate"
+      }}
+    </button>
+  </div>
+
+  <div class="my-3 form-row">
+    <div class="col">
+      <div class="clearfix form-group">
+        <button
+          type="submit"
+          class="float-right text-white btn btn-secondary"
+          *ngIf="!loader"
+          [disabled]="
+            InvestmentForm.get('InvestmentTypeId').invalid ||
+            InvestmentForm.get('InvestmentAmount').invalid ||
+            InvestmentForm.get('EmailAddress').invalid ||
+            InvestmentForm.invalid ||
+            (appOwner?.financeInteractionData?.investmentInitialIsActive && !InvestmentForm.value.financeInteractionCashOrBankAccountId)
+          "
+        >
+          Submit Application
+        </button>
+        <button
+          type="button"
+          class="float-right btn btn-success"
+          *ngIf="loader"
+          [disabled]="true"
+        >
+          <i class="icon icon-spin icon-spin2"></i> Processing...
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- /form -->
+</form>

@@ -1,0 +1,28 @@
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  button {
+    background-color: var(--secondary-color);
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    color: #fff;
+  }
+}
+
+main {
+  header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-bottom: 30px;
+    input{
+      width: 25%;
+    }
+    button {
+      background-color: var(--secondary-color);
+      color: #fff;
+    }
+  }
+}

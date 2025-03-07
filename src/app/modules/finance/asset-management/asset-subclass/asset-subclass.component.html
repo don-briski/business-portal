@@ -1,0 +1,494 @@
+<!-- Page Header -->
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">
+    Assets Sub Class
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <a
+          class="btn btn-primary mr-2 text-white"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          (click)="openModal(assetSubClassModal)"
+          href="javascript:void(0)"
+          ><i class="icon icon-add-circle mr-2"></i>Add New</a
+        >
+      </div>
+    </span>
+  </h1>
+</div>
+<!-- /page header -->
+
+<div class="row">
+  <div class="col-xl-12">
+    <div class="tab-content">
+      <!-- Tab Pane -->
+      <div id="tab-created" class="tab-pane active show">
+        <!-- Card -->
+        <div class="dt-card">
+          <!-- Card Body -->
+          <div class="dt-card__body">
+            <!-- Tables -->
+            <div class="table-responsive">
+              <!-- Pagination Top-->
+              <div class="row m-0">
+                <div class="col-md-6">
+                  <label style="display: inline-flex"
+                    ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                    ><select
+                      [(ngModel)]="pagination.pageSize"
+                      aria-controls="data-table"
+                      (change)="filterAssets()"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                    <span style="padding: 8px 2px; font-size: 12px"
+                      >entries</span
+                    ></label
+                  >
+                </div>
+                <div class="col-md-6">
+                  <label style="display: inline-flex; float: right"
+                    ><input
+                      type="search"
+                      [(ngModel)]="pagination.assetSubClassName"
+                      (keydown.enter)="filterAssets()"
+                      placeholder="Enter name"
+                      class="form-control form-control-sm mr-3"
+                      aria-controls="data-table"
+                    />
+                    <button
+                      class="btn btn-xs text-white"
+                      [style.background]="currentTheme.secondaryColor"
+                      (click)="filterAssets()"
+                    >
+                      <i class="icon icon-search"></i>
+                    </button>
+                  </label>
+                </div>
+                <div class="form-group col-md-6"></div>
+              </div>
+              <div
+                class=""
+                aria-live="polite"
+                style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+              >
+                Showing
+                {{
+                  (pagination.pageNumber - 1) * pagination.pageSize + 1
+                    | number : "1.0-0"
+                }}
+                -
+                {{
+                  (pagination.pageNumber - 1) * pagination.pageSize +
+                    pagination.count | number : "1.0-0"
+                }}
+                of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+              </div>
+              <div *ngIf="tabLoader" class="d-flex justify-content-center">
+                <lnd-spinner
+                  text="Loading..."
+                  [color]="currentTheme?.secondaryColor"
+                ></lnd-spinner>
+              </div>
+              <table
+                *ngIf="!tabLoader"
+                id="data-table"
+                class="table table-striped table-hover"
+              >
+                <thead>
+                  <tr>
+                    <th>Asset Sub Class Name</th>
+                    <th>Asset Class</th>
+                    <th>Asset Prefix</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="!tabLoader">
+                    <ng-container *ngIf="allAssets?.length > 0">
+                      <tr class="gradeX" *ngFor="let item of allAssets">
+                        <td>{{ item?.assetSubClassName }}</td>
+                        <td>{{ item?.assetClass }}</td>
+                        <td>{{ item?.assetSubClassTagPrefix }}</td>
+                        <td>
+                          <div class="dropdown mr-2 mb-2 d-inline-block">
+                            <button
+                              class="btn btn-warning btn-xs dropdown-toggle"
+                              type="button"
+                              data-toggle="dropdown"
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                            ></button>
+
+                            <div class="dropdown-menu">
+                              <a
+                                class="dropdown-item"
+                                href="javascript:void(0)"
+                                (click)="openModal(assetSubClassModal, item)"
+                                ><i class="icon icon-edit icon-fw mr-2"></i
+                                >Edit</a
+                              >
+                              <a
+                                class="dropdown-item text-danger"
+                                (click)="attemptDelete(item.assetSubClassId)"
+                                href="javascript:void(0)"
+                                ><i class="icon icon-trash icon-fw mr-2"></i
+                                >Delete</a
+                              >
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <ng-container *ngIf="allAssets?.length === 0">
+                      <tr>
+                        <td colspan="8" class="text-center">
+                          No record found
+                          <span *ngIf="searchTerm != ''"
+                            >that matches your search</span
+                          >
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+              <nav *ngIf="!tabLoader">
+                <ul class="pagination pagination-sm justify-content-end">
+                  <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="pagination.pageNumber = +pagination.pageNumber - 1;; filterAssets()"
+                      tabindex="-1"
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item pagination-menu-wrapper">
+                    <a
+                      class="page-link page-target"
+                      href="javascript:void(0)"
+                      (click)="itemPaginatedJumpModal()"
+                    >
+                      {{ pagination.pageNumber }} of {{ pagination.totalPages }}
+                      {{ pagination.totalPages > 1 ? "pages" : "page" }}
+                      <span class="sr-only">(current)</span>
+                    </a>
+                    <div
+                      class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                    >
+                      <div class="pagination-menu-body">
+                        <div class="h-auto">
+                          <span>Jump to Page</span>
+                          <select
+                            aria-controls="data-table"
+                            [(ngModel)]="pagination.pageNumber"
+                            class="custom-select custom-select-xl form-control form-control-xl height"
+                            (change)="filterAssets()"
+                          >
+                            <option
+                              *ngFor="let line of pagination.jumpArray"
+                              (click)="pagination.pageNumber = line"
+                            >
+                              {{ line }}
+                            </option>
+                          </select>
+                          <div class="text-center mt-3">
+                            <button type="button" class="btn btn-danger btn-xs" 
+                              (click)="itemPaginatedJumpModal()">
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="page-item" *ngIf="pagination.hasNextPage">
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="pagination.pageNumber = +pagination.pageNumber + 1; filterAssets()"
+                    >
+                      Next
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+
+<ng-template #assetSubClassModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      {{ isEditing ? "Edit" : "Create New" }} Asset Sub Class
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body w-100">
+    <form
+      [formGroup]="subClassForm"
+      (ngSubmit)="submitForm()"
+      class="d-flex flex-column align-items-center justify-content-center"
+    >
+      <div style="border-bottom: 1px dashed gainsboro">
+        <header class="py-3">
+          <p><b>Basic Info</b></p>
+        </header>
+        <div class="form-row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="roleName"
+                >Asset Sub Class Name<span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                placeholder="Sub class name"
+                class="form-control"
+                formControlName="assetSubClassName"
+              />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="permission"
+                >Asset Class<span class="text-danger">*</span></label
+              >
+              <slct-2
+                [data]="assetClass"
+                formControlName="assetclass"
+                [customSearchEnabled]="true"
+                [placeholder]="'Select Asset Class'"
+              ></slct-2>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="permission"
+                >Depreciation Method <span class="text-danger">* </span>(%)
+              </label>
+              <slct-2
+                [data]="depreciationMethods"
+                formControlName="depreciationmethod"
+                [customSearchEnabled]="true"
+                [placeholder]="'Search Depreciation Method'"
+              ></slct-2>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              subClassForm.get('depreciationMethod').value !== 'Straight Line'
+            "
+            class="col-md-6"
+          >
+            <div class="form-group">
+              <ng-template #tipContent>
+                (i.e 20% = 5years, 25% = 4years)
+              </ng-template>
+              <label for="roleName"
+                >Depreciation Rate (%)<span class="text-danger">*</span
+                ><span>
+                  <i
+                    class="icon icon-question-circle"
+                    placement="top"
+                    [ngbTooltip]="tipContent"
+                  >
+                  </i> </span
+              ></label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                placeholder="Depreciation rate"
+                class="form-control"
+                formControlName="depreciationRate"
+              />
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="roleName"
+                >Asset Sub Class Short Code<span class="text-danger"
+                  >*</span
+                ></label
+              >
+              <input
+                type="text"
+                placeholder="Sub class code"
+                class="form-control"
+                formControlName="assetSubClassTagPrefix"
+              />
+            </div>
+          </div>
+          <div
+            *ngIf="
+              subClassForm.get('depreciationMethod').value === 'Straight Line'
+            "
+            class="col-md-6"
+          >
+            <div class="form-group">
+              <label for="roleName"
+                >Effective Life In Years<span class="text-danger"
+                  >*</span
+                ></label
+              >
+              <input
+                type="number"
+                placeholder="Effective Life In Years"
+                class="form-control"
+                formControlName="effectiveLifeInYears"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="w-100">
+        <header class="py-3">
+          <p><b>Accounts</b></p>
+        </header>
+        <div class="form-row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="permission"
+                >Asset Sub Class Account<span class="text-danger"
+                  >*</span
+                ></label
+              >
+              <account-slct
+                [data]="accounts"
+                (selectedAccount)="
+                  selectAccount('assetSubClassAccountId', $event)
+                "
+                [preselectedAccount]="
+                  isEditing && asset
+                    ? {
+                        accountId: subClassForm.get('assetSubClassAccountId')
+                          .value,
+                        name: asset.assetSubClassAccountName
+                      }
+                    : null
+                "
+              ></account-slct>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="permission">Revaluation Account</label>
+              <account-slct
+                [data]="accounts"
+                (selectedAccount)="
+                  selectAccount('revaluationAccountId', $event)
+                "
+                [preselectedAccount]="
+                  isEditing && asset
+                    ? {
+                        accountId: subClassForm.get('revaluationAccountId')
+                          .value,
+                        name: asset.revaluationAccountName
+                      }
+                    : null
+                "
+              ></account-slct>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="permission"
+                >Depreciation Expense Account<span class="text-danger"
+                  >*</span
+                ></label
+              >
+              <account-slct
+                [data]="accounts"
+                (selectedAccount)="
+                  selectAccount('depreciationExpenseAccountId', $event)
+                "
+                [preselectedAccount]="
+                  isEditing && asset
+                    ? {
+                        accountId: subClassForm.get(
+                          'depreciationExpenseAccountId'
+                        ).value,
+                        name: asset.depreciationExpenseAccountName
+                      }
+                    : null
+                "
+              ></account-slct>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="form-group">
+              <label for="permission"
+                >Accumulated Depreciation Account
+                <span class="text-danger">*</span></label
+              >
+              <account-slct
+                [data]="accounts"
+                (selectedAccount)="
+                  selectAccount('accumDepreciationAccountId', $event)
+                "
+                [preselectedAccount]="
+                  isEditing && asset
+                    ? {
+                        accountId: subClassForm.get(
+                          'accumDepreciationAccountId'
+                        ).value,
+                        name: asset.accumDepreciationAccountName
+                      }
+                    : null
+                "
+              ></account-slct>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-100 d-flex justify-content-end pr-4">
+        <button
+          type="submit"
+          class="btn btn-sm text-white"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          *ngIf="!loader"
+          [disabled]="subClassForm.invalid"
+        >
+          {{ isEditing ? "Update" : "Save" }}
+        </button>
+        <button
+          type="button"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          class="btn text-white"
+          *ngIf="loader"
+          disabled
+        >
+          <i class="icon icon-spin icon-spin2"></i> Processing...
+        </button>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>

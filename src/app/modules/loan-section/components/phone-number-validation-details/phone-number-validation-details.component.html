@@ -1,0 +1,83 @@
+<section class="px-5 pt-5">
+  <div *ngIf="verifyingAltPhoneNo" class="d-flex justify-content-center mb-3">
+    <lnd-spinner text="Retrieving Details..."/>
+  </div>
+  <ng-container *ngIf="!verifyingAltPhoneNo">
+    <div class="d-flex justify-content-between">
+      <h2>Verification Results</h2>
+    </div>
+    <div class="row">
+      <div class="details col-md-8">
+        <h4 class="mt-5 mb-2">Personal Information</h4>
+        <p class="row">
+          <span class="title col-md-6">First Name</span
+          ><span class="col-md-6">{{ customerData?.firstName }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">Middle Name</span
+          ><span class="col-md-6">{{ customerData?.middleName }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">Last Name</span
+          ><span class="col-md-6">{{ customerData?.lastName }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">Mobile Number</span
+          ><span class="col-md-6">{{ customerData?.mobile }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">Date of Birth</span
+          ><span class="col-md-6">{{ customerData?.dateOfBirth }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">NIN</span
+          ><span class="col-md-6">{{ customerData?.nin }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">ID Number</span
+          ><span class="col-md-6">{{ customerData?.idNumber }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">Address</span
+          ><span class="col-md-6">{{ customerData?.address?.addressLine + " " + customerData?.address?.lga + " " + customerData?.address?.state }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">LGA</span
+          ><span class="col-md-6">{{ customerData?.lga }}</span>
+        </p>
+        <p class="row">
+          <span class="title col-md-6">Country</span
+          ><span class="col-md-6">{{ customerData?.country }}</span>
+        </p>
+      </div>
+      <div class="col-md-4 mt-5">
+        <div class="d-flex justify-content-center">
+          <img
+            class="dt-avatar size-75"
+            [src]="customerData?.image"
+            alt="Customer Image"
+          />
+        </div>
+      </div>
+    </div>
+    <div class="dashed my-5"></div>
+    <div class="form-group">
+      <label>Enter Transaction Pin To Confirm Customer Info</label>
+      <div class="d-flex">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Transaction Pin"
+          [(ngModel)]="transactionPin"
+          autocomplete="off"
+        />
+        <button class="btn btn-success mx-3" (click)="onConfirm()">
+          Confirm
+        </button>
+        <button class="btn btn-outline-danger" (click)="onCloseModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</section>

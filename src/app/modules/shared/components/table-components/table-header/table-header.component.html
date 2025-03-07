@@ -1,0 +1,68 @@
+<header class="row mx-0 mb-5">
+  <div class="col-md-4 px-0">
+    <label style="display: inline-flex"
+      ><span style="padding: 8px 2px; font-size: 12px">Show </span
+      ><select
+        [(ngModel)]="pagination.pageSize"
+        aria-controls="data-table"
+        (change)="onPaginationChange(pagination)"
+        class="custom-select custom-select-xl form-control form-control-xl height"
+      >
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <span style="padding: 8px 2px; font-size: 12px">entries</span></label
+    >
+  </div>
+
+  <div class="col-md-4">
+    <div
+      *ngIf="isLoading"
+      class="table-loader"
+      style="text-align: center; color: indianred"
+    >
+      <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+    </div>
+  </div>
+
+  <div *ngIf="!hideSection.includes('search')" class="form-group col-md-4 px-0">
+    <label style="display: inline-flex; float: right">
+      <input
+        #search
+        type="search"
+        [(ngModel)]="pagination.keyword"
+        (keydown.enter)="onPaginationChange(pagination)"
+        [placeholder]="placeholder"
+        class="form-control form-control-sm"
+      />
+
+      <button
+        class="btn btn-xs text-white ml-3"
+        [style.background]="currentTheme.secondaryColor"
+        (click)="onPaginationChange(pagination)"
+      >
+        <i class="icon icon-search"></i>
+      </button>
+    </label>
+  </div>
+  <div
+    class="d-flex justify-content-between w-100 align-items-center"
+    [ngClass]="{'mt-3':hideSection.includes('search')}"
+    style="padding: 0"
+  >
+    <div class="" aria-live="polite" style="font-size: 13px;">
+      Showing
+      {{
+        (pagination.pageNumber - 1) * pagination.pageSize + 1 | number: "1.0-0"
+      }}
+      -
+      {{
+        (pagination.pageNumber - 1) * pagination.pageSize + pagination.count
+          | number: "1.0-0"
+      }}
+      of {{ pagination.totalCount | number: "1.0-0" }} record(s)
+    </div>
+  </div>
+</header>

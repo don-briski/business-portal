@@ -1,0 +1,441 @@
+<div *ngIf="gettingData" class="d-flex justify-content-center mt-5">
+  <lnd-spinner text="Loading..." />
+</div>
+<div
+  *ngIf="!gettingData"
+  class="new-dashboard-notifier text-white p-3 text-center"
+  [style.background]="currentTheme?.primaryColor"
+>
+  <p class="m-0">
+    Switch to old dashboard? Click
+    <span
+      class="cursor"
+      [style.color]="currentTheme?.secondaryColor"
+      (click)="switchDashboard.emit()"
+      >here</span
+    >
+  </p>
+</div>
+<section *ngIf="!gettingData" class="row">
+  <div class="col-md-8">
+    <div class="main-loan-stats">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card p-3">
+            <p class="m-0 mb-3 title">Active Loan Types</p>
+            <p class="m-0 figure">{{ activeLoanTypes.count }}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-3">
+            <p class="m-0 mb-3 title">Average Loan Size</p>
+            <p class="m-0 figure">
+              {{ currencySymbol }}{{ averageLoanSize.value | number : "1.0-0" }}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="main-loan-stats-bottom">
+        <div class="row">
+          <div class="col-md-4">
+            <lnd-loan-dashboard-card
+              id="new-c-regs"
+              [title]="{ text: 'New Customer Registration', value: '' }"
+              [subtitle]="{
+                text: 'Average Number of Registrations',
+                value: newCustomers.count
+              }"
+              [loading]="gettingNewCustomersReg"
+              (getMetrics)="onGetMetrics($event, 'new-customer-regs')"
+            ></lnd-loan-dashboard-card>
+          </div>
+          <div class="col-md-4">
+            <lnd-loan-dashboard-card
+              id="loan-apps"
+              [title]="{
+                text: 'Loan Applications',
+                value: loanApplications.value,
+                type: 'amount'
+              }"
+              [subtitle]="{
+                text: 'Number of applications',
+                value: loanApplications.count
+              }"
+              (getMetrics)="onGetMetrics($event, 'loan-apps')"
+              [loading]="gettingLoanAppsCount"
+            ></lnd-loan-dashboard-card>
+          </div>
+          <div class="col-md-4">
+            <lnd-loan-dashboard-card
+              id="approved-apps"
+              [title]="{
+                text: 'Applications Approved',
+                value: approvedLoans.value,
+                type: 'amount'
+              }"
+              [subtitle]="{
+                text: 'Number of applications approved',
+                value: approvedLoans.count
+              }"
+              (getMetrics)="onGetMetrics($event, 'approved-apps')"
+              [loading]="gettingApprovedLoans"
+            ></lnd-loan-dashboard-card>
+          </div>
+          <div class="col-md-4">
+            <lnd-loan-dashboard-card
+              id="disbs"
+              [title]="{
+                text: 'Disbursement',
+                value: disbursements.value,
+                type: 'amount'
+              }"
+              [subtitle]="{
+                text: 'Total number disbursed',
+                value: disbursements.count
+              }"
+              (getMetrics)="onGetMetrics($event, 'disbursements')"
+              [loading]="gettingDisbursements"
+            ></lnd-loan-dashboard-card>
+          </div>
+          <div class="col-md-4">
+            <lnd-loan-dashboard-card
+              id="active-loans"
+              [title]="{
+                text: 'Active Loans',
+                value: activeLoans.value,
+                type: 'amount'
+              }"
+              [subtitle]="{
+                text: 'Number of active Loans',
+                value: activeLoans.count
+              }"
+              (getMetrics)="onGetMetrics($event, 'active-loans')"
+              [loading]="gettingActiveLoansCount"
+            ></lnd-loan-dashboard-card>
+          </div>
+          <div class="col-md-4">
+            <lnd-loan-dashboard-card
+              id="repayments"
+              [title]="{
+                text: 'Repayments',
+                value: settledLoans.value,
+                type: 'amount'
+              }"
+              [subtitle]="{
+                text: 'Number of loans repaid',
+                value: settledLoans.count
+              }"
+              (getMetrics)="onGetMetrics($event, 'settled-loans')"
+              [loading]="gettingSettledLoansCount"
+            ></lnd-loan-dashboard-card>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 pr-0">
+        <div class="card px-3 py-5 weekly-loan-funnel">
+          <div>
+            <h3 class="m-0 mb-2">Weekly Loan Funnel</h3>
+            <p class="m-0 mb-3 subtitle">
+              Track this week's loan status breakdown
+            </p>
+          </div>
+          <lnd-loan-status-breakdown-chart
+            [loanStatusBreakdown]="loanStatusBreakdown"
+          ></lnd-loan-status-breakdown-chart>
+        </div>
+      </div>
+      <div class="col-md-6 pr-0">
+        <div class="card px-3 py-5 weekly-loan-stats-counter">
+          <div>
+            <h3 class="m-0 mb-2">Weekly Stats Counter</h3>
+            <p class="m-0 mb-3 subtitle">
+              This week's loan stats:
+              <b class="date-range"
+                >{{ weekRange.start | date : "mediumDate" }} -
+                {{ weekRange.end | date : "mediumDate" }}</b
+              >
+            </p>
+          </div>
+          <div>
+            <div class="d-flex justify-content-between">
+              <div class="card px-3 py-5 flex-1 mr-2 mb-3 text-center">
+                <p class="m-0 mb-3 subtitle">Most Product Sold</p>
+                <div *ngIf="mostSoldProduct.valueName">
+                  <p class="m-0 mb-2 subtitle">
+                    <span>{{ mostSoldProduct.valueName }}</span>
+                  </p>
+                  <p class="m-0 mb-3 figure">
+                    {{ currencySymbol
+                    }}{{ mostSoldProduct.value | number : "1.2-2" }}
+                  </p>
+                  <p class="m-0 mb-3 subtitle">
+                    {{ mostSoldProduct.count }} Loan{{
+                      mostSoldProduct.count === 1 ? "" : "s"
+                    }}
+                  </p>
+                </div>
+                <div>
+                  <no-data
+                    *ngIf="!mostSoldProduct?.name"
+                    containerClasses="mt-2"
+                    [imageWidth]="60"
+                    title="No data available"
+                    titleSize="10px"
+                  ></no-data>
+                </div>
+              </div>
+              <div class="card px-3 py-5 flex-1 mb-3 text-center">
+                <p class="m-0 mb-3 subtitle">Largest Loan Ticket</p>
+                <div
+                  *ngIf="
+                    largestLoanTicket.value !== undefined &&
+                    largestLoanTicket.value !== null
+                  "
+                >
+                  <div class="chart-img-container">
+                    <img
+                      src="assets/images/green-chart-line.svg"
+                      alt="Chart Line"
+                    />
+                  </div>
+                  <p class="m-0 mb-3 figure">
+                    {{ currencySymbol
+                    }}{{ largestLoanTicket.value | number : "1.2-2" }}
+                  </p>
+                  <p class="m-0 mb-3 subtitle">
+                    {{ largestLoanTicket.count }} Loan{{
+                      largestLoanTicket.count === 1 ? "" : "s"
+                    }}
+                  </p>
+                </div>
+                <no-data
+                  *ngIf="
+                    largestLoanTicket.value === undefined ||
+                    largestLoanTicket.value === null
+                  "
+                  title="No data available"
+                  containerClasses="mt-2"
+                  [imageWidth]="60"
+                  title="No data available"
+                  titleSize="10px"
+                ></no-data>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between">
+              <div class="card px-3 py-5 flex-1 mr-2 text-center">
+                <p class="m-0 mb-3 subtitle">Smallest Loan Ticket</p>
+                <div
+                  *ngIf="
+                    smallestLoanTicket.value !== undefined &&
+                    smallestLoanTicket.value !== null
+                  "
+                >
+                  <div>
+                    <img
+                      src="assets/images/red-chart-line.svg"
+                      alt="Chart Line"
+                    />
+                  </div>
+                  <p class="m-0 mb-3 figure">
+                    {{ currencySymbol
+                    }}{{ smallestLoanTicket.value | number : "1.2-2" }}
+                  </p>
+                  <p class="m-0 mb-3 subtitle">
+                    {{ smallestLoanTicket.count }} Loan{{
+                      smallestLoanTicket.count === 1 ? "" : "s"
+                    }}
+                  </p>
+                </div>
+                <no-data
+                  *ngIf="
+                    smallestLoanTicket.value === undefined ||
+                    smallestLoanTicket.value === null
+                  "
+                  title="No data available"
+                  containerClasses="mt-2"
+                  [imageWidth]="60"
+                  title="No data available"
+                  titleSize="10px"
+                ></no-data>
+              </div>
+              <div class="card px-3 py-5 flex-1 text-center">
+                <p class="m-0 mb-3 subtitle">Most Subscribed Tenor</p>
+                <div
+                  *ngIf="
+                    mostSubscribedTenor.value !== undefined &&
+                    mostSubscribedTenor.value !== null
+                  "
+                >
+                  <div>
+                    <img
+                      src="assets/images/chart-calendar.svg"
+                      alt="Chart Line"
+                    />
+                  </div>
+                  <p class="m-0 mb-3 figure">
+                    {{ mostSubscribedTenor.value }}
+                  </p>
+                  <p class="m-0 mb-3 subtitle">
+                    {{ mostSubscribedTenor.count }} Month{{
+                      mostSubscribedTenor.count === 1 ? "" : "s"
+                    }}
+                  </p>
+                </div>
+                <no-data
+                  *ngIf="
+                    smallestLoanTicket.value === undefined ||
+                    smallestLoanTicket.value === null
+                  "
+                  title="No data available"
+                  containerClasses="mt-2"
+                  [imageWidth]="60"
+                  title="No data available"
+                  titleSize="10px"
+                ></no-data>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card px-2 py-4 activities-card">
+      <div class="inner-content p-2">
+        <div class="mb-3 d-flex justify-content-between">
+          <h4 class="m-0">Daily Activities</h4>
+          <span>
+            <img
+              class="cursor mr-3"
+              src="assets/images/refresh-orange.svg"
+              alt="Refresh Button"
+              placement="left"
+              ngbTooltip="Refresh Activities"
+              (click)="onGetUserLoanActivities()"
+            />
+            <a
+              *ngIf="userLoanActivities.length"
+              class="subtitle cursor"
+              (click)="onGotoReports()"
+              >View More</a
+            >
+          </span>
+        </div>
+        <div class="text-center p-5" *ngIf="gettingUserLoanActivities">
+          <lnd-spinner></lnd-spinner>
+        </div>
+        <no-data
+          *ngIf="!userLoanActivities.length && !gettingUserLoanActivities"
+          title="No activities recorded yet"
+        ></no-data>
+        <ng-container *ngIf="!gettingUserLoanActivities">
+          <div
+            class="d-flex align-items-start mb-3"
+            *ngFor="let activity of userLoanActivities"
+          >
+            <div
+              class="activity-leading d-flex justify-content-center align-items-center mr-2"
+            >
+              <img src="assets/images/empty-wallet.svg" alt="Activity Icon" />
+            </div>
+            <div class="activity-trailing">
+              <p class="m-0 mb-2">
+                {{ activity.activity }}
+              </p>
+              <div class="d-flex justify-content-between activity-date">
+                <span>{{ activity.activityDate | date : "shortTime" }}</span
+                ><span>{{ activity.activityDate | date : "mediumDate" }}</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <footer
+          class="mt-5"
+          *ngIf="!gettingUserLoanActivities && userLoanActivities.length"
+        >
+          <ul class="pagination pagination-sm justify-content-end">
+            <li class="page-item" *ngIf="pagination.hasPreviousPage">
+              <a
+                class="page-link"
+                href="javascript:void(0)"
+                (click)="
+                  onGetUserLoanActivities({
+                    pageNumber: pagination.pageNumber - 1,
+                    pageSize: +pagination.pageSize
+                  })
+                "
+                >Previous</a
+              >
+            </li>
+            <li class="page-item pagination-menu-wrapper">
+              <a
+                class="page-link page-target"
+                href="javascript:void(0)"
+                (click)="itemPaginatedJumpModal()"
+              >
+                {{ pagination.pageNumber }} of
+                {{ pagination.totalPages }} page{{
+                  pagination.totalPages > 1 ? "s" : ""
+                }}
+                <span class="sr-only">(current)</span>
+              </a>
+              <div
+                class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+              >
+                <div class="pagination-menu-body">
+                  <div class="h-auto">
+                    <span>Jump to Page</span>
+                    <select
+                      aria-controls="data-table"
+                      [(ngModel)]="pagination.pageNumber"
+                      (change)="
+                        onGetUserLoanActivities({
+                          pageNumber: pagination.pageNumber,
+                          pageSize: +pagination.pageSize
+                        });
+                        itemPaginatedJumpModal()
+                      "
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option
+                        (click)="pagination.pageNumber = line"
+                        *ngFor="let line of pagination.jumpArray"
+                      >
+                        {{ line }}
+                      </option>
+                    </select>
+                    <div class="text-center mt-3">
+                      <button
+                        (click)="itemPaginatedJumpModal()"
+                        type="button"
+                        class="btn btn-danger btn-xs"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="page-item" *ngIf="pagination.hasNextPage">
+              <a
+                class="page-link"
+                href="javascript:void(0)"
+                (click)="
+                  onGetUserLoanActivities({
+                    pageNumber: pagination.pageNumber + 1,
+                    pageSize: +pagination.pageSize
+                  })
+                "
+              >
+                Next
+              </a>
+            </li>
+          </ul>
+        </footer>
+      </div>
+    </div>
+  </div>
+</section>

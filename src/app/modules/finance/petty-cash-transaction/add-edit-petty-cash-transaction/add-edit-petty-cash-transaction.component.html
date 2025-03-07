@@ -1,0 +1,276 @@
+<div class="row m-0">
+  <div class="col-md-6 offset-md-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="dt-page__title clearfix mb-0">
+        {{ editing ? "Edit" : "Raise" }} Petty Cash
+      </h1>
+      <a
+        class="btn btn-primary btn-sm mr-2 text-white"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [routerLink]="['/finance/pettycash/transaction']"
+        routerLinkActive="router-link-active"
+        href="javascript:void(0)"
+        >Back</a
+      >
+    </div>
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <div class="text-primary text-center" *ngIf="fetchingPettyCash">
+          <i class="icon icon-spin icon-spin2"></i> Initializing...
+        </div>
+        <form [formGroup]="form" *ngIf="!fetchingPettyCash">
+          <div class="row">
+            <div class="form-group col-md-6">
+              <label for="permission"
+                >Recipient Type<b class="help-block">*</b></label
+              >
+              <slct-2
+                [data]="pettyCashRecipientTypes"
+                formControlName="recipientArray"
+              ></slct-2>
+            </div>
+            <div
+              class="form-group col-md-6"
+              *ngIf="
+                this.form.get('recipient').value ===
+                pettyCashRecipientEnum.Staff
+              "
+            >
+              <label>Staff<b class="help-block">*</b></label>
+              <slct-2
+                [data]="staffList"
+                formControlName="staffArray"
+                [customSearchEnabled]="true"
+                placeholder="Search Staff"
+                [customSearchEnabled]="true"
+                [searchService]="getStaffService()"
+                (searchResult)="updateDropdown($event, 'staff')"
+              ></slct-2>
+            </div>
+
+            <div class="form-group col-md-6">
+              <label>Bank<b class="help-block"> *</b></label>
+              <slct-2
+                [data]="bankList"
+                [customSearchEnabled]="true"
+                placeholder="Search Bank"
+                formControlName="paymentInformationBankNameArray"
+              ></slct-2>
+            </div>
+            <div class="col-md-12">
+              <h4>Recipient Information</h4>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label>Account Number<b class="help-block"> *</b></label>
+                  <input
+                    type="text"
+                    mask="9*"
+                    formControlName="paymentInformationBankAccountNumber"
+                    class="form-control"
+                    placeholder="Enter account number"
+                  />
+                  <lnd-input-errors
+                    label="Account number"
+                    [control]="form.get('paymentInformationBankAccountNumber')"
+                  ></lnd-input-errors>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Account Name<b class="help-block"> *</b></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="paymentInformationAccountName"
+                  />
+                  <lnd-input-errors
+                    label="Account name"
+                    [control]="form.get('paymentInformationAccountName')"
+                  ></lnd-input-errors>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <h4 class="mb-3">Transaction Details</h4>
+              <div class="row">
+                <div class="form-group col-md-6">
+                  <label>Amount</label><b class="help-block"> *</b>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="amount"
+                    currencyMask
+                    [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                  />
+                  <lnd-input-errors
+                    label="Amount"
+                    [control]="form.get('amount')"
+                  ></lnd-input-errors>
+                </div>
+                <div class="form-group col-md-6">
+                  <label
+                    >Account Paid Through<b class="help-block"> *</b></label
+                  >
+                  <slct-2
+                    [data]="paidThroughAccounts"
+                    formControlName="paidThroughAccountArray"
+                    placeholder="Select Source Account"
+                    [customSearchEnabled]="true"
+                    [searchService]="getAccountService('bank')"
+                    (searchResult)="updateDropdown($event, 'paidThrough')"
+                  ></slct-2>
+                  <lnd-input-errors
+                    label="Account paid through"
+                    [control]="form.get('paidThroughAccountId')"
+                  ></lnd-input-errors>
+                </div>
+                <div class="form-group col-md-6">
+                  <label>Petty Cash Account<b class="help-block"> *</b></label>
+                  <slct-2
+                    [data]="pettyCashAccounts"
+                    formControlName="sourceAccountArray"
+                    placeholder="Select petty cash account"
+                    [customSearchEnabled]="true"
+                    [searchService]="getAccountService('PettyCashCredit')"
+                    (searchResult)="updateDropdown($event, 'PettyCashCredit')"
+                  ></slct-2>
+                  <lnd-input-errors
+                    label="Petty Cash Account"
+                    f
+                    [control]="form.get('sourceAccountId')"
+                  ></lnd-input-errors>
+                </div>
+                <div class="form-group col-md-6">
+                  <label for="date">Date <b class="help-block">*</b></label>
+                  <input
+                  lndInvalidDateChecker
+                    formControlName="transactionDate"
+                    type="date"
+                    class="form-control"
+                    id="date"
+                  />
+                  <lnd-input-errors
+                    label="Date"
+                    [control]="form.get('transactionDate')"
+                  ></lnd-input-errors>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <h4 class="mb-3">Others</h4>
+              <div class="row">
+                <div class="form-group col-md-12">
+                  <label>Description <b class="help-block"> *</b></label>
+                  <textarea
+                    class="form-control"
+                    formControlName="description"
+                    rows="3"
+                    placeholder="Type a description"
+                  >
+                  </textarea>
+                  <lnd-input-errors
+                    label="Description"
+                    [control]="form.get('description')"
+                  ></lnd-input-errors>
+                </div>
+                <div class="form-group col-md-12">
+                  <label>Comment</label>
+                  <textarea
+                    class="form-control"
+                    formControlName="comment"
+                    rows="3"
+                    placeholder="comment"
+                  >
+                  </textarea>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <lnd-approval-comments
+                *ngIf="pettyCash?.comments?.length > 0"
+                [comments]="pettyCash?.comments"
+              >
+              </lnd-approval-comments>
+            </div>
+            <div class="col-md-12">
+              <div>
+                <ng-container *ngIf="files.length">
+                  <span
+                    *ngFor="let file of files; let fileIndex = index"
+                    class="badge badge-pill badge-outline mr-2 px-3 mb-1"
+                    >{{ file.name || file.originalName }}
+                    <i
+                      class="icon icon-trash ml-2 cursor text-danger"
+                      (click)="onRemoveFile(fileIndex)"
+                    ></i> </span
+                ></ng-container>
+                <ng-container
+                  *ngIf="
+                    editing &&
+                    this.uploadedFiles.length &&
+                    this.files.length < 1
+                  "
+                >
+                  <span
+                    *ngFor="let file of uploadedFiles; let fileIndex = index"
+                    class="badge badge-pill badge-outline ml-2 px-4 mb-1"
+                    >{{ file.name || file.originalName }}
+                  </span>
+                </ng-container>
+              </div>
+              <div class="my-5">
+                <div class="d-flex mb-1">
+                  <small>Attach relevant files </small>
+                </div>
+                <button
+                  type="button"
+                  class="btn btn-xs btn-secondary text-white"
+                  (click)="fileInput.click()"
+                >
+                  <i class="icon icon-upload"></i>
+                  Attach File(s)
+                </button>
+              </div>
+              <input
+                #fileInput
+                type="file"
+                multiple
+                (change)="handleFileInput($event.target.files)"
+                style="display: none"
+              />
+            </div>
+            <footer class="col-md-12 mt-2">
+              <div class="d-flex justify-content-end">
+                <button
+                  class="btn btn-xs btn-light mr-2"
+                  type="submit"
+                  [disabled]="form.invalid"
+                  *ngIf="!loading"
+                  (click)="form.get('draft').setValue(true); onSubmit()"
+                >
+                  Save As Draft
+                </button>
+                <button
+                  *ngIf="!loading"
+                  type="submit"
+                  class="btn btn-xs btn-primary"
+                  [disabled]="form.invalid"
+                  (click)="onSubmit('Approval')"
+                >
+                  Send For Approval
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-xs btn-warning"
+                  *ngIf="loading"
+                  disabled
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Processing...
+                </button>
+              </div>
+            </footer>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

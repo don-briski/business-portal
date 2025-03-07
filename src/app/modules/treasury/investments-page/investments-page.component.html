@@ -1,0 +1,3972 @@
+<!-- Page Header -->
+<div id="header" class="dt-page__header">
+  <h1 class="dt-page__title clearfix">Investments</h1>
+  <div>
+    <div>
+      <button
+        id="btnGroupDrop1"
+        type="button"
+        class="btn dropdown-toggle text-white ml-1"
+        data-toggle="dropdown"
+        aria-expanded="false"
+        [style.background]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+      >
+        Add New
+      </button>
+      <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+        <a
+          class="dropdown-item"
+          (click)="triggerModal('New Investment')"
+          href="javascript:void(0)"
+          >New Investment</a
+        >
+        <a class="dropdown-item" (click)="openAside()" href="javascript:void(0)"
+          >Merge Investment</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xl-12">
+    <ul
+      id="active-div"
+      class="card-header-pills nav nav-pill justify-content-center"
+      role="tablist"
+    >
+      <li class="nav-item">
+        <a
+          id="pool"
+          class="nav-link pool-nav active-tab"
+          data-toggle="tab"
+          href="#tab-pool"
+          role="tab"
+          aria-controls="tab-pool"
+          aria-selected="false"
+          (click)="switchTabs('Pool')"
+          >Pool
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          id="navApproved"
+          class="nav-link pool-nav"
+          data-toggle="tab"
+          href="#tab-activated"
+          role="tab"
+          aria-controls="tab-activated"
+          aria-selected="false"
+          (click)="switchTabs('Approved')"
+          >Active
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          id="navTerminated"
+          class="nav-link pool-nav"
+          data-toggle="tab"
+          href="#tab-terminated"
+          role="tab"
+          aria-controls="tab-terminated"
+          aria-selected="false"
+          (click)="switchTabs('Terminated')"
+          >Terminated
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          id="navDeactivated"
+          class="nav-link pool-nav"
+          data-toggle="tab"
+          href="#tab-deactivated"
+          role="tab"
+          aria-controls="tab-deactivated"
+          aria-selected="false"
+          (click)="switchTabs('Deactivated')"
+          >Deactivated</a
+        >
+      </li>
+    </ul>
+    <div class="tab-content">
+      <div id="tab-pool" class="tab-pane active">
+        <div class="dt-card">
+          <div class="dt-card__body">
+            <div class="row">
+              <div class="col-md-4">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                  ><select
+                    (change)="filterInvestment($event.target.value)"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px"
+                    >entries</span
+                  ></label
+                >
+              </div>
+
+              <div class="col-md-4">
+                <div
+                  *ngIf="tabLoader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+              </div>
+              <lnd-search-dropdown
+                [searchColumns]="pagination.searchColumns"
+                [currentTheme]="currentTheme"
+                (searchParams)="onSearchParams($event)"
+              ></lnd-search-dropdown>
+              <div class="col-md-12 mb-3">
+                <lnd-selected-filters
+                  (initialized)="onSelectedFiltersInit($event)"
+                ></lnd-selected-filters>
+              </div>
+              <div
+                class="d-flex justify-content-between w-100 align-items-center"
+                style="padding: 0 18px"
+              >
+                <div class="" aria-live="polite" style="font-size: 13px">
+                  Showing
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1
+                      | number : "1.0-0"
+                  }}
+                  -
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize +
+                      pagination.count | number : "1.0-0"
+                  }}
+                  of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+                </div>
+                <div>
+                  <button
+                    type="button"
+                    (click)="onOpenFilterModal()"
+                    class="text-white btn btn-warning btn-xs"
+                  >
+                    <i class="mr-2 icon icon-filter"></i>
+                    Filters
+                  </button>
+
+                  <lnd-filter
+                    *ngIf="!tabLoader"
+                    [filterOptions]="filterOptions"
+                    (optionSelected)="onOptionSelected($event)"
+                  >
+                  </lnd-filter>
+                </div>
+              </div>
+            </div>
+            <!-- Tables -->
+            <div class="table-responsive">
+              <table id="data-table" class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Investor</th>
+                    <th class="text-right">Amount ({{ currencySymbol }})</th>
+                    <th>Tenor(Days)</th>
+                    <th>Date Invested</th>
+                    <th>Created By</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="!tabLoader">
+                    <ng-container *ngIf="investmentList?.length > 0">
+                      <tr
+                        class="gradeX cursor"
+                        *ngFor="let item of investmentList"
+                        (click)="viewInvestment(item?.investmentId)"
+                      >
+                        <td
+                          class="copy_icon_wrapper"
+                          [style.color]="currentTheme?.secondaryColor"
+                        >
+                          {{ item?.investmentCode }}
+
+                          <img
+                            (mouseover)="copy_hover = true"
+                            (mouseleave)="copy_hover = false"
+                            class="copy_icon"
+                            src="assets/images/copy.png"
+                            alt="copy icon"
+                            width="15"
+                            height="15"
+                            (click)="copyCode(item?.investmentCode)"
+                            placement="right"
+                            ngbTooltip="Copy Investment Code"
+                          />
+                        </td>
+                        <td>{{ item?.investorName }}</td>
+                        <td class="text-right">
+                          {{ item?.initialDeposit | number : "1.2-2" }}
+                        </td>
+                        <td>{{ item?.investmentTenor }}</td>
+                        <td>{{ item?.createdAt | date : "dd/MM/yyyy" }}</td>
+                        <td>{{ item?.createdBy }}</td>
+                        <td>
+                          <span
+                            class="badge mb-1 mr-1"
+                            [ngClass]="{
+                              'badge-success':
+                                item?.status == 'Approved' ||
+                                item?.status === 'Matured',
+                              'badge-warning': item?.status == 'Pool',
+                              'badge-danger':
+                                item?.status == 'Terminated' ||
+                                item?.status == 'Deactivated' || item.status == 'Rejected',
+                              'badge-primary': item?.status == 'Redraft',
+                              'badge-secondary':
+                                item?.status == 'AwaitingApproval'
+                            }"
+                          >
+                            <i class="icon icon-folder-o"></i>
+                            {{ item?.status | humanify }}</span
+                          >
+                        </td>
+                        <td>
+                          <a
+                            class="i_clicked"
+                            href="javascript:void(0)"
+                            *ngIf="
+                              currentuser?.permission?.includes(
+                                'Manage Investment'
+                              )
+                            "
+                          >
+                            <span class="badge badge-light mb-1 mr-1"
+                              >Details</span
+                            >
+                          </a>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <ng-container
+                      *ngIf="!tabLoader && investmentList?.length == 0"
+                    >
+                      <tr>
+                        <td colspan="8" class="text-center">
+                          No record found
+                          <span *ngIf="searchTerm != ''"
+                            >that matches your search</span
+                          >
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+              <footer>
+                <nav>
+                  <ul class="pagination pagination-sm justify-content-end">
+                    <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="
+                          pagination.pageNumber = pagination.pageNumber - 1;
+                          getInvestments()
+                        "
+                        >Previous</a
+                      >
+                    </li>
+                    <li class="page-item pagination-menu-wrapper">
+                      <a
+                        class="page-link page-target"
+                        href="javascript:void(0)"
+                        (click)="itemPaginatedJumpModal()"
+                      >
+                        {{ pagination.pageNumber }} of
+                        {{ pagination.totalPages }} page{{
+                          pagination.pageNumber > 1 ? "s" : ""
+                        }}
+                        <span class="sr-only">(current)</span>
+                      </a>
+                      <div
+                        class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                      >
+                        <div class="pagination-menu-body">
+                          <div class="h-auto">
+                            <span>Jump to Page</span>
+                            <select
+                              aria-controls="data-table"
+                              [(ngModel)]="pagination.pageNumber"
+                              (change)="getInvestments()"
+                              class="custom-select custom-select-xl form-control form-control-xl height"
+                            >
+                              <option
+                                (click)="pagination.pageNumber = line"
+                                *ngFor="let line of pagination.jumpArray"
+                              >
+                                {{ line }}
+                              </option>
+                            </select>
+                            <div class="text-center mt-3">
+                              <button
+                                (click)="itemPaginatedJumpModal()"
+                                type="button"
+                                class="btn btn-danger btn-xs"
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="page-item" *ngIf="pagination.hasNextPage">
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="
+                          pagination.pageNumber = pagination.pageNumber + 1;
+                          getInvestments()
+                        "
+                      >
+                        Next
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </footer>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="tab-activated" class="tab-pane">
+        <!-- Card -->
+        <div class="dt-card">
+          <!-- Card Body -->
+          <div class="dt-card__body">
+            <!-- Tables -->
+            <div class="row">
+              <div class="col-md-4">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                  ><select
+                    [(ngModel)]="pagination.pageSize"
+                    (change)="switchTabs()"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px"
+                    >entries</span
+                  ></label
+                >
+              </div>
+
+              <div class="col-md-4">
+                <div
+                  *ngIf="tabLoader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+              </div>
+              <lnd-search-dropdown
+                [searchColumns]="pagination.searchColumns"
+                [currentTheme]="currentTheme"
+                (searchParams)="onSearchParams($event)"
+              ></lnd-search-dropdown>
+              <div
+                class="d-flex justify-content-between w-100 align-items-center my-3"
+                style="padding: 0 18px"
+              >
+                <div class="" aria-live="polite" style="font-size: 13px">
+                  Showing
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1
+                      | number : "1.0-0"
+                  }}
+                  -
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize +
+                      pagination.count | number : "1.0-0"
+                  }}
+                  of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table id="data-table" class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Investor</th>
+                    <th class="text-right">
+                      Amount Invested ({{ currencySymbol }})
+                    </th>
+                    <th>Date Created</th>
+                    <th>End Date</th>
+                    <th>Days to Maturity</th>
+                    <th class="text-right">
+                      Interest Accrued ({{ currencySymbol }})
+                    </th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="!tabLoader">
+                    <ng-container *ngIf="investmentList?.length > 0">
+                      <tr
+                        class="gradeX cursor"
+                        *ngFor="let item of investmentList"
+                        (click)="
+                          viewInvestment(item?.investmentId, dropdownToggle)
+                        "
+                      >
+                        <td
+                          class="copy_icon_wrapper"
+                          [style.color]="currentTheme?.secondaryColor"
+                        >
+                          {{ item?.investmentCode }}
+
+                          <img
+                            (mouseover)="copy_hover = true"
+                            (mouseleave)="copy_hover = false"
+                            class="copy_icon"
+                            src="assets/images/copy.png"
+                            alt="copy icon"
+                            width="15"
+                            height="15"
+                            (click)="copyCode(item?.investmentCode)"
+                            placement="right"
+                            ngbTooltip="Copy Investment Code"
+                          />
+                        </td>
+                        <td>{{ item?.investorName }}</td>
+                        <td class="text-right">
+                          {{ item?.initialDeposit | number : "1.2-2" }}
+                        </td>
+                        <td>{{ item?.createdAt | date : "dd/MM/yyyy" }}</td>
+                        <td>
+                          {{ item?.investmentExpiryDate | date : "dd/MM/yyyy" }}
+                        </td>
+                        <td>{{ item.daysToMaturity }}</td>
+                        <td class="text-right">
+                          {{ item?.currentAccruedAmount | number : "1.2-2" }}
+                        </td>
+                        <td>
+                          <span
+                            class="mb-1 mr-1 badge"
+                            [ngClass]="{
+                              'badge-success': item?.status == 'Matured',
+                              'badge-warning': item?.status == 'Approved',
+                              'badge-danger':
+                                item?.status === 'Deactivated' ||
+                                item?.status == 'Terminated',
+                              'badge-primary': item?.status == 'Redraft',
+                              'badge-secondary':
+                                item?.status == 'Awaiting Approval'
+                            }"
+                          >
+                            <i
+                              *ngIf="item?.status === 'Redraft'"
+                              class="icon icon-folder-o"
+                            ></i>
+                            <i
+                              *ngIf="item?.status === 'Approved'"
+                              class="icon icon-setting icon-spin"
+                            ></i>
+
+                            {{
+                              item?.status === "Approved"
+                                ? "Investment Active"
+                                : item?.status
+                            }}
+                          </span>
+                        </td>
+                        <td>
+                          <div
+                            #dropdownToggle
+                            class="dropdown mr-2 mb-2 d-inline-block"
+                          >
+                            <button
+                              class="btn btn-warning btn-xs dropdown-toggle"
+                              type="button"
+                              data-toggle="dropdown"
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                            ></button>
+
+                            <div class="dropdown-menu">
+                              <a class="dropdown-item" href="javascript:void(0)"
+                                ><i class="icon icon-forward icon-fw mr-2"></i
+                                >View</a
+                              >
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <ng-container
+                      *ngIf="!tabLoader && investmentList?.length == 0"
+                    >
+                      <tr>
+                        <td colspan="9" class="text-center">
+                          No record available
+                          <span *ngIf="searchTerm != ''">for your search</span>
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+              <footer>
+                <nav>
+                  <ul class="pagination pagination-sm justify-content-end">
+                    <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="
+                          pagination.pageNumber = pagination.pageNumber - 1;
+                          switchTabs()
+                        "
+                        >Previous</a
+                      >
+                    </li>
+                    <li class="page-item pagination-menu-wrapper">
+                      <a
+                        class="page-link page-target"
+                        href="javascript:void(0)"
+                        (click)="itemPaginatedJumpModal()"
+                      >
+                        {{ pagination.pageNumber }} of
+                        {{ pagination.totalPages }} page{{
+                          pagination.pageNumber > 1 ? "s" : ""
+                        }}
+                        <span class="sr-only">(current)</span>
+                      </a>
+                      <div
+                        class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                      >
+                        <div class="pagination-menu-body">
+                          <div class="h-auto">
+                            <span>Jump to Page</span>
+                            <select
+                              aria-controls="data-table"
+                              [(ngModel)]="pagination.pageNumber"
+                              (change)="switchTabs()"
+                              class="custom-select custom-select-xl form-control form-control-xl height"
+                            >
+                              <option
+                                (click)="pagination.pageNumber = line"
+                                *ngFor="let line of pagination.jumpArray"
+                              >
+                                {{ line }}
+                              </option>
+                            </select>
+                            <div class="text-center mt-3">
+                              <button
+                                (click)="itemPaginatedJumpModal()"
+                                type="button"
+                                class="btn btn-danger btn-xs"
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="page-item" *ngIf="pagination.hasNextPage">
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="
+                          pagination.pageNumber = pagination.pageNumber + 1;
+                          switchTabs()
+                        "
+                      >
+                        Next
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </footer>
+            </div>
+            <!-- /tables -->
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+
+      <!-- Tab Pane -->
+      <div id="tab-terminated" class="tab-pane">
+        <!-- Card -->
+        <div class="dt-card">
+          <!-- Card Body -->
+          <div class="dt-card__body">
+            <!-- Tables -->
+            <div class="row">
+              <div class="col-md-4">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                  ><select
+                    [(ngModel)]="pagination.pageSize"
+                    (change)="switchTabs()"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px"
+                    >entries</span
+                  ></label
+                >
+              </div>
+
+              <div class="col-md-4">
+                <div
+                  *ngIf="tabLoader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+              </div>
+
+              <div class="form-group col-md-4">
+                <label style="display: inline-flex; float: right">
+                  <input
+                    type="text"
+                    #box2
+                    (keyup.enter)="SearchTable($event.target.value)"
+                    placeholder="Code Or Name"
+                    class="form-control"
+                  />
+
+                  <button
+                    class="btn btn-xs text-white ml-3"
+                    [style.background]="currentTheme.secondaryColor"
+                    (click)="SearchTable(box2.value)"
+                  >
+                    <i class="icon icon-search"></i>
+                  </button>
+                </label>
+              </div>
+              <div
+                class="d-flex justify-content-between w-100 align-items-center"
+                style="padding: 0 18px"
+              >
+                <div
+                  class=""
+                  aria-live="polite"
+                  style="font-size: 13px; margin-top: -8px"
+                >
+                  Showing
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1
+                      | number : "1.0-0"
+                  }}
+                  -
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize +
+                      pagination.count | number : "1.0-0"
+                  }}
+                  of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+                </div>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table id="data-table" class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Investor</th>
+                    <th class="text-right">Amount Invested</th>
+                    <th>Date Created</th>
+                    <th>End Date</th>
+                    <th class="text-right">Amount Terminated</th>
+                    <th class="text-right">Interest Accrued</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="!tabLoader">
+                    <ng-container *ngIf="investmentList?.length > 0">
+                      <tr
+                        class="gradeX cursor"
+                        *ngFor="let item of investmentList"
+                        (click)="viewInvestment(item?.investmentId)"
+                      >
+                        <td
+                          class="copy_icon_wrapper"
+                          [style.color]="currentTheme?.secondaryColor"
+                        >
+                          {{ item?.investmentCode }}
+
+                          <img
+                            (mouseover)="copy_hover = true"
+                            (mouseleave)="copy_hover = false"
+                            class="copy_icon"
+                            src="assets/images/copy.png"
+                            alt="copy icon"
+                            width="15"
+                            height="15"
+                            (click)="copyCode(item?.investmentCode)"
+                            placement="right"
+                            ngbTooltip="Copy Investment Code"
+                          />
+                        </td>
+                        <td>{{ item?.investorName }}</td>
+                        <td class="text-right">
+                          {{ item?.initialDeposit | currency : currencySymbol }}
+                        </td>
+                        <td>{{ item?.createdAt | date : "dd/MM/yyyy" }}</td>
+                        <td>
+                          {{ item?.investmentExpiryDate | date : "dd/MM/yyyy" }}
+                        </td>
+                        <td class="text-right">
+                          {{
+                            item?.totalAmountTerminated
+                              | currency : currencySymbol
+                          }}
+                        </td>
+                        <td class="text-right">
+                          {{
+                            item?.totalInterestAccruedAtTermination
+                              | currency : currencySymbol
+                          }}
+                        </td>
+                        <td>
+                          <span
+                            class="mb-1 mr-1 badge"
+                            [ngClass]="{
+                              'badge-success': item?.status == 'Approved',
+                              'badge-warning': item?.status == 'Pool',
+                              'badge-danger': item?.status == 'Terminated',
+                              'badge-primary': item?.status == 'Redraft',
+                              'badge-secondary':
+                                item?.status == 'Awaiting Approval'
+                            }"
+                          >
+                            <i class="icon icon-folder-o"></i>
+                            {{ item?.status }}
+                          </span>
+                        </td>
+                        <td>
+                          <a
+                            class="i_clicked"
+                            href="javascript:void(0)"
+                            *ngIf="
+                              currentuser?.permission?.includes(
+                                'Manage Investment'
+                              )
+                            "
+                          >
+                            <span class="mb-1 mr-1 badge badge-light"
+                              >Details</span
+                            >
+                          </a>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <ng-container
+                      *ngIf="!tabLoader && investmentList?.length == 0"
+                    >
+                      <tr>
+                        <td colspan="9" class="text-center">
+                          No record available
+                          <span *ngIf="searchTerm != ''">for your search</span>
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+              <footer>
+                <nav>
+                  <ul class="pagination pagination-sm justify-content-end">
+                    <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="
+                          pagination.pageNumber = pagination.pageNumber - 1;
+                          switchTabs()
+                        "
+                        >Previous</a
+                      >
+                    </li>
+                    <li class="page-item pagination-menu-wrapper">
+                      <a
+                        class="page-link page-target"
+                        href="javascript:void(0)"
+                        (click)="itemPaginatedJumpModal()"
+                      >
+                        {{ pagination.pageNumber }} of
+                        {{ pagination.totalPages }} page{{
+                          pagination.pageNumber > 1 ? "s" : ""
+                        }}
+                        <span class="sr-only">(current)</span>
+                      </a>
+                      <div
+                        class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                      >
+                        <div class="pagination-menu-body">
+                          <div class="h-auto">
+                            <span>Jump to Page</span>
+                            <select
+                              aria-controls="data-table"
+                              [(ngModel)]="pagination.pageNumber"
+                              (change)="switchTabs()"
+                              class="custom-select custom-select-xl form-control form-control-xl height"
+                            >
+                              <option
+                                (click)="pagination.pageNumber = line"
+                                *ngFor="let line of pagination.jumpArray"
+                              >
+                                {{ line }}
+                              </option>
+                            </select>
+                            <div class="text-center mt-3">
+                              <button
+                                (click)="itemPaginatedJumpModal()"
+                                type="button"
+                                class="btn btn-danger btn-xs"
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="page-item" *ngIf="pagination.hasNextPage">
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="
+                          pagination.pageNumber = pagination.pageNumber + 1;
+                          switchTabs()
+                        "
+                      >
+                        Next
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </footer>
+            </div>
+            <!-- /tables -->
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+
+      <!-- Tab Pane -->
+      <div id="tab-deactivated" class="tab-pane">
+        <!-- Card -->
+        <div class="dt-card">
+          <!-- Card Body -->
+          <div class="dt-card__body">
+            <!-- Tables -->
+            <div class="row">
+              <div class="col-md-4">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                  ><select
+                    [(ngModel)]="pagination.pageSize"
+                    (change)="switchTabs()"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px"
+                    >entries</span
+                  ></label
+                >
+              </div>
+
+              <div class="col-md-4">
+                <div
+                  *ngIf="tabLoader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+              </div>
+
+              <div class="form-group col-md-4">
+                <lnd-search-dropdown
+                  [searchColumns]="pagination.searchColumns"
+                  [currentTheme]="currentTheme"
+                  (searchParams)="onSearchParams($event)"
+                ></lnd-search-dropdown>
+              </div>
+              <div
+                class="d-flex justify-content-between w-100 align-items-center"
+                style="padding: 0 18px"
+              >
+                <div
+                  class=""
+                  aria-live="polite"
+                  style="font-size: 13px; margin-top: 8px"
+                >
+                  Showing
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1
+                      | number : "1.0-0"
+                  }}
+                  -
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize +
+                      pagination.count | number : "1.0-0"
+                  }}
+                  of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table id="data-table" class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Investor</th>
+                    <th class="text-right">Amount Invested</th>
+                    <th>Date Created</th>
+                    <th>End Date</th>
+                    <th class="text-right">Amount Terminated</th>
+                    <th class="text-right">Interest Accrued</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="!tabLoader">
+                    <ng-container *ngIf="investmentList?.length > 0">
+                      <tr
+                        class="gradeX cursor"
+                        *ngFor="let item of investmentList"
+                        (click)="viewInvestment(item?.investmentId)"
+                      >
+                        <td
+                          class="copy_icon_wrapper"
+                          [style.color]="currentTheme?.secondaryColor"
+                        >
+                          {{ item?.investmentCode }}
+
+                          <img
+                            (mouseover)="copy_hover = true"
+                            (mouseleave)="copy_hover = false"
+                            class="copy_icon"
+                            src="assets/images/copy.png"
+                            alt="copy icon"
+                            width="15"
+                            height="15"
+                            (click)="copyCode(item?.investmentCode)"
+                            placement="right"
+                            ngbTooltip="Copy Investment Code"
+                          />
+                        </td>
+                        <td>{{ item?.investorName }}</td>
+                        <td class="text-right">
+                          {{ item?.initialDeposit | currency : currencySymbol }}
+                        </td>
+                        <td>{{ item?.createdAt | date : "dd/MM/yyyy" }}</td>
+                        <td>
+                          {{ item?.investmentExpiryDate | date : "dd/MM/yyyy" }}
+                        </td>
+                        <td class="text-right">
+                          {{
+                            item?.totalAmountTerminated
+                              | currency : currencySymbol
+                          }}
+                        </td>
+                        <td class="text-right">
+                          {{
+                            item?.totalInterestAccruedAtTermination
+                              | currency : currencySymbol
+                          }}
+                        </td>
+                        <td>
+                          <span
+                            class="mb-1 mr-1 badge"
+                            [ngClass]="{ 'badge-danger': true }"
+                          >
+                            <i class="icon icon-folder-o"></i>
+                            {{ item?.status }}
+                          </span>
+                        </td>
+                        <td>
+                          <a
+                            class="i_clicked"
+                            href="javascript:void(0)"
+                            *ngIf="
+                              currentuser?.permission?.includes(
+                                'Manage Investment'
+                              )
+                            "
+                          >
+                            <span class="mb-1 mr-1 badge badge-light"
+                              >Details</span
+                            >
+                          </a>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <ng-container *ngIf="investmentList?.length == 0">
+                      <tr>
+                        <td colspan="9" class="text-center">
+                          No record available
+                          <span *ngIf="searchTerm != ''">for your search</span>
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+              <footer>
+                <nav>
+                  <ul class="pagination pagination-sm justify-content-end">
+                    <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="
+                          pagination.pageNumber = pagination.pageNumber - 1;
+                          switchTabs()
+                        "
+                        >Previous</a
+                      >
+                    </li>
+                    <li class="page-item pagination-menu-wrapper">
+                      <a
+                        class="page-link page-target"
+                        href="javascript:void(0)"
+                        (click)="itemPaginatedJumpModal()"
+                      >
+                        {{ pagination.pageNumber }} of
+                        {{ pagination.totalPages }} page{{
+                          pagination.pageNumber > 1 ? "s" : ""
+                        }}
+                        <span class="sr-only">(current)</span>
+                      </a>
+                      <div
+                        class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                      >
+                        <div class="pagination-menu-body">
+                          <div class="h-auto">
+                            <span>Jump to Page</span>
+                            <select
+                              aria-controls="data-table"
+                              [(ngModel)]="pagination.pageNumber"
+                              (change)="switchTabs()"
+                              class="custom-select custom-select-xl form-control form-control-xl height"
+                            >
+                              <option
+                                (click)="pagination.pageNumber = line"
+                                *ngFor="let line of pagination.jumpArray"
+                              >
+                                {{ line }}
+                              </option>
+                            </select>
+                            <div class="text-center mt-3">
+                              <button
+                                (click)="itemPaginatedJumpModal()"
+                                type="button"
+                                class="btn btn-danger btn-xs"
+                              >
+                                Close
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                    <li class="page-item" *ngIf="pagination.hasNextPage">
+                      <a
+                        class="page-link"
+                        href="javascript:void(0)"
+                        (click)="
+                          pagination.pageNumber = pagination.pageNumber + 1;
+                          switchTabs()
+                        "
+                      >
+                        Next
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              </footer>
+            </div>
+            <!-- /tables -->
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #liquidationModal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-1">
+      <i class="icon icon-revenue-new orange"></i> Liquidation Information
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <form [formGroup]="preliquidateForm">
+    <div class="modal-body">
+      <div class="dt-login__content-inner">
+        <div class="mb-0 text-left">
+          <!-- Avatar -->
+          <!-- /avatar -->
+          <div class="row">
+            <!-- <span class="mr-4 text-white dt-avatar size-35 rounded-circle bg-light-blue">AL</span> -->
+
+            <!-- <img class="dt-avatar" src="assets/images/user-avatar/domnic-harris.jpg" alt="Zakie chain"> -->
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>
+                    <i
+                      class="mr-1 icon icon-contacts align-self-center text-warning"
+                    ></i
+                    >Investor
+                  </th>
+                  <th class="text-right">Investment Code</th>
+                  <th class="text-right">
+                    <i
+                      class="icon icon-revenue-new align-self-center text-warning"
+                    ></i>
+                    Amount ({{ ownerInformation?.currency?.currencySymbol }})
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="gradeX">
+                  <td class="small">
+                    <span>{{ investmentDetails?.investorName }}</span>
+                  </td>
+                  <td
+                    [style.color]="currentTheme?.secondaryColor"
+                    class="text-right code small"
+                  >
+                    {{ investmentDetails?.investmentCode }}
+                  </td>
+                  <td class="text-right amount-field small">
+                    {{
+                      investmentDetails?.initialDeposit + amountAccrued
+                        | currency : currencySymbol
+                    }}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" class="text-right">Penal Charge</td>
+                  <td class="text-right amount-field small red">
+                    <b>{{
+                      liquidateForm?.get("PenalCharge").value
+                        | currency : currencySymbol
+                    }}</b>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" class="text-right">Total Income</td>
+                  <td class="text-right amount-field small">
+                    <b>{{
+                      investmentDetails?.initialDeposit +
+                        amountAccrued -
+                        liquidateForm?.get("PenalCharge").value
+                        | currency : currencySymbol
+                    }}</b>
+                  </td>
+                </tr>
+                <tr>
+                  <th colspan="2" class="text-right">Liquidation Amount</th>
+                  <td class="text-right">
+                    {{
+                      liquidateForm?.get("LiquidatedAmount").value
+                        | currency : currencySymbol
+                    }}
+                  </td>
+                </tr>
+                <tr>
+                  <th colspan="2" class="text-right">Roll Over Amount</th>
+                  <td class="text-right">
+                    {{ rollOverAmount | currency : currencySymbol }}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+            <div
+              class="form-group"
+              *ngIf="rolloverList?.length > 0 && rollOverAmount > 0"
+            >
+              <div class="alert alert-warning">
+                <label for="invType" class="text-left"
+                  >Select Rollover Investment Type <b class="red">*</b></label
+                >
+                <div
+                  *ngFor="let item of rolloverList; let i = index"
+                  class="text-left custom-control custom-radio"
+                  style="cursor: pointer"
+                >
+                  <input
+                    type="radio"
+                    id="customRadioInline-{{ i }}"
+                    value="{{ item?.investmentTypeId }}"
+                    name="InvestmentTypeId"
+                    class="custom-control-input"
+                    (change)="investmentChange(item?.investmentTypeId)"
+                    [checked]="
+                      item?.investmentTypeId ==
+                      investmentDetails?.investmentTypeId
+                    "
+                  />
+                  <label
+                    class="custom-control-label"
+                    for="customRadioInline-{{ i }}"
+                  >
+                    {{ item?.investmentName }} - (Range - ({{
+                      item?.minAmount | currency : currencySymbol
+                    }}
+                    - {{ item?.maxAmount | currency : currencySymbol }}), Rate -
+                    ({{ item?.minInterestRate }}% -
+                    {{ item?.maxInterestRate }}%), Tenor - ({{
+                      item?.minInvestmentTenor
+                    }}
+                    - {{ item?.maxInvestmentTenor }} days), Type - ({{
+                      item?.interestRateType
+                    }}))
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div
+              class="mb-2 form-row"
+              *ngIf="
+                preliquidateForm.get('InvestmentTypeId').value != '' &&
+                rollOverAmount > 0
+              "
+            >
+              <div class="form-group col">
+                <label for="InvestmentRate"
+                  >Investment Rate <b class="red">*</b></label
+                >
+                <input
+                  type="text"
+                  currencyMask
+                  [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                  id="InvestmentRate"
+                  formControlName="InvestmentRate"
+                  class="form-control"
+                />
+                <span
+                  class="help-block text-danger f-12"
+                  *ngIf="
+                    preliquidateForm.get('InvestmentRate').errors ||
+                    preliquidateForm.get('InvestmentRate').touched
+                  "
+                >
+                  <span
+                    *ngIf="
+                      preliquidateForm
+                        .get('InvestmentRate')
+                        .getError('required')
+                    "
+                    >This field is required.</span
+                  >
+                  {{
+                    preliquidateForm
+                      .get("InvestmentRate")
+                      .getError("OutOfRange")
+                  }}
+                </span>
+              </div>
+              <div class="form-group col">
+                <label for="InvestmentTenor"
+                  >Investment Tenor <b class="red">*</b></label
+                >
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="InvestmentTenor"
+                  formControlName="InvestmentTenor"
+                  class="form-control"
+                />
+                <span
+                  class="help-block text-danger f-12"
+                  *ngIf="
+                    preliquidateForm.get('InvestmentTenor').errors ||
+                    preliquidateForm.get('InvestmentTenor').touched
+                  "
+                >
+                  <span
+                    *ngIf="
+                      preliquidateForm
+                        .get('InvestmentTenor')
+                        .getError('required')
+                    "
+                    >This field is required.</span
+                  >
+                  {{
+                    preliquidateForm
+                      .get("InvestmentTenor")
+                      .getError("OutOfRange")
+                  }}
+                </span>
+              </div>
+              <div class="form-group col-12">
+                <label for="startDate"
+                  >Investment Start Date <b class="red">*</b></label
+                >
+                <input
+                  lndInvalidDateChecker
+                  type="date"
+                  id="startDate"
+                  formControlName="StartDate"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div
+              class=""
+              *ngIf="rolloverList?.length == 0 && rollOverAmount > 0"
+            >
+              <div class="alert alert-warning">
+                We couldn't find any investment package that fits your roll over
+                amount
+                <b class="text-dark">{{
+                  rollOverAmount | currency : currencySymbol
+                }}</b
+                >. Kindly consider full liquidation or changing the liquidation
+                amount.
+              </div>
+            </div>
+            <div
+              *ngIf="
+                ownerInformation.financeInteractionData
+                  .investmentInitialAndAccruedIsActive
+              "
+              class="d-flex my-5 w-100"
+            >
+              <div class="form-group w-75">
+                <ng-template #tipContent
+                  >Account for finance interaction
+                </ng-template>
+                <label for="account" class="d-flex align-items-center"
+                  >Finance Account
+                  <i
+                    class="icon icon-question-circle ml-2"
+                    placement="top"
+                    [ngbTooltip]="tipContent"
+                  >
+                  </i
+                ></label>
+                <slct-2
+                  formControlName="financeInteractionCashOrBankAccountIdObj"
+                  id="account"
+                  [data]="accounts"
+                  [customSearchEnabled]="true"
+                  placeholder="Select Account"
+                ></slct-2>
+              </div>
+            </div>
+            <!-- Form Group -->
+            <div class="form-group">
+              <label class="sr-only" for="password-1"
+                >Confirm Transaction Pin</label
+              >
+              Enter your Transaction Pin to open a liquidation request or post
+              directly
+              <input
+                type="password"
+                formControlName="TransactionPin"
+                class="form-control"
+                placeholder="Transaction Pin"
+                name="new-password"
+              />
+            </div>
+            <div class="form-group">
+              <div class="d-flex align-items-center" *ngIf="!liquidateLoader">
+                <button
+                  (click)="savePreliquidationForm()"
+                  class="btn btn-xs btn-primary mr-3"
+                  type="submit"
+                  [disabled]="preliquidateFormNotValid"
+                >
+                  Send For Approval
+                </button>
+                <button
+                  *ngIf="
+                    currentuser?.permission?.includes(
+                      'Review Investment Liquidation Request'
+                    )
+                  "
+                  (click)="savePreliquidationForm(true)"
+                  class="btn btn-xs btn-success"
+                  type="submit"
+                  [disabled]="preliquidateFormNotValid"
+                >
+                  Post
+                </button>
+              </div>
+              <button
+                type="button"
+                class="btn btn-xs btn-success"
+                *ngIf="liquidateLoader"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Loading...
+              </button>
+            </div>
+            <!-- /form -->
+          </div>
+        </div>
+        <!-- /login content inner -->
+      </div>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #payOutModal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-1">
+      <i class="icon icon-revenue-new orange"></i> Payout/Rollover Information
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <form [formGroup]="payOutForm">
+    <div class="modal-body">
+      <div class="dt-login__content-inner">
+        <div class="mb-0 text-center">
+          <!-- Avatar -->
+          <!-- /avatar -->
+          <div class="row">
+            <!-- <span class="mr-4 text-white dt-avatar size-35 rounded-circle bg-light-blue">AL</span> -->
+
+            <!-- <img class="dt-avatar" src="assets/images/user-avatar/domnic-harris.jpg" alt="Zakie chain"> -->
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>
+                    <i
+                      class="mr-1 icon icon-contacts align-self-center text-warning"
+                    ></i
+                    >Investor
+                  </th>
+                  <th class="text-right">Investment Code</th>
+                  <th class="text-right">
+                    <i
+                      class="icon icon-revenue-new align-self-center text-warning"
+                    ></i>
+                    Amount ({{ ownerInformation?.currency?.currencySymbol }})
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="gradeX">
+                  <td class="small">
+                    <span>{{ investmentDetails?.investorName }}</span>
+                  </td>
+                  <td
+                    [style.color]="currentTheme?.secondaryColor"
+                    class="text-right code small"
+                  >
+                    {{ investmentDetails?.investmentCode }}
+                  </td>
+                  <td class="text-right amount-field small">
+                    {{
+                      investmentDetails?.totalInvestmentEarning
+                        | currency : currencySymbol
+                    }}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="2" class="text-right">Penal Charge</td>
+                  <td class="text-right amount-field small red">
+                    <b>{{ penalChargeAmount | currency : currencySymbol }}</b>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="2" class="text-right">Total Income</td>
+                  <td class="text-right amount-field small">
+                    <b>{{
+                      investmentDetails?.totalInvestmentEarning -
+                        penalChargeAmount | currency : currencySymbol
+                    }}</b>
+                  </td>
+                </tr>
+                <tr>
+                  <th colspan="2" class="text-right">Payout Amount</th>
+                  <td class="text-right">
+                    {{
+                      rollOverForm?.get("Amount").value
+                        | currency : currencySymbol
+                    }}
+                  </td>
+                </tr>
+                <tr>
+                  <th colspan="2" class="text-right">Roll Over Amount</th>
+                  <td class="text-right">
+                    {{ rollOverAmount | currency : currencySymbol }}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+            <div
+              *ngIf="
+                ownerInformation.financeInteractionData
+                  .investmentInitialAndAccruedIsActive
+              "
+              class="d-flex w-100"
+            >
+              <div class="form-group w-75">
+                <ng-template #tipContent
+                  >Account for finance interaction
+                </ng-template>
+                <label for="account" class="d-flex align-items-center"
+                  >Finance Account
+                  <i
+                    class="icon icon-question-circle ml-2"
+                    placement="top"
+                    [ngbTooltip]="tipContent"
+                  >
+                  </i
+                ></label>
+                <slct-2
+                  formControlName="FinanceInteractionCashOrBankAccountIdObj"
+                  id="account"
+                  [data]="accounts"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Select Account'"
+                ></slct-2>
+              </div>
+            </div>
+            <div
+              class="form-group"
+              *ngIf="rolloverList?.length > 0 && rollOverAmount > 0"
+            >
+              <div class="alert alert-warning">
+                <label for="invType" class="text-left"
+                  >Select Rollover Investment Type <b class="red">*</b></label
+                >
+                <div
+                  *ngFor="let item of rolloverList; let i = index"
+                  class="text-left custom-control custom-radio"
+                >
+                  <input
+                    (change)="investmentPayOutChange(item?.investmentTypeId)"
+                    type="radio"
+                    id="customRadioInline-{{ i }}"
+                    value="{{ item?.investmentTypeId }}"
+                    name="InvestmentTypeId"
+                    class="custom-control-input"
+                    [checked]="
+                      item?.investmentTypeId ==
+                      investmentDetails?.investmentTypeId
+                    "
+                  />
+                  <label
+                    class="custom-control-label"
+                    for="customRadioInline-{{ i }}"
+                  >
+                    {{ item?.investmentName }} - (Range - ({{
+                      item?.minAmount | currency : currencySymbol
+                    }}
+                    - {{ item?.maxAmount | currency : currencySymbol }}), Rate -
+                    ({{ item?.minInterestRate }}% -
+                    {{ item?.maxInterestRate }}%), Tenor - ({{
+                      item?.minInvestmentTenor
+                    }}
+                    - {{ item?.maxInvestmentTenor }} days), Type - ({{
+                      item?.interestRateType
+                    }}))
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div
+              class="mb-2 form-row"
+              *ngIf="
+                payOutForm.get('InvestmentTypeId').value != '' &&
+                rollOverAmount > 0
+              "
+            >
+              <div class="form-group col">
+                <label for="InvestmentRate"
+                  >Investment Rate <b class="red">*</b></label
+                >
+                <input
+                  type="text"
+                  currencyMask
+                  [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                  id="InvestmentRate"
+                  formControlName="InvestmentRate"
+                  class="form-control"
+                />
+                <span
+                  class="help-block text-danger f-12"
+                  *ngIf="
+                    payOutForm.get('InvestmentRate').errors ||
+                    payOutForm.get('InvestmentRate').touched
+                  "
+                >
+                  <span
+                    *ngIf="
+                      payOutForm.get('InvestmentRate').getError('required')
+                    "
+                    >This is required.</span
+                  >
+                  {{ payOutForm.get("InvestmentRate").getError("OutOfRange") }}
+                </span>
+              </div>
+              <div class="form-group col">
+                <label for="InvestmentTenor"
+                  >Investment Tenor <b class="red">*</b></label
+                >
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  id="InvestmentTenor"
+                  formControlName="InvestmentTenor"
+                  class="form-control"
+                />
+                <span
+                  class="help-block text-danger f-12"
+                  *ngIf="
+                    payOutForm.get('InvestmentTenor').errors ||
+                    payOutForm.get('InvestmentTenor').touched
+                  "
+                >
+                  <span
+                    *ngIf="
+                      payOutForm.get('InvestmentTenor').getError('required')
+                    "
+                    >This field is required.</span
+                  >
+                  {{ payOutForm.get("InvestmentTenor").getError("OutOfRange") }}
+                </span>
+              </div>
+              <div class="form-group col-12">
+                <label for="startDate"
+                  >Investment Start Date <b class="red">*</b></label
+                >
+                <input
+                  lndInvalidDateChecker
+                  type="date"
+                  id="startDate"
+                  formControlName="StartDate"
+                  class="form-control"
+                />
+              </div>
+            </div>
+            <div
+              class=""
+              *ngIf="rolloverList?.length == 0 && rollOverAmount > 0"
+            >
+              <div class="alert alert-warning">
+                We couldn't find any investment package that fits your roll over
+                amount
+                <b class="text-dark">{{
+                  rollOverAmount | currency : currencySymbol
+                }}</b
+                >. Kindly consider full pay out or changing the pay out amount.
+              </div>
+            </div>
+
+            <!-- Form Group -->
+            <div class="form-group text-left">
+              <label class="sr-only" for="password-1">Confirm Password</label>
+              <span
+                >Enter your Transaction Pin to open a liquidation request or
+                post directly</span
+              >
+              <input
+                type="password"
+                formControlName="TransactionPin"
+                class="form-control"
+                placeholder="Transaction Pin"
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <div *ngIf="!rolloverLoader" class="d-flex align-items-center">
+                <button
+                  (click)="savePayOutForm()"
+                  class="btn btn-xs btn-primary mr-3"
+                  type="submit"
+                  [disabled]="payoutFormNotValid"
+                >
+                  Send For Approval
+                </button>
+                <button
+                  *ngIf="
+                    currentuser?.permission?.includes(
+                      'Review Investment Liquidation Request'
+                    )
+                  "
+                  (click)="savePayOutForm(true)"
+                  class="btn btn-xs btn-success"
+                  type="submit"
+                  [disabled]="payoutFormNotValid"
+                >
+                  Post
+                </button>
+              </div>
+              <button
+                type="button"
+                class="btn btn-success"
+                *ngIf="rolloverLoader"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Loading...
+              </button>
+            </div>
+            <!-- /form -->
+          </div>
+        </div>
+        <!-- /login content inner -->
+      </div>
+    </div>
+  </form>
+</ng-template>
+
+<!-- Customizer Sidebar -->
+<aside style="display: block" class="dt-customizer dt-drawer position-right">
+  <div *ngIf="mergeState === 'merge'" class="dt-customizer__inner">
+    <app-custom-aside
+      (closeChildAside)="closeAside()"
+      [currentTheme]="currentTheme"
+      [investmentTypeList]="investmentTypeList"
+    ></app-custom-aside>
+  </div>
+  <div *ngIf="mergeState === 'split'" class="dt-customizer__inner">
+    <!-- Customizer Header -->
+    <div class="dt-customizer__header">
+      <!-- Avatar Wrapper -->
+      <div class="dt-avatar-wrapper">
+        <!-- Avatar -->
+        <img
+          class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+          src="assets/images/male-default-profile.png"
+          alt="investmentDetails?.investorName"
+        />
+        <!-- /avatar -->
+
+        <!-- Info -->
+        <div class="dt-avatar-info">
+          <span class="mb-2 dt-avatar-name display-5 font-weight-light black"
+            >{{ investmentDetails?.investorName }} &nbsp;
+            <span
+              class="mb-1 mr-1 badge"
+              [ngClass]="{
+                'badge-success':
+                  investmentDetails?.status == 'Approved' ||
+                  investmentDetails?.status == 'Matured',
+                'badge-warning': investmentDetails?.status == 'Pool',
+                'badge-danger':
+                  investmentDetails?.status == 'Terminated' ||
+                  investmentDetails?.status == 'Deactivated',
+                'badge-primary': investmentDetails?.status == 'Redraft',
+                'badge-secondary':
+                  investmentDetails?.status == 'Awaiting Approval'
+              }"
+            >
+              <i class="icon icon-folder-o"></i> {{ investmentDetails?.status }}
+            </span>
+          </span>
+          <span class="f-12"
+            ><span style="color: #1e5a8a">{{
+              investmentDetails?.investmentCode
+            }}</span> </span
+          ><br />
+          <button
+            class="btn btn-xs btn-primary"
+            (click)="
+              editInvestment(
+                investmentDetails?.investmentId,
+                investmentDetails?.investorType
+              )
+            "
+            *ngIf="
+              investmentDetails?.status == 'Redraft' &&
+              (investmentDetails?.createdById === currentuser?.userId ||
+                currentuser?.permission?.includes('Edit Investment'))
+            "
+          >
+            Edit Investment
+          </button>
+        </div>
+      </div>
+      <button type="button" class="close" (click)="toggleAside()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <div class="row">
+        <div class="col-md-12" style="padding: 20px; position: relative">
+          <ul class="dt-list dt-list-one-second padded-left">
+            <li class="dt-list__item">
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Principal</span
+                  >
+                  <h5 class="mb-0">
+                    <b>{{
+                      investmentDetails?.initialDeposit
+                        | currency : currencySymbol
+                    }}</b>
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-user-o icon-3x align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Gross Rate(%)</span
+                  >
+                  <h5 class="mb-0">{{ investmentDetails?.investmentRate }}</h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-user-o icon-3x align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12">WHT(%)</span>
+                  <h5 class="mb-0">
+                    {{ investmentDetails?.investmentTypeInfo?.withHoldingTax }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Duration</span
+                  >
+                  <h5 class="mb-0">
+                    {{ investmentDetails?.investmentTenor }} days
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item" *ngIf="investmentActive">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Days to Maturity</span
+                  >
+                  <h5 class="mb-0">{{ investmentDetails?.daysToMaturity }}</h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Gross Interest Accrued</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      investmentDetails?.grossInterest
+                        | currency : currencySymbol
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body amountAccrued -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Net Interest Accrued</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      investmentDetails?.status == "Terminated"
+                        ? (investmentDetails?.totalInterestAccruedAtTermination
+                          | currency : currencySymbol)
+                        : (investmentDetails?.currentAccruedAmount
+                          | currency : currencySymbol)
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body amountAccrued -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-user-o icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Created by</span
+                  >
+                  <h5 class="mb-0">{{ investmentDetails?.createdBy }}</h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Created At</span
+                  >
+                  <h5 class="mb-0">
+                    {{ investmentDetails?.createdAt | date : "mediumDate" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item" *ngIf="investmentActive">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Approval Date</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      investmentDetails?.investmentApprovalDate
+                        | date : "mediumDate"
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Start Date</span
+                  >
+                  <h5 class="mb-0">
+                    {{ investmentDetails?.startDate | date : "mediumDate" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- List Item -->
+            <!-- List Item -->
+            <li class="dt-list__item" *ngIf="investmentActive">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Maturity Date</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      investmentDetails?.investmentExpiryDate
+                        | date : "mediumDate"
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- List Item -->
+            <ng-template #tipContent
+              >Interest type :
+              {{ investmentDetails?.investmentTypeInfo?.interestRateType
+              }}<br />
+              Amount range :
+              {{
+                investmentDetails?.investmentTypeInfo?.minAmount
+                  | currency : currencySymbol
+              }}
+              -
+              {{
+                investmentDetails?.investmentTypeInfo?.maxAmount
+                  | currency : currencySymbol
+              }}<br />
+              Rate range :
+              {{
+                investmentDetails?.investmentTypeInfo?.minInterestRate +
+                  "-" +
+                  investmentDetails?.investmentTypeInfo?.maxInterestRate
+              }}
+              %<br />
+              Tenor range :
+              {{
+                investmentDetails?.investmentTypeInfo?.minInvestmentTenor +
+                  "-" +
+                  investmentDetails?.investmentTypeInfo?.maxInvestmentTenor
+              }}
+              days<br />
+              Penal charge :
+              {{ investmentDetails?.investmentTypeInfo?.penalCharge }} %<br />
+            </ng-template>
+
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-5 icon icon-editor icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Investment Type</span
+                  >
+                  <h5 class="mb-0">
+                    {{ investmentDetails?.investmentTypeInfo?.investmentName }}
+                    <span>
+                      <i
+                        class="icon icon-question-circle"
+                        placement="top"
+                        [ngbTooltip]="tipContent"
+                      >
+                      </i>
+                    </span>
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+
+            <li class="dt-list__item" *ngIf="investmentDetails?.nuban">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12">NUBAN</span>
+                  <h5 class="mb-0" style="position: relative">
+                    <span>
+                      {{ investmentDetails?.nuban }}
+                    </span>
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+          </ul>
+          <!-- /list -->
+          <div class="d-flex px-5">
+            <button
+              class="btn btn-sm btn-outline-primary preview ml-auto mr-3"
+              (click)="getCertificateInfo()"
+              [disabled]="loadingCert"
+            >
+              <span *ngIf="loadingCert"
+                ><i class="icon icon-spin icon-spin2"></i
+              ></span>
+              {{
+                loadingCert
+                  ? "Getting certificate..."
+                  : "Preview Investment Certificate"
+              }}
+            </button>
+            <button
+              *ngIf="
+                investmentDetails?.status !== 'Deactivated' && investmentActive
+              "
+              class="btn-md btn btn-warning"
+              (click)="sendInvestmentCertificate()"
+              [disabled]="certificateLoader"
+            >
+              Send Investment Certificate
+              <i
+                class="icon icon-spin icon-spin2"
+                *ngIf="certificateLoader"
+              ></i>
+            </button>
+          </div>
+
+          <div class="text-center">
+            <span
+              *ngIf="
+                investmentDetails?.status != 'Deactivated' &&
+                investmentActive &&
+                currentuser?.permission?.includes('Deactivate Investment')
+              "
+            >
+              <button
+                class="btn btn-danger btn-xs mb-3 mt-1"
+                type="button"
+                (click)="
+                  toggleDeactivationModal(
+                    investmentDetails?.investmentId,
+                    deactivationModal
+                  )
+                "
+              >
+                Deactivate Investment
+              </button>
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- Customizer Body Inner  -->
+      <div *ngIf="showTabArea">
+        <br />
+        <!-- Section -->
+        <div class="dt-card__body">
+          <ul
+            class="flex-row nav nav-underline border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li class="nav-item" *ngIf="investmentActive">
+              <a
+                class="nav-link inv-def clicked active"
+                data-toggle="tab"
+                href="#details-tab"
+                role="tab"
+                aria-controls="details-tab"
+                aria-selected="true"
+                >Investment Details</a
+              >
+            </li>
+            <li
+              class="nav-item"
+              *ngIf="
+                currentuser?.permission?.includes('Approve Investment') &&
+                investmentDetails?.status === investmentFilterEnum.Pool
+              "
+            >
+              <a
+                class="nav-link active"
+                data-toggle="tab"
+                href="#approval-comments-tab"
+                role="tab"
+                aria-controls="approval-comments-tab"
+                aria-selected="true"
+                >Approval Comments</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link inv-sel"
+                [ngClass]="
+                  investmentDetails?.status === investmentFilterEnum.Redraft
+                    ? 'active'
+                    : ''
+                "
+                (click)="fetchCustomerPreviousInvestments()"
+                data-toggle="tab"
+                href="#investor-info-tab"
+                role="tab"
+                aria-controls="investor-info-tab"
+                aria-selected="true"
+                >Investor Info</a
+              >
+            </li>
+            <li class="nav-item" *ngIf="investmentActive">
+              <a
+                class="nav-link inv-sel"
+                data-toggle="tab"
+                href="#activity-tab"
+                role="tab"
+                aria-controls="activity-tab"
+                aria-selected="true"
+                >Activity</a
+              >
+            </li>
+
+            <li
+              *ngIf="
+                currentuser?.permission?.includes('Split Investment') &&
+                investmentDetails?.status !== 'Deactivated' && investmentActive
+              "
+              class="nav-item"
+            >
+              <a
+                class="nav-link inv-sel"
+                data-toggle="tab"
+                href="#split-investment-tab"
+                (click)="onSplitSelect()"
+                role="tab"
+                aria-controls="split-investment-tab"
+                aria-selected="true"
+                >Split Investment</a
+              >
+            </li>
+          </ul>
+          <div class="tab-content">
+            <!-- tab 1-->
+            <div
+              id="details-tab"
+              class="tab-pane inv-def active"
+              *ngIf="investmentActive"
+            >
+              <div class="row">
+                <!-- /grid item -->
+                <!-- Grid Item -->
+                <div class="col-xl-8">
+                  <!-- Card -->
+                  <div class="overflow-hidden dt-card">
+                    <!-- Card Body -->
+                    <div class="p-0 dt-card__body">
+                      <!-- Tables -->
+                      <div class="table-responsive">
+                        <table class="table mb-0 table-striped">
+                          <thead class="thead-light">
+                            <tr>
+                              <th class="text-uppercase" scope="col">
+                                Start Date
+                              </th>
+                              <th class="text-uppercase" scope="col">
+                                End Date
+                              </th>
+                              <th class="text-right text-uppercase" scope="col">
+                                Principal
+                              </th>
+                              <th class="text-uppercase" scope="col">Tenor</th>
+                              <th
+                                class="text-uppercase text-center"
+                                scope="col"
+                              >
+                                Rate(%)
+                              </th>
+                              <th class="text-right text-uppercase" scope="col">
+                                Gross Interest
+                              </th>
+                              <th class="text-right text-uppercase" scope="col">
+                                WHT
+                              </th>
+                              <th class="text-right text-uppercase" scope="col">
+                                Net Interest
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr
+                              *ngFor="
+                                let item of investmentDetails?.cycleSchedules;
+                                last as isLast
+                              "
+                            >
+                              <td>
+                                {{ item?.cycleStartDate | date : "mediumDate" }}
+                              </td>
+                              <td>
+                                {{ item?.cycleEndDate | date : "mediumDate" }}
+                              </td>
+                              <td class="text-right">
+                                {{
+                                  item?.principal | currency : currencySymbol
+                                }}
+                              </td>
+                              <td>{{ item?.tenor }}</td>
+                              <td class="text-center">
+                                {{ investmentDetails?.investmentRate }}
+                              </td>
+                              <td class="text-right">
+                                {{
+                                  item?.grossInterest
+                                    | currency : currencySymbol
+                                }}
+                              </td>
+                              <td class="text-right">
+                                {{
+                                  item?.withHoldingTax
+                                    | currency : currencySymbol
+                                }}
+                              </td>
+                              <td class="text-right">
+                                <span>{{
+                                  item?.totalInterest
+                                    | currency : currencySymbol
+                                }}</span>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-4">
+                  <div class="dt-card">
+                    <div class="dt-card__header">
+                      <div class="dt-card__heading">
+                        <h3 class="dt-card__title">
+                          Investor Investment Balance
+                        </h3>
+                      </div>
+                    </div>
+                    <div class="dt-card__body">
+                      <div class="row no-gutters">
+                        <span
+                          class="mb-4 text-right d-inline-block text-light-gray"
+                          >Investment Status
+                          <span
+                            class="mb-1 mr-1 badge"
+                            [ngClass]="{
+                              'badge-warning':
+                                investmentDetails?.status == 'Approved',
+                              'badge-success':
+                                investmentDetails?.status == 'Matured',
+                              'badge-warning':
+                                investmentDetails?.status == 'Pool',
+                              'badge-danger':
+                                investmentDetails?.status == 'Terminated' ||
+                                investmentDetails?.status == 'Deactivated',
+                              'badge-primary':
+                                investmentDetails?.status == 'Redraft',
+                              'badge-secondary':
+                                investmentDetails?.status == 'Awaiting Approval'
+                            }"
+                          >
+                            <i class="icon icon-check"></i>
+                            {{ investmentDetails?.status }}</span
+                          >
+                        </span>
+                        <div class="mb-6 col-sm-12 pr-sm-2 mb-sm-0">
+                          <h2 class="mb-3 font-weight-medium">
+                            {{
+                              investmentDetails?.totalInvestmentEarning
+                                | currency : currencySymbol
+                            }}
+                          </h2>
+                          <span class="mb-0 d-inline-block text-light-gray"
+                            >Total income</span
+                          >
+                          <hr class="mb-6 border-dashed" />
+                          <div
+                            *ngIf="
+                              currentuser?.permission?.includes(
+                                'Raise Investment Liquidation Request'
+                              )
+                            "
+                          >
+                            <p class="card-text">
+                              <a
+                                href="javascript:void(0)"
+                                class="mr-2 btn text-white"
+                                [style.backgroundColor]="
+                                  currentTheme?.secondaryColor
+                                "
+                                [style.borderColor]="
+                                  currentTheme?.secondaryColor
+                                "
+                                (click)="togglePayout()"
+                                *ngIf="investmentDetails?.status == 'Matured'"
+                                >Payout/Rollover</a
+                              >
+                              <a
+                                href="javascript:void(0)"
+                                class="text-white btn bg-cyan"
+                                (click)="toggleLiquidate()"
+                                *ngIf="
+                                  !investmentDetails?.investmentExpired &&
+                                  investmentDetails?.status == 'Approved'
+                                "
+                                >Pre-Liquidate</a
+                              >
+                            </p>
+                            <div class="investment-menu investment-menu-right">
+                              <div class="investment-menu-header">
+                                <h4 class="title">
+                                  <i class="mr-2 icon icon-revenue-new"></i
+                                  >Investment Liquidation
+                                </h4>
+                              </div>
+                              <div class="investment-menu-body">
+                                <div class="h-auto" *ngIf="liquidateForm">
+                                  <form
+                                    [formGroup]="liquidateForm"
+                                    (ngSubmit)="
+                                      saveLiquidationForm(liquidationModal)
+                                    "
+                                  >
+                                    <div class="form-row">
+                                      <div class="mb-3 col-sm-12">
+                                        <ng-container
+                                          *ngIf="
+                                            preLiquidationWarning &&
+                                            continueLiquidation
+                                          "
+                                        >
+                                          <div
+                                            class="mb-3 warning-img-container"
+                                          >
+                                            <img
+                                              class="warning-img"
+                                              src="assets/images/exclamation.png"
+                                              alt="Warning"
+                                            />
+                                          </div>
+                                          <p class="text-center warning-color">
+                                            Since this is a pre-liquidation
+                                            request, please note that a penal
+                                            charge of
+                                            {{
+                                              investmentDetails
+                                                ?.investmentTypeInfo
+                                                ?.penalCharge
+                                            }}% -
+                                            <b class="text-dark">{{
+                                              liquidateForm.get("PenalCharge")
+                                                .value
+                                                | currency : currencySymbol
+                                            }}</b>
+                                            will be charged on your total
+                                            accrued interest
+                                            {{
+                                              amountAccrued
+                                                | currency : currencySymbol
+                                            }}.
+                                          </p>
+                                        </ng-container>
+                                        <ng-container
+                                          *ngIf="continueLiquidation"
+                                        >
+                                          <div class="form-group">
+                                            <label for="Amount1"
+                                              >Liquidation Amount
+                                              <span class="text-success"
+                                                >(Available -
+                                                {{
+                                                  investmentDetails?.initialDeposit +
+                                                    amountAccrued -
+                                                    liquidateForm.get(
+                                                      "PenalCharge"
+                                                    ).value
+                                                    | currency : currencySymbol
+                                                }})</span
+                                              ><span class="text-danger"
+                                                >*</span
+                                              ></label
+                                            >
+                                            <input
+                                              type="text"
+                                              formControlName="LiquidatedAmount"
+                                              currencyMask
+                                              [options]="{
+                                                prefix: '',
+                                                thousands: ',',
+                                                decimal: '.'
+                                              }"
+                                              class="form-control"
+                                              id="Amount1"
+                                              placeholder="Enter liquidation amount"
+                                            />
+                                            <span
+                                              class="help-block text-danger f-12"
+                                              *ngIf="
+                                                liquidateForm.get(
+                                                  'LiquidatedAmount'
+                                                ).errors &&
+                                                liquidateForm.get(
+                                                  'LiquidatedAmount'
+                                                ).touched
+                                              "
+                                            >
+                                              <span
+                                                *ngIf="
+                                                  liquidateForm
+                                                    .get('LiquidatedAmount')
+                                                    .getError('required')
+                                                "
+                                                >This field is required.</span
+                                              >
+                                              {{
+                                                liquidateForm
+                                                  .get("LiquidatedAmount")
+                                                  .getError("NotEarned")
+                                              }}
+                                              {{
+                                                liquidateForm
+                                                  .get("LiquidatedAmount")
+                                                  .getError("LessThanZero")
+                                              }}
+                                            </span>
+                                          </div>
+                                          <div
+                                            class="form-group"
+                                            *ngIf="
+                                              investmentDetails?.currentAccruedAmount >
+                                              0
+                                            "
+                                          >
+                                            <div
+                                              class="mb-8 custom-control custom-checkbox mt-9"
+                                            >
+                                              <input
+                                                class="custom-control-input"
+                                                type="checkbox"
+                                                id="checkboxPenalCharge"
+                                                value="true"
+                                                (click)="
+                                                  removePenalCharge($event)
+                                                "
+                                              />
+                                              <label
+                                                class="custom-control-label"
+                                                for="checkboxPenalCharge"
+                                              >
+                                                No Penal Charge
+                                              </label>
+                                            </div>
+                                            <div
+                                              class="text-danger"
+                                              *ngIf="!preLiquidationWarning"
+                                            >
+                                              Liquidating without penal charge
+                                              will require approval
+                                            </div>
+                                          </div>
+                                          <hr class="mb-4 border-dashed" />
+                                          <div class="form-group">
+                                            Amount Available To Rollover -
+                                            <h3 class="text-dark">
+                                              <strong>{{
+                                                rollOverAmount
+                                                  | currency : currencySymbol
+                                              }}</strong>
+                                            </h3>
+                                          </div>
+                                          <div class="form-group">
+                                            <button
+                                              type="submit"
+                                              class="text-white btn btn-xs bg-cyan withdraw-click"
+                                              [disabled]="
+                                                liquidateForm.get(
+                                                  'LiquidatedAmount'
+                                                ).invalid
+                                              "
+                                              *ngIf="!liquidateLoader"
+                                            >
+                                              Liquidate
+                                            </button>
+                                            <button
+                                              type="button"
+                                              class="btn btn-success"
+                                              *ngIf="liquidateLoader"
+                                              [disabled]="true"
+                                            >
+                                              <i
+                                                class="icon icon-spin icon-spin2"
+                                              ></i>
+                                              Liquidating...
+                                            </button>
+                                          </div>
+                                        </ng-container>
+                                        <ng-container
+                                          *ngIf="!continueLiquidation"
+                                        >
+                                          <div class="form-group">
+                                            <label for="liquidationDate"
+                                              >Liquidation As At?</label
+                                            >
+                                            <input
+                                              lndInvalidDateChecker
+                                              type="date"
+                                              class="form-control"
+                                              formControlName="liquidationDate"
+                                              id="liquidationDate"
+                                            />
+                                          </div>
+                                          <div class="form-group">
+                                            <button
+                                              type="button"
+                                              class="btn text-white"
+                                              [style.backgroundColor]="
+                                                currentTheme?.secondaryColor
+                                              "
+                                              [style.borderColor]="
+                                                currentTheme?.secondaryColor
+                                              "
+                                              [disabled]="
+                                                liquidateForm.get(
+                                                  'liquidationDate'
+                                                ).invalid || invLoader
+                                              "
+                                              (click)="
+                                                recalculateLiquidationDetails()
+                                              "
+                                            >
+                                              Continue
+                                              <i
+                                                *ngIf="invLoader"
+                                                class="icon icon-spin icon-spin2"
+                                              ></i>
+                                            </button>
+                                          </div>
+                                        </ng-container>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                              <div class="investment-menu-footer">
+                                <div class="footer-right">
+                                  <button
+                                    type="button"
+                                    class="btn btn-danger btn-xs targeted2"
+                                    (click)="toggleLiquidate()"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="rollover-menu rollover-menu-right">
+                              <div class="rollover-menu-header">
+                                <h4 class="title">
+                                  <i class="mr-2 icon icon-revenue-new"></i>
+                                  Payout/Rollover
+                                </h4>
+                              </div>
+                              <div class="rollover-menu-body">
+                                <div class="h-auto" *ngIf="rollOverForm">
+                                  <form
+                                    [formGroup]="rollOverForm"
+                                    (submit)="saveRollOverForm(payOutModal)"
+                                  >
+                                    <div class="form-row">
+                                      <div class="mb-3 col-sm-12">
+                                        <p class="text-center warning-color">
+                                          Please enter amount to payout
+                                        </p>
+                                        <div class="form-group">
+                                          <label for="Amount"
+                                            >Payout Amount
+                                            <span class="text-danger"
+                                              >*</span
+                                            ></label
+                                          >
+                                          <input
+                                            type="text"
+                                            formControlName="Amount"
+                                            class="form-control"
+                                            currencyMask
+                                            [options]="{
+                                              prefix: '',
+                                              thousands: ',',
+                                              decimal: '.'
+                                            }"
+                                            id="Amount"
+                                            placeholder="Enter payout amount"
+                                          />
+                                          <span
+                                            class="help-block text-danger f-12"
+                                            *ngIf="
+                                              rollOverForm.get('Amount')
+                                                .errors &&
+                                              rollOverForm.get('Amount').touched
+                                            "
+                                          >
+                                            <span
+                                              *ngIf="
+                                                rollOverForm
+                                                  .get('Amount')
+                                                  .getError('required')
+                                              "
+                                              >This field is required.</span
+                                            >
+                                            {{
+                                              rollOverForm
+                                                .get("Amount")
+                                                .getError("NotEarned")
+                                            }}
+                                            {{
+                                              rollOverForm
+                                                .get("Amount")
+                                                .getError("LessThanZero")
+                                            }}
+                                          </span>
+                                        </div>
+                                        <hr class="mb-4 border-dashed" />
+                                        <h5>
+                                          Amount available to Rollover -
+                                          <b>{{
+                                            rollOverAmount
+                                              | currency : currencySymbol
+                                          }}</b>
+                                        </h5>
+                                        <div class="mt-3 text-center">
+                                          <button
+                                            type="submit"
+                                            class="text-white btn btn-sm bg-cyan withdraw-click"
+                                          >
+                                            Continue
+                                          </button>
+                                        </div>
+                                        <!-- /form group -->
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+
+                              <div class="rollover-menu-footer">
+                                <div class="footer-right">
+                                  <button
+                                    type="button"
+                                    class="btn btn-danger btn-xs targeted3"
+                                    (click)="togglePayout()"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              id="approval-comments-tab"
+              class="tab-pane active"
+              *ngIf="
+                currentuser?.permission?.includes('Approve Investment') &&
+                investmentDetails?.status === investmentFilterEnum.Pool
+              "
+            >
+              <div class="row">
+                <div class="col-6">
+                  <form [formGroup]="approvalForm">
+                    <div class="row mb-6">
+                      <div class="col-md-8">
+                        <label class="mb-2">Internal Note</label>
+                        <textarea
+                          formControlName="comment"
+                          class="form-control"
+                          rows="4"
+                          cols="10"
+                        ></textarea>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-8 mb-6">
+                        <label>Enter Transaction Pin </label>
+                        <input
+                          type="password"
+                          class="form-control"
+                          formControlName="transactionPin"
+                          placeholder="Enter Transaction Pin"
+                        />
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-8">
+                        <div class="form-group">
+                          <button
+                            type="submit"
+                            [disabled]="approvalForm.invalid"
+                            class="btn btn-danger error-alert mr-2"
+                            *ngIf="!submittingApprovalForm"
+                            (click)="submitApprovalForm('Rejected')"
+                          >
+                            Reject
+                          </button>
+                          <button
+                            type="submit"
+                            [disabled]="approvalForm.invalid"
+                            class="btn btn-light error-alert mr-2"
+                            *ngIf="!submittingApprovalForm"
+                            (click)="submitApprovalForm('Redraft')"
+                          >
+                            Redraft
+                          </button>
+                          <button
+                            type="submit"
+                            [disabled]="approvalForm.invalid"
+                            class="btn btn-success success-alert"
+                            *ngIf="!submittingApprovalForm"
+                            (click)="submitApprovalForm('Approved')"
+                          >
+                            Approve Investment
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-primary btn-sm"
+                            *ngIf="submittingApprovalForm"
+                            [disabled]="true"
+                          >
+                            <i class="icon icon-spin icon-spin2"></i>
+                            Processing...
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-6">
+                  <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                      <thead class="thead-light">
+                        <tr>
+                          <th class="text-uppercase" scope="col">Status</th>
+                          <th class="text-uppercase" scope="col">Username</th>
+                          <th class="text-uppercase" scope="col">Comment</th>
+                          <th class="text-uppercase" scope="col">
+                            Date Created
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="
+                            let item of investmentDetails?.approvalDetailInfo
+                          "
+                        >
+                          <td>{{ item?.status }}</td>
+                          <td>{{ item?.username }}</td>
+                          <td>{{ item?.comment }}</td>
+                          <td>{{ item?.createdAt | date : "dd/MM/yyyy" }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              id="investor-info-tab"
+              class="tab-pane inv-sel"
+              [ngClass]="
+                investmentDetails?.status === investmentFilterEnum.Redraft
+                  ? 'active'
+                  : ''
+              "
+            >
+              <div class="row">
+                <div class="col-xl-8">
+                  <div class="dt-card">
+                    <div
+                      class="bg-transparent card-header card-nav d-flex justify-content-between"
+                    >
+                      <ul
+                        class="card-header-links nav nav-underline"
+                        role="tablist"
+                      >
+                        <li class="nav-item">
+                          <a
+                            class="nav-link active"
+                            data-toggle="tab"
+                            href="#account-tab"
+                            role="tab"
+                            aria-controls="account-tab"
+                            aria-selected="true"
+                            >Customer Investment History</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table mb-0 table-striped">
+                        <thead class="thead-light">
+                          <tr>
+                            <th class="text-uppercase" scope="col">Code</th>
+                            <th class="text-right text-uppercase" scope="col">
+                              Principal
+                            </th>
+                            <th class="text-uppercase" scope="col">Tenor</th>
+                            <th class="text-uppercase" scope="col">Rate(%)</th>
+                            <th class="text-uppercase" scope="col">
+                              Start Date
+                            </th>
+                            <th class="text-uppercase" scope="col">Period</th>
+                            <th class="text-right text-uppercase" scope="col">
+                              Interest Till Date
+                            </th>
+                            <th class="text-uppercase" scope="col">Status</th>
+                            <!-- <th class="text-uppercase" scope="col">Approval Status</th> -->
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <ng-container *ngIf="!customerHistoryLoader">
+                            <ng-container
+                              *ngIf="previousInvestmentList?.length > 0"
+                            >
+                              <tr
+                                *ngFor="
+                                  let item of previousInvestmentList;
+                                  last as isLast
+                                "
+                              >
+                                <td
+                                  [style.color]="currentTheme?.secondaryColor"
+                                >
+                                  {{ item?.investmentCode }}
+                                </td>
+                                <td class="text-right">
+                                  {{
+                                    item?.initialDeposit
+                                      | currency : currencySymbol
+                                  }}
+                                </td>
+                                <td>{{ item?.investmentTenor }}</td>
+                                <td>{{ item?.investmentRate }}</td>
+                                <td>
+                                  {{
+                                    item?.investmentApprovalDate
+                                      | date : "dd/MM/yyyy"
+                                  }}
+                                </td>
+                                <td>{{ item?.dayCount }}</td>
+                                <td class="text-right">
+                                  {{
+                                    item?.currentAccruedAmount
+                                      | currency : currencySymbol
+                                  }}
+                                </td>
+                                <td>
+                                  <span
+                                    class="mb-1 mr-1 badge"
+                                    [ngClass]="{
+                                      'badge-success':
+                                        item?.status == 'Approved',
+                                      'badge-warning': item?.status == 'Pool',
+                                      'badge-danger':
+                                        item?.status == 'Terminated' ||
+                                        item?.status == 'Deactivated',
+                                      'badge-primary':
+                                        item?.status == 'Redraft',
+                                      'badge-secondary':
+                                        item?.status == 'Awaiting Approval'
+                                    }"
+                                  >
+                                    <i class="icon icon-folder-o"></i>
+                                    {{ item?.status }}
+                                  </span>
+                                </td>
+                              </tr>
+                            </ng-container>
+                            <ng-container
+                              *ngIf="previousInvestmentList?.length == 0"
+                            >
+                              <tr>
+                                <td colspan="8" class="text-center">
+                                  No previous investment from this investor.
+                                </td>
+                              </tr>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container *ngIf="customerHistoryLoader">
+                            <tr>
+                              <td colspan="8" class="text-center">
+                                <i class="fa fa-spinner fa-pulse"></i> Loading
+                                previous investments
+                              </td>
+                            </tr>
+                          </ng-container>
+                        </tbody>
+                      </table>
+                    </div>
+                    <!-- /tables -->
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- /grid item -->
+
+                <!-- Grid Item -->
+                <div class="col-xl-4">
+                  <!-- Card -->
+                  <div class="card">
+                    <!-- Card Header -->
+                    <div
+                      class="bg-transparent card-header card-nav d-flex justify-content-between"
+                    >
+                      <!-- <h4 class="mb--20 text-uppercase">Account Information</h4> -->
+                      <ul
+                        class="card-header-links nav nav-underline"
+                        role="tablist"
+                      >
+                        <li class="nav-item">
+                          <a
+                            class="nav-link active"
+                            data-toggle="tab"
+                            href="#account-tab"
+                            role="tab"
+                            aria-controls="account-tab"
+                            aria-selected="true"
+                            >Personal Information</a
+                          >
+                        </li>
+                      </ul>
+                    </div>
+                    <!-- /card header -->
+                    <!-- Card Body -->
+                    <div class="pb-2 card-body">
+                      <!-- Tab Content-->
+                      <div class="mt-5 tab-content">
+                        <!-- Tab panel -->
+                        <div id="account-tab" class="tab-pane active">
+                          <!-- List -->
+                          <ul class="dt-list">
+                            <!-- List Item -->
+                            <li class="dt-list__item">
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="mr-5 icon icon-email icon-4x align-self-center text-warning"
+                                ></i>
+
+                                <!-- Media Body -->
+                                <div class="media-body">
+                                  <span
+                                    class="mb-1 d-block text-light-gray f-12"
+                                    >Email</span
+                                  >
+                                  <h5
+                                    class="mb-0"
+                                    style="word-break: break-all"
+                                  >
+                                    {{
+                                      investmentDetails?.additionalInfo
+                                        ?.investorEmail
+                                    }}
+                                  </h5>
+                                </div>
+                                <!-- /media body -->
+                              </div>
+                              <!-- /media -->
+                            </li>
+                            <!-- /list item -->
+
+                            <!-- List Item -->
+                            <li class="dt-list__item">
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="mr-5 icon icon-phone icon-4x align-self-center text-warning"
+                                ></i>
+
+                                <!-- Media Body -->
+                                <div class="media-body">
+                                  <span
+                                    class="mb-1 d-block text-light-gray f-12"
+                                    >Phone</span
+                                  >
+                                  <h5 class="mb-0">
+                                    {{
+                                      investmentDetails?.additionalInfo
+                                        ?.phoneNumber
+                                    }}
+                                  </h5>
+                                </div>
+                                <!-- /media body -->
+                              </div>
+                              <!-- /media -->
+                            </li>
+                            <!-- /list item -->
+
+                            <!-- List Item -->
+                            <li class="dt-list__item">
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="mr-5 icon icon-user-o icon-4x align-self-center text-warning"
+                                ></i>
+                                <!-- Media Body -->
+                                <div class="media-body">
+                                  <span
+                                    class="mb-1 d-block text-light-gray f-12"
+                                    >Account Name</span
+                                  >
+                                  <h5
+                                    class="mb-0"
+                                    style="word-break: break-all"
+                                  >
+                                    {{
+                                      investmentDetails?.additionalInfo
+                                        ?.bankAccountName
+                                    }}
+                                  </h5>
+                                </div>
+                                <!-- /media body -->
+                              </div>
+                              <!-- /media -->
+                            </li>
+                            <!-- /list item -->
+                            <!-- List Item -->
+                            <li class="dt-list__item">
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="mr-5 icon icon-company icon-4x align-self-center text-warning"
+                                ></i>
+
+                                <!-- Media Body -->
+                                <div class="media-body">
+                                  <span
+                                    class="mb-1 d-block text-light-gray f-12"
+                                    >Account Number</span
+                                  >
+                                  <h5
+                                    class="mb-0"
+                                    style="word-break: break-all"
+                                  >
+                                    {{
+                                      investmentDetails?.additionalInfo
+                                        ?.bankAccountNumber
+                                    }}
+                                  </h5>
+                                </div>
+                                <!-- /media body -->
+                              </div>
+                              <!-- /media -->
+                            </li>
+                            <!-- /list item -->
+
+                            <!-- List Item -->
+                            <li class="dt-list__item">
+                              <!-- Media -->
+                              <div class="media">
+                                <i
+                                  class="mr-5 icon icon-company icon-4x align-self-center text-warning"
+                                ></i>
+
+                                <!-- Media Body -->
+                                <div class="media-body">
+                                  <span
+                                    class="mb-1 d-block text-light-gray f-12"
+                                    >Bank</span
+                                  >
+                                  <h5
+                                    class="mb-0"
+                                    style="word-break: break-all"
+                                  >
+                                    {{
+                                      investmentDetails?.additionalInfo
+                                        ?.bankName
+                                    }}
+                                  </h5>
+                                </div>
+                                <!-- /media body -->
+                              </div>
+                              <!-- /media -->
+                            </li>
+                            <!-- /list item -->
+                          </ul>
+                          <!-- /list -->
+                        </div>
+                        <!-- /tab panel -->
+                      </div>
+                      <!-- /tab content-->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- /grid item -->
+              </div>
+            </div>
+
+            <div id="activity-tab" class="tab-pane inv-sel">
+              <div class="row">
+                <!-- Grid Item -->
+                <div class="col-6" *ngIf="investmentDetails?.status != 'Pool'">
+                  <!-- Card -->
+                  <div class="overflow-hidden dt-card">
+                    <!-- Card Body -->
+                    <div class="p-0 dt-card__body">
+                      <!-- Tables -->
+                      <div class="table-responsive">
+                        <table class="table mb-0 table-striped">
+                          <thead class="thead-light">
+                            <tr>
+                              <th class="text-uppercase" scope="col">Status</th>
+                              <th class="text-right text-uppercase" scope="col">
+                                Amount
+                              </th>
+                              <th class="text-right text-uppercase" scope="col">
+                                Penal Charge
+                              </th>
+                              <th class="text-uppercase" scope="col">Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <ng-container
+                              *ngIf="
+                                investmentDetails?.liquidationHistory?.length >
+                                0
+                              "
+                            >
+                              <tr
+                                *ngFor="
+                                  let item of investmentDetails?.liquidationHistory
+                                "
+                              >
+                                <td>{{ item?.status }}</td>
+                                <td class="text-right">
+                                  {{
+                                    item?.liquidatedAmount
+                                      | currency : currencySymbol
+                                  }}
+                                </td>
+                                <td class="text-right">
+                                  {{
+                                    item?.penalCharge
+                                      | currency : currencySymbol
+                                  }}
+                                </td>
+                                <td>
+                                  {{ item?.createdAt | date : "dd/MM/yyyy" }}
+                                </td>
+                              </tr>
+                            </ng-container>
+                            <ng-container
+                              *ngIf="
+                                investmentDetails?.liquidationHistory?.length ==
+                                0
+                              "
+                            >
+                              <tr>
+                                <td colspan="4" class="text-center">
+                                  No activity yet
+                                </td>
+                              </tr>
+                            </ng-container>
+                          </tbody>
+                        </table>
+                      </div>
+                      <!-- /tables -->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- GRID -->
+                <div class="col-6" *ngIf="investmentDetails?.status != 'Pool'">
+                  <!-- Tables -->
+                  <div class="table-responsive">
+                    <table class="table mb-0 table-striped">
+                      <thead class="thead-light">
+                        <tr>
+                          <th class="text-uppercase" scope="col">Status</th>
+                          <th class="text-uppercase" scope="col">Username</th>
+                          <th class="text-uppercase" scope="col">Comment</th>
+                          <th class="text-uppercase" scope="col">
+                            Date Created
+                          </th>
+                          <!-- <th class="text-uppercase" scope="col">Approval Status</th> -->
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="
+                            let item of investmentDetails?.approvalDetailsInfo
+                          "
+                        >
+                          <td>
+                            <span
+                              class="mb-1 mr-1 badge"
+                              [ngClass]="{
+                                'badge-success': item.status === 'Approved',
+                                'badge-warning': item.status === 'Pool',
+                                'badge-danger':
+                                  item.status === 'Terminated' ||
+                                  item.status === 'Deactivated' ||
+                                  item.status === 'Expired' ||
+                                  item.status === 'Rejected',
+                                'badge-primary': item.status === 'Redraft',
+                                'badge-secondary':
+                                  item.status === 'AwaitingApproval'
+                              }"
+                            >
+                              <i class="icon icon-folder-o"></i>
+                              {{
+                                item.status === "AwaitingApproval"
+                                  ? "Awaiting Approval"
+                                  : item.status
+                              }}
+                            </span>
+                          </td>
+                          <td>{{ item?.username }}</td>
+                          <td>{{ item?.comment }}</td>
+                          <td>
+                            {{ item?.createdAt | date : "dd/MM/yyyy H:mm a" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <!-- /tables -->
+                </div>
+              </div>
+            </div>
+
+            <div
+              *ngIf="
+                currentuser?.permission?.includes('Split Investment') &&
+                mergeState === 'split'
+              "
+              id="split-investment-tab"
+              class="tab-pane inv-sel"
+            >
+              <app-split-investment
+                *ngIf="investmentDetails"
+                [mergeState]="mergeState"
+                [currentTheme]="currentTheme"
+                [investmentId]="investmentDetails.investmentId"
+                [investmentAmount]="investmentDetails.totalInvestmentEarning"
+              ></app-split-investment>
+            </div>
+          </div>
+          <!-- /tab content -->
+        </div>
+      </div>
+      <!-- /section -->
+    </div>
+    <!-- /customizer body inner -->
+  </div>
+</aside>
+<!-- /customizer sidebar -->
+
+<ng-template #deactivationModal>
+  <!-- Modal Header -->
+
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="DeactivationForm"
+    (ngSubmit)="submitDeactivationForm(DeactivationForm.value)"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Login Content Inner -->
+      <div class="dt-login__content-inner">
+        <div class="text-center mb-8">
+          <!-- Avatar -->
+          <!-- /avatar -->
+
+          <div class="row">
+            <div class="dt-avatar-wrapper">
+              <!-- Avatar -->
+              <img
+                class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+                src="assets/images/male-default-profile.png"
+                alt="investmentDetails?.investorName"
+              />
+
+              <span
+                class="mb-2 dt-avatar-name display-5 font-weight-light black"
+                >{{ investmentDetails?.investorName }}
+                &nbsp;
+                <span
+                  class="mb-1 mr-1 badge"
+                  [ngClass]="{
+                    'badge-success':
+                      investmentDetails?.status == 'Approved' ||
+                      investmentDetails?.status == 'Matured',
+                    'badge-warning': investmentDetails?.status == 'Pool',
+                    'badge-danger':
+                      investmentDetails?.status == 'Terminated' ||
+                      investmentDetails?.status == 'Deactivated',
+                    'badge-primary': investmentDetails?.status == 'Redraft',
+                    'badge-secondary':
+                      investmentDetails?.status == 'Awaiting Approval'
+                  }"
+                >
+                  <i class="icon icon-folder-o"></i>
+                  {{ investmentDetails?.status }}
+                </span>
+              </span>
+            </div>
+
+            <!--
+            <span>
+
+              <span *ngIf="loaninformation?.loanStage == 'Loan Active'" class="badge badge-success btn-xs mb-1 mr-1">{{
+                loaninformation?.loanStage }}</span>
+              <span
+                *ngIf="loaninformation?.loanStage == 'Rejected' || loaninformation?.statusString == 'DisbursementFailed' || loaninformation?.statusString == 'Deactivated'  "
+                class="badge badge-danger btn-xs mb-1 mr-1">{{ loaninformation?.loanStage }}</span>
+              <span *ngIf="loaninformation?.statusString == 'Redraft'" style="background-color: #453488;color: white;"
+                class="badge badge-warning btn-xs mb-1 mr-1">{{ loaninformation?.loanStage }}</span>
+              <span
+                *ngIf="loaninformation?.loanStage != 'Loan Active' && loaninformation?.loanStage != 'Rejected' && loaninformation?.statusString != 'Redraft' && loaninformation?.statusString != 'DisbursementFailed' && loaninformation?.statusString != 'Deactivated'"
+                class="badge badge-warning btn-xs mb-1 mr-1">{{ loaninformation?.loanStage }}</span>
+
+
+            </span> -->
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Investment Code</th>
+                  <th class="amount-field">
+                    <i
+                      class="icon icon-revenue-new align-self-center text-warning"
+                    ></i>
+                    Principal ({{ currencySymbol }})
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="gradeX">
+                  <td
+                    [style.color]="currentTheme?.secondaryColor"
+                    class="code small"
+                  >
+                    {{ investmentDetails?.investmentCode }}
+                  </td>
+                  <td class="amount-field small">
+                    {{
+                      investmentDetails?.initialDeposit
+                        | currency : currencySymbol
+                    }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+          <div class="">
+            <ul
+              class="nav nav-underline mt-3 flex-row border-bottom nav-card-tabs"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  class="nav-link active"
+                  (mouseover)="hover_das = true"
+                  (mouseleave)="hover_das = false"
+                  [ngStyle]="
+                    hover_das ? { color: currentTheme?.secondaryColor } : {}
+                  "
+                  data-toggle="tab"
+                  href="#one-tab"
+                  role="tab"
+                  aria-controls="tab-pane0"
+                  aria-selected="true"
+                  >Deactivation Section
+                </a>
+              </li>
+              <!-- <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" (mouseover)="hover_anc=true" (mouseleave)="hover_anc=false"
+                  [ngStyle]="hover_anc ? {'color': currentTheme?.secondaryColor} : {}"
+                  (click)="submitLoanRequest('LoanActivities', loaninformation?.loanId,loaninformation?.applicationCode)"
+                  href="#second-tab" role="tab" aria-controls="tab-pane0" aria-selected="true">Activities & Comments</a>
+              </li> -->
+            </ul>
+            <br />
+            <div class="tab-content">
+              <div id="one-tab" class="tab-pane active">
+                <!-- <div class="dt-card overflow-hidden"> -->
+                <!-- Card Body -->
+                <!-- <div class="dt-card__body p-0"> -->
+
+                <!-- <small
+                  *ngIf="  loaninformation?.statusString != 'DeactivationRequestSent' || loaninformation?.statusString != 'DeactivationRejected'  || loaninformation?.statusString != 'Deactivated'">
+                  Check Activites & Comments tab for deactivation comments made(if any). </small> -->
+
+                <div class="col-md-12">
+                  <label for="validationDefault02" class="left-aligned"
+                    >Additional Comment</label
+                  ><br />
+
+                  <input
+                    formControlName="InvestmentId"
+                    type="text"
+                    value="investmentDetails?.investmentId"
+                    hidden="true"
+                  />
+
+                  <textarea
+                    class="form-control"
+                    formControlName="Comment"
+                    rows="4"
+                    placeholder="Enter Here"
+                  ></textarea>
+                  <br /><br />
+                  <!-- Form Group -->
+                  <div class="form-group row">
+                    <!-- <small>This will deactivate the loan application above </small><br /><br /> -->
+                    <div class="text-right col-md-8">
+                      <small>Enter your Transaction Pin to Proceed</small>
+                    </div>
+                    <div class="col-md-4">
+                      <input
+                        type="password"
+                        class="form-control"
+                        formControlName="TransactionPin"
+                        placeholder="Transaction Pin"
+                        autocomplete="off"
+                      />
+                    </div>
+                  </div>
+                  <!-- /form group -->
+                  <!-- /tables -->
+                  <hr />
+                  <div class="">
+                    <button
+                      type="button"
+                      class="btn btn-secondary btn-sm"
+                      (click)="closeModal(false)"
+                      style="color: #fff"
+                    >
+                      Close
+                    </button>
+                    &nbsp;
+                    <button
+                      type="submit"
+                      class="btn btn-warning btn-sm"
+                      *ngIf="
+                        !loading &&
+                        currentuser?.permission?.includes(
+                          'Deactivate Investment'
+                        )
+                      "
+                      [disabled]="DeactivationForm.invalid"
+                    >
+                      Deactivate Investment
+                    </button>
+
+                    &nbsp;<button
+                      type="button"
+                      class="btn btn-claim btn-sm"
+                      *ngIf="loading"
+                      [disabled]="true"
+                    >
+                      <i class="icon icon-spin icon-spin2"></i> Processing...
+                    </button>
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- /card body -->
+
+                <!-- </div> -->
+                <!-- /card -->
+                <!-- </div> -->
+              </div>
+            </div>
+
+            <!-- Card -->
+          </div>
+        </div>
+      </div>
+      <!-- /login content inner -->
+    </div>
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<ng-template #financeAccount>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-1">
+      <i class="mr-2 icon icon-ckeditor"></i>
+      Select a Finance Account
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <form [formGroup]="approvalInteractionForm">
+      <small
+        >You are seeing this because interactions for
+        <span class="text-primary">initial investment + accrued interest</span>
+        is <span class="text-success">active</span></small
+      >
+      <slct-2
+        formControlName="financeInteractionCashOrBankAccountIdObj"
+        id="account"
+        [data]="accounts"
+        [customSearchEnabled]="true"
+        [placeholder]="'Select Account'"
+      ></slct-2>
+
+      <button
+        *ngIf="!isApproving"
+        (click)="submitApproval()"
+        class="btn btn-sm mt-5 btn-primary"
+      >
+        Submit
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-warning mt-5 btn-sm"
+        *ngIf="isApproving"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </form>
+  </div>
+  <!-- Modal Footer -->
+</ng-template>
+
+<!-- New Investment Modal -->
+<lnd-popup
+  [togglePopup]="showPopup"
+  (closePopup)="closePopup()"
+  [hideFooter]="true"
+  [size]="'large'"
+>
+<header
+    class="pop-header d-flex justify-content-between align-items-center w-100"
+  >
+    <h4 class="mb-0"> New Investment Application</h4>
+
+    <span class="pointer" (click)="clearLoanTopUpData(); closePopup()">
+      <img src="assets/images/close.svg" alt="close" />
+    </span>
+  </header>
+
+
+  <main class="pop-content w-[912px]">
+    <div class="container-fluid">
+      <div class="form-row mt-3">
+        <div class="" style="width: 100%">
+          <div class="dt-card__body">
+            <div class="tab-content">
+              <div class="tab-pane active" id="tab-manual">
+                <form [formGroup]="searchInvestorForm">
+                  <div class="form-row">
+                    <div class="col-md-12">
+                      <label for="validationDefault02" class="left-aligned"
+                        >Search Customer Email
+                      </label>
+                      <input
+                        formControlName="searchValue"
+                        placeholder="Enter Investor Email."
+                        class="form-control"
+                      />
+                      <div
+                        *ngIf="searchrequestLoader"
+                        class="table-loader mt-5"
+                        style="text-align: center; color: indianred"
+                      >
+                        <span>
+                          <i class="icon icon-spin icon-spin2"></i>
+                          Searching...Please wait</span
+                        >
+                      </div>
+                    </div>
+
+                    <div class="col-md-3">
+                      <button
+                        [disabled]="loading || searchInvestorForm.invalid "
+                        type="button"
+                        class="btn btn-floating search-btn btn-success btn-x search button"
+                        (click)="searchInvestor()"
+                      >
+                        <i class="icon icon-search"></i> Search
+                      </button>
+                    </div>
+
+                    <div class="col-sm-12 mb-3">
+                      <div
+                        *ngIf="loading"
+                        class="table-loader"
+                        style="text-align: center; color: indianred"
+                      >
+                        <span>
+                          <i class="icon icon-spin icon-spin2"></i>
+                          Loading...</span
+                        >
+                      </div>
+
+                      <section class="mt-5" style="margin-top: 40px !important">
+                        <div *ngIf="newInvestors?.length == 0">
+                          <div>
+                            <h4>
+                              <i
+                                class="icon icon-search icon-2x mr-2 align-self-center text-warning"
+                              ></i>
+                              Search Result(s):
+                            </h4>
+                            <hr />
+                            <h6 class="empty-response">No Customer Found.</h6>
+                          </div>
+
+                          <div class="actions col-md-12">
+                            <button
+                              [disabled]="loading"
+                              type="button"
+                              class="btn btn-floating search-btn btn-warning btn-x search button"
+                              (click)="navigateToInvestmentPage('individual')"
+                            >
+                              Add New Investor (Individual)
+                            </button>
+
+                            <button
+                              [disabled]="loading"
+                              type="button"
+                              class="btn btn-floating search-btn btn-warning btn-x search button"
+                              (click)="navigateToInvestmentPage('corporate')"
+                            >
+                              Add New Investor (Corporate)
+                            </button>
+                          </div>
+                        </div>
+
+                        <div
+                          class="modal-body px-0"
+                          *ngIf="newInvestors?.length > 0"
+                        >
+                          <div
+                            class="modal-header p-0"
+                            style="border-bottom: none"
+                          >
+                            <h4 class="modal-title" id="modal-basic-title">
+                              <i
+                                class="icon icon-search icon-2x mr-2 align-self-center text-warning"
+                              ></i>
+                              Search Result(s):
+                            </h4>
+                          </div>
+                          <div class="table-responsive">
+                            <table class="table table-hover">
+                              <thead>
+                                <th class="pl-0">Full Name</th>
+                                <th class="pl-0">Email Address</th>
+                                <th class="pl-0">Phone Number</th>
+                                <th class="pl-0">Investor Type</th>
+                                <th>Date Created</th>
+                                <th></th>
+                              </thead>
+                              <tbody>
+                                <tr *ngFor="let item of newInvestors">
+                                  <td class="pl-0">
+                                    <span
+                                      ngxTextHighlight
+                                      [content]="getFullName(item)"
+                                      [searchTerm]="searchInvestor"
+                                    ></span>
+                                  </td>
+
+                                  <td class="pl-0">
+                                    <span
+                                      ngxTextHighlight
+                                      [content]="item?.emailAddress"
+                                      [searchTerm]="searchInvestor"
+                                    ></span>
+                                  </td>
+                                  <td class="pl-0">
+                                    <span
+                                      ngxTextHighlight
+                                      [content]="item?.phoneNumber"
+                                      [searchTerm]="searchInvestor"
+                                    ></span>
+                                  </td>
+                                  <td class="pl-0">
+                                    <span
+                                      ngxTextHighlight
+                                      [content]="item?.investorType"
+                                      [searchTerm]="searchInvestor"
+                                    ></span>
+                                  </td>
+                                  <td class="pl-0">
+                                    <span
+                                      ngxTextHighlight
+                                      [content]="
+                                        item?.createdAt | date : 'dd/MM/yyyy'
+                                      "
+                                      [searchTerm]="searchInvestor"
+                                    ></span>
+                                  </td>
+
+                                  <td>
+                                    <button
+                                      type="button"
+                                      class="btn btn-xs btn-warning"
+                                      (click)="
+                                        launchInvestmentForm(
+                                          item?.investorType.toLowerCase(),
+                                          item
+                                        )
+                                      "
+                                    >
+                                      Select
+                                    </button>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </section>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</lnd-popup>
+

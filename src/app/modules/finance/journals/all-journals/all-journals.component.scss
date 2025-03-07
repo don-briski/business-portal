@@ -1,0 +1,26 @@
+.action-btns {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  button {
+    color: var(--white);
+    i {
+      margin-left: 10px;
+    }
+    &:first-child {
+      background-color: var(--lenda-green);
+    }
+    &:last-child {
+      background-color: var(--secondary-color);
+    }
+  }
+}
+
+footer{
+  display: flex;
+  justify-content: flex-end;
+  button{
+    background-color: var(--secondary-color);
+    color: var(--white);
+  }
+}

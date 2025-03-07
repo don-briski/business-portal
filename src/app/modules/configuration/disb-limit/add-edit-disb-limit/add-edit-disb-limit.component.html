@@ -1,0 +1,196 @@
+<lnd-popup
+  type="aside"
+  [togglePopup]="showPopup"
+  [hideFooter]="true"
+  (closePopup)="closeLimitPopup()"
+>
+  <header
+    class="pop-header d-flex justify-content-between align-items-center w-100"
+  >
+    <h4 class="mb-0">
+      {{ limitDetail ? "Update" : "Create" }} New Disbursement Limit
+    </h4>
+
+    <img
+      src="assets/images/close.svg"
+      alt="close"
+      class="pointer"
+      (click)="closeLimitPopup()"
+    />
+  </header>
+
+  <div class="pop-content">
+    <div class="d-flex align-items-center my-3">
+      <lnd-switch
+        [value]="form.value?.isActive"
+        (emittedValue)="toggleActiveState($event)"
+      />
+      <span class="ml-3"
+        >Limit is {{ form.value?.isActive ? "Active" : "Inactive" }}</span
+      >
+    </div>
+
+    <form [formGroup]="form">
+      <div *ngIf="isLoading" class="mb-4">
+        <lnd-spinner text="Retrieving..." />
+      </div>
+
+      <div *ngIf="!isLoading">
+        <label>{{ selectedResource }}<b class="text-danger">*</b></label>
+        <multi-select-dropdown
+          formControlName="entityId"
+          [placeholder]="'Search ' + selectedResource"
+          [data]="selectedResourceList"
+          [disableApiSearch]="disableApiSearch"
+          [searchService]="getSearchService()"
+          (searchResult)="updateSearchDropdown($event)"
+        />
+      </div>
+
+      <div>
+        <label>Limit Amount<b class="text-danger">*</b></label>
+        <input
+          class="form-control"
+          type="text"
+          placeholder="Enter Limit Amount"
+          currencyMask
+          [options]="{
+            prefix: '',
+            thousands: ',',
+            decimal: '.'
+          }"
+          formControlName="limitAmount"
+        />
+        <lnd-input-errors
+          label="Limit Amount"
+          [control]="form.get('limitAmount')"
+        />
+      </div>
+
+      <div>
+        <label
+          >Frequency <b class="text-danger">*</b>
+          <i
+            class="icon icon-question-circle icon-fw icon-xl"
+            placement="top"
+            ngbTooltip="Specify how often the loan limit report should be sent, such as weekly, or monthly"
+          ></i
+        ></label>
+        <slct-2
+          [data]="frequencies"
+          formControlName="resetFrequency"
+          placeholder="Select Type"
+        />
+      </div>
+
+      <div>
+        <label
+          >Start Date<b class="text-danger">*</b>
+          <i
+            class="icon icon-question-circle icon-fw icon-xl"
+            placement="top"
+            ngbTooltip="Defaults to today"
+          ></i>
+        </label>
+        <input
+          lndInvalidDateChecker
+          type="date"
+          formControlName="frequencyStartDate"
+          class="form-control"
+          [readOnly]="!limitDetail"
+        />
+        <lnd-input-errors
+          label="Start Date"
+          [control]="form.get('frequencyStartDate')"
+        />
+      </div>
+
+      <div>
+        <label
+          >Minimum Alert Threshold <b class="text-danger">*</b>
+          <i
+            class="icon icon-question-circle icon-fw icon-xl"
+            placement="top"
+            ngbTooltip="Set up to three alert levels as a percentage or fixed amount to trigger alerts when nearing the limit."
+          ></i
+        ></label>
+
+        <ng-container formArrayName="alertThresholds">
+          <ng-container
+            *ngFor="let control of alertThresholds().controls; let i = index"
+          >
+            <ng-container [formGroup]="control">
+              <div class="mt-3">
+                <div class="threshold mb-2">
+                  <slct-2
+                    [data]="thresholdOpts"
+                    placeholder="Select Type"
+                    formControlName="type"
+                  />
+
+                  <input
+                    type="number"
+                    class="form-control"
+                    placeholder="Enter Value"
+                    formControlName="amount"
+                  />
+                  <button
+                    class="btn btn-xs btn-outline-danger"
+                    (click)="removeThreshold(i)"
+                  >
+                    X
+                  </button>
+                </div>
+                <lnd-input-errors
+                  label="Amount"
+                  [control]="control.get('amount')"
+                />
+              </div>
+            </ng-container>
+          </ng-container>
+        </ng-container>
+
+        <div
+          *ngIf="alertThresholds().controls.length < 3"
+          class="add-threshold-btn-wrapper"
+        >
+          <span class="pointer" (click)="addThreshold()">
+            <button class="btn btn-xs">+</button>
+            Add new
+          </span>
+
+          <span
+            >{{ 3 - alertThresholds().controls.length }} Maximum threshold
+            alerts left</span
+          >
+        </div>
+      </div>
+
+      <div class="constraint">
+        <lnd-switch
+          text="Constraint Toggle"
+          [value]="setLimitConstraint"
+          (emittedValue)="toggleLimitConstraint($event)"
+        />
+
+        <p>
+          Enable this to automatically stop loan applications once the set limit
+          is reached.
+        </p>
+      </div>
+
+      <footer>
+        <button
+          class="btn"
+          (click)="submit()"
+          [disabled]="
+            form.invalid || form.value.entityId.length < 1 || isLoading
+          "
+        >
+          {{ isLoading ? "Processing..." : "Save Settings" }}
+          <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+        </button>
+      </footer>
+    </form>
+  </div>
+</lnd-popup>

@@ -1,0 +1,94 @@
+<div class="dt-customizer__inner">
+  <div class="dt-customizer__header">
+    <div class="dt-avatar-wrapper">
+      <div class="dt-avatar-info">
+        <span class="display-5 mb-2 font-weight-light">
+          <i class="icon icon-editor icon-xl mr-3"></i>Batch Information -
+          <span [style.color]="colorTheme?.secondaryColor">{{
+            disbursementBatch?.batchCode
+          }}</span>
+        </span>
+      </div>
+    </div>
+    <button
+      type="button"
+      class="close"
+      data-toggle="customizer"
+      onClick="viewLoan()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="dt-customizer__body ps-custom-scrollbar">
+    <div class="row">
+      <div class="col-md-12" style="padding-top: 20px">
+        <ul class="dt-list dt-list-one-second padded-left">
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Created At</span
+                >
+                <h5 class="mb-0">
+                  {{ disbursementBatch?.dateCreated | date : "dd/MM/yyyy" }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="icon icon-contacts icon-3x mr-3 align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Created By</span
+                >
+                <h5 class="mb-0">
+                  {{ disbursementBatch.createdBy }}
+                </h5>
+              </div>
+            </div>
+          </li>
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="icon icon-revenue-new icon-3x mr-3 align-self-center text-warning"
+              ></i>
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Total Amount in Batch</span
+                >
+                <h5 class="mb-0">
+                  <b
+                    >{{ appOwnerInfo?.currency?.currencySymbol
+                    }}{{ disbursementBatch?.batchValue | number : "1.2-2" }}</b
+                  >
+                </h5>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <lnd-tab-bar
+      classes="px-5 py-3"
+      [tabs]="tabs"
+      [currentTabId]="currentTabId"
+    ></lnd-tab-bar>
+    <lnd-loans-for-disbursement
+      *ngIf="currentTabId === 'loans'"
+      [colorTheme]="colorTheme"
+      [disbursementBatch]="disbursementBatch"
+      [appOwnerInfo]="appOwnerInfo"
+    ></lnd-loans-for-disbursement>
+    <lnd-disbursement-activities
+      *ngIf="currentTabId === 'activities'"
+      [colorTheme]="colorTheme"
+      [disbursementBatchId]="disbursementBatch.disbursementBatchId"
+    ></lnd-disbursement-activities>
+  </div>
+</div>

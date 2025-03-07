@@ -1,0 +1,371 @@
+<section *ngIf="!placementType">
+  <header class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">Placement Types</h1>
+    <a
+      *ngIf="user?.permission?.includes('Create Short Term Placement Type')"
+      class="btn btn-primary mr-2 text-white"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [routerLink]="['/configurations/placement-types/create']"
+      routerLinkActive="router-link-active"
+      href="javascript:void(0)"
+    >
+      <i class="icon icon-add-circle mr-2"></i>Add New</a
+    >
+  </header>
+  <div class="dt-card w-100">
+    <div class="dt-card__body">
+      <div class="row">
+        <div class="col-md-4">
+          <label style="display: inline-flex"
+            ><span style="padding: 8px 2px; font-size: 12px">Show </span
+            ><select
+              [(ngModel)]="pagination.pageSize"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height"
+              (change)="getShortTermPlacementsTypes()"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span style="padding: 8px 2px; font-size: 12px"
+              >entries</span
+            ></label
+          >
+        </div>
+
+        <div class="col-md-4">
+          <div
+            *ngIf="isLoading"
+            class="table-loader"
+            style="text-align: center; color: indianred"
+          >
+            <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+          </div>
+        </div>
+
+        <div class="form-group col-md-4">
+          <label style="display: inline-flex; float: right">
+            <input
+              type="search"
+              placeholder="Search..."
+              class="form-control form-control-sm"
+              placeholder="Code or Name"
+              aria-controls="data-table"
+              (keydown.enter)="getShortTermPlacementsTypes(search.value)"
+              #search
+            />
+
+            <button
+              class="btn btn-xs text-white ml-3"
+              [style.background]="currentTheme.secondaryColor"
+              (click)="getShortTermPlacementsTypes(search.value)"
+            >
+              <i class="icon icon-search"></i>
+            </button>
+          </label>
+        </div>
+        <div
+          class="d-flex justify-content-between w-100 align-items-center"
+          style="padding: 0 18px"
+        >
+          <div
+            class=""
+            aria-live="polite"
+            style="font-size: 13px; margin-top: -8px"
+          >
+            Showing
+            {{
+              (pagination.pageNumber - 1) * pagination.pageSize + 1
+                | number : "1.0-0"
+            }}
+            -
+            {{
+              (pagination.pageNumber - 1) * pagination.pageSize +
+                pagination.count | number : "1.0-0"
+            }}
+            of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!isLoading">
+        <table
+          id="data-table"
+          class="table mt-5 table-striped"
+          *ngIf="shortTermPlacementsTypes.length > 0; else noData"
+        >
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Placement Name</th>
+              <th class="text-right">
+                Amount ({{ ownerInformation?.currency?.currencySymbol }})
+              </th>
+              <th>Rate (%)</th>
+              <th>Tenor</th>
+              <!-- <th>Placement Type</th> -->
+              <th>Institution</th>
+              <th>Date Created</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              class="cursor"
+              *ngFor="let placementType of shortTermPlacementsTypes"
+              (click)="
+                viewShortTermPlacementType(placementType, dropdownToggle)
+              "
+            >
+              <td [style.color]="currentTheme?.secondaryColor">
+                {{ placementType.placementCode }}
+              </td>
+              <td>{{ placementType.placementName }}</td>
+              <td class="text-right">
+                {{ placementType.minAmount.toLocaleString() }} -
+                {{ placementType.maxAmount.toLocaleString() }}
+              </td>
+              <td>
+                {{ placementType.minInterestRate }} -
+                {{ placementType.maxInterestRate }}
+              </td>
+              <td>
+                {{ placementType.minTenor }} - {{ placementType.maxTenor }}
+              </td>
+              <td>{{ placementType.financialInstitution }}</td>
+              <td>{{ placementType.createdAt | date : "dd/MM/yyyy" }}</td>
+              <td>
+                <span
+                  class="badge badge-sm"
+                  [ngClass]="{
+                    'badge-warning': placementType?.status === 'Inactive',
+                    'badge-success': placementType?.status === 'Active'
+                  }"
+                >
+                  {{ placementType.status }}
+                </span>
+              </td>
+              <td>
+                <div #dropdownToggle class="dropdown mr-2 mb-2 d-inline-block">
+                  <button
+                    class="btn btn-warning btn-xs dropdown-toggle"
+                    type="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  ></button>
+                  <div class="dropdown-menu">
+                    <a class="dropdown-item" href="javascript:void(0)"
+                      ><i class="icon icon-forward icon-fw mr-2"></i>View
+                    </a>
+                    <a
+                      class="dropdown-item"
+                      *ngIf="
+                        user?.permission?.includes(
+                          'Edit Short Term Placement Type'
+                        )
+                      "
+                      href="javascript:void(0)"
+                      [routerLink]="
+                        '/configurations/placement-types/edit/' +
+                        placementType?.shortTermPlacementTypeId
+                      "
+                    >
+                      <i class="icon icon-xs icon-setting"></i> Manage
+                    </a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <footer>
+        <nav>
+          <ul class="pagination pagination-sm justify-content-end">
+            <li class="page-item" *ngIf="pagination.hasPreviousPage">
+              <a
+                class="page-link"
+                href="javascript:void(0)"
+                (click)="
+                  pagination.pageNumber = pagination.pageNumber - 1;
+                  getShortTermPlacementsTypes()
+                "
+                >Previous</a
+              >
+            </li>
+            <li class="page-item pagination-menu-wrapper">
+              <a
+                class="page-link page-target"
+                href="javascript:void(0)"
+                (click)="itemPaginatedJumpModal()"
+              >
+                {{ pagination.pageNumber }} of {{ pagination.maxPage }} page{{
+                  pagination.pageNumber > 1 ? "s" : ""
+                }}
+                <span class="sr-only">(current)</span>
+              </a>
+              <div
+                class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+              >
+                <div class="pagination-menu-body">
+                  <div class="h-auto">
+                    <span>Jump to Page</span>
+                    <select
+                      aria-controls="data-table"
+                      [(ngModel)]="pagination.pageNumber"
+                      (change)="getShortTermPlacementsTypes()"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option
+                        (click)="pagination.pageNumber = line"
+                        *ngFor="let line of pagination.jumpArray"
+                      >
+                        {{ line }}
+                      </option>
+                    </select>
+                    <div class="text-center mt-3">
+                      <button type="button" class="btn btn-danger btn-xs">
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="page-item" *ngIf="pagination.hasNextPage">
+              <a
+                class="page-link"
+                href="javascript:void(0)"
+                (click)="
+                  pagination.pageNumber = pagination.pageNumber + 1;
+                  getShortTermPlacementsTypes()
+                "
+              >
+                Next
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </footer>
+      <ng-template #noData>
+        <h1 class="display-4 text-center font-weight-light p-5">
+          No Data Available
+        </h1>
+      </ng-template>
+    </div>
+  </div>
+</section>
+<section *ngIf="placementType" class="card placement_type">
+  <div header>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">
+        {{ placementType?.investmentName }}
+        <span
+          class="badge"
+          [ngClass]="{
+            'badge-success': placementType?.status === 'Active',
+            'badge-warning': placementType?.status === 'Inactive'
+          }"
+          >{{
+            placementType?.status === "Active"
+              ? placementType?.status
+              : "Inactive"
+          }}</span
+        >
+      </h1>
+
+      <div>
+        <button
+          [routerLink]="
+            '/configurations/placement-types/edit/' +
+            placementType?.shortTermPlacementTypeId
+          "
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          class="btn btn-sm px-6 text-white mr-1"
+        >
+          Edit
+        </button>
+        <button
+          class="btn btn-sm px-6 text-dark ml-1 btn-outline-light"
+          (click)="placementType = null"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+    <p class="sub_title mt-4">
+      This placement type
+      {{ placementType?.requireApproval ? "requires" : "does NOT require" }}
+      approval
+    </p>
+  </div>
+  <div *ngIf="placementType">
+    <lnd-accordion
+      accordionId="placementDetails"
+      title="Placement Details"
+      subTitle="Review Placement Information"
+      [open]="true"
+    >
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.placementDetails">
+          <lnd-accordion-item
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+            [tooltip]="item?.tooltip"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+    <lnd-accordion
+      accordionId="parameters"
+      title="Placement Parameters"
+      subTitle="Overview of Placement Criteria"
+      [open]="true"
+    >
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.parameters">
+          <lnd-accordion-item
+            [bgColor]="lightenColor(currentTheme?.primaryColor, lightenAmount)"
+            [primaryColor]="currentTheme?.primaryColor"
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+            [tooltip]="item?.tooltip"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+    <lnd-accordion
+      accordionId="fees"
+      title="Placement Fees"
+      subTitle="Review Placement Fee Terms"
+      [open]="true"
+    >
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.fees">
+          <lnd-accordion-item
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+            [tooltip]="item?.tooltip"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+  </div>
+</section>
+<ng-template #addeditplacement>
+  <addedit-placement-type
+    [currentTheme]="currentTheme"
+    [shortTermPlacementTypeId]="shortTermPlacementTypeId"
+    (closeModelEvent)="closeModal($event)"
+  ></addedit-placement-type>
+</ng-template>

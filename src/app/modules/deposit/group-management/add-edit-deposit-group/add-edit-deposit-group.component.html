@@ -1,0 +1,141 @@
+<header class="d-flex justify-content-between align-items-center w-100 mb-3">
+  <h1 class="mb-0">
+    <span>{{ !isEditing ? "Add " : "Edit " }}Group</span>
+  </h1>
+
+  <a
+    class="btn text-white"
+    [routerLink]="['/deposits/groups']"
+    routerLinkActive="router-link-active"
+    [style.background]="currentTheme?.secondaryColor"
+    [style.borderColor]="currentTheme?.secondaryColor"
+    href="javascript:void(0)"
+    >Back</a
+  >
+</header>
+
+<p
+  *ngIf="isLoading && isEditing"
+  class="text-center"
+  [style.color]="currentTheme?.secondaryColor"
+>
+  Retrieving Group... <i class="icon icon-spin icon-spin2"></i>
+</p>
+
+<main class="row">
+  <div class="col-md-8 offset-2">
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <form [formGroup]="groupForm" (ngSubmit)="submit()">
+          <p>Create and assign group roles to users</p>
+
+          <div class="form-group">
+            <label for="name">Group Name <b class="text-danger">*</b></label>
+            <input
+              type="text"
+              placeholder="Enter group name"
+              class="form-control"
+              formControlName="groupName"
+            />
+            <lnd-input-errors
+              label="Group name"
+              [control]="groupForm.get('groupName')"
+            ></lnd-input-errors>
+          </div>
+
+          <div class="form-group mb-5">
+            <label for="members">Group Members</label>
+            <div #members>
+              <slct-2
+                [data]="customers"
+                [customSearchEnabled]="true"
+                [multiple]="true"
+                [placeholder]="'Search Members'"
+                formControlName="groupMembers"
+              ></slct-2>
+            </div>
+          </div>
+
+          <div id="group-roles" formArrayName="memberRoles">
+            <ng-container
+              *ngFor="
+                let memberRolesCntrls of memberRoles().controls;
+                let i = index
+              "
+            >
+              <div [formGroup]="memberRolesCntrls">
+                <div class="form-row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="roles"
+                        >Group Roles <b class="text-danger">*</b></label
+                      >
+                      <slct-2
+                        [data]="groupRoles"
+                        [customSearchEnabled]="true"
+                        [multiple]="true"
+                        [allowSelectAll]="true"
+                        [placeholder]="'Search Group'"
+                        formControlName="groupRoles"
+                      ></slct-2>
+                    </div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                      <div class="form-group w-100">
+                        <label for="roles"
+                          >Group Member <b class="text-danger">*</b></label
+                        >
+                        <slct-2
+                          [data]="selectedGroupMembers"
+                          [customSearchEnabled]="true"
+                          [placeholder]="'Search Member'"
+                          formControlName="person"
+                        ></slct-2>
+                      </div>
+
+                      <i
+                        class="icon icon-trash icon-lg cursor text-danger ml-3"
+                        (click)="removeRole(i)"
+                      ></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <button
+              *ngIf="groupForm.get('members').value.length > 0"
+              [disabled]="
+                memberRoles().length === groupForm.get('members').value.length
+              "
+              type="button"
+              class="btn btn-xs add-btn mb-5 text-white"
+              (click)="addMemberRole()"
+            >
+              Add Group Role
+            </button>
+            <br />
+          </div>
+          <footer>
+            <div *ngIf="!isLoading; else processing">
+              <button
+                [disabled]="groupForm.invalid"
+                type="submit"
+                class="btn btn-xs btn-primary mt-5"
+              >
+                {{ isEditing ? "Edit " : "Create " }}Group
+              </button>
+            </div>
+
+            <ng-template #processing>
+              <button class="btn btn-xs btn-warning mx-1 text-white" disabled>
+                <i class="icon icon-spin icon-spin2"></i> Processing..
+              </button>
+            </ng-template>
+          </footer>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>

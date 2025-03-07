@@ -1,0 +1,19 @@
+<ng-container *ngIf="account?.children?.length > 0">
+  <ng-container *ngFor="let child of account.children">
+    <div
+      class="py-1"
+      [ngStyle]="{
+        'margin-left': account.children.length > 0 ? '30px' : '7px'
+      }"
+    >
+      <div class="d-flex align-items-center">
+        <div
+          class="mr-2"
+          style="width: 20px; height: 1px; background-color: #545454"
+        ></div>
+        <span class="name">{{ child.name }}</span>
+      </div>
+      <app-account [account]="child"></app-account>
+    </div>
+  </ng-container>
+</ng-container>

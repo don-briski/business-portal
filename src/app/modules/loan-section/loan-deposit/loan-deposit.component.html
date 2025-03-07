@@ -1,0 +1,36 @@
+<div
+  *ngIf="isDepositRequired && depositAmount"
+  class="w-100 mt-4 px-4"
+>
+  <div class="col-12 lnd-border border-warning mb-6">
+    <p
+      *ngIf="depositType === 'Fixed'"
+      class="mb-0"
+    >
+      A <b>Fixed</b> Deposit of
+      <b
+        >{{currencySymbol
+        }}{{ depositAmount | number : "1.2-2" }}</b
+      >
+      is required on the selected Loan Product
+    </p>
+
+    <p
+      *ngIf="depositType === 'Percent'"
+      class="mb-0"
+    >
+      An initial Deposit of
+      <span
+        ><b
+          >{{ currencySymbol
+          }}{{
+            depositAmount | number : "1.2-2"
+          }}</b
+        ></span
+      >
+      ({{ depositValue }}% of the loan
+      amount {{ LoanAmount | number : "1.2-2" }}) is
+      required on the selected Loan Product
+    </p>
+  </div>
+</div>

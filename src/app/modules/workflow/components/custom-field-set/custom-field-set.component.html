@@ -1,0 +1,84 @@
+<section class="top-margin">
+  <div
+    class="field-set p-4 mt-4"
+    *ngFor="
+      let customFieldSet of customFieldSets.controls;
+      let cFSetIndex = index
+    "
+    [formGroup]="customFieldSet"
+  >
+    <div id="accordion">
+      <div>
+        <div class="d-flex justify-content-between" id="accrdHeader">
+          <h4 class="mb-0 mr-3 d-inline-block">
+            {{
+              customFieldSet.value.customFieldSetName === ""
+                ? "New Field Set"
+                : customFieldSet.value.customFieldSetName
+            }}
+          </h4>
+          <div class="d-flex align-items-center">
+            <i
+              *ngIf="!viewMode"
+              (click)="onRemoveCustomFieldSet(cFSetIndex)"
+              class="cursor text-danger icon icon-trash mr-5"
+            ></i>
+            <span
+              (click)="onExpandCFSet(cFSetIndex)"
+              [ngClass]="selectedCFSetIndex === cFSetIndex ? 'open' : 'close'"
+              class="cursor"
+              [attr.data-target]="'#accrdContent' + cFSetIndex"
+              ><i class="icon icon-chevron-down icon-lg"></i
+            ></span>
+          </div>
+        </div>
+        <div>
+          <div
+            [id]="'accrdContent' + cFSetIndex"
+            [class]="selectedCFSetIndex === cFSetIndex ? '' : 'collapse'"
+            aria-labelledby="accrdHeader"
+            data-parent="#accordion"
+          >
+            <div class="row mt-4">
+              <div class="col-md-6">
+                <label>Field Set Name <b class="text-danger">*</b></label>
+                <input
+                  class="form-control"
+                  formControlName="customFieldSetName"
+                  [readonly]="viewMode"
+                  placeholder="Enter field set name"
+                />
+              </div>
+            </div>
+            <div class="row mt-4">
+              <div class="col-md-12">
+                <label>Field Notes</label>
+                <textarea
+                  class="form-control"
+                  formControlName="customFieldSetNotes"
+                  rows="3"
+                  placeholder="Enter some text"
+                  [readonly]="viewMode"
+                ></textarea>
+              </div>
+            </div>
+            <lnd-custom-field
+              [colorTheme]="colorTheme"
+              [customFields]="customFieldSet.get('customFields')"
+              [viewMode]="viewMode"
+            ></lnd-custom-field>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button
+    *ngIf="!viewMode"
+    type="button"
+    class="btn pl-0"
+    [style.color]="colorTheme.secondaryColor"
+    (click)="onAddCustomFieldSet()"
+  >
+    <i class="icon icon-add"></i> Add New Field Set
+  </button>
+</section>

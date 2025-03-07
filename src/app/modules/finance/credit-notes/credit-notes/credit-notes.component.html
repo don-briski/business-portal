@@ -1,0 +1,977 @@
+<div *ngIf="!viewingSingleCN; else singleCN">
+  <header class="w-100 d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Credit Notes</h1>
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <button
+          type="button"
+          class="btn btn-success mr-2"
+          aria-expanded="false"
+          (click)="openApprovalModal(cnImport)"
+        >
+          {{ isImporting ? "Importing..." : "Import" }}
+          <i class="icon icon-upload"></i>
+          <i *ngIf="isImporting" class="icon icon-spin icon-spin2 ml-2"></i>
+        </button>
+        <a
+          *ngIf="user?.permission.includes('Create Credit Note')"
+          class="btn btn-primary mr-2 text-white"
+          [style.borderColor]="colorTheme.secondaryColor"
+          [style.backgroundColor]="colorTheme.secondaryColor"
+          [routerLink]="['/finance/credit-notes/create']"
+          routerLinkActive="router-link-active"
+          href="javascript:void(0)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New</a
+        >
+      </div>
+    </span>
+  </header>
+  <ul
+    id="active-div"
+    class="card-header-pills nav nav-pill justify-content-center mb-2"
+    role="tablist"
+  >
+    <li class="nav-item">
+      <a
+        [ngClass]="{ 'active-tab': currentView === 'open' }"
+        class="nav-link pool-nav active-tab"
+        href="javascript:void(0)"
+        (click)="onSwitchTableView('open')"
+      >
+        Open
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        [ngClass]="{ 'active-tab': currentView === 'closed' }"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="onSwitchTableView('closed')"
+      >
+        Closed
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        [ngClass]="{ 'active-tab': currentView === 'all' }"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="onSwitchTableView('all')"
+      >
+        All
+      </a>
+    </li>
+  </ul>
+  <div class="dt-card w-100">
+    <div class="dt-card__body">
+      <header class="my-4">
+        <div class="form-row">
+          <div class="col-md-4">
+            <label style="display: inline-flex"
+              ><span style="padding: 8px 2px; font-size: 12px">Show </span
+              ><select
+                [(ngModel)]="cnPagination.pageSize"
+                [ngModelOptions]="{ standalone: true }"
+                aria-controls="data-table"
+                class="custom-select custom-select-xl form-control form-control-xl height mx-2"
+                (change)="fetchCNotes()"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span style="padding: 8px 2px; font-size: 12px"
+                >entries</span
+              ></label
+            >
+          </div>
+          <div class="col-md-4">
+            <app-loader *ngIf="fetchingCNs" message="Loading..."></app-loader>
+          </div>
+          <lnd-search-dropdown
+            [searchColumns]="cnPagination.searchColumns"
+            [currentTheme]="colorTheme"
+            (searchParams)="onSearchParams($event)"
+          ></lnd-search-dropdown>
+        </div>
+        <lnd-selected-filters
+          (initialized)="onSelectedFiltersInit($event)"
+        ></lnd-selected-filters>
+        <div *ngIf="!fetchingCNs" class="d-flex justify-content-between mt-4">
+          <div aria-live="polite">
+            Showing
+            {{
+              (cnPagination.pageNumber - 1) * cnPagination.pageSize + 1
+                | number : "1.0-0"
+            }}
+            -
+            {{
+              (cnPagination.pageNumber - 1) * cnPagination.pageSize +
+                cnPagination.count | number : "1.0-0"
+            }}
+            of {{ cnPagination.totalCount | number : "1.0-0" }} records
+          </div>
+
+          <div>
+            <lnd-filter-btn (filterModalOpen)="onOpenFilterModal()"></lnd-filter-btn>
+
+            <lnd-filter
+              [filterOptions]="filterOptions"
+              (optionSelected)="onOptionSelected($event)"
+            >
+            </lnd-filter>
+          </div>
+        </div>
+      </header>
+
+      <table
+        *ngIf="haveCNotes && !fetchingCNs"
+        id="data-table"
+        class="table table-striped"
+      >
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Customer</th>
+            <th>Salesperson</th>
+            <th>Date</th>
+            <th class="text-right">Total Amount ({{ currencySymbol }})</th>
+            <th class="text-right">Credits Remaining ({{ currencySymbol }})</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let cnote of cnotes; let i = index"
+            class="cursor"
+            (click)="viewSingleCN(cnote.id, dropdownToggle)"
+          >
+            <td
+              class="copy_icon_wrapper"
+              [style.color]="colorTheme.secondaryColor"
+            >
+              {{ cnote.code }}
+
+              <img
+                (mouseover)="copy_hover = true"
+                (mouseleave)="copy_hover = false"
+                class="copy_icon"
+                src="assets/images/copy.png"
+                alt="copy icon"
+                width="15"
+                height="15"
+                (click)="copyCode(cnote.code)"
+                placement="right"
+                ngbTooltip="Copy Credit Note Code"
+              />
+            </td>
+            <td>{{ cnote.customer }}</td>
+            <td>{{ cnote.salesPerson }}</td>
+            <td>
+              {{ cnote.date | customDatePipe : "DD-MMM-YY" }}
+            </td>
+            <td class="text-right">
+              {{ cnote.totalAmount | number : "1.2-2" }}
+            </td>
+            <td class="text-right">
+              {{ cnote.creditsRemaining | number : "1.2-2" }}
+            </td>
+            <td>
+              <span
+                class="badge mb-1 mr-1"
+                [ngClass]="{
+                  'badge-warning': cnote.status === 'Draft',
+                  'badge-redraft': cnote.status === 'Redraft',
+                  'badge-approval': cnote.status === 'SentForApproval',
+                  'badge-success': cnote.status === 'Posted',
+                  'badge-danger': cnote.status === 'Rejected'
+                }"
+                >{{ getCNStatus(cnote.status) }}</span
+              >
+            </td>
+
+            <td class="text-center">
+              <div #dropdownToggle class="dropdown mr-2 mb-2 d-inline-block">
+                <button
+                  class="btn btn-warning btn-xs dropdown-toggle"
+                  data-toggle="dropdown"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                ></button>
+                <div class="dropdown-menu">
+                  <a
+                    *ngIf="user?.permission?.includes('View Credit Note')"
+                    class="dropdown-item"
+                    href="javascript:void(0)"
+                    ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+                  >
+                  <a
+                    *ngIf="
+                      user?.permission?.includes('Edit Credit Note') &&
+                      (cnote.status === 'Draft' || cnote.status === 'Redraft')
+                    "
+                    class="dropdown-item"
+                    [routerLink]="'/finance/credit-notes/edit/' + cnote.id"
+                    ><i class="icon icon-edit icon-fw mr-2"></i>Edit</a
+                  >
+                  <a
+                    *ngIf="
+                      user?.permission?.includes('Create Credit Refund') &&
+                      cnote.creditsRemaining > 0 &&
+                      cnote.status === 'Posted'
+                    "
+                    class="dropdown-item cursor"
+                    (click)="onOpenRefundModal($event, refundView, cnote)"
+                    ><i class="icon icon-feedback mr-2"></i>Refund</a
+                  >
+                  <a
+                    *ngIf="
+                      user?.permission?.includes('Edit Credit Note') &&
+                      (cnote.status === 'Draft' || cnote.status === 'Redraft')
+                    "
+                    class="dropdown-item text-danger"
+                    (click)="attemptCNDelete(cnote.id)"
+                    href="javascript:void(0)"
+                    ><i class="icon icon-trash icon-fw mr-2"></i>Delete
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        *ngIf="!haveCNotes && !fetchingCNs"
+        class="d-flex flex-column align-items-center w-100"
+      >
+        <h1 class="display-4 text-center font-weight-light pt-5">
+          {{
+            errorOccured
+              ? "Couldn't load credit notes, please try again"
+              : "No Credit Notes Available"
+          }}
+        </h1>
+        <button
+          *ngIf="errorOccured"
+          class="btn btn-sm mb-5"
+          [style.background]="colorTheme.secondaryColor"
+          (click)="fetchCNotes()"
+        >
+          Retry
+        </button>
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm justify-content-end">
+          <li class="page-item" *ngIf="cnPagination.hasPreviousPage">
+            <a
+              class="page-link"
+              href="javascript:void(0)"
+              (click)="
+                fetchCNotes({
+                  pageSize: +cnPagination.pageSize,
+                  pageNumber: +cnPagination.pageNumber - 1,
+                  searchParam: ''
+                })
+              "
+              tabindex="-1"
+              >Previous</a
+            >
+          </li>
+          <li class="page-item pagination-menu-wrapper">
+            <a
+              class="page-link page-target"
+              href="javascript:void(0)"
+              (click)="itemPaginatedJumpModal()"
+            >
+              {{ cnPagination.pageNumber }} of {{ cnPagination.totalPages }}
+              {{ cnPagination.totalPages > 1 ? "pages" : "page" }}
+              <span class="sr-only">(current)</span>
+            </a>
+            <div
+              class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+            >
+              <div class="pagination-menu-body">
+                <div class="h-auto">
+                  <span>Jump to Page</span>
+                  <select
+                    aria-controls="data-table"
+                    [(ngModel)]="cnPagination.pageNumber"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                    (change)="fetchCNotes()"
+                  >
+                    <option
+                      *ngFor="let line of cnPagination.jumpArray"
+                      (click)="cnPagination.pageNumber = line"
+                    >
+                      {{ line }}
+                    </option>
+                  </select>
+                  <div class="text-center mt-3">
+                    <button type="button" class="btn btn-danger btn-xs">
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="page-item" *ngIf="cnPagination.hasNextPage">
+            <a
+              class="page-link"
+              href="javascript:void(0)"
+              (click)="
+                fetchCNotes({
+                  pageSize: +cnPagination.pageSize,
+                  pageNumber: +cnPagination.pageNumber + 1,
+                  searchParam: ''
+                })
+              "
+            >
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<ng-template #refundView>
+  <lnd-add-edit-credit-refund
+    relatedObject="CreditNote"
+    [relatedObjectId]="cnDetails.id"
+    [maxAmount]="cnDetails.creditsRemaining"
+    (close)="onCloseRefundModal($event)"
+  ></lnd-add-edit-credit-refund>
+</ng-template>
+
+<ng-template #singleCN>
+  <div class="wrapper single-view">
+    <div class="d-flex flex-row">
+      <div class="left pr-4">
+        <div class="top">
+          <header
+            class="w-100 d-flex align-items-center justify-content-between mb-3"
+          >
+            <h1 class="dt-page__title">Credit Notes</h1>
+            <span class="float-right role-add">
+              <a
+                *ngIf="user?.permission.includes('Create Credit Note')"
+                class="btn btn-primary mr-2 text-white"
+                [style.borderColor]="colorTheme.secondaryColor"
+                [style.backgroundColor]="colorTheme.secondaryColor"
+                [routerLink]="['/finance/credit-notes/create']"
+                routerLinkActive="router-link-active"
+                href="javascript:void(0)"
+              >
+                <i class="icon icon-add-circle mr-2"></i>Create Credit Note</a
+              >
+            </span>
+          </header>
+        </div>
+        <div class="body">
+          <div class="card">
+            <div class="card-body p-0">
+              <ul class="cn-list">
+                <li
+                  *ngFor="let cn of cnotes"
+                  (click)="viewSingleCN(cn.id)"
+                  [ngClass]="{
+                    selected: cnDetails.id === cn.id
+                  }"
+                  [style.border-left]="
+                    cnDetails.id === cn?.id
+                      ? '5px solid ' + colorTheme.secondaryColor
+                      : ''
+                  "
+                  (mouseover)="cn.hover = true"
+                  (mouseleave)="
+                    cnDetails.id !== cn?.id ? (cn.hover = false) : null
+                  "
+                  [ngStyle]="cn.hover ? hoverStyle : {}"
+                >
+                  <span
+                    class="d-flex justify-content-between align-items-center title"
+                  >
+                    <span>{{ cn.customer }}</span>
+                    <span
+                      >{{ currencySymbol
+                      }}{{ cn.creditsRemaining | number : "1.2-2" }}</span
+                    >
+                  </span>
+                  <span
+                    class="d-flex justify-content-between align-items-center sub-title mt-2"
+                  >
+                    <span>
+                      {{ cn.code }} |
+                      {{ cn.date | customDatePipe : "DD-MMM-YY" }}
+                    </span>
+                    <span>
+                      <span
+                        class="badge badge-sm"
+                        [ngClass]="{
+                          'badge-warning': cn.status === 'Draft',
+                          'badge-approval': cn.status === 'SentForApproval',
+                          'badge-success': cn.status === 'Posted',
+                          'badge-danger': cn.status === 'Rejected',
+                          'badge-redraft': cn.status === 'Redraft'
+                        }"
+                        >{{
+                          cn.status === "SentForApproval"
+                            ? "Awaiting Approval"
+                            : cn.status
+                        }}</span
+                      >
+                    </span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="right px-2">
+        <div class="top card mb-3">
+          <div class="card-body">
+            <div class="float-right">
+              <button
+                *ngIf="
+                  cnDetails.status === 'SentForApproval' &&
+                  user?.permission.includes('Approve Credit Note')
+                "
+                class="btn btn-review btn-xs"
+                (click)="openApprovalModal(approvalView)"
+              >
+                Review Request
+              </button>
+              <button
+                *ngIf="
+                  cnDetails.status === 'Posted' &&
+                  haveCredits &&
+                  user.permission.includes('Apply Credit Note')
+                "
+                class="btn btn-xs btn-success"
+                (click)="openModal(applyToInvoiceView, cnDetails)"
+              >
+                Apply To Invoice(s)
+              </button>
+              <button
+                *ngIf="
+                  user?.permission.includes('Edit Credit Note') &&
+                  (cnDetails.status === 'Draft' ||
+                    cnDetails.status === 'Redraft')
+                "
+                class="btn btn-xs btn-light"
+                [routerLink]="'/finance/credit-notes/edit/' + cnDetails.id"
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-xs btn-primary"
+                (click)="printCN(cnDetails?.customer)"
+              >
+                {{ printStatus }}
+                <i
+                  *ngIf="printStatus === 'Processing'"
+                  class="icon icon-spin icon-spin2"
+                ></i>
+              </button>
+              <button
+                class="btn btn-xs btn-outline-dark"
+                (click)="closeSingleCNView()"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="tabs"
+          class="d-flex justify-content-between align-items-center py-2"
+          style="padding-left: 30px"
+        >
+          <ul
+            id="active-div"
+            class="card-header-pills nav nav-pill justify-content-center align-items-center"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                [ngClass]="currentTab === 'overview' ? 'active-tab' : ''"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                role="tab"
+                aria-controls="tab-overview"
+                aria-selected="false"
+                (click)="onSwitchTab('overview')"
+                >Overview</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                [ngClass]="currentTab === 'comments' ? 'active-tab' : ''"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                role="tab"
+                aria-controls="tab-comments"
+                aria-selected="false"
+                (click)="onSwitchTab('comments')"
+                >Comments</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                [ngClass]="currentTab === 'activity' ? 'active-tab' : ''"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                role="tab"
+                aria-controls="tab-activity"
+                aria-selected="false"
+                (click)="onSwitchTab('activity')"
+                >Activity Logs</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                [ngClass]="currentTab === 'files' ? 'active-tab' : ''"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                role="tab"
+                aria-controls="tab-files"
+                aria-selected="false"
+                (click)="onSwitchTab('files')"
+                >Files</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <div class="tab-content">
+          <div
+            id="tab-overview"
+            class="tab-pane"
+            [ngClass]="{ 'active show': currentTab === 'overview' }"
+            *ngIf="currentTab === 'overview'"
+          >
+            <div class="paper p-5" #creditNotePaper>
+              <div class="card">
+                <lnd-ribbon [status]="cnDetails.status"></lnd-ribbon>
+                <div class="card-body">
+                  <div class="content">
+                    <div class="d-flex justify-content-between mb-5">
+                      <span>
+                        <div class="img-container mb-2">
+                          <img
+                            class="mx-auto img-fluid d-block"
+                            [src]="base64Image"
+                          />
+                        </div>
+                        <p class="h3 mb-1">{{ appOwner.appOwnerName }}</p>
+                        <p class="mb-1">{{ appOwner.appOwnerEmail }}</p>
+                        <p class="mb-1">
+                          {{ appOwner.appOwnerBillingAddress }}
+                        </p>
+                      </span>
+                      <span class="text-right">
+                        <h3 class="display-1">Credit Notes</h3>
+                        <p>Credit Note# {{ cnDetails.code }}</p>
+
+                        <br />
+                        <br />
+                        <p class="mb-1">Credits Remaining</p>
+                        <p class="display-3">
+                          {{ currencySymbol
+                          }}{{ cnDetails.creditsRemaining | number : "1.2-2" }}
+                        </p>
+                      </span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3 mb-3">
+                      <span class="d-flex">
+                        <span>
+                          <p class="mb-1">Customer</p>
+                          <p class="mb-3 text-primary">
+                            {{ cnDetails.customer }}
+                          </p>
+                        </span>
+                        <span class="ml-5">
+                          <p class="mb-1">Sales Person</p>
+                          <p class="mb-3 text-primary">
+                            {{ cnDetails?.salesPerson }}
+                          </p>
+                        </span>
+                      </span>
+                      <span>
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td>Credit Note Date:</td>
+                              <td>
+                                {{
+                                  cnDetails.date
+                                    | customDatePipe : "DD-MMM-YYYY"
+                                }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </span>
+                    </div>
+                    <div class="text-center">
+                      <div
+                        *ngIf="fetchingCN"
+                        class="table-loader"
+                        style="text-align: center; color: indianred"
+                      >
+                        <span>
+                          <i class="icon icon-spin icon-spin2"></i> Loading
+                          items...</span
+                        >
+                      </div>
+                    </div>
+                    <div class="line" *ngIf="cnDetails.lines.length">
+                      <table class="table items-table">
+                        <thead [style.background]="colorTheme.primaryColor">
+                          <th>#</th>
+                          <th>Item</th>
+                          <th>Quantity</th>
+                          <th class="text-right">
+                            Rate ({{ currencySymbol }})
+                          </th>
+                          <th class="text-right">
+                            Amount ({{ appOwner?.currency?.currencySymbol }})
+                          </th>
+                        </thead>
+                        <tbody>
+                          <tr
+                            *ngFor="let row of cnDetails.lines; let i = index"
+                          >
+                            <td>{{ i + 1 }}</td>
+                            <td>{{ row.itemName }} ({{ row.itemCode }})</td>
+                            <td>{{ row.quantity }}</td>
+                            <td class="text-right">
+                              {{ row.unitPrice | number : "1.2-2" }}
+                            </td>
+                            <td class="text-right">
+                              {{ row.amountAfterTax | number : "1.2-2" }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right"><b>Sub total</b></td>
+                            <td class="text-right">
+                              {{ currencySymbol
+                              }}{{ cnDetails.subTotal | number : "1.2-2" }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right">Tax</td>
+                            <td class="text-right">
+                              {{ currencySymbol
+                              }}{{
+                                cnDetails.taxTotalAmount | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="text-right">Discount</td>
+                            <td class="text-danger text-right">
+                              {{ currencySymbol
+                              }}{{
+                                cnDetails.discountAmount | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td
+                              class="text-right p-4"
+                              style="background-color: gainsboro"
+                            >
+                              <b>Balance Due</b>
+                            </td>
+                            <td
+                              class="text-right p-4"
+                              style="background-color: gainsboro"
+                            >
+                              {{ currencySymbol
+                              }}{{ cnDetails.totalAmount | number : "1.2-2" }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane"
+            [ngClass]="{ 'active show': currentTab === 'comments' }"
+            *ngIf="currentTab === 'comments'"
+          >
+            <div class="p-5 paper">
+              <div class="card">
+                <table
+                  class="table table-striped mb-0"
+                  *ngIf="cnDetails.comments.length; else noComments"
+                >
+                  <thead class="thead-light">
+                    <tr>
+                      <th class="text-uppercase" scope="col">Username</th>
+                      <th class="text-uppercase" scope="col">Comment</th>
+                      <th class="text-uppercase" scope="col">Date Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let c of cnDetails.comments">
+                      <td>{{ c.name }}</td>
+                      <td>{{ c.comment }}</td>
+                      <td>{{ c.dateCreated | customDatePipe }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <ng-template #noComments>
+                  <div class="d-flex flex-column align-items-center w-100 py-3">
+                    <p class="display-4 text-center font-weight-light mb-0">
+                      No Comments Available
+                    </p>
+                    <img
+                      src="assets/images/no data.svg"
+                      alt="no-data-svg"
+                      width="200px"
+                      class="py-5"
+                    />
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane"
+            [ngClass]="{ 'active show': currentTab === 'activity' }"
+            *ngIf="currentTab === 'activity'"
+          >
+            <div class="p-5">
+              <div class="card">
+                <table
+                  *ngIf="selectedCNActivities.length"
+                  class="table mb-0 table-striped"
+                >
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Code</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let activi of selectedCNActivities">
+                      <td [style.color]="colorTheme.secondaryColor">
+                        {{ activi.relatedObjectInitiatorCode }}
+                      </td>
+                      <td>{{ activi.activityDescription }}</td>
+                      <td>
+                        {{ activi.activityDate | customDatePipe }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div
+                  *ngIf="!selectedCNActivities.length"
+                  class="d-flex flex-column align-items-center w-100 py-3"
+                >
+                  <p class="text-center font-weight-light mb-0">
+                    <span *ngIf="fetchingSelectedCNActivities">
+                      <i class="icon icon-spin icon-spin2 mr-2"></i>
+                      Fetching Activities...
+                    </span>
+                    <span *ngIf="!fetchingSelectedCNActivities"
+                      >No Activities Available</span
+                    >
+                  </p>
+                  <img
+                    *ngIf="!fetchingSelectedCNActivities"
+                    src="assets/images/no data.svg"
+                    alt="no-data-svg"
+                    width="200px"
+                    class="py-5"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane"
+            [ngClass]="{ 'active show': currentTab === 'files' }"
+          >
+            <lnd-uploaded-files [files]="cnDetails.files"></lnd-uploaded-files>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #approvalView>
+  <lnd-trans-pin-modal
+    [comments]="cnDetails?.comments"
+    feature="credit notes"
+    [canApprove]="user?.permission?.includes('Approve Credit Note')"
+    (sendPayload)="onApproveCN($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>
+
+<ng-template #applyToInvoiceView>
+  <div class="p-5">
+    <div class="d-flex justify-content-between mb-5">
+      <h2>Apply credits from {{ cnDetails.code }}</h2>
+      <span
+        class="display-3 cursor"
+        (click)="closeApplyCreditsModal()"
+        aria-hidden="true"
+        >&times;</span
+      >
+    </div>
+    <div class="d-flex justify-content-end mb-5">
+      <span class="text-right">
+        <p class="mb-1">Credits Remaining:</p>
+        <p class="display-3">
+          {{ currencySymbol }}{{ amount.creditsRemaining | number : "1.2-2" }}
+        </p>
+      </span>
+    </div>
+    <div *ngIf="!invoices.length" class="text-center p-5">
+      <div class="table-loader" style="text-align: center; color: indianred">
+        <span *ngIf="fetchingInvoices">
+          <i class="icon icon-spin icon-spin2"></i> Loading Invoices...</span
+        >
+        <p *ngIf="!fetchingInvoices">No Invoice(s) for this customer</p>
+      </div>
+    </div>
+    <form [formGroup]="applyCreditsForm">
+      <table
+        class="table items-table"
+        *ngIf="!fetchingInvoices && invoices.length"
+      >
+        <thead [style.background]="colorTheme.primaryColor">
+          <tr>
+            <th></th>
+            <th>Invoice#</th>
+            <th>Due Date</th>
+            <th class="text-right">Invoice Amount ({{ currencySymbol }})</th>
+            <th class="text-right">Invoice Balance ({{ currencySymbol }})</th>
+            <th class="text-right">Amount To Credit ({{ currencySymbol }})</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="lines">
+          <tr
+            *ngFor="let invoice of invoices; let i = index"
+            [formGroup]="lines.controls[i]"
+          >
+            <td>{{ i + 1 }}</td>
+            <td>{{ invoice.code }}</td>
+            <td>{{ invoice.invoiceDueDate | customDatePipe : "DD-MMM-YY" }}</td>
+            <td class="text-right">
+              {{ invoice.amount | number : "1.2-2" }}
+            </td>
+            <td class="text-right">
+              {{ invoice.balanceDue | number : "1.2-2" }}
+            </td>
+            <td class="text-right">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Amount"
+                formControlName="amount"
+                (keyup)="onAmountChange(invoice, lines.controls[i])"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+    <footer>
+      <div class="d-flex justify-content-end">
+        <h4>
+          Amount To Credit: {{ currencySymbol
+          }}{{ amount.amountToCredit | number : "1.2-2" }}
+        </h4>
+      </div>
+      <div class="d-flex justify-content-end">
+        <h4>
+          Remaining Credits: {{ currencySymbol
+          }}{{ amount.totalCreditsRemaining | number : "1.2-2" }}
+        </h4>
+      </div>
+    </footer>
+    <div class="d-flex justify-content-end mt-3">
+      <button
+        type="button"
+        class="btn btn-light btn-xs"
+        (click)="closeApplyCreditsModal()"
+        *ngIf="!applying"
+      >
+        Cancel
+      </button>
+      <button
+        class="btn btn-xs ml-3 text-white"
+        [style.background]="colorTheme.secondaryColor"
+        (click)="onApplyToInvoice()"
+        [disabled]="!haveLinesWithAmount"
+        *ngIf="!applying && user?.permission?.includes('Apply Credit Note')"
+      >
+        Apply
+      </button>
+      <button class="btn btn-xs btn-warning mx-1" disabled *ngIf="applying">
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #cnImport>
+  <lnd-import-modal
+    title="Credit Note Import"
+    [currentTheme]="colorTheme"
+    [downloading]="downloading"
+    (closeModal)="closeApprovalModal()"
+    (downloadTemplate)="downloadTemplate()"
+    (selectedFile)="submitImportedCN($event)"
+  >
+    <p><b>Requirements</b></p>
+    <ul>
+      <li>Each item selected must have a sales account and sales price</li>
+      <li>All fields are required (*)</li>
+    </ul>
+  </lnd-import-modal>
+</ng-template>

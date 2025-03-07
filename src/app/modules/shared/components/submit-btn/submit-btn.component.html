@@ -1,0 +1,9 @@
+<button
+  class="btn"
+  [ngClass]="customClasses ? customClasses : 'text-white'"
+  (click)="triggerAction.emit()"
+  [disabled]="isProcessing || !isValid"
+>
+  {{ isProcessing ? "Processing..." : text }}
+  <i *ngIf="isProcessing" class="icon icon-spin icon-spin2"></i>
+</button>

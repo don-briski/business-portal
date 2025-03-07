@@ -1,0 +1,84 @@
+<form *ngIf="ShortTermPlacementForm" [formGroup]="ShortTermPlacementForm" (submit)="saveShortTermPlacementForm(ShortTermPlacementForm.value)">
+  <!-- Form -->
+  <div class="form-row">
+    <div class="col form-group">
+      <label for="type">Type<b class="text-danger">*</b></label>
+      <select class="custom-select custom-select-xl form-control form-control-xl height" formControlName="Type" (change)="switchSTPType($event.target.value)">
+        <option disabled>Select Type</option>
+        <option *ngFor="let item of StpTypes.ShortTermPlacementTypeList" value="{{item}}">{{ camelPad(item)}}</option>
+      </select>
+    </div>
+
+    <div class="col form-group">
+      <label for="type">Institution<b class="text-danger">*</b></label>
+      <select class="custom-select custom-select-xl form-control form-control-xl height" formControlName="FinancialInstitutionId">
+        <option disabled>Select Institution</option>
+        <option *ngFor="let item of financialInstitutions" value="{{item.financialInstitutionId}}">{{ item.name }}</option>
+      </select>
+    </div>
+
+    <div class="col form-group">
+      <label for="TenorPeriod">Tenor Period<b class="text-danger">*</b></label>
+      <select class="custom-select custom-select-xl form-control form-control-xl height" formControlName="TenorPeriod" id="tenorPeriod">
+        <option disabled>Select Tenor Period</option>
+        <option *ngFor="let item of StpTypes.ShortTermPlacementTenorPeriodList" value="{{item}}">{{item}}</option>
+      </select>
+    </div>
+
+    <div class="form-group col">
+      <label for="Tenor">Tenor<b class="text-danger">*</b></label>
+      <input type="number"  formControlName="Tenor" id="Tenor" class="form-control" min=1 step="1"/>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col">
+      <label for="InterestRate">Annual Interest Rate<b class="text-danger">*</b> (%)</label>
+      <input type="text" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  formControlName="InterestRate" id="InterestRate" class="form-control" />
+    </div>
+
+    <div class="col form-group">
+      <label for="InterestType">Interest Type<b class="text-danger">*</b></label>
+      <select class="custom-select custom-select-xl form-control form-control-xl height" formControlName="InterestType" id="InterestType" (change)="switchShortTermPlacementInterestType($event.target.value)">
+        <option disabled>Select Interest Type</option>
+        <option *ngFor="let item of StpTypes.ShortTermPlacementInterestTypeList" value="{{item}}">{{item}}</option>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="form-row">
+
+    <div class="form-group col">
+      <label for="Principal">Principal<b class="text-danger">*</b></label>
+      <input type="text" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" formControlName="Principal" id="Principal" class="form-control" />
+    </div>
+
+    <div class="col form-group">
+      <label for="MaturityAction">Maturity Action<b class="text-danger">*</b></label>
+      <select class="custom-select custom-select-xl form-control form-control-xl height" formControlName="MaturityAction" id="MaturityAction">
+        <option disabled>Select Maturity Action</option>
+        <option *ngFor="let item of StpTypes.ShortTermPlacementMaturityActionList" value="{{item}}">{{ camelPad(item)}}</option>
+      </select>
+    </div>
+
+    <div class="form-group col" *ngIf="selectedType == 'FixedDeposit'">
+      <label for="PreLiquidationCharge">Pre Liquidation Charge</label>
+      <input type="text" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }" formControlName="PreLiquidationCharge" id="PreLiquidationCharge" class="form-control" />
+    </div>
+
+  </div>
+
+  <hr class="border-dashed mb-3">
+  <!-- /form -->
+    <div class="form-group clearfix">
+      <button type="submit" class="btn btn-secondary text-white float-right" *ngIf="!loader"
+        [disabled]="!ShortTermPlacementForm.valid">
+        Submit Application
+      </button>
+      <button type="button" class="btn btn-success float-right" *ngIf="loader" [disabled]="true">
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+
+</form>

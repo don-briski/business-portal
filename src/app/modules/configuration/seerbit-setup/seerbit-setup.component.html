@@ -1,0 +1,82 @@
+<h3 [style.color]="currentTheme?.secondaryColor" class="mb-2 orange">
+  Update Seerbit Integration Details
+</h3>
+<p *ngIf="seerbitSetup !== null">
+  Seerbit payment method is currently
+  <span class="badge badge-pill badge-success" *ngIf="seerbitSetup?.isActive"
+    >Active</span
+  >
+  <span class="badge badge-pill badge-danger" *ngIf="!seerbitSetup?.isActive"
+    >Inactive</span
+  >
+</p>
+<form [formGroup]="form">
+  <div class="form-group">
+    <label for="email">Email Address</label>
+    <input
+      type="email"
+      formControlName="emailAddress"
+      class="form-control"
+      placeholder="Email Address"
+    />
+  </div>
+  <div class="form-group">
+    <label>API Public Key</label>
+    <input
+      type="text"
+      formControlName="apiPublicKey"
+      class="form-control"
+      placeholder="API Public Key"
+    />
+  </div>
+  <ng-container formGroupName="integrationExtraInfoDto">
+    <div class="form-group">
+      <label for="pocket-id">Pocket ID</label>
+      <input
+        type="pocket-id"
+        formControlName="pocketId"
+        class="form-control"
+        placeholder="Pocket ID"
+      />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input
+        type="text"
+        formControlName="password"
+        class="form-control"
+        placeholder="Password"
+      />
+    </div>
+  </ng-container>
+  <div class="form-group">
+    <button
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      (click)="updateSetup()"
+      class="btn btn-primary btn-sm text-uppercase orange-bg"
+      [disabled]="form.invalid || isUpdatingSetup"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="isUpdatingSetup"></i>
+      {{ isUpdatingSetup ? "Updating..." : "Update" }}
+    </button>
+    <button
+      class="btn btn-sm btn-success text-uppercase"
+      *ngIf="!seerbitSetup?.isActive"
+      [disabled]="form.invalid || isUpdatingStatus"
+      (click)="onUpdateStatus(true)"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="isUpdatingStatus"></i>
+      {{ isUpdatingStatus ? "Activating..." : "Activate" }}
+    </button>
+    <button
+      class="btn btn-sm btn-danger text-uppercase"
+      *ngIf="seerbitSetup?.isActive"
+      [disabled]="form.invalid || isUpdatingStatus"
+      (click)="onUpdateStatus(false)"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="isUpdatingStatus"></i>
+      {{ isUpdatingStatus ? "Deactivating..." : "Deactivate" }}
+    </button>
+  </div>
+</form>

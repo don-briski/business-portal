@@ -1,0 +1,62 @@
+<section
+  *ngIf="
+    user?.permission?.includes('View Checkout Transactions') ||
+    user?.permission?.includes('View Checkout Commission Invoices')
+  "
+>
+  <header class="w-100 d-flex align-items-center justify-content-between mb-5">
+    <h1 class="dt-page__title m-0">Transactions</h1>
+  </header>
+  <ul
+    id="active-div"
+    class="card-header-pills nav nav-pill justify-content-center mb-2"
+    role="tablist"
+  >
+    <li
+      *ngIf="user?.permission?.includes('View Checkout Transactions')"
+      class="nav-item"
+    >
+      <a
+        [ngClass]="{ 'active-tab': currentTab === 'Transactions' }"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="onSwitchTab('Transactions')"
+      >
+        Transactions
+      </a>
+    </li>
+    <li
+      *ngIf="user?.permission?.includes('View Checkout Commission Invoices')"
+      class="nav-item"
+    >
+      <a
+        [ngClass]="{ 'active-tab': currentTab === 'Commissions' }"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="onSwitchTab('Commissions')"
+      >
+        Commissions
+      </a>
+    </li>
+  </ul>
+  <div class="dt-card w-100">
+    <div class="dt-card__body">
+      <ng-container
+        *ngIf="
+          currentTab === 'Transactions' &&
+          user?.permission?.includes('View Checkout Transactions')
+        "
+      >
+        <lnd-merchant-transactions></lnd-merchant-transactions>
+      </ng-container>
+      <ng-container
+        *ngIf="
+          currentTab === 'Commissions' &&
+          user?.permission?.includes('View Checkout Commission Invoices')
+        "
+      >
+        <lnd-merchant-commissions></lnd-merchant-commissions>
+      </ng-container>
+    </div>
+  </div>
+</section>

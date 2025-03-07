@@ -1,0 +1,19 @@
+<lnd-table
+  [isLoading]="isLoading"
+  [config]="tableConfig"
+  [pagination]="pagination"
+  [headers]="tableHeaders"
+  [data]="tableData"
+  [complexFilters]="filters"
+  [useComplexFilters]="true"
+  [useStartAndEndDate]="true"
+  (complexFiltersChange)="onComplexFiltersChange($event)"
+  (dateSelectionChange)="onDateSelectionFilter($event)"
+  [searchColumns]="pagination?.searchColumns"
+  (paginationChange)="onPaginationChange($event)"
+  (searchParams)="onSearchParams($event)"
+  [enableFiltersSearch]="true"
+  noDataTitle='Transaction page is empty by default'
+  noDataDesc="Use the filter button to display specific content based
+  on your preferences."
+></lnd-table>

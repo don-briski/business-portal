@@ -1,0 +1,92 @@
+<section
+  class="upload-section p-5"
+  lndDnd
+  (fileDropped)="handleFileInput.emit($event)"
+>
+  <div *ngIf="!showSummary" class="content">
+    <div class="d-flex justify-content-center mb-5">
+      <img src="assets/images/upload1.svg" alt="upload file" />
+    </div>
+    <p>
+      Drag & drop here or
+      <span class="link-text cursor" (click)="files.click()">Click Upload</span>
+    </p>
+    <p class="font-weight-light">
+      {{ text }}
+    </p>
+
+    <p *ngIf="!isLoading" class="mt-5">
+      Click
+      <span class="link-text cursor" (click)="downloadTemplate.emit()"
+        >here</span
+      >
+      to download {{ resource }} Template
+    </p>
+    <p *ngIf="isLoading" [style.color]="currentTheme?.secondaryColor">
+      Downloading Template... <i class="icon icon-spin icon-spin2"></i>
+    </p>
+
+    <input
+      #files
+      type="file"
+      (change)="handleFileInput.emit($event.target.files)"
+      style="display: none"
+    />
+  </div>
+
+  <div *ngIf="showSummary" id="summary">
+    <p>File uploaded successfully</p>
+    <div id="file-progress" class="mb-5">
+      <img
+        src="assets/images/file-green-bg.svg"
+        alt="file with green background"
+      />
+      <div class="mx-5">
+        <p class="mb-0">
+          {{ file?.name }}
+        </p>
+        <small>{{ file?.fileSize }}</small>
+
+        <lnd-progress-bar [progressValue]="progressValue"></lnd-progress-bar>
+      </div>
+      <i
+        class="icon icon-trash icon-xl mb-3 cursor"
+        (click)="deleteFile.emit()"
+      ></i>
+    </div>
+
+    <div *ngIf="stats?.length > 0" class="mb-5">
+      <ng-container *ngFor="let stat of stats; let i = index">
+        <span *ngIf="i === 0" class="summary-pill"
+          >{{ stat?.value }} Row<span *ngIf="stat?.value > 1">s</span></span
+        >
+        <span *ngIf="i !== 0" class="summary-pill">
+          <span *ngIf="stat?.label">{{ stat?.label }}: </span>
+          <span *ngIf="i !== 0">{{ currencySymbol }}</span>
+          {{ stat?.value | number : "1.2-2" }}
+        </span>
+      </ng-container>
+    </div>
+
+    <button
+      *ngIf="allowPreview"
+      class="btn mt-3"
+      type="button"
+      (click)="openPreviewModal.emit()"
+    >
+      Preview
+    </button>
+
+    <button
+      *ngIf="allowSubmit"
+      class="btn mt-3"
+      type="button"
+      (click)="submit.emit()"
+    >
+      <span *ngIf="!isLoading">Upload {{ resource }}</span>
+      <span *ngIf="isLoading"
+        >Processing... <i class="icon icon-spin icon-spin2 mr-2"></i
+      ></span>
+    </button>
+  </div>
+</section>

@@ -1,0 +1,22 @@
+app-sidebar {
+    width: 240px;   
+}
+
+@media screen and (max-width: 991px) { 
+    app-sidebar {
+        width: auto;   
+    }
+}
+
+.dt-content-wrapper {
+    margin-top: 74px;
+  }
+
+.ui-select-choices {
+    display: block;
+}
+
+.modal-lg, .modal-xl {
+    max-width: 80%;
+}
+

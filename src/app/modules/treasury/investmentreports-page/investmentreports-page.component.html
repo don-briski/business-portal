@@ -1,0 +1,1756 @@
+<!-- Page Header -->
+<div class="dt-page__header">
+  <h1 class="dt-page__title">Investment Reports</h1>
+</div>
+<div
+  class="row dt-masonry"
+  *ngIf="userInfo?.permission?.includes('View Reports')"
+>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Report')"
+  >
+    <div class="dt-card">
+      <div class="dt-card__header">
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Investment Report
+          </h3>
+        </div>
+      </div>
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                class="cursor"
+                [style.color]="currentTheme?.secondaryColor"
+                (click)="toggleAside('Investment Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Liquidation Report')"
+  >
+    <div class="dt-card">
+      <div class="dt-card__header">
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Investment Liquidation
+            Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Investment Liquidation Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Investment Maturity Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Investment Maturity Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Interest Accrued Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Interest Accrued Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Activity Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Activity Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Report')"
+  >
+    <div class="dt-card">
+      <div class="dt-card__header">
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Short Term Investment
+            Report
+          </h3>
+        </div>
+      </div>
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                class="cursor"
+                [style.color]="currentTheme?.secondaryColor"
+                (click)="
+                  toggleAside(
+                    investmentReportNameEnum.ShortTermInvestmentReport
+                  )
+                "
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Report')"
+  >
+    <div class="dt-card">
+      <div class="dt-card__header">
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Short Term Maturity Report
+          </h3>
+        </div>
+      </div>
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                class="cursor"
+                [style.color]="currentTheme?.secondaryColor"
+                (click)="
+                  toggleAside(
+                    investmentReportNameEnum.ShortTermInvestmentMaturityReport
+                  )
+                "
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Report')"
+  >
+    <div class="dt-card">
+      <div class="dt-card__header">
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Short Term Liquidation
+            Report
+          </h3>
+        </div>
+      </div>
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                class="cursor"
+                [style.color]="currentTheme?.secondaryColor"
+                (click)="
+                  toggleAside(
+                    investmentReportNameEnum.ShortTermInvestmentLiquidationReport
+                  )
+                "
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="col-md-3 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Investment Report')"
+  >
+    <div class="dt-card">
+      <div class="dt-card__header">
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="mr-2 icon icon-revenue-new"></i>Short Term Interest
+            Accrued Report
+          </h3>
+        </div>
+      </div>
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                class="cursor"
+                [style.color]="currentTheme?.secondaryColor"
+                (click)="
+                  toggleAside(
+                    investmentReportNameEnum.ShortTermInvestmentInterestAccruedReport
+                  )
+                "
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<ng-template #reportModal>
+  <!-- Modal Content -->
+  <div class="modal-content">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h3 class="modal-title" id="model-1">
+        <i class="mr-2 icon icon-ckeditor"></i>Generate New Report
+      </h3>
+      <button
+        type="button"
+        class="close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="closeModal()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- /modal header -->
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Form -->
+      <form>
+        <div class="mb-4 form-row">
+          <label
+            for="normal-input-4"
+            class="col-md-2 col-sm-3 col-form-label col-form-label-sm text-sm-right"
+            >Filter By</label
+          >
+          <div class="col-md-10 col-sm-9">
+            <select class="custom-select custom-select-sm" id="normal-input-4">
+              <option selected>Daily</option>
+              <option value="1">Weekly</option>
+              <option value="2">Monthly</option>
+              <option value="2">Yearly</option>
+            </select>
+          </div>
+        </div>
+        <!-- /card tools -->
+        <!-- Form Group -->
+        <div class="form-group form-row">
+          <label
+            for="normal-input-5"
+            class="col-md-2 col-sm-3 col-form-label col-form-label-sm text-sm-right"
+            >Title</label
+          >
+          <div class="col-md-10 col-sm-9">
+            <input
+              type="email"
+              class="form-control form-control-sm"
+              id="normal-input-5"
+              placeholder="Report Title"
+            />
+          </div>
+        </div>
+        <!-- /form group -->
+
+        <!-- Form Row -->
+        <div class="form-row">
+          <label
+            class="col-md-2 col-sm-3 col-form-label text-sm-right"
+            for="text-area-1"
+            >Internal Note</label
+          >
+
+          <div class="col-md-10 col-sm-9">
+            <textarea
+              class="form-control"
+              id="text-area-1"
+              rows="3"
+              placeholder="Internal note"
+            ></textarea>
+          </div>
+        </div>
+        <!-- /form row -->
+      </form>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        data-dismiss="modal"
+        (click)="closeModal()"
+      >
+        Close
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        data-dismiss="modal"
+        (click)="toggleAside()"
+      >
+        Generate Report
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </div>
+  <!-- /modal content -->
+</ng-template>
+<!-- /modal -->
+<lnd-aside [isOpen]="openReportAside" (closeAside)="closeAside()">
+  <div header class="dt-avatar-wrapper">
+    <h4>
+      <i class="mr-2 icon icon-ckeditor icon-3x"> {{ reportName }} </i>
+    </h4>
+  </div>
+  <div class="row">
+    <div class="col-md-12" style="padding: 20px">
+      <ul class="dt-list dt-list-one-second padded-left">
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-user-o icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12">Created by</span>
+              <h5 class="mb-0">{{ userInfo?.person?.displayName }}</h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-datepicker icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12"
+                >Date Created</span
+              >
+              <h5 class="mb-0">
+                {{ today | date : "dd/MM/yyyy, h:mm a" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div class="d-flex justify-content-between align-items-center mx-5">
+        <div>
+          <lnd-selected-filters [useFilterModel]="false"></lnd-selected-filters>
+        </div>
+        <div
+          class="btn-group"
+          role="group"
+          aria-label="Basic example"
+          style="float: right"
+        >
+          <div class="d-flex justify-content-between align-items-center">
+            <button
+              type="button"
+              (click)="filtermodal()"
+              class="text-white btn btn-success cadet-lit btn-xs"
+            >
+              <i class="icon icon-search"></i> Generate Report
+            </button>
+          </div>
+          <div class="generate-menu generate-menu-right">
+            <div class="generate-menu-header">
+              <h4 class="title">
+                <i class="mr-2 icon icon-ckeditor"></i> Period Selection
+              </h4>
+            </div>
+            <form
+              *ngIf="searchForm"
+              [formGroup]="searchForm"
+              (ngSubmit)="filterReport()"
+            >
+              <div class="generate-menu-body">
+                <div class="h-auto">
+                  <div class="form-row">
+                    <div *ngIf="reportInputDateType != 3" class="mb-3 col-sm-6">
+                      <label for="validationDefault02">Start Date<b *ngIf="startDateRequired" class="text-danger">*</b></label>
+                      <div
+                        class="input-group date"
+                        id="date-time-picker-1"
+                        data-target-input="nearest"
+                      >
+                        <input
+                          lndInvalidDateChecker
+                          type="date"
+                          [(ngModel)]="startDate"
+                          formControlName="startDate"
+                          class="form-control"
+                        />
+                        <div class="input-group-append">
+                          <div class="input-group-text">
+                            <i class="icon icon-calendar"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <small
+                        *ngIf="reportInputDateType == 1"
+                        style="text-align: center; color: indianred"
+                        >Leave empty to spool as at the <b>End date</b></small
+                      >
+                    </div>
+                    <div class="mb-3 col-sm-6">
+                      <label for="validationDefault02">End Date <span *ngIf="reportInputDateType === 1 || endDateRequired"><b class="text-danger">*</b></span></label>
+                      <div
+                        class="input-group date"
+                        id="date-time-picker-1"
+                        data-target-input="nearest"
+                      >
+                        <input
+                          lndInvalidDateChecker
+                          type="date"
+                          [(ngModel)]="endDate"
+                          formControlName="endDate"
+                          class="form-control"
+                        />
+                        <div class="input-group-append">
+                          <div class="input-group-text">
+                            <i class="icon icon-calendar"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <br />
+                    <div *ngIf="reportOutputFormatCheck" class="mb-3 col-sm-12">
+                      <slct-2
+                        [allowClear]="true"
+                        [data]="resultOutputTypeArray"
+                        (selected)="selected('OutputType', $event)"
+                        placeholder="Select Result Output Type"
+                      >
+                      </slct-2>
+                    </div>
+                    <div class="mb-3 col-sm-12" *ngIf="showBranch">
+                      <label>Select Preferred Branch(es) </label>
+                      <div>
+                        <slct-2
+                          [multiple]="true"
+                          [data]="branchesAccessibleArray"
+                          (selected)="selected('AccessibleBranch', $event)"
+                          (removed)="removed('AccessibleBranch', $event)"
+                          placeholder="Select Branch(es)"
+                        ></slct-2>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div
+                      *ngIf="reportName == 'Investment Report'"
+                      class="mb-3 col-sm-6"
+                    >
+                      <label for="validationDefault02">Status</label>
+                      <slct-2
+                        [data]="statuses"
+                        [active]="[statuses[0]]"
+                        (selected)="selected('statusType', $event)"
+                      ></slct-2>
+
+                      <small
+                        *ngIf="reportInputDateType == 1"
+                        style="text-align: center; color: indianred"
+                        >Leave empty to spool as at the <b>End date</b></small
+                      >
+                    </div>
+                    <div *ngIf="paginated" class="mb-3 col-sm-6">
+                      <label>Desired result size (in rows)</label>
+                      <slct-2
+                        [data]="desiredRows"
+                        [active]="[{ id: 500, text: 500 }]"
+                        (selected)="selected('rowSize', $event)"
+                      ></slct-2>
+                    </div>
+                  </div>
+                </div>
+                <div class="generate-menu-footer">
+                  <div class="footer-right">
+                    <button
+                      type="submit"
+                      class="mr-2 btn btn-primary btn-xs"
+                      *ngIf="!loader"
+                      [disabled]="searchForm.invalid"
+                    >
+                      Generate Report
+                    </button>
+                    <button
+                      type="button"
+                      class="mr-2 btn btn-primary btn-xs"
+                      [disabled]="true"
+                      *ngIf="loader"
+                    >
+                      <i class="icon icon-spin icon-spin2"></i> Generating ...
+                    </button>
+                    <button
+                      type="button"
+                      (click)="filtermodal()"
+                      class="btn btn-danger btn-xs"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <br />
+      <div class="dt-card__body">
+        <ul
+          class="flex-row nav nav-underline border-bottom nav-card-tabs"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              class="nav-link clicked active show"
+              data-toggle="tab"
+              href="#tab-pane1"
+              role="tab"
+              aria-controls="tab-pane1"
+              aria-selected="true"
+              >Report Table</a
+            >
+          </li>
+        </ul>
+        <div *ngIf="openReportAside">
+          <div class="tab-pane">
+            <div class="dt-card">
+              <div
+                *ngIf="this.loader"
+                class="table-loader"
+                style="text-align: center; color: indianred"
+              >
+                <span>
+                  <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                >
+              </div>
+              <div
+                *ngIf="!this.loader"
+                class="dt-card__body"
+                style="padding: 1.4rem 1.4rem"
+              >
+                <small
+                  style="color: darkred"
+                  *ngIf="ownerInformation != '' && ownerInformation != null"
+                  >*Base Currency:
+                  {{ ownerInformation?.currency?.currencyName }} ({{
+                    ownerInformation?.currency?.currencySymbol
+                  }})</small
+                >
+                <p class="text-center">
+                  <span
+                    *ngIf="reportInputDateType != 1 && reportInputDateType != 3"
+                  >
+                    <span> {{ reportName }}</span> &nbsp;
+                    <span
+                      ><b>From:</b> {{ startDate | date : "dd-MM-yyyy" }}</span
+                    >
+                    &nbsp;
+                    <span
+                      ><b>To:</b> {{ endDate | date : "dd-MM-yyyy" }}</span
+                    ></span
+                  >
+                  <span
+                    *ngIf="
+                      (reportInputDateType == 1 || reportInputDateType == 3) &&
+                      (startDate == '' || startDate == null)
+                    "
+                  >
+                    <span> {{ reportName }}</span> &nbsp;
+                    <small>
+                      <b>As at:</b>
+                      {{ endDate | date : "dd-MM-yyyy" }}</small
+                    >
+                  </span>
+                  <span
+                    *ngIf="
+                      reportInputDateType == 1 &&
+                      startDate != '' &&
+                      startDate != null &&
+                      endDate != '' &&
+                      endDate != null
+                    "
+                  >
+                    <span> {{ reportName }}</span> &nbsp;
+                    <span *ngIf="startDate != '' && startDate != null"
+                      ><small
+                        ><b>From:</b> {{ startDate | date : "dd-MM-yyyy" }}
+                      </small></span
+                    >
+                    &nbsp;
+                    <small>
+                      <b>To:</b> {{ endDate | date : "dd-MM-yyyy" }}</small
+                    >
+                  </span>
+                </p>
+                <div class="row" *ngIf="paginated && !usePagination2">
+                  <div class="col-md-4">
+                    <label style="display: inline-flex"
+                      ><span style="padding: 8px 2px; font-size: 12px"
+                        >Show </span
+                      ><select
+                        [(ngModel)]="pagination.pageSize"
+                        aria-controls="data-table"
+                        (change)="
+                          getItemsPaginatedSearch(
+                            this.pagination.searchTerm,
+                            this.pagination.pageSize,
+                            1
+                          )
+                        "
+                        class="custom-select custom-select-xl form-control form-control-xl height"
+                      >
+                        <option value="500">500</option>
+                        <option value="1500">1,500</option>
+                        <option value="2000">2,000</option>
+                        <option value="2500">2,500</option>
+                        <option value="3000">3,000</option>
+                        <option value="5000">5,000</option>
+                        <option value="8000">8,000</option>
+                        <option
+                          *ngIf="!reportinvolvesCalculation"
+                          value="20000"
+                        >
+                          20,000
+                        </option>
+                      </select>
+                      <span style="padding: 8px 2px; font-size: 12px"
+                        >entries</span
+                      ></label
+                    >
+                  </div>
+                  <div class="col-md-4"></div>
+                  <div class="form-group col-md-4">
+                    <nav>
+                      <ul class="pagination pagination-sm justify-content-end">
+                        <li
+                          class="page-item"
+                          *ngIf="
+                            (pagination.pageNum - 1) * pagination.pageSize + 1 >
+                            10
+                          "
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="
+                              getItemsPaginatedSearch(
+                                this.pagination.searchTerm,
+                                this.pagination.pageSize,
+                                pagination.pageNum - 1
+                              )
+                            "
+                            tabindex="-1"
+                            >Previous</a
+                          >
+                        </li>
+                        <li class="page-item pagination-menu-wrapper">
+                          <a
+                            class="page-link page-target"
+                            (click)="getItemsPaginatedPageJumpModal()"
+                            href="javascript:void(0)"
+                            >{{ pagination.pageNum }} of
+                            {{ this.pagination.maxPage }} page<span
+                              *ngIf="pagination.pageNum > 1"
+                              >s</span
+                            ><span class="sr-only">(current)</span></a
+                          >
+                          <div class="pagination-menu pagination-menu-right">
+                            <div class="pagination-menu-body">
+                              <div class="h-auto">
+                                <span>Jump to Page</span>
+                                <select
+                                  aria-controls="data-table"
+                                  [(ngModel)]="pagination.pageNum"
+                                  (change)="filterReport(pagination.pageNum)"
+                                  class="custom-select custom-select-xl form-control form-control-xl height"
+                                >
+                                  <option
+                                    *ngFor="let line of pagination.jumpArray"
+                                  >
+                                    {{ line }}
+                                  </option>
+                                </select>
+                                <div class="mt-3 text-center">
+                                  <button
+                                    type="button"
+                                    (click)="getItemsPaginatedPageJumpModal()"
+                                    class="btn btn-danger btn-xs"
+                                  >
+                                    Close
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                        <li
+                          class="page-item"
+                          *ngIf="
+                            this.pagination.pageNum < this.pagination.maxPage
+                          "
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="
+                              getItemsPaginatedSearch(
+                                this.pagination.searchTerm,
+                                this.pagination.pageSize,
+                                pagination.pageNum + 1
+                              )
+                            "
+                            >Next</a
+                          >
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                  <div
+                    class=""
+                    aria-live="polite"
+                    style="
+                      padding-left: 18px;
+                      font-size: 13px;
+                      margin-top: -8px;
+                    "
+                  >
+                    Showing
+                    {{ (pagination.pageNum - 1) * pagination.pageSize + 1 }}
+                    -
+                    {{
+                      pagination.pageSize && pagination.pageCount
+                        ? (pagination.pageNum - 1) * pagination.pageSize +
+                          pagination.count
+                        : pagination.totalRecords
+                    }}
+                    of {{ pagination.totalRecords }} record(s)
+                  </div>
+                </div>
+                <div class="row" *ngIf="usePagination2">
+                  <div class="col-md-4">
+                    <label style="display: inline-flex"
+                      ><span style="padding: 8px 2px; font-size: 12px"
+                        >Show
+                      </span>
+                      <select
+                        [(ngModel)]="pagination2.pageSize"
+                        aria-controls="data-table"
+                        (change)="filterReport()"
+                        class="custom-select custom-select-xl form-control form-control-xl mx-2 height"
+                      >
+                        <option value="500">500</option>
+                        <option value="1500">1,500</option>
+                        <option value="2000">2,000</option>
+                        <option value="2500">2,500</option>
+                        <option value="3000">3,000</option>
+                        <option value="5000">5,000</option>
+                        <option value="8000">8,000</option>
+                      </select>
+                      <span style="padding: 8px 2px; font-size: 12px"
+                        >entries</span
+                      >
+                    </label>
+                  </div>
+                  <div
+                    class="d-flex justify-content-between w-100 align-items-center"
+                    style="padding: 0 18px"
+                  >
+                    <div
+                      class="mt-3"
+                      aria-live="polite"
+                      style="font-size: 13px; margin-top: -8px"
+                    >
+                      Showing
+                      {{
+                        (pagination2.pageNumber - 1) * pagination2.pageSize + 1
+                          | number : "1.0-0"
+                      }}
+                      -
+                      {{
+                        (pagination2.pageNumber - 1) * pagination2.pageSize +
+                          pagination2.count | number : "1.0-0"
+                      }}
+                      of
+                      {{ pagination2.totalCount | number : "1.0-0" }} record(s)
+                    </div>
+                  </div>
+                </div>
+                <br />
+                <ng-container *ngIf="investmentReportList?.length > 0">
+                  <button
+                    class="mr-2 btn btn-xs btn-primary"
+                    (click)="exportLog(investmentReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('investmentReportTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div class="table-reponsive" id="investmentReportTable">
+
+                    <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                      <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                    </div>
+
+                    <div class="report-info">
+                      <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                      <h5><span> Report Name: {{reportName}} </span></h5>
+                      <h5><span> Period: From {{ startDate | customDatePipe : "DD-MMM-YYYY" }} to {{endDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                      <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                    </div>
+
+                    <small
+                      style="color: darkred"
+                      *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                      >*Base Currency:
+                      {{ ownerInformation?.currency?.currencyName }} ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </small>
+
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Investor Name</th>
+                          <th class="text-right">Amount ({{currencySymbol}})</th>
+                          <th>Tenor</th>
+                          <th>Start Date</th>
+                          <th>Maturity Date</th>
+                          <th>Interest Rate</th>
+                          <th class="text-right">Gross Interest ({{currencySymbol}})</th>
+                          <th class="text-right">WHT ({{currencySymbol}})</th>
+                          <th class="text-right">Net Interest ({{currencySymbol}})</th>
+                          <th>Status</th>
+                          <th>Investment Type</th>
+                          <th>Period</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of investmentReportList"
+                        >
+                          <td>{{ item?.investmentCode }}</td>
+                          <td>{{ item?.investorName }}</td>
+                          <td class="text-right">
+                            {{ item?.initialDeposit }}
+                          </td>
+                          <td>{{ item?.tenor }}</td>
+                          <td>
+                            {{
+                              item?.investmentStartDate | date : "dd-MM-yyyy"
+                            }}
+                          </td>
+                          <td>
+                            {{ item?.maturityDate | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.investmentRate }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.grossInterestRate }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.withHoldingTax }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.netInterestRate }}
+                          </td>
+                          <td>{{ item?.status }}</td>
+                          <td>{{ item?.investmentType }}</td>
+                          <td>{{ item?.period }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="investmentInterestReportList?.length > 0">
+                  <button
+                    class="mr-2 btn btn-xs btn-primary"
+                    (click)="exportLog(investmentInterestReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('investmentInterestReportTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="investmentInterestReportTable"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportName}} </span></h5>
+                    <h5><span> Period: From {{ startDate | customDatePipe : "DD-MMM-YYYY" }} to {{endDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Investor Name</th>
+                          <th class="text-right">Amount ({{currencySymbol}})</th>
+                          <th>Tenor</th>
+                          <th>Start Date</th>
+                          <th>Maturity Date</th>
+                          <th class="text-right">Gross Interest ({{currencySymbol}})</th>
+                          <th class="text-right">WHT ({{currencySymbol}})</th>
+                          <th class="text-right">Net Interest ({{currencySymbol}})</th>
+                          <th>Status</th>
+                          <th>Investment Type</th>
+                          <th>Period</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of investmentInterestReportList"
+                        >
+                          <td>{{ item?.investmentCode }}</td>
+                          <td>{{ item?.investorName }}</td>
+                          <td class="text-right">
+                            {{ item?.initialDeposit }}
+                          </td>
+                          <td>{{ item?.tenor }}</td>
+                          <td>
+                            {{
+                              item?.investmentStartDate | date : "dd-MM-yyyy"
+                            }}
+                          </td>
+                          <td>
+                            {{ item?.maturityDate | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.grossInterestRate }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.withHoldingTax }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.netInterestRate }}
+                          </td>
+                          <td>{{ item?.status }}</td>
+                          <td>{{ item?.investmentType }}</td>
+                          <td>{{ item?.period }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="investmentMaturityReportList?.length > 0">
+                  <button
+                    class="mr-2 btn btn-xs btn-primary"
+                    (click)="exportLog(investmentMaturityReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('investmentMaturityReportTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="investmentMaturityReportTable"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportName}} </span></h5>
+                    <h5><span> Period: From {{ startDate | customDatePipe : "DD-MMM-YYYY" }} to {{endDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Investor Name</th>
+                          <th class="text-right">Amount ({{currencySymbol}})</th>
+                          <th>Tenor</th>
+                          <th>Start Date</th>
+                          <th>Maturity Date</th>
+                          <th class="text-right">Gross Interest ({{currencySymbol}})</th>
+                          <th class="text-right">WHT ({{currencySymbol}})</th>
+                          <th class="text-right">Net Interest ({{currencySymbol}})</th>
+                          <th>Status</th>
+                          <th>Investment Type</th>
+                          <th>Period</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of investmentMaturityReportList"
+                        >
+                          <td>{{ item?.investmentCode }}</td>
+                          <td>{{ item?.investorName }}</td>
+                          <td class="text-right">
+                            {{ item?.initialDeposit }}
+                          </td>
+                          <td>{{ item?.tenor }}</td>
+                          <td>
+                            {{
+                              item?.investmentStartDate | date : "dd-MM-yyyy"
+                            }}
+                          </td>
+                          <td>
+                            {{ item?.maturityDate | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.grossInterestRate }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.withHoldingTax }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.netInterestRate }}
+                          </td>
+                          <td>{{ item?.status }}</td>
+                          <td>{{ item?.investmentType }}</td>
+                          <td>{{ item?.period }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container
+                  *ngIf="investmentLiquidationReportList?.length > 0"
+                >
+                  <button
+                    class="mr-2 btn btn-xs btn-primary"
+                    (click)="exportLog(investmentLiquidationReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('investmentLiquidationReportTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="investmentLiquidationReportTable"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportName}} </span></h5>
+                    <h5><span> Period: From {{ startDate | customDatePipe : "DD-MMM-YYYY" }} to {{endDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Investor</th>
+                          <th class="text-right">Principal ({{currencySymbol}})</th>
+                          <th class="text-right">Amount Liquidated ({{currencySymbol}})</th>
+                          <th class="text-right">Penal Charge ({{currencySymbol}})</th>
+                          <th>Liquidation Date</th>
+                          <th>Start Date</th>
+                          <th>Maturity Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of investmentLiquidationReportList"
+                        >
+                          <td>{{ item?.investmentCode }}</td>
+                          <td>{{ item?.investorName }}</td>
+                          <td class="text-right">
+                            {{ item?.initialDeposit }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.liquidatedAmount }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.penalCharge }}
+                          </td>
+                          <td>
+                            {{ item?.liquidationDate | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td>
+                            {{
+                              item?.investmentStartDate | date : "dd-MM-yyyy"
+                            }}
+                          </td>
+                          <td>
+                            {{ item?.maturityDate | date : "dd-MM-yyyy" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="investmentActivityReportList?.length > 0">
+                  <button
+                    class="mr-2 btn btn-xs btn-primary"
+                    (click)="exportLog(investmentActivityReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('investmentActivityReportTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="investmentActivityReportTable"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportName}} </span></h5>
+                    <h5><span> Period: From {{ startDate | customDatePipe : "DD-MMM-YYYY" }} to {{endDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Description</th>
+                          <th>Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of investmentActivityReportList"
+                        >
+                          <td>{{ item?.activityDescription }}</td>
+                          <td>
+                            {{ item?.activityDate | date : "dd-MM-yyyy" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container
+                  *ngIf="
+                    stpInvestmentReportList?.length > 0 ||
+                    stpInvestmentMaturityReportList?.length > 0 ||
+                    stpInvestmentLiquidationReportList.length > 0 ||
+                    stpInterestAccruedReportList.length > 0
+                  "
+                >
+                  <button
+                    class="mr-2 btn btn-xs btn-primary"
+                    (click)="exportLog(getShortTermPlacementReportList())"
+                  >
+                    Export
+                  </button>
+                  <button
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('stpReportTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div class="table-reponsive" id="stpReportTable">
+
+                    <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                      <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                    </div>
+
+                    <div class="report-info">
+                      <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                      <h5><span> Report Name: {{reportName}} </span></h5>
+                      <h5><span> Period: From {{ startDate | customDatePipe : "DD-MMM-YYYY" }} to {{endDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                      <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                    </div>
+
+                    <small
+                      style="color: darkred"
+                      *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                      >*Base Currency:
+                      {{ ownerInformation?.currency?.currencyName }} ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Created At</th>
+                          <th class="text-right">
+                            Principal ({{ appOwner?.currency?.currencySymbol }})
+                          </th>
+                          <th
+                            *ngIf="
+                              reportName ===
+                              investmentReportNameEnum.ShortTermInvestmentInterestAccruedReport
+                            "
+                          >
+                            Interest ({{ appOwner?.currency?.currencySymbol }})
+                          </th>
+                          <th class="text-right">
+                            Interest Accrued ({{
+                              appOwner?.currency?.currencySymbol
+                            }})
+                          </th>
+                          <th>Tenor</th>
+                          <th>WHT</th>
+                          <th>Start Date</th>
+                          <th>Maturity Date</th>
+                          <th>Days Till Maturity</th>
+                          <th
+                            *ngIf="
+                              reportName ===
+                              investmentReportNameEnum.ShortTermInvestmentLiquidationReport
+                            "
+                          >
+                            Penal Charge ({{
+                              appOwner?.currency?.currencySymbol
+                            }})
+                          </th>
+                          <th
+                            *ngIf="
+                              reportName ===
+                              investmentReportNameEnum.ShortTermInvestmentLiquidationReport
+                            "
+                          >
+                            Liquidation Date
+                          </th>
+                          <th
+                            *ngIf="
+                              reportName ===
+                              investmentReportNameEnum.ShortTermInvestmentLiquidationReport
+                            "
+                          >
+                            Liquidation Amount ({{
+                              appOwner?.currency?.currencySymbol
+                            }})
+                          </th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of getShortTermPlacementReportList()"
+                        >
+                          <td>{{ item?.shortTermPlacementCode }}</td>
+                          <td>
+                            {{ item?.createdAt | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.principal | number : "1.2-2" }}
+                          </td>
+                          <td class="text-right"
+                            *ngIf="
+                              reportName ===
+                              investmentReportNameEnum.ShortTermInvestmentInterestAccruedReport
+                            "
+                          >
+                            {{ item?.interest | number : "1.2-2" }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.interestAccrued | number : "1.2-2" }}
+                          </td>
+                          <td>
+                            {{ item?.tenor }}
+                          </td>
+                          <td>
+                            {{ item?.whtRate }}
+                          </td>
+                          <td>
+                            {{ item?.startDate | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td>
+                            {{ item?.maturityDate | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td>
+                            {{ item?.daysTillMaturity }}
+                          </td>
+                          <td
+                            *ngIf="
+                              reportName ===
+                              investmentReportNameEnum.ShortTermInvestmentLiquidationReport
+                            "
+                          >
+                            {{ item?.penalCharge | number : "1.2-2" }}
+                          </td>
+                          <td
+                            *ngIf="
+                              reportName ===
+                              investmentReportNameEnum.ShortTermInvestmentLiquidationReport
+                            "
+                          >
+                            {{ item?.liquidationDate | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td
+                            *ngIf="
+                              reportName ===
+                              investmentReportNameEnum.ShortTermInvestmentLiquidationReport
+                            "
+                          >
+                            {{ item?.liquidationAmount | number : "1.2-2" }}
+                          </td>
+                          <td>
+                            {{ item?.status }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="!searchForm.get('endDate').value">
+                  <div class="p-5 text-center">
+                    <p>Specify the period for your report.</p>
+                  </div>
+                </ng-container>
+                <div
+                  class="row"
+                  *ngIf="
+                    paginated && pagination.totalRecords > 50 && !usePagination2
+                  "
+                >
+                  <div class="col-md-4">
+                    <label style="display: inline-flex"
+                      ><span style="padding: 8px 2px; font-size: 12px"
+                        >Show </span
+                      ><select
+                        [(ngModel)]="pagination.pageSize"
+                        aria-controls="data-table"
+                        (change)="
+                          getItemsPaginatedSearch(
+                            this.pagination.searchTerm,
+                            this.pagination.pageSize,
+                            1
+                          )
+                        "
+                        class="custom-select custom-select-xl form-control form-control-xl height"
+                      >
+                        <option value="500">500</option>
+                        <option value="1500">1500</option>
+                        <option value="2500">2500</option>
+                        <option value="3000">3000</option>
+                        <option *ngIf="!reportinvolvesCalculation" value="5000">
+                          5000
+                        </option>
+                        <option
+                          *ngIf="!reportinvolvesCalculation"
+                          value="10000"
+                        >
+                          10000
+                        </option>
+                      </select>
+                      <span style="padding: 8px 2px; font-size: 12px"
+                        >entries</span
+                      ></label
+                    >
+                  </div>
+                  <div class="col-md-4"></div>
+
+                  <div class="form-group col-md-4">
+                    <nav>
+                      <ul class="pagination pagination-sm justify-content-end">
+                        <li
+                          class="page-item"
+                          *ngIf="
+                            (pagination.pageNum - 1) * pagination.pageSize + 1 >
+                            10
+                          "
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="
+                              getItemsPaginatedSearch(
+                                this.pagination.searchTerm,
+                                this.pagination.pageSize,
+                                pagination.pageNum - 1
+                              )
+                            "
+                            tabindex="-1"
+                            >Previous</a
+                          >
+                        </li>
+                        <li class="page-item pagination-menu-wrapper">
+                          <a
+                            class="page-link page-target"
+                            (click)="getItemsPaginatedPageJumpModal()"
+                            href="javascript:void(0)"
+                            >{{ pagination.pageNum }} of
+                            {{ this.pagination.maxPage }} page<span
+                              *ngIf="pagination.pageNum > 1"
+                              >s</span
+                            ><span class="sr-only">(current)</span></a
+                          >
+
+                          <div class="pagination-menu pagination-menu-right">
+                            <div class="pagination-menu-body">
+                              <div class="h-auto">
+                                <span>Jump to Page</span>
+                                <select
+                                  aria-controls="data-table"
+                                  [(ngModel)]="pagination.pageNum"
+                                  (change)="filterReport(pagination.pageNum)"
+                                  class="custom-select custom-select-xl form-control form-control-xl height"
+                                >
+                                  <option
+                                    *ngFor="let line of pagination.jumpArray"
+                                  >
+                                    {{ line }}
+                                  </option>
+                                </select>
+                                <div class="mt-3 text-center">
+                                  <button
+                                    type="button"
+                                    (click)="getItemsPaginatedPageJumpModal()"
+                                    class="btn btn-danger btn-xs"
+                                  >
+                                    Close
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                        <li
+                          class="page-item"
+                          *ngIf="
+                            this.pagination.pageNum < this.pagination.maxPage
+                          "
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="
+                              getItemsPaginatedSearch(
+                                this.pagination.searchTerm,
+                                this.pagination.pageSize,
+                                pagination.pageNum + 1
+                              )
+                            "
+                            >Next</a
+                          >
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+
+                  <div
+                    class=""
+                    aria-live="polite"
+                    style="
+                      padding-left: 18px;
+                      font-size: 13px;
+                      margin-top: -8px;
+                    "
+                  >
+                    Showing
+                    {{ (pagination.pageNum - 1) * pagination.pageSize + 1 }}
+                    -
+                    {{
+                      (pagination.pageNum - 1) * pagination.pageSize +
+                        pagination.count
+                    }}
+                    of {{ pagination.totalRecords }} record(s)
+                  </div>
+
+                  <div
+                    *ngIf="this.loader"
+                    class="table-loader"
+                    style="text-align: center; color: indianred"
+                  >
+                    <span>
+                      <i class="icon icon-spin icon-spin2"></i>
+                      Loading...</span
+                    >
+                  </div>
+                </div>
+                <footer *ngIf="usePagination2">
+                  <nav>
+                    <ul class="pagination pagination-sm justify-content-end">
+                      <li class="page-item" *ngIf="pagination2.hasPreviousPage">
+                        <a
+                          class="page-link"
+                          href="javascript:void(0)"
+                          (click)="
+                            pagination2.pageNumber = pagination2.pageNumber - 1;
+                            filterReport()
+                          "
+                          tabindex="-1"
+                          >Previous</a
+                        >
+                      </li>
+                      <li class="page-item pagination-menu-wrapper">
+                        <a
+                          class="page-link page-target"
+                          (click)="itemPaginatedJumpModal()"
+                          href="javascript:void(0)"
+                        >
+                          {{ pagination2.pageNumber }} of
+                          {{ pagination2.totalPages }} page{{
+                            pagination2.pageNumber > 1 ? "s" : ""
+                          }}
+                          <span class="sr-only">(current)</span>
+                        </a>
+                        <div
+                          class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                        >
+                          <div class="pagination-menu-body">
+                            <div class="h-auto">
+                              <span>Jump to Page</span>
+                              <select
+                                aria-controls="data-table"
+                                [(ngModel)]="pagination2.pageNumber"
+                                (change)="filterReport()"
+                                class="custom-select custom-select-xl form-control form-control-xl height"
+                              >
+                                <option
+                                  (click)="pagination2.pageNumber = line"
+                                  *ngFor="let line of pagination2.jumpArray"
+                                >
+                                  {{ line }}
+                                </option>
+                              </select>
+                              <div class="text-center mt-3">
+                                <button
+                                  type="button"
+                                  class="btn btn-danger btn-xs"
+                                  (click)="itemPaginatedJumpModal()"
+                                >
+                                  Close
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                      <li class="page-item" *ngIf="pagination2.hasNextPage">
+                        <a
+                          class="page-link"
+                          href="javascript:void(0)"
+                          (click)="
+                            pagination2.pageNumber = pagination2.pageNumber + 1;
+                            filterReport()
+                          "
+                        >
+                          Next
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</lnd-aside>

@@ -1,0 +1,32 @@
+.card {
+  height: 180px;
+  margin-bottom: 16px !important;
+  border: 2px solid #e4e4e7;
+}
+
+.card .main-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card .title {
+  font-size: 16px;
+  color: var(--lenda-grey);
+}
+
+.card .figure {
+  font-weight: 500;
+  font-size: 20px;
+}
+
+.card .subtitle {
+  font-size: 14px;
+  color: var(--lenda-grey);
+}
+
+.card .subtitle span {
+  font-size: 16px;
+  color: var(--lenda-orange);
+}

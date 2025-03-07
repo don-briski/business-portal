@@ -1,0 +1,509 @@
+<div *ngIf="editing && !merchant" class="text-center p-5">
+  <lnd-spinner></lnd-spinner>
+</div>
+<section *ngIf="(editing && merchant) || !editing">
+  <header class="w-100 d-flex align-items-center justify-content-between mb-5">
+    <h1 class="dt-page__title m-0">
+      {{ editing ? "Edit" : "Add New" }} Merchant
+    </h1>
+    <a
+      class="btn btn-primary mr-2 text-white"
+      [style.borderColor]="colorTheme.secondaryColor"
+      [style.backgroundColor]="colorTheme.secondaryColor"
+      routerLink="/checkout-admin/config/merchants"
+    >
+      Back</a
+    >
+  </header>
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="dt-card w-100">
+        <div class="dt-card__body">
+          <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <header>
+              <p>Kindly fill in all information correctly.</p>
+            </header>
+            <h4 class="section-header">Business Information</h4>
+            <div class="d-flex align-items-center my-4">
+              <lnd-switch
+                [value]="form.value.isActive"
+                text="Merchant is"
+                (emittedValue)="toggleStatusSwitch($event)"
+              ></lnd-switch>
+              <span
+                class="ml-1"
+                [ngClass]="form.value.isActive ? 'text-success' : 'text-danger'"
+                >{{ form.value.isActive ? "Active" : "Inactive" }}</span
+              >
+            </div>
+            <div class="row mb-5">
+              <div class="col-md-6">
+                <label for="name"
+                  >Business Name <span class="text-danger">*</span></label
+                >
+                <input
+                  id="name"
+                  type="text"
+                  formControlName="name"
+                  class="form-control"
+                  placeholder="Enter Business name"
+                />
+                <lnd-input-errors
+                  label="Business name"
+                  [control]="form.get('name')"
+                ></lnd-input-errors>
+              </div>
+              <div class="col-md-6">
+                <label for="email"
+                  >Business Registration Number
+                  <span class="text-danger">*</span></label
+                >
+                <input
+                  id="regNumber"
+                  type="text"
+                  formControlName="registrationNumber"
+                  class="form-control"
+                  placeholder="Enter business CAC or BRN number"
+                />
+                <lnd-input-errors
+                  label="Registration number"
+                  [control]="form.get('registrationNumber')"
+                ></lnd-input-errors>
+              </div>
+            </div>
+            <div class="row mb-5">
+              <div class="col-md-12">
+                <label for="address"
+                  >Business Address <span class="text-danger">*</span></label
+                >
+                <input
+                  id="address"
+                  type="text"
+                  formControlName="address"
+                  class="form-control"
+                  placeholder="Enter business address"
+                />
+                <lnd-input-errors
+                  label="Business address"
+                  [control]="form.get('address')"
+                ></lnd-input-errors>
+              </div>
+            </div>
+            <div class="row mb-5">
+              <div class="col-md-3">
+                <label for="flat"
+                  >Flat number <span class="text-muted">(Optional)</span></label
+                >
+                <input
+                  id="flat"
+                  type="text"
+                  formControlName="houseNumber"
+                  class="form-control"
+                  placeholder="Enter flat number"
+                />
+                <lnd-input-errors
+                  label="Flat number"
+                  [control]="form.get('houseNumber')"
+                ></lnd-input-errors>
+              </div>
+              <div class="col-md-3">
+                <label for="city"
+                  >City <span class="text-danger">*</span></label
+                >
+                <input
+                  id="city"
+                  type="text"
+                  formControlName="city"
+                  class="form-control"
+                  placeholder="Enter business city"
+                />
+                <lnd-input-errors
+                  label="City"
+                  [control]="form.get('city')"
+                ></lnd-input-errors>
+              </div>
+              <div class="col-md-3">
+                <label for="state"
+                  >State <span class="text-danger">*</span></label
+                >
+                <slct-2
+                  [data]="states"
+                  id="state"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Search State'"
+                  formControlName="stateObj"
+                ></slct-2>
+              </div>
+              <div class="col-md-3">
+                <label for="country"
+                  >Country <span class="text-danger">*</span></label
+                >
+                <slct-2
+                  [data]="countries"
+                  id="country"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Search Country'"
+                  formControlName="countryObj"
+                  [disabled]="true"
+                ></slct-2>
+              </div>
+            </div>
+            <div class="row mb-5">
+              <div class="col-md-4">
+                <label for="email"
+                  >Business Email <span class="text-danger">*</span></label
+                >
+                <input
+                  id="businessEmail"
+                  type="text"
+                  formControlName="email"
+                  class="form-control"
+                  placeholder="Enter email address"
+                />
+                <lnd-input-errors
+                  label="Business email"
+                  [control]="form.get('email')"
+                ></lnd-input-errors>
+              </div>
+              <div class="col-md-4">
+                <label for="phoneNumber"
+                  >Phone Number <span class="text-danger">*</span></label
+                >
+                <input
+                  id="phoneNumber"
+                  type="text"
+                  formControlName="phoneNumber"
+                  class="form-control"
+                  placeholder="Enter phone number"
+                />
+                <lnd-input-errors
+                  label="Phone number"
+                  [control]="form.get('phoneNumber')"
+                ></lnd-input-errors>
+              </div>
+              <div class="col-md-4">
+                <label for="logo"
+                  >Business Logo
+                  <span *ngIf="!editing" class="text-danger">*</span></label
+                >
+                <input
+                  #file
+                  type="file"
+                  data-max-file-size="5M"
+                  accept="image/jpeg, image/png, image/jpg"
+                  (change)="handleFileInput($event.target.files)"
+                  class="form-control"
+                  placeholder="Upload merchant logo"
+                />
+              </div>
+            </div>
+            <div class="row mb-5">
+              <div class="col-md-6">
+                <label for="bankName"
+                  >Bank <span class="text-danger">*</span></label
+                >
+                <slct-2
+                  [data]="modifiedBanks"
+                  placeholder="Select Bank"
+                  formControlName="bankArray"
+                  [customSearchEnabled]="true"
+                ></slct-2>
+              </div>
+              <div class="col-md-6">
+                <label for="accountNumber"
+                  >Account Number <span class="text-danger">*</span></label
+                >
+                <input
+                  id="accountNumber"
+                  type="text"
+                  formControlName="accountNumber"
+                  class="form-control"
+                  placeholder="Enter account number"
+                />
+                <lnd-input-errors
+                  label="Account number"
+                  [control]="form.get('accountNumber')"
+                ></lnd-input-errors>
+                <button
+                  (click)="onVerifyAccDetails()"
+                  type="button"
+                  [disabled]="
+                    form.get('accountNumber').invalid || verifyingAccNumber
+                  "
+                  class="btn btn-primary btn-sm mt-2"
+                >
+                  <ng-container *ngIf="!verifyingAccNumber"
+                    ><span>Verify</span>
+                    <i class="icon icon-arrow-right ml-3"></i
+                  ></ng-container>
+                  <lnd-spinner
+                    *ngIf="verifyingAccNumber"
+                    color="#fff"
+                    text="Verifying..."
+                  ></lnd-spinner>
+                </button>
+              </div>
+            </div>
+            <div class="row mb-5">
+              <div class="col-md-12">
+                <label>Verified Account Name</label>
+                <input
+                  class="form-control"
+                  formControlName="bankAccountName"
+                  type="text"
+                  placeholder="Verify account name"
+                />
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label for="redirectUrl">Redirect URL</label>
+                <input
+                  id="redirectUrl"
+                  type="text"
+                  formControlName="redirectUrl"
+                  class="form-control"
+                  placeholder="Enter redirect URL"
+                />
+                <p class="input-info-text mt-2">
+                  This URL is used to redirect a customer from the Checkout
+                  experience back to the Merchant website
+                </p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <label for="Webhook">Webhook URL</label>
+                <input
+                  id="callbackUrl"
+                  type="text"
+                  formControlName="callbackUrl"
+                  class="form-control"
+                  placeholder="Enter Webhook URL"
+                />
+                <p class="input-info-text mt-2 mb-0">
+                  This will be the URL used to inform the merchant's API of the
+                  outcome of the customer's checkout experience.
+                </p>
+              </div>
+            </div>
+            <hr class="divider my-5" />
+            <section>
+              <h4 class="section-header">Business Settings</h4>
+              <div class="row mb-5">
+                <div class="col-md-12">
+                  <div class="my-3">
+                    <div class="d-flex align-items-center">
+                      <lnd-switch
+                        [value]="form.value.hasCommission"
+                        text="Commission Rate (%)"
+                        (emittedValue)="toggleSwitch($event, 'commission')"
+                      ></lnd-switch>
+                      <lnd-tooltip
+                        placement="top"
+                        text="This setting determines the amount per transaction that the merchant is paid as a commission for using Checkout."
+                      >
+                      </lnd-tooltip>
+                      <div class="ml-5" *ngIf="form.value.hasCommission">
+                        <input
+                          id="hasCommission"
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="100"
+                          class="form-control"
+                          formControlName="commission"
+                        />
+                        <lnd-input-errors
+                          label="Commission rate"
+                          [control]="form.get('commission')"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="d-flex align-items-center mb-3">
+                    <lnd-switch
+                      [value]="form.value.hasMaximumLoanAmount"
+                      text="Maximum Loan Amount"
+                      (emittedValue)="toggleSwitch($event, 'loanAmount')"
+                    ></lnd-switch>
+                    <lnd-tooltip
+                      placement="top"
+                      text="Sets the maximum amount of financing that can be provided to the each customer of the business."
+                    >
+                    </lnd-tooltip>
+
+                    <div class="ml-5" *ngIf="form.value.hasMaximumLoanAmount">
+                      <input
+                        id="hasMaximumLoanAmount"
+                        type="text"
+                        class="form-control"
+                        formControlName="maxLoanAmount"
+                        currencyMask
+                        [options]="{
+                          prefix: currencySymbol,
+                          thousands: ',',
+                          decimal: '.'
+                        }"
+                      />
+                      <lnd-input-errors
+                        label="Max loan amount"
+                        [control]="form.get('maxLoanAmount')"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="d-flex align-items-center mb-3">
+                    <lnd-switch
+                      [value]="form.value.autoDeclineByCategories"
+                      text="Set Auto Decline Categories"
+                      (emittedValue)="toggleSwitch($event, 'categories')"
+                    ></lnd-switch>
+
+                    <div class="ml-5 w-25" *ngIf="form.value.autoDeclineByCategories">
+                      <slct-2
+                      [data]="categoriesArr"
+                      placeholder="Select Categories"
+                      formControlName="categoriesToDecline"
+                      [customSearchEnabled]="false"
+                      [multiple]="true"
+                    ></slct-2>
+                      <lnd-input-errors
+                        label="Auto decline categories"
+                        [control]="form.get('categoriesToDecline')"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="d-flex align-items-center">
+                    <lnd-switch
+                      [value]="form.value.autoDeclineByEarningClass"
+                      text="Set Auto Decline Earning Classes"
+                      (emittedValue)="toggleSwitch($event, 'earningClass')"
+                    ></lnd-switch>
+
+                    <div class="ml-5 w-25" *ngIf="form.value.autoDeclineByEarningClass">
+                      <slct-2
+                      [data]="earningClassArr"
+                      placeholder="Select Earning Classes"
+                      formControlName="earningClassesToDecline"
+                      [customSearchEnabled]="false"
+                      [multiple]="true"
+                    ></slct-2>
+                      <lnd-input-errors
+                        label="Auto decline earning classes"
+                        [control]="form.get('earningClassesToDecline')"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="my-4">
+                <div class="d-flex align-items-center">
+                  <lnd-switch
+                    [value]="form.value.hasInterestRate"
+                    text="Interest Rate (%)"
+                    (emittedValue)="toggleSwitch($event, 'interestRate')"
+                  ></lnd-switch>
+                  <lnd-tooltip
+                    placement="top"
+                    text="This is the interest rate applied to the loan given to the customer"
+                  >
+                  </lnd-tooltip>
+                  <div class="ml-5" *ngIf="form.value.hasInterestRate">
+                    <input
+                      id="interestRate"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="100"
+                      class="form-control"
+                      formControlName="interestRate"
+                    />
+                    <lnd-input-errors
+                      label="Interest rate"
+                      [control]="form.get('interestRate')"
+                    />
+                  </div>
+                </div>
+                <p class="input-info-text">
+                  Toggling this switch on and setting a value for the interest
+                  rate will override the default product rate
+                </p>
+              </div>
+              <div class="my-4">
+                <div class="d-flex align-items-center">
+                  <lnd-switch
+                    [value]="form.value.downPaymentRequired"
+                    text="Down Payment Required (%)"
+                    (emittedValue)="toggleSwitch($event, 'downPayment')"
+                  ></lnd-switch>
+
+                  <div class="ml-5" *ngIf="form.value.downPaymentRequired">
+                    <input
+                      id="downPaymentRate"
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="100"
+                      class="form-control"
+                      formControlName="downPaymentRate"
+                    />
+                    <lnd-input-errors
+                      label="Down payment rate"
+                      [control]="form.get('downPaymentRate')"
+                    />
+                  </div>
+                </div>
+                <p class="input-info-text">
+                  Toggling this switch will prompt customers to make a down
+                  payment of the specified percentage.
+                </p>
+              </div>
+              <div class="row">
+                <div class="col-md-12">
+                  <label for="notes">Additional Notes</label>
+                  <textarea
+                    id="notes"
+                    class="form-control"
+                    rows="3"
+                    placeholder="Enter additional information here"
+                    formControlName="notes"
+                  ></textarea>
+                </div>
+              </div>
+            </section>
+            <div class="d-flex justify-content-end mt-5">
+              <button
+                type="button"
+                class="btn btn-xs btn-outline-secondary mr-2"
+                [disabled]="submitting"
+                routerLink="/checkout-admin/config/merchants"
+              >
+                Close
+              </button>
+              <button
+                [disabled]="form.invalid || submitting"
+                class="btn btn-xs btn-primary mx-1"
+                *ngIf="!submitting"
+              >
+                Save
+              </button>
+              <button
+                class="btn btn-xs btn-warning"
+                disabled
+                *ngIf="submitting"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Saving...
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

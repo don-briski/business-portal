@@ -1,0 +1,16 @@
+<ng-multiselect-dropdown
+  class="drpdwn"
+  [settings]="dropdownSettings"
+  [data]="data"
+  [placeholder]="placeholder"
+  [disabled]="disabled"
+  (onSelect)="valueChange($event)"
+  (onSelectAll)="selectAll()"
+  (onDeSelectAll)="deselectAll()"
+  (onDeSelect)="removeValue($event)"
+  (onFilterChange)="onFilterChange($event)"
+  (blur)="onBlur()"
+  (onDropDownClose)="dropdownClosedEvent($event)"
+  [(ngModel)]="value"
+>
+</ng-multiselect-dropdown>

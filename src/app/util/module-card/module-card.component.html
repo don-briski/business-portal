@@ -1,0 +1,61 @@
+<div>
+  <div
+    class="card cards my-4"
+    [ngClass]="{ 'border-crm': moduleCard?.module === allModulesEnum.CRM, 'border-wacs':moduleCard?. module === allModulesEnum.wacs }"
+    [style.background]="
+      currentTheme.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+    "
+  >
+    <h2
+      class="f-20"
+      [style.color]="
+        currentTheme.theme === 'Dark'
+          ? currentTheme?.dark?.textColor
+          : currentTheme.primaryColor
+      "
+    >
+      {{ moduleCard?.name }}
+    </h2>
+
+    <p
+      *ngIf="!moduleCard?.subscriptionIsActive"
+      class="red f-12 mb-3"
+      [style.color]="
+        currentTheme.theme === 'Dark'
+          ? currentTheme?.dark?.primaryColor
+          : currentTheme.primaryColor
+      "
+    >
+      <i class="icon icon-error"></i> Subscription has expired
+    </p>
+
+    <div class="btn-container">
+      <button
+        [routerLink]="moduleCard?.routerLink"
+        [style.color]="
+          currentTheme.theme === 'Dark'
+            ? currentTheme?.dark?.primaryColor
+            : currentTheme.primaryColor
+        "
+        [style.borderColor]="currentTheme?.primaryColor"
+        class="btn btn-sm btn-primary btn-view p-2"
+        (mouseover)="onHover = true"
+        (mouseleave)="onHover = false"
+        [ngStyle]="
+          onHover
+            ? {
+                background: currentTheme?.primaryColor,
+                color: '#fff'
+              }
+            : { color: currentTheme?.primaryColor }
+        "
+        (click)="openModule()"
+      >
+        View module
+      </button>
+    </div>
+    <div class="mx-auto w-140" id="lottie">
+      <ng-lottie [options]="financeLottieOptions"></ng-lottie>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,42 @@
+<section class="p-5">
+  <header class="d-flex justify-content-between">
+    <h3 class="mb-0">{{ title }}</h3>
+    <img src="assets/images/close.svg" alt="close" (click)="closeModal.emit()" class="cursor">
+  </header>
+
+  <div class="d-flex justify-content-center">
+    <img src="assets/images/import.svg" alt="import" class="w-50 h-50" />
+  </div>
+  <div class="dashed-border p-5">
+    <ng-content></ng-content>
+  </div>
+
+  <div class="d-flex justify-content-center">
+    <button
+      class="btn text-white mt-3 import-btn"
+      (click)="importFile.click()"
+    >
+      Import
+    </button>
+  </div>
+  <p class="my-4 text-center">
+    <span *ngIf="!downloading">Download a </span>
+    <span
+      class="text-info cursor"
+      (click)="initiateDownloadProcess();"
+      ><b
+        >{{ downloading ? "Downloading Template..." : "sample here" }}
+        <i *ngIf="downloading" class="icon icon-spin icon-spin2"></i></b
+    ></span>
+    to see the required format
+  </p>
+</section>
+
+<input
+  #importFile
+  type="file"
+  class="d-none"
+  (change)="selectedFile.emit($event.target.files[0]); closeModal.emit()"
+  placeholder="Upload file"
+  accept=".csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+/>

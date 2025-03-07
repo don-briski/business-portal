@@ -1,0 +1,23 @@
+.comment {
+  font-size: 12px;
+}
+
+.caption-text {
+  font-size: 11px;
+}
+
+.approved-color {
+  color: var(--lenda-green);
+}
+
+.rejected-color {
+  color: var(--yellow);
+}
+
+.caption-text .date {
+  color: var(--lenda-grey);
+}
+
+.dashed {
+  border-bottom: 1px dashed #dcdcdc;
+}

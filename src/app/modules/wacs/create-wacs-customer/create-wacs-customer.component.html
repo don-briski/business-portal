@@ -1,0 +1,330 @@
+<header class="d-flex justify-content-between align-items-center mb-3">
+  <h1>Wacs Customer Details</h1>
+
+  <a
+    class="btn text-white"
+    routerLink="/wacs/customers"
+    routerLinkActive="router-link-active"
+    href="javascript:void(0)"
+    >Back</a
+  >
+</header>
+
+<form class="card" [formGroup]="form" (ngSubmit)="submit()">
+  <section>
+    <h3>Personal Information</h3>
+
+    <div class="form-row">
+      <ng-container formGroupName="user">
+        <div class="col-md-4">
+          <label>First Name </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="firstName"
+            readonly
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label>Middle Name </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="middleName"
+            readonly
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label>Last Name </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="lastName"
+            readonly
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label>Phone Number </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="phoneNumber"
+            readonly
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label>Email </label>
+          <input
+            type="email"
+            class="form-control"
+            formControlName="email"
+            readonly
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label>Date of Birth </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="dateOfBirth"
+            readonly
+          />
+        </div>
+      </ng-container>
+
+      <div class="col-md-4">
+        <label>IPPIS </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="ippisNumber"
+          readonly
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>BVN </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="bvn"
+          readonly
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Bank </label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="bank"
+          readonly
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Account Number </label>
+        <div *ngIf="form.value?.accountName" class="acc-name-badge">{{form.value?.accountName}}</div>
+        <input
+          type="text"
+          placeholder="Enter Account Number"
+          class="form-control"
+          formControlName="accountNumber"
+          readonly
+        />
+      </div>
+
+      <div class="col-md-8">
+        <label>Address </label>
+        <textarea readonly formControlName="address" placeholder="Enter Address" class="form-control"></textarea>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-4">
+    <h3>Next Of Kin Information</h3>
+
+    <div class="form-row" formGroupName="nextOfKinInfo">
+      <div class="col-md-4">
+        <label>First Name </label>
+        <input
+          type="text"
+          placeholder="Enter First Name"
+          class="form-control"
+          formControlName="firstName"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Last Name </label>
+        <input
+          type="text"
+          placeholder="Enter Last Name"
+          class="form-control"
+          formControlName="lastName"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Phone Number </label>
+        <input
+          type="text"
+          placeholder="Enter Phone Number"
+          class="form-control"
+          formControlName="phone"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>House Number </label>
+        <input
+          type="text"
+          placeholder="Enter House Name"
+          class="form-control"
+          formControlName="houseNumber"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Street Name </label>
+        <input
+          type="text"
+          placeholder="Enter Street Name"
+          class="form-control"
+          formControlName="street1"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Nearest Bus Stop </label>
+        <input
+          type="text"
+          placeholder="Enter Nearest Bus Stop"
+          class="form-control"
+          formControlName="nearestLandMark"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Country</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="country"
+          readonly
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>State</label>
+        <slct-2
+          [data]="states"
+          formControlName="state"
+          [customSearchEnabled]="true"
+          (selected)="setState($event, true)"
+          (removed)="setState(null, false)"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Local Government Area</label>
+        <slct-2
+          [data]="lgas"
+          formControlName="localGovernmentArea"
+          [customSearchEnabled]="true"
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-4">
+    <h3>Referee Information</h3>
+
+    <div class="form-row" formGroupName="refereeInfo">
+      <div class="col-md-4">
+        <label>First Name </label>
+        <input
+          type="text"
+          placeholder="Enter First Name"
+          class="form-control"
+          formControlName="firstName"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Last Name </label>
+        <input
+          type="text"
+          placeholder="Enter Last Name"
+          class="form-control"
+          formControlName="lastName"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Phone Number </label>
+        <input
+          type="text"
+          placeholder="Enter Phone Number"
+          class="form-control"
+          formControlName="phone"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>House Number </label>
+        <input
+          type="text"
+          placeholder="Enter House Name"
+          class="form-control"
+          formControlName="houseNumber"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Street Name </label>
+        <input
+          type="text"
+          placeholder="Enter Street Name"
+          class="form-control"
+          formControlName="street1"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Nearest Bus Stop </label>
+        <input
+          type="text"
+          placeholder="Enter Nearest Bus Stop"
+          class="form-control"
+          formControlName="nearestLandMark"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Country</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="country"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>State</label>
+        <slct-2
+          [data]="states"
+          formControlName="state"
+          [customSearchEnabled]="true"
+          (selected)="setState($event, true)"
+          (removed)="setState(null, false)"
+        />
+      </div>
+
+      <div class="col-md-4">
+        <label>Local Government Area</label>
+        <slct-2
+          [data]="lgas"
+          formControlName="localGovernmentArea"
+          [customSearchEnabled]="true"
+        />
+      </div>
+    </div>
+  </section>
+
+  <footer class="mt-4">
+    <button
+      class="btn btn-xs"
+      type="submit"
+      [disabled]="form.invalid || isProcessing"
+    >
+      {{ isProcessing ? "Processing..." : "Submit" }}
+      <i *ngIf="isProcessing" class="icon icon-spin icon-spin2 ml-2"></i>
+    </button>
+  </footer>
+</form>

@@ -1,0 +1,64 @@
+<h3 [style.color]="currentTheme?.secondaryColor" class="mb-2 orange">
+  Update Dojah Integration Details
+</h3>
+<p *ngIf="dojahSetup !== null">
+  Dojah payment method is currently
+  <span class="badge badge-pill badge-success" *ngIf="dojahSetup?.isActive"
+    >Active</span
+  >
+  <span class="badge badge-pill badge-danger" *ngIf="!dojahSetup?.isActive"
+    >Inactive</span
+  >
+</p>
+<form [formGroup]="form">
+  <div class="form-group">
+    <label>API Secret Key</label>
+    <input
+      type="text"
+      formControlName="apiSecretKey"
+      class="form-control"
+      placeholder="API Secret Key"
+    />
+  </div>
+  <ng-container formGroupName="integrationExtraInfoDto">
+    <div class="form-group">
+      <label for="app-id">App ID</label>
+      <input
+        type="text"
+        formControlName="appId"
+        class="form-control"
+        placeholder="App ID"
+      />
+    </div>
+  </ng-container>
+  <div class="form-group">
+    <button
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      (click)="updateSetup()"
+      class="btn btn-primary btn-sm text-uppercase orange-bg"
+      [disabled]="form.invalid || isUpdatingSetup"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="isUpdatingSetup"></i>
+      {{ isUpdatingSetup ? "Updating..." : "Update" }}
+    </button>
+    <button
+      class="btn btn-sm btn-success text-uppercase"
+      *ngIf="!dojahSetup?.isActive"
+      [disabled]="statusLoader"
+      (click)="onUpdateStatus(true)"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="isUpdatingStatus"></i>
+      {{ isUpdatingStatus ? "Activating..." : "Activate" }}
+    </button>
+    <button
+      class="btn btn-sm btn-danger text-uppercase"
+      *ngIf="dojahSetup?.isActive"
+      [disabled]="isUpdatingStatus"
+      (click)="onUpdateStatus(false)"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="isUpdatingStatus"></i>
+      {{ isUpdatingStatus ? "Deactivating..." : "Deactivate" }}
+    </button>
+  </div>
+</form>

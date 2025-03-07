@@ -1,0 +1,1384 @@
+<!-- Page Header -->
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">
+    Assets Management
+    <span class="float-right role-add">
+      <div>
+        <button
+          type="button"
+          class="btn btn-success text-white mr-1"
+          (click)="triggerImportPopup(importAsset)"
+        >
+          <span *ngIf="!isImporting">
+            Import <i class="ml-2 icon icon-upload"></i>
+          </span>
+
+          <span *ngIf="isImporting">
+            Importing... <i class="ml-2 icon icon-spin icon-spin2"></i>
+          </span>
+        </button>
+        <button
+          id="btnGroupDrop1"
+          type="button"
+          class="btn dropdown-toggle text-white ml-1"
+          data-toggle="dropdown"
+          aria-expanded="false"
+          [style.background]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+        >
+          Add New
+        </button>
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+          <a
+            class="dropdown-item"
+            [routerLink]="['/finance/assets/create']"
+            routerLinkActive="active"
+            >Asset Card</a
+          >
+          <a
+            class="dropdown-item"
+            href="javascript:void(0)"
+            (click)="openModal(addition, null, 'lg')"
+            >Asset Additions</a
+          >
+          <a
+            class="dropdown-item"
+            href="javascript:void(0)"
+            (click)="openModal(revaluation, null, 'lg')"
+            >Revaluation</a
+          >
+          <a
+            class="dropdown-item"
+            href="javascript:void(0)"
+            (click)="openModal(disposal, null, 'lg')"
+            >Asset Disposal</a
+          >
+          <a
+            class="dropdown-item"
+            href="javascript:void(0)"
+            (click)="openModal(postingSchedule, null, 'lg')"
+            >Depreciations</a
+          >
+        </div>
+      </div>
+    </span>
+  </h1>
+</div>
+<!-- /page header -->
+
+<div class="row">
+  <div class="col-xl-12">
+    <div class="tab-content">
+      <!-- Tab Pane -->
+      <div id="tab-created" class="tab-pane active show">
+        <!-- Card -->
+        <div class="dt-card">
+          <!-- Card Body -->
+          <div class="dt-card__body">
+            <!-- Tables -->
+            <div class="table-responsive">
+              <!-- Pagination Top-->
+              <div class="row m-0">
+                <div class="col-md-4">
+                  <label style="display: inline-flex"
+                    ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                    ><select
+                      [(ngModel)]="pagination.pageSize"
+                      aria-controls="data-table"
+                      (change)="filterAssets()"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                    <span style="padding: 8px 2px; font-size: 12px"
+                      >entries</span
+                    ></label
+                  >
+                </div>
+                <div class="col-md-4">
+                  <ng-container *ngIf="tabLoader">
+                    <div
+                      class="table-loader"
+                      style="text-align: center; color: indianred"
+                    >
+                      <span>
+                        <i class="icon icon-spin icon-spin2"></i>
+                        Loading...</span
+                      >
+                    </div>
+                  </ng-container>
+                </div>
+                <div class="form-group col-md-4">
+                  <label style="display: inline-flex; float: right">
+                    <input
+                      type="search"
+                      [(ngModel)]="pagination.assetCode"
+                      (keydown.enter)="filterAssets()"
+                      placeholder="Code or Asset Name"
+                      class="form-control form-control-sm mr-3"
+                      aria-controls="data-table"
+                    />
+                    <button
+                      class="btn btn-xs text-white"
+                      [style.background]="currentTheme.secondaryColor"
+                      (click)="filterAssets()"
+                    >
+                      <i class="icon icon-search"></i>
+                    </button>
+                  </label>
+                </div>
+                <div
+                  class=""
+                  aria-live="polite"
+                  style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+                >
+                  Showing
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1
+                      | number : "1.0-0"
+                  }}
+                  -
+                  {{
+                    (pagination.pageNumber - 1) * pagination.pageSize +
+                      pagination.count | number : "1.0-0"
+                  }}
+                  of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+                </div>
+              </div>
+              <!-- /pagination Top -->
+              <table
+                id="data-table"
+                class="table table-striped table-hover"
+                *ngIf="!tabLoader"
+              >
+                <thead>
+                  <tr>
+                    <th>Code</th>
+                    <th>Asset Name</th>
+                    <th>Activation Date</th>
+                    <th class="text-right">
+                      Total Cost({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </th>
+                    <th class="text-right">
+                      Accum Dep({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </th>
+                    <th class="text-right">
+                      NBV ({{ ownerInformation?.currency?.currencySymbol }})
+                    </th>
+                    <th class="text-right">Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container *ngIf="!tabLoader">
+                    <ng-container *ngIf="allAssets?.length > 0">
+                      <tr
+                        class="gradeX cursor"
+                        *ngFor="let item of allAssets"
+                        (click)="viewAsset(item.assetCardId, dropdownToggle)"
+                      >
+                        <td
+                          class="copy_icon_wrapper"
+                          [style.color]="currentTheme?.secondaryColor"
+                        >
+                          {{ item?.assetCode }}
+                          <img
+                            (mouseover)="copy_hover = true"
+                            (mouseleave)="copy_hover = false"
+                            class="copy_icon"
+                            src="assets/images/copy.png"
+                            alt="copy icon"
+                            width="15"
+                            height="15"
+                            (click)="copyCode(item?.assetCode)"
+                            placement="right"
+                            ngbTooltip="Copy Asset Code"
+                          />
+                        </td>
+                        <td>{{ item?.assetName }}</td>
+
+                        <td>
+                          {{
+                            item?.status !== "Draft"
+                              ? (item?.assetActivationDate
+                                | customDatePipe : "DD-MMM-YY")
+                              : "-"
+                          }}
+                        </td>
+                        <td class="text-right">
+                          {{ item?.totalCost | number : "1.2-2" }}
+                        </td>
+                        <td class="text-right">
+                          {{ item?.totalDepreciation | number : "1.2-2" }}
+                        </td>
+                        <td class="text-right">
+                          {{ item?.netBookValue | number : "1.2-2" }}
+                        </td>
+
+                        <td class="text-right">
+                          <span
+                            class="badge mb-1 mr-1"
+                            [ngClass]="{
+                              'badge-light': item?.status === 'InActive',
+                              'badge-warning': item?.status == 'Draft',
+                              'badge-success': item?.status == 'Running',
+                              'badge-secondary': item?.status == 'Depreciated',
+                              'badge-danger': item?.status == 'Disposed'
+                            }"
+                            >{{ item?.status }}</span
+                          >
+                        </td>
+
+                        <td>
+                          <div
+                            #dropdownToggle
+                            class="dropdown mr-2 mb-2 d-inline-block"
+                          >
+                            <button
+                              class="btn btn-warning btn-xs dropdown-toggle"
+                              type="button"
+                              data-toggle="dropdown"
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                            ></button>
+
+                            <div class="dropdown-menu">
+                              <a
+                                class="dropdown-item text-success"
+                                (click)="
+                                  openModal(
+                                    assetActivationModal,
+                                    item?.assetCardId
+                                  )
+                                "
+                                *ngIf="item?.status === 'Draft'"
+                                href="javascript:void(0)"
+                                ><i class="icon icon-check icon-fw mr-2"></i
+                                >Activate Asset</a
+                              >
+                              <a
+                                *ngIf="
+                                  user?.permission?.includes('View Asset Cards')
+                                "
+                                class="dropdown-item"
+                                href="javascript:void(0)"
+                                ><i class="icon icon-forward icon-fw mr-2"></i
+                                >View Asset</a
+                              >
+                              <a
+                                *ngIf="
+                                  user?.permission?.includes(
+                                    'Edit Asset Card'
+                                  ) && item?.status === 'Draft'
+                                "
+                                class="dropdown-item"
+                                [routerLink]="[
+                                  '/finance/assets/edit',
+                                  item.assetCardId
+                                ]"
+                                ><i class="icon icon-edit icon-fw mr-2"></i>Edit
+                                Asset</a
+                              >
+                              <a
+                                *ngIf="
+                                  user?.permission?.includes(
+                                    'Delete Asset Card'
+                                  ) && item?.status === 'Draft'
+                                "
+                                class="dropdown-item text-danger"
+                                (click)="attemptDelete(item.assetCardId)"
+                                href="javascript:void(0)"
+                                ><i class="icon icon-trash icon-fw mr-2"></i
+                                >Delete Asset</a
+                              >
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </ng-container>
+                    <ng-container *ngIf="allAssets?.length === 0">
+                      <tr>
+                        <td colspan="8" class="text-center">
+                          No record found
+                          <span *ngIf="searchTerm != ''"
+                            >that matches your search</span
+                          >
+                        </td>
+                      </tr>
+                    </ng-container>
+                  </ng-container>
+                </tbody>
+              </table>
+              <nav>
+                <ul class="pagination pagination-sm justify-content-end">
+                  <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        pagination.pageNumber = pagination.pageNumber - 1;
+                        loadAllAssets()
+                      "
+                      >Previous</a
+                    >
+                  </li>
+                  <li class="page-item pagination-menu-wrapper">
+                    <a
+                      class="page-link page-target"
+                      (click)="itemPaginatedJumpModal()"
+                      href="javascript:void(0)"
+                    >
+                      {{ pagination.pageNumber }} of
+                      {{ pagination.totalPages }} page{{
+                        pagination.pageNumber > 1 ? "s" : ""
+                      }}
+                      <span class="sr-only">(current)</span>
+                    </a>
+                    <div
+                      class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                    >
+                      <div class="pagination-menu-body">
+                        <div class="h-auto">
+                          <span>Jump to Page</span>
+                          <select
+                            aria-controls="data-table"
+                            [(ngModel)]="pagination.pageNumber"
+                            (change)="loadAllAssets()"
+                            class="custom-select custom-select-xl form-control form-control-xl height"
+                          >
+                            <option
+                              (click)="pagination.pageNumber = line"
+                              *ngFor="let line of pagination.jumpArray"
+                            >
+                              {{ line }}
+                            </option>
+                          </select>
+                          <div class="text-center mt-3">
+                            <button type="button" class="btn btn-danger btn-xs">
+                              Close
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  <li class="page-item" *ngIf="pagination.hasNextPage">
+                    <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="
+                        pagination.pageNumber = pagination.pageNumber + 1;
+                        loadAllAssets()
+                      "
+                    >
+                      Next
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+            <!-- /tables -->
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- # region -->
+<!-- Modals -->
+<ng-template #assetActivationModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Activate Asset Card</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <p
+    *ngIf="!editingAssetCard && loader"
+    class="text-center"
+    [style.color]="currentTheme?.secondaryColor"
+  >
+    Retrieving Asset...
+    <i class="icon icon-spin icon-spin2"></i>
+  </p>
+
+  <div *ngIf="editingAssetCard" class="modal-body">
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <td>
+            <p class="font-weight-bold">Asset name</p>
+            <p>{{ editingAssetCard?.assetName }}</p>
+          </td>
+          <td>
+            <p class="font-weight-bold">Asset code</p>
+            <p>{{ editingAssetCard?.assetCode }}</p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <p class="font-weight-bold">Date of purchase</p>
+            <p>
+              {{
+                editingAssetCard?.dateOfPurchaseOrAcquisition
+                  | customDatePipe : "DD-MMMM-YYYY"
+              }}
+            </p>
+          </td>
+          <td>
+            <p class="font-weight-bold">Depreciation method</p>
+            <p>{{ editingAssetCard?.depreciationMethod }}</p>
+          </td>
+        </tr>
+        <tr rowspan="2">
+          <p class="font-weight-bold">Asset description</p>
+          <p>{{ editingAssetCard?.descriptionOfAsset }}</p>
+        </tr>
+      </tbody>
+    </table>
+    <form [formGroup]="activationForm" (ngSubmit)="submitForm()">
+      <div class="form-group">
+        <label>Asset Activation Date</label>
+        <input
+        lndInvalidDateChecker
+          type="date"
+          class="form-control"
+          formControlName="assetActivationDate"
+        />
+      </div>
+      <div class="form-group">
+        <label>Assigned Employee</label>
+
+        <slct-2
+          [data]="employeeList"
+          (selected)="selectEmployee($event)"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Employee'"
+        ></slct-2>
+      </div>
+
+      <div class="form-group">
+        <button
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          type="submit"
+          class="btn btn-block btn-primary text-white"
+          *ngIf="!loader"
+          [disabled]="activationForm.invalid"
+        >
+          Activate
+        </button>
+        <button
+          type="button"
+          class="btn btn-block btn-primary text-white"
+          *ngIf="loader"
+          [disabled]="true"
+        >
+          <i class="icon icon-spin icon-spin2"></i> Activating...
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer"></div>
+</ng-template>
+<!-- /Modals -->
+<!-- # endregion -->
+
+<!-- Customizer Sidebar -->
+<aside
+  class="dt-customizer dt-drawer position-right"
+  [ngClass]="{ open: openAside }"
+>
+  <div class="dt-customizer__inner">
+    <!-- Customizer Header -->
+    <div class="dt-customizer__header">
+      <!-- Avatar Wrapper -->
+      <div class="dt-avatar-wrapper">
+        <!-- Avatar -->
+        <!-- /avatar -->
+
+        <!-- Info -->
+        <div class="dt-avatar-info" *ngIf="assetDetail">
+          <span class="mb-2 display-5 font-weight-light">
+            {{ assetDetail?.assetName }} &nbsp;
+
+            <span class="mb-1 mr-3 badge badge-warning btn-xs">
+              {{ assetDetail?.assetCode }}
+            </span>
+            <span
+              [ngClass]="{
+                'badge-success': assetDetail?.status === 'Running',
+                'badge-danger': assetDetail?.status === 'Disposed'
+              }"
+              class="mb-1 badge btn-xs"
+            >
+              {{ assetDetail?.status === "Running" ? "Active" : "Disposed" }}
+            </span>
+          </span>
+        </div>
+        <!-- /info -->
+      </div>
+      <!-- /avatar wrapper -->
+
+      <!-- Close Button -->
+      <button type="button" class="close" (click)="toggleAside()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <!-- /close button -->
+    </div>
+    <!-- /customizer header -->
+
+    <!-- Customizer Body -->
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <div *ngIf="assetDetail" class="row">
+        <div class="col-md-12" style="padding: 20px">
+          <!-- List -->
+          <ul class="dt-list dt-list-one-second padded-left">
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Purchase Price</span
+                  >
+                  <h5 class="mb-0">
+                    <b
+                      >{{ ownerInformation?.currency?.currencySymbol
+                      }}{{ assetDetail?.purchasePrice | number : "1.2-2" }}</b
+                    >
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Total Cost</span
+                  >
+                  <h5 class="mb-0">
+                    <b
+                      >{{ ownerInformation?.currency?.currencySymbol
+                      }}{{ assetDetail?.totalCost | number : "1.2-2" }}</b
+                    >
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Accum Dep</span
+                  >
+                  <h5 class="mb-0">
+                    <b
+                      >{{ ownerInformation?.currency?.currencySymbol
+                      }}{{
+                        assetDetail?.totalDepreciation | number : "1.2-2"
+                      }}</b
+                    >
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Net Book value</span
+                  >
+                  <h5 class="mb-0">
+                    <b
+                      >{{ ownerInformation?.currency?.currencySymbol
+                      }}{{ assetDetail?.netBookValue | number : "1.2-2" }}</b
+                    >
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Residual Value</span
+                  >
+                  <h5 class="mb-0">
+                    <b
+                      >{{ ownerInformation?.currency?.currencySymbol
+                      }}{{ assetDetail?.residualValue | number : "1.2-2" }}</b
+                    >
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12">Branch</span>
+                  <h5 class="mb-0">
+                    {{ assetDetail?.branchName }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Activation Date</span
+                  >
+                  <h5 *ngIf="assetDetail?.assetActivationDate" class="mb-0">
+                    {{ assetDetail?.assetActivationDate | customDatePipe }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li *ngIf="assetDetail?.assignedEmployeeName" class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Assigned To</span
+                  >
+                  <h5 class="mb-0">
+                    {{ assetDetail?.assignedEmployeeName }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Effective Life in Years</span
+                  >
+                  <h5 class="mb-0">
+                    {{ assetDetail?.effectiveLifeInYears }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Purchase Date</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      assetDetail?.dateOfPurchaseOrAcquisition | customDatePipe
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- /list item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Depreciation Method</span
+                  >
+                  <h5 class="mb-0">
+                    {{ assetDetail?.depreciationMethod | humanify }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-stats icon-2x mr-3 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Depreciation Rate</span
+                  >
+                  <h5 class="mb-0">{{ assetDetail?.depreciationRate }} %</h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+          </ul>
+          <!-- /list -->
+        </div>
+      </div>
+      <!-- Customizer Body Inner  -->
+      <div *ngIf="assetDetail" class="">
+        <br />
+        <!-- Section -->
+        <div class="dt-card__body">
+          <ul
+            class="flex-row nav nav-underline border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                data-toggle="tab"
+                href="#asset-info"
+                role="tab"
+                aria-controls="asset-info"
+                (click)="switchTabs('asset-info')"
+                (mouseover)="hover = true"
+                (mouseleave)="hover = false"
+                [ngStyle]="hover ? { color: currentTheme?.secondaryColor } : {}"
+                aria-selected="true"
+                >Asset Info
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-toggle="tab"
+                href="#tab-pane1"
+                role="tab"
+                aria-controls="tab-pane1"
+                (click)="switchTabs('depreciation')"
+                (mouseover)="hover = true"
+                (mouseleave)="hover = false"
+                [ngStyle]="hover ? { color: currentTheme?.secondaryColor } : {}"
+                aria-selected="true"
+                >Depreciation Lines
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-toggle="tab"
+                href="#tab-pane2"
+                role="tab"
+                aria-controls="tab-pane2"
+                (click)="switchTabs('revaluation')"
+                (mouseover)="hover = true"
+                (mouseleave)="hover = false"
+                [ngStyle]="hover ? { color: currentTheme?.secondaryColor } : {}"
+                aria-selected="true"
+                >Revaluation Board
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                data-toggle="tab"
+                href="#tab-pane3"
+                role="tab"
+                aria-controls="tab-pane3"
+                (click)="switchTabs('addition')"
+                (mouseover)="hover = true"
+                (mouseleave)="hover = false"
+                [ngStyle]="hover ? { color: currentTheme?.secondaryColor } : {}"
+                aria-selected="true"
+                >Addition Board
+              </a>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div id="asset-info" class="tab-pane active">
+              <ul class="dt-list dt-list-one-third">
+                <!-- List Item -->
+                <li class="dt-list__item">
+                  <!-- Media -->
+                  <div class="media">
+                    <i
+                      class="icon icon-company icon-2x mr-3 align-self-center text-warning"
+                    ></i>
+
+                    <!-- Media Body -->
+                    <div class="media-body">
+                      <span class="d-block text-light-gray f-12 mb-1"
+                        >Asset Class</span
+                      >
+                      <h5 class="mb-0">
+                        {{ assetDetail.assetClass }}
+                      </h5>
+                    </div>
+                    <!-- /media body -->
+                  </div>
+                  <!-- /media -->
+                </li>
+                <!-- /list item -->
+
+                <!-- List Item -->
+                <li class="dt-list__item">
+                  <!-- Media -->
+                  <div class="media">
+                    <i
+                      class="icon icon-company icon-2x mr-3 align-self-center text-warning"
+                    ></i>
+
+                    <!-- Media Body -->
+                    <div class="media-body">
+                      <span class="d-block text-light-gray f-12 mb-1"
+                        >Asset Sub Class</span
+                      >
+                      <h5 class="mb-0">
+                        {{ assetDetail.assetSubClassName }}
+                      </h5>
+                    </div>
+                    <!-- /media body -->
+                  </div>
+                  <!-- /media -->
+                </li>
+                <!-- /list item -->
+
+                <!-- List Item -->
+                <li class="dt-list__item">
+                  <!-- Media -->
+                  <div class="media">
+                    <i
+                      class="icon icon-datepicker icon-2x mr-3 align-self-center text-warning"
+                    ></i>
+
+                    <!-- Media Body -->
+                    <div class="media-body">
+                      <span class="d-block text-light-gray f-12 mb-1"
+                        >Asset Activation Date</span
+                      >
+                      <h5 class="mb-0">
+                        {{ assetDetail.assetActivationDate | customDatePipe }}
+                      </h5>
+                    </div>
+                    <!-- /media body -->
+                  </div>
+                  <!-- /media -->
+                </li>
+                <!-- /list item -->
+
+                <!-- List Item -->
+                <li class="dt-list__item">
+                  <!-- Media -->
+                  <div class="media">
+                    <i
+                      class="icon icon-datepicker icon-2x mr-3 align-self-center text-warning"
+                    ></i>
+
+                    <!-- Media Body -->
+                    <div class="media-body">
+                      <span class="d-block text-light-gray f-12 mb-1"
+                        >Branch</span
+                      >
+                      <h5 class="mb-0">
+                        {{ assetDetail.branchName }}
+                      </h5>
+                    </div>
+                    <!-- /media body -->
+                  </div>
+                  <!-- /media -->
+                </li>
+                <!-- /list item -->
+
+                <!-- List Item -->
+                <li class="dt-list__item">
+                  <!-- Media -->
+                  <div class="media">
+                    <i
+                      class="icon icon-datepicker icon-2x mr-3 align-self-center text-warning"
+                    ></i>
+
+                    <!-- Media Body -->
+                    <div class="media-body">
+                      <span class="d-block text-light-gray f-12 mb-1"
+                        >Effective Life In Years</span
+                      >
+                      <h5 class="mb-0">
+                        {{ assetDetail.effectiveLifeInYears }}
+                      </h5>
+                    </div>
+                    <!-- /media body -->
+                  </div>
+                  <!-- /media -->
+                </li>
+                <!-- /list item -->
+              </ul>
+            </div>
+            <div id="tab-pane1" class="tab-pane">
+              <!-- Tables -->
+              <div class="table-responsive">
+                <table
+                  *ngIf="assetDetail?.depreciationLines?.length > 0"
+                  class="table mb-0 table-striped"
+                  style="font-size: 11px"
+                >
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col"></th>
+                      <th scope="col">Depreciation Start Date</th>
+                      <th scope="col">Depreciation End Date</th>
+                      <th scope="col">Days Interval</th>
+                      <th class="text-uppercase amount-field" scope="col">
+                        Opening Value
+                      </th>
+
+                      <th class="amount-field" scope="col">
+                        Depreciation Value ({{
+                          ownerInformation?.currency?.currencySymbol
+                        }})
+                      </th>
+                      <th class="amount-field" scope="col">
+                        Accumulated Depreciation ({{
+                          ownerInformation?.currency?.currencySymbol
+                        }})
+                      </th>
+                      <th class="amount-field" scope="col">
+                        Closing Value ({{
+                          ownerInformation?.currency?.currencySymbol
+                        }})
+                      </th>
+                      <th scope="col" class="text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="
+                        let row of assetDetail?.depreciationLines;
+                        let i = index
+                      "
+                    >
+                      <td scope="row">{{ i + 1 }}</td>
+                      <td scope="row">
+                        {{ row?.depreciationDate | customDatePipe }}
+                      </td>
+                      <td scope="row">
+                        {{ row?.depreciationEndDate | customDatePipe }}
+                      </td>
+                      <td scope="row">
+                        {{ row?.daysInterval }}
+                      </td>
+                      <td class="amount-field">
+                        <ng-template #activity>
+                          <div
+                            *ngIf="
+                              row?.additionRevaluationActivities.length > 0
+                            "
+                          >
+                            <div
+                              *ngFor="
+                                let activity of row?.additionRevaluationActivities
+                              "
+                            >
+                              <div class="activity-dashed mb-3">
+                                <span
+                                  >Asset {{ activity?.operation }} of
+                                  <b>{{
+                                    activity?.amount | number : "1.2-2"
+                                  }}</b>
+                                  happened on
+                                  {{ activity?.date | customDatePipe }}</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </ng-template>
+                        <span
+                          *ngIf="row?.additionRevaluationActivities.length > 0"
+                          [ngbPopover]="activity"
+                          placement="right"
+                          popoverTitle="Operation(s)"
+                          [style.color]="currentTheme?.secondaryColor"
+                          ><i
+                            [style.color]="currentTheme?.secondaryColor"
+                            class="icon red-tooltip icon-question-circle cursor mr-2 icon-1x"
+                          ></i
+                        ></span>
+                        <span>{{
+                          row?.openingBalance | number : "1.2-2"
+                        }}</span>
+                      </td>
+
+                      <td class="amount-field">
+                        {{ row?.depreciationValue | number : "1.2-2" }}
+                      </td>
+                      <td class="amount-field">
+                        {{ row?.accumulatedDepreciation | number : "1.2-2" }}
+                      </td>
+                      <td class="amount-field">
+                        {{ row?.closingValue | number : "1.2-2" }}
+                      </td>
+                      <td class="text-right">
+                        <span
+                          class="badge"
+                          [ngClass]="{
+                            'badge-success':
+                              row?.depreciationLogStatus === 'Posted',
+                            'badge-warning':
+                              row?.depreciationLogStatus === 'Not Posted',
+                            'badge-danger':
+                              row?.depreciationLogStatus === 'Canceled'
+                          }"
+                          >{{ row?.depreciationLogStatus }}</span
+                        >
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <p
+                  *ngIf="
+                    assetDetail?.depreciationLines?.length === 0 ||
+                    !assetDetail?.depreciationLines
+                  "
+                  class="h6 text-center"
+                >
+                  There are no depreciation lines.
+                </p>
+              </div>
+              <!-- /tables -->
+            </div>
+
+            <div id="tab-pane2" class="tab-pane">
+              <div class="table-responsive">
+                <table
+                  *ngIf="
+                    assetDetail?.assetRevaluationLogs.length > 0;
+                    else noRevaluation
+                  "
+                  class="table mb-0 table-striped w-50"
+                  style="font-size: 11px"
+                >
+                  <thead class="thead-light">
+                    <th>Revaluation Date</th>
+                    <th class="text-right">
+                      Asset Value Before Revaluation ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </th>
+                    <th class="text-right">
+                      Asset Revalued To ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </th>
+
+                    <th>File(s)</th>
+                  </thead>
+
+                  <tbody>
+                    <tr
+                      *ngFor="
+                        let revaluationLog of assetDetail?.assetRevaluationLogs
+                      "
+                    >
+                      <td>{{ revaluationLog.createdAt | customDatePipe }}</td>
+                      <td class="text-right">
+                        {{ revaluationLog.previousValue | number : "1.2-2" }}
+                      </td>
+                      <td class="text-right">
+                        {{ revaluationLog.newValue | number : "1.2-2" }}
+                      </td>
+
+                      <td>
+                        <ng-template #files>
+                          <div *ngFor="let file of revaluationLog?.files">
+                            <p>
+                              {{ file?.originalName }}
+                              <span
+                                [style.color]="currentTheme?.secondaryColor"
+                                class="ml-2 cursor"
+                              >
+                                <a [href]="file.filePath" target="_blank"
+                                  >view</a
+                                >
+                              </span>
+                            </p>
+                          </div>
+                        </ng-template>
+
+                        <i
+                          *ngIf="revaluationLog?.files.length > 0"
+                          [ngbPopover]="files"
+                          placement="right"
+                          popoverTitle="File(s)"
+                          [style.color]="currentTheme?.secondaryColor"
+                          class="icon icon-files cursor"
+                        ></i>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <ng-template #noRevaluation>
+                  <p class="text-center">
+                    No Revaluation(s) have been made to this asset.
+                  </p>
+                </ng-template>
+              </div>
+            </div>
+
+            <div id="tab-pane3" class="tab-pane">
+              <ng-template #noAdditionLogs>
+                <p class="text-center">
+                  No addition(s) have been made to this asset.
+                </p>
+              </ng-template>
+              <div
+                class="table-responsive"
+                *ngIf="assetDetail?.additionLogs.length; else noAdditionLogs"
+              >
+                <table class="table mb-0 table-striped" style="font-size: 11px">
+                  <thead class="thead-light">
+                    <th></th>
+                    <th>Addition Date</th>
+                    <th>Description</th>
+                    <th>Addition Reference</th>
+                    <th class="text-right">
+                      Asset Value Before Addition ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </th>
+                    <th class="text-right">
+                      Amount Added ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </th>
+                  </thead>
+
+                  <tbody>
+                    <tr
+                      *ngFor="
+                        let addLog of assetDetail?.additionLogs;
+                        let i = index
+                      "
+                    >
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ addLog.createdAt | customDatePipe }}</td>
+                      <td>{{ addLog.description }}</td>
+                      <td>{{ addLog.reference }}</td>
+                      <td class="text-right">
+                        {{ addLog.previousValue | number : "1.2-2" }}
+                      </td>
+                      <td class="text-right">
+                        {{ addLog.amount | number : "1.2-2" }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /section -->
+      </div>
+      <!-- /customizer body inner -->
+      <div
+        *ngIf="!assetDetail"
+        class="table-loader mt-5"
+        style="text-align: center; color: indianred"
+      >
+        <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+      </div>
+    </div>
+    <!-- /customizer body -->
+
+    <!-- /form -->
+  </div>
+</aside>
+
+<div *ngIf="openAside" class="dt-backdrop" (click)="toggleAside()"></div>
+
+<!-- /customizer sidebar -->
+
+<ng-template #importAsset>
+  <lnd-import-modal
+    title="Asset(s) Import"
+    [currentTheme]="currentTheme"
+    [downloading]="loader"
+    (closeModal)="closeModal()"
+    (downloadTemplate)="downloadTemplate()"
+    (selectedFile)="submitImportedAsset($event)"
+  >
+    <p>Tip</p>
+    <ul class="tips">
+      <li>Ensure you fill in all the required fields, marked with <b>*</b></li>
+      <li>
+        You can use the <b>Sample Asset Cards sheets</b> as a reference
+      </li>
+      <li>Please use the <b>dd/mm/yyyy</b> format for date fields.(should be in text form)</li>
+      <li>The Staff Info Sheet contains essential staff information.</li>
+      <li>
+        Refer to the Depreciation Methods Sheet for a list of valid depreciation
+        methods.
+      </li>
+      <li>Find all valid asset subclasses in the Asset Subclass Sheet.</li>
+      <li>
+        Explore the Branch Sheet for a comprehensive list of valid branches.
+      </li>
+    </ul>
+  </lnd-import-modal>
+</ng-template>
+
+<ng-template #addition>
+  <app-asset-additions
+    (closeDepModal)="closeModal()"
+    (fetchUpdatedAssets)="loadAllAssets()"
+    [user]="user"
+    [currentTheme]="currentTheme"
+  ></app-asset-additions>
+</ng-template>
+
+<ng-template #disposal>
+  <app-asset-disposal
+    (closeDepModal)="closeModal()"
+    (fetchUpdatedAssets)="loadAllAssets()"
+    [user]="user"
+    [currentTheme]="currentTheme"
+  ></app-asset-disposal>
+</ng-template>
+
+<ng-template #postingSchedule>
+  <app-asset-depreciation
+    (closeDepModal)="closeModal()"
+    (loadAllAssets)="loadAllAssets()"
+    [user]="user"
+    [currentTheme]="currentTheme"
+  ></app-asset-depreciation>
+</ng-template>
+
+<ng-template #revaluation>
+  <app-asset-revaluation
+    (closeDepModal)="closeModal()"
+    (loadAllAssets)="loadAllAssets()"
+    [user]="user"
+    [initAssets]="allAssets"
+    [initPagination]="pagination"
+    [currentTheme]="currentTheme"
+  ></app-asset-revaluation>
+</ng-template>

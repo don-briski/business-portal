@@ -1,0 +1,203 @@
+<div class="px-5">
+  <div class="row mt-4">
+    <div class="col-md-4">
+      <label>Request Type <b class="text-danger">*</b></label>
+      <slct-2
+        [active]="[{ id: configName, text: configName }]"
+        [customSearchEnabled]="true"
+        [disabled]="true"
+      ></slct-2>
+    </div>
+    <div *ngIf="configType === 'Payments'" class="col-md-4">
+      <label>Total Amount <b class="text-danger">*</b></label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text" id="basic-addon1"></span>
+        </div>
+        <input
+          type="text"
+          class="form-control"
+          readonly
+          currencyMask
+          [options]="{
+            thousands: ',',
+            decimal: '.'
+          }"
+        />
+      </div>
+    </div>
+    <div *ngIf="configType === 'Payments'" class="col-md-4">
+      <label>Vendor <b class="text-danger">*</b></label>
+      <slct-2 placeholder="Select Vendor" [disabled]="true"></slct-2>
+    </div>
+    <div *ngIf="configType === 'Payments'" class="col-md-4 mt-5">
+      <label>Payment Date <b class="text-danger">*</b></label>
+      <input class="form-control" readonly />
+    </div>
+  </div>
+  <div class="mt-5" *ngIf="configType === 'Payments'">
+    <table class="table mb-0">
+      <thead>
+        <tr class="d-flex">
+          <th>S/N</th>
+          <th class="c-width">Item Name <b class="text-danger">*</b></th>
+          <th class="c-width">Rate</th>
+          <th class="c-width">Quantity <b class="text-danger">*</b></th>
+          <th class="c-width">
+            <div class="d-flex justify-content-between">
+              <span>Amount</span>
+              <button
+                type="button"
+                class="btn btn-xs btn-secondary text-white ml-1"
+                disabled
+              >
+                <i class="icon icon-add"></i> Add
+              </button>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="table-row d-flex">
+          <td class="d-flex align-items-center">1</td>
+          <td class="c-width">
+            <slct-2 placeholder="Select Item" [disabled]="true"></slct-2>
+          </td>
+          <td class="c-width">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Rate"
+              readonly
+            />
+          </td>
+          <td class="c-width">
+            <input
+              type="number"
+              class="form-control"
+              placeholder="Quantity"
+              readonly
+            />
+          </td>
+          <td class="c-width">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Amount"
+              readonly
+            />
+          </td>
+        </tr>
+        <tr class="spacer"></tr>
+      </tbody>
+    </table>
+    <div class="total-amt-container d-flex justify-content-end p-3">
+      <span><b>Total: </b>0.00</span>
+    </div>
+  </div>
+
+  <div
+    class="field-set p-3 mt-5"
+    id="accordion"
+    *ngFor="let cFSet of customForm?.customFieldSets; let cFSetIndex = index"
+  >
+    <div class="d-flex justify-content-between" id="accrdHeader">
+      <h3 class="m-0">{{ cFSet.customFieldSetName }}</h3>
+      <span
+        (click)="onExpandCFSet(cFSetIndex)"
+        [ngClass]="selectedCFSetIndex === cFSetIndex ? 'open' : 'close'"
+        class="cursor"
+        [attr.data-target]="'#accrdContent' + cFSetIndex"
+        data-toggle="collapse"
+        ><i class="icon icon-chevron-down icon-lg"></i
+      ></span>
+    </div>
+    <div
+      [id]="'accrdContent' + cFSetIndex"
+      class="collapse"
+      aria-labelledby="accrdHeader"
+      data-parent="#accordion"
+    >
+      <div class="row">
+        <div
+          class="mt-5 col-md-4"
+          *ngFor="let customF of cFSet.customFields; let customFIndex = index"
+        >
+          <div
+            class="form-group"
+            *ngIf="
+              customF.dataType !== 'Selection' &&
+              customF.dataType !== 'RadioGroup'
+            "
+          >
+            <label
+              >{{ customF.customFieldName }}
+              <b *ngIf="customF.isRequired" class="text-danger">*</b></label
+            >
+            <input
+              class="form-control"
+              [type]="getCustomFieldDataType(customF.dataType)"
+              readonly
+            />
+          </div>
+          <ng-container *ngIf="customF.dataType === 'RadioGroup'">
+            <div class="radio d-flex flex-column justify-content-between">
+              <label class="m-0">
+                {{ customF.customFieldName }}
+                <b *ngIf="customF.isRequired" class="text-danger">*</b>
+              </label>
+              <div>
+                <div
+                  class="d-inline-block mr-2"
+                  *ngFor="let selection of customF.customFieldSelections"
+                >
+                  <label class="d-flex align-items-center m-0"
+                    ><input
+                      class="d-inline-block mr-2"
+                      type="radio"
+                      [name]="customF.customFieldName"
+                      [value]="selection.label"
+                    />
+                    {{ selection.label }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+          <div class="form-group" *ngIf="customF.dataType === 'Selection'">
+            <label
+              >{{ customF.customFieldName }}
+              <b *ngIf="customF.required" class="text-danger">*</b></label
+            >
+            <slct-2
+              [data]="getSelectionsLabels(customF)"
+              [placeholder]="'Select ' + customF.customFieldName"
+            ></slct-2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-5">
+    <div class="col-8">
+      <label>Description <b class="text-danger">*</b></label>
+      <textarea
+        class="form-control"
+        rows="3"
+        placeholder="Enter some text"
+        readonly
+      ></textarea>
+    </div>
+  </div>
+  <div class="mt-5" *ngIf="requireSupportingDocument">
+    <small class="d-block">Attach relevant files</small>
+    <button
+      type="button"
+      disabled
+      class="btn btn-xs btn-secondary text-white mt-1"
+    >
+      <i class="icon icon-upload"></i>
+      Attach File(s)
+    </button>
+  </div>
+</div>

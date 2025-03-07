@@ -1,0 +1,4629 @@
+<!-- Page Header -->
+<div class="dt-page__header">
+  <h1 class="dt-page__title">
+    Reports
+  </h1>
+</div>
+<!-- /page header -->
+
+<!-- Grid -->
+<div
+  class="row dt-masonry"
+  *ngIf="userInfo?.permission?.includes('View Reports')"
+>
+  <!-- Grid Item -->
+
+  <!-- /grid item -->
+  <!-- Grid Item -->
+
+  <!-- /grid item -->
+  <!-- Grid Item -->
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Disbursements Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-company mr-2"></i>Disbursements
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Disbursement Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Fee Report')"
+  >
+    <div class="dt-card">
+      <div class="dt-card__header">
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-company mr-2"></i>Fee
+          </h3>
+        </div>
+      </div>
+
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Fee Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Deduction Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-queries mr-2"></i>Deduction
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Deduction Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <!-- /grid item -->
+  <!-- Grid Item -->
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Activity Log Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-queries mr-2"></i>Activity Log
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Activity Log')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <!-- /grid item -->
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Interest Income Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-company mr-2"></i>Interest Income
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Interest Income Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Loanbook Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>Loanbook
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Loanbook Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Repayments Due Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>Repayments Due
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Repayments Due Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Payments Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>Payments
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Payments Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View CBN Loan Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>CBN Loan Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('CBN Loan Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View CBN Customer Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>CBN Customer Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('CBN Customer Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View TopUp Eligibility Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>TopUp Eligibility
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('TopUp Eligibility Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Customers Information Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>Customer Information
+            Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Customers Information Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View Customer Repayment Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>Customer Repayment Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Customer Repayment Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View All Redraft Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>Redraft Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Redraft Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <div
+    class="col-md-4 dt-masonry__item"
+    *ngIf="userInfo?.permission?.includes('View All Redraft Report')"
+  >
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Header -->
+      <div class="dt-card__header">
+        <!-- Card Heading -->
+        <div class="dt-card__heading">
+          <h3 class="dt-card__title">
+            <i class="icon icon-revenue-new mr-2"></i>Settlement Differential
+            Report
+          </h3>
+        </div>
+        <!-- /card heading -->
+      </div>
+      <!-- /card header -->
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="alert alert-light" role="alert">
+              <a
+                [style.color]="currentTheme?.secondaryColor"
+                class="cursor"
+                (click)="toggleAside('Settlement Differential Report')"
+                >View Report</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+<!-- Modal -->
+<ng-template #reportModal>
+  <!-- Modal Content -->
+  <div class="modal-content">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h3 class="modal-title" id="model-1">
+        <i class="icon icon-ckeditor mr-2"></i>Generate New Report
+      </h3>
+      <button
+        type="button"
+        class="close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="closeModal()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- /modal header -->
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Form -->
+      <form>
+        <div class="form-row mb-4">
+          <label
+            for="normal-input-4"
+            class="col-md-2 col-sm-3 col-form-label col-form-label-sm text-sm-right"
+            >Filter By</label
+          >
+          <div class="col-md-10 col-sm-9">
+            <select class="custom-select custom-select-sm" id="normal-input-4">
+              <option selected>Daily</option>
+              <option value="1">Weekly</option>
+              <option value="2">Monthly</option>
+              <option value="2">Yearly</option>
+            </select>
+          </div>
+        </div>
+        <!-- /card tools -->
+        <!-- Form Group -->
+        <div class="form-group form-row">
+          <label
+            for="normal-input-5"
+            class="col-md-2 col-sm-3 col-form-label col-form-label-sm text-sm-right"
+            >Title</label
+          >
+          <div class="col-md-10 col-sm-9">
+            <input
+              type="email"
+              class="form-control form-control-sm"
+              id="normal-input-5"
+              placeholder="Report Title"
+            />
+          </div>
+        </div>
+        <!-- /form group -->
+
+        <!-- Form Row -->
+        <div class="form-row">
+          <label
+            class="col-md-2 col-sm-3 col-form-label text-sm-right"
+            for="text-area-1"
+            >Internal Note</label
+          >
+
+          <div class="col-md-10 col-sm-9">
+            <textarea
+              class="form-control"
+              id="text-area-1"
+              rows="3"
+              placeholder="Internal note"
+            ></textarea>
+          </div>
+        </div>
+        <!-- /form row -->
+      </form>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        data-dismiss="modal"
+        (click)="closeModal()"
+      >
+        Close
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        data-dismiss="modal"
+        (click)="toggleAside()"
+      >
+        Generate Report
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </div>
+  <!-- /modal content -->
+</ng-template>
+<!-- /modal -->
+
+<ng-template #loanSearch>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="icon icon-search icon-2x mr-2 align-self-center text-warning"
+      ></i>
+      Search Result(s)
+    </h4>
+    <small style="color: palevioletred"
+      >*** Click outside search view once selection is completed ***</small
+    >
+  </div>
+  <div class="modal-body">
+    <div class="table-responsive" *ngIf="loansearchResult?.length > 0">
+      <table class="table table-hover">
+        <thead>
+          <th>Loan Information</th>
+          <th>Action</th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of loansearchResult">
+            <td>
+              <span
+                ngxTextHighlight
+                [content]="item?.combinedLoanInformation"
+                [searchTerm]="loanReasonSearchTerm"
+              ></span>
+            </td>
+
+            <td>
+              <button
+                type="button"
+                class="btn btn-xs btn-success"
+                (click)="pushtoSelectedLoan(item, double)"
+              >
+                <i class="icon icon-add"></i>Select
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-center" *ngIf="loansearchResult?.length == 0">
+      <h6>
+        Loan information for search parameter: "{{
+          AddPaymentForm.get("SearchParam").value
+        }}" was not found.
+      </h6>
+    </div>
+  </div>
+</ng-template>
+
+<lnd-aside [isOpen]="openReportAside" (closeAside)="closeAside()">
+  <div header class="dt-avatar-wrapper">
+    <h4 class="my-2">
+      <i class="icon icon-ckeditor mr-2 icon-3x"> {{ reportName }} </i>
+    </h4>
+  </div>
+  <div class="row">
+    <div class="col-md-12" style="padding: 20px">
+      <!-- List -->
+      <ul class="dt-list dt-list-one-second padded-left">
+        <!-- List Item -->
+
+        <!-- List Item -->
+        <li class="dt-list__item">
+          <!-- Media -->
+          <div class="media">
+            <i
+              class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+            ></i>
+            <!-- Media Body -->
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1">Created by</span>
+              <h5 class="mb-0">{{ userInfo?.person?.displayName }}</h5>
+            </div>
+            <!-- /media body -->
+          </div>
+          <!-- /media -->
+        </li>
+        <!-- /list item -->
+
+        <!-- List Item -->
+        <li class="dt-list__item">
+          <!-- Media -->
+          <div class="media">
+            <i
+              class="icon icon-datepicker icon-3x mr-5 align-self-center text-warning"
+            ></i>
+
+            <!-- Media Body -->
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Date Created</span
+              >
+              <h5 class="mb-0">
+                {{ today | date : "dd/MM/yyyy, h:mm a" }}
+              </h5>
+            </div>
+            <!-- /media body -->
+          </div>
+          <!-- /media -->
+        </li>
+        <!-- /list item -->
+      </ul>
+      <!-- /list -->
+      <div  class="d-flex justify-content-between align-items-center col-12">
+        <div class="col-10">
+          <lnd-selected-filters
+          [useFilterModel]="false"
+          ></lnd-selected-filters>
+        </div>
+
+        <div
+        class="btn-group mr-2 mb-2"
+        role="group"
+        aria-label="Basic example"
+        style="float: right"
+      >
+        <div class="mr-3">
+          <lnd-filter-btn (filterModalOpen)="filterModal()"/>
+        </div>
+        <!-- generate-report menu -->
+        <div class="generate-menu generate-menu-right">
+          <div class="generate-menu-header">
+            <h4 class="title">
+              <i class="icon icon-ckeditor mr-2"></i> Period Selection
+            </h4>
+          </div>
+          <form
+            *ngIf="searchForm"
+            [formGroup]="searchForm"
+            (ngSubmit)="filterReport()"
+          >
+            <div class="generate-menu-body">
+              <div class="h-auto">
+                <div class="form-row" *ngIf="loanSearchCheck"></div>
+
+                <div class="form-row">
+                  <div *ngIf="reportInputDateType != 3" class="col-sm-6 mb-3">
+                    <label for="validationDefault02">Start Date <span *ngIf="isStartDateRequired" class="text-danger">*</span></label>
+                    <div
+                      class="input-group date"
+                      id="date-time-picker-1"
+                      data-target-input="nearest"
+                    >
+                      <input
+                      lndInvalidDateChecker
+                        type="date"
+                        [(ngModel)]="StartDate"
+                        formControlName="StartDate"
+                        class="form-control"
+                      />
+                      <div class="input-group-append">
+                        <div class="input-group-text">
+                          <i class="icon icon-calendar"></i>
+                        </div>
+                      </div>
+                    </div>
+                    <small
+                      *ngIf="reportInputDateType == 1"
+                      style="text-align: center; color: indianred"
+                      >Leave empty to spool as at the <b>End date</b></small
+                    >
+                  </div>
+                  <div class="col-sm-6 mb-3">
+                    <label for="validationDefault02">End Date  <span class="text-danger">*</span></label>
+                    <div
+                      class="input-group date"
+                      id="date-time-picker-1"
+                      data-target-input="nearest"
+                    >
+                      <input
+                      lndInvalidDateChecker
+                        type="date"
+                        [(ngModel)]="EndDate"
+                        formControlName="EndDate"
+                        class="form-control"
+                      />
+                      <div class="input-group-append">
+                        <div class="input-group-text">
+                          <i class="icon icon-calendar"></i>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <br />
+                  <div *ngIf="reportOutputFormatCheck" class="col-sm-12 mb-3">
+                    <label
+                      >Select Preferred Output
+                      <span class="text-danger">*</span>
+                    </label>
+                    <slct-2
+                      [(ngModel)]="outputTypeSelect"
+                      [ngModelOptions]="{ standalone: true }"
+                      [allowClear]="false"
+                      [customSearchEnabled]="true"
+                      [data]="resultOutputTypeArray"
+                      [active]="[
+                        { id: selectedOutputType, text: selectedOutputType }
+                      ]"
+                      (selected)="selected('OutputType', $event)"
+                      placeholder="Select Result Output Type"
+                    >
+                    </slct-2>
+                  </div>
+
+                  <div class="col-sm-12 mb-3" *ngIf="showVolumeofRepayments">
+                    <label>Volume of Repayments Made (%) </label>
+                    <div class="form-group">
+                      <input
+                        type="text"
+                        class="form-control"
+                        formControlName="RepaymentVolume"
+                        currencyMask
+                        [options]="{
+                          prefix: '',
+                          thousands: ',',
+                          decimal: '.'
+                        }"
+                        placeholder="Enter Pecentage Value"
+                      />
+                      <small style="text-align: center; color: indianred"
+                        >Leave empty to spool
+                        <b> Loan Type Configured Constraints</b></small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-sm-12 mb-3" *ngIf="showBranch">
+                    <label>Select Preferred Branch(es) </label>
+                    <div>
+                      <slct-2
+                        [(ngModel)]="branchSelect"
+                        [ngModelOptions]="{ standalone: true }"
+                        [multiple]="true"
+                        [allowSelectAll]="true"
+                        [customSearchEnabled]="true"
+                        [data]="branchesAccessibleArray"
+                        (selected)="selected('AccessibleBranch', $event)"
+                        (selectedAll)="toggleSelectAllBranches()"
+                        (removed)="removed('AccessibleBranch', $event)"
+                        (deselectedAll)="toggleSelectAllBranches()"
+                        placeholder="Select Branch(es)"
+                      ></slct-2>
+                    </div>
+                  </div>
+
+                  <div class="col-sm-12 mb-3" *ngIf="showLoan">
+                    <label>Select Preferred Loan Type(s) </label>
+                    <div>
+                      <slct-2
+                        [(ngModel)]="loanTypeSelect"
+                        [ngModelOptions]="{ standalone: true }"
+                        [multiple]="true"
+                        [allowSelectAll]="true"
+                        [customSearchEnabled]="true"
+                        [data]="loantypesArray"
+                        (selected)="selected('LoanTypes', $event)"
+                        (selectedAll)="toggleSelectAllLoans()"
+                        (deselectedAll)="toggleSelectAllLoans()"
+                        (removed)="removed('LoanTypes', $event)"
+                        placeholder="Select Loan Types "
+                      ></slct-2>
+                    </div>
+                  </div>
+
+                  <div *ngIf="paginated" class="col-sm-12">
+                    <label>Desired result size (in rows)</label>
+                    <slct-2
+                      [data]="desiredRows"
+                      [active]="[{ id: 50, text: 50 }]"
+                      (selected)="selected('rowSize', $event)"
+                    ></slct-2>
+                  </div>
+                </div>
+              </div>
+
+              <div class="generate-menu-footer">
+                <div class="footer-right">
+                  <button
+                    type="submit"
+                    class="btn btn-primary btn-xs mr-2"
+                    *ngIf="!loader"
+                    [disabled]="searchForm.invalid"
+                  >
+                    Generate Report
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-xs mr-2"
+                    [disabled]="true"
+                    *ngIf="loader"
+                  >
+                    <i class="icon icon-spin icon-spin2"></i> Generating ...
+                  </button>
+                  <button
+                    type="button"
+                    (click)="filterModal()"
+                    class="btn btn-danger btn-xs"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      </div>
+    </div>
+    <!-- Customizer Body Inner  -->
+    <div class="col-md-12">
+      <br />
+      <!-- Section -->
+      <div class="dt-card__body">
+        <ul
+          class="nav nav-underline flex-row border-bottom nav-card-tabs"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              #firstTab
+              class="nav-link clicked"
+              data-toggle="tab"
+              href="#tab-pane1"
+              role="tab"
+              aria-controls="tab-pane1"
+              aria-selected="true"
+              >Report Table</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              (click)="loadQueuedReports()"
+              data-toggle="tab"
+              href="#tab-pane2"
+              role="tab"
+              aria-controls="tab-pane2"
+              aria-selected="false"
+              >Queued Reports</a
+            >
+          </li>
+          <li
+            class="nav-item"
+            *ngIf="
+              reportName === 'CBN Loan Report' ||
+              reportName === 'CBN Customer Report'
+            "
+          >
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#tab-pane3"
+              role="tab"
+              aria-controls="tab-pane3"
+              aria-selected="false"
+              >Helper Document</a
+            >
+          </li>
+        </ul>
+
+        <div class="tab-content">
+          <!-- tab 1-->
+          <div id="tab-pane1" class="tab-pane">
+            <!-- Card -->
+            <div class="dt-card">
+              <div
+                *ngIf="this.loader"
+                class="table-loader"
+                style="text-align: center; color: indianred"
+              >
+                <span>
+                  <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                >
+              </div>
+
+              <!-- Card Body -->
+              <div
+                *ngIf="!this.loader"
+                class="dt-card__body"
+                style="padding: 1.4rem 1.4rem"
+              >
+                <small
+                  style="color: darkred"
+                  *ngIf="ownerInformation != '' && ownerInformation != null"
+                  >*Base Currency:
+                  {{ ownerInformation?.currency?.currencyName }} ({{
+                    ownerInformation?.currency?.currencySymbol
+                  }})</small
+                >
+                <p class="text-center">
+                  <span
+                    *ngIf="reportInputDateType != 1 && reportInputDateType != 3"
+                  >
+                    <span> {{ reportName }}</span> &nbsp;
+                    <span
+                      ><b>From:</b> {{ StartDate | date : "dd-MM-yyyy" }}</span
+                    >
+                    &nbsp;
+                    <span
+                      ><b>To:</b> {{ EndDate | date : "dd-MM-yyyy" }}</span
+                    ></span
+                  >
+                  <span
+                    *ngIf="
+                      (reportInputDateType == 1 || reportInputDateType == 3) &&
+                      (StartDate == '' || StartDate == null)
+                    "
+                  >
+                    <span> {{ reportName }}</span> &nbsp;
+                    <small>
+                      <b>As at:</b>
+                      {{ EndDate | date : "dd-MM-yyyy" }}</small
+                    >
+                  </span>
+                  <span
+                    *ngIf="
+                      reportInputDateType == 1 &&
+                      StartDate != '' &&
+                      StartDate != null &&
+                      EndDate != '' &&
+                      EndDate != null
+                    "
+                  >
+                    <span> {{ reportName }}</span> &nbsp;
+                    <span *ngIf="StartDate != '' && StartDate != null"
+                      ><small
+                        ><b>From:</b> {{ StartDate | date : "dd-MM-yyyy" }}
+                      </small></span
+                    >
+                    &nbsp;
+                    <small>
+                      <b>To:</b> {{ EndDate | date : "dd-MM-yyyy" }}</small
+                    >
+                  </span>
+                </p>
+
+                <!-- Pagination Top-->
+                <div class="row" *ngIf="paginated">
+                  <div class="col-md-4">
+                    <label style="display: inline-flex"
+                      ><span style="padding: 8px 2px; font-size: 12px"
+                        >Show
+                      </span>
+                      <select
+                        [(ngModel)]="pagination.pageSize"
+                        aria-controls="data-table"
+                        (change)="
+                          getItemsPaginatedSearch(
+                            this.pagination.searchTerm,
+                            this.pagination.pageSize,
+                            1
+                          )
+                        "
+                        class="custom-select custom-select-xl form-control form-control-xl height"
+                      >
+                        <!-- <option value="1500">1,500</option>
+                        <option value="2500">2,500</option>
+                        <option value="5000">5,000</option> -->
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                        <!-- <option
+                          *ngIf="!reportinvolvesCalculation"
+                          value="100000"
+                        >
+                          100,000
+                        </option> -->
+                        <option value="10000000">All</option>
+                      </select>
+                      <span style="padding: 8px 2px; font-size: 12px"
+                        >entries</span
+                      ></label
+                    >
+                  </div>
+                  <div class="col-md-4"></div>
+
+                  <div class="form-group col-md-4">
+                    <nav>
+                      <ul class="pagination pagination-sm justify-content-end">
+                        <li
+                          class="page-item"
+                          *ngIf="
+                            (pagination.pageNum - 1) * pagination.pageSize + 1 >
+                            10
+                          "
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="
+                              getItemsPaginatedSearch(
+                                this.pagination.searchTerm,
+                                this.pagination.pageSize,
+                                pagination.pageNum - 1
+                              )
+                            "
+                            tabindex="-1"
+                            >Previous</a
+                          >
+                        </li>
+                        <li class="page-item pagination-menu-wrapper">
+                          <a
+                            class="page-link page-target"
+                            (click)="getItemsPaginatedPageJumpModal()"
+                            href="javascript:void(0)"
+                            >{{ pagination.pageNum }} of
+                            {{ this.pagination.maxPage }} page<span
+                              *ngIf="pagination.pageNum > 1"
+                              >s</span
+                            ><span class="sr-only">(current)</span></a
+                          >
+
+                          <div class="pagination-menu pagination-menu-right">
+                            <div class="pagination-menu-body">
+                              <div class="h-auto">
+                                <span>Jump to Page</span>
+                                <select
+                                  aria-controls="data-table"
+                                  [(ngModel)]="pagination.pageNum"
+                                  (change)="filterReport(pagination.pageNum)"
+                                  class="custom-select custom-select-xl form-control form-control-xl height"
+                                >
+                                  <option
+                                    *ngFor="let line of pagination.jumpArray"
+                                  >
+                                    {{ line }}
+                                  </option>
+                                </select>
+                                <div class="text-center mt-3">
+                                  <button
+                                    type="button"
+                                    (click)="getItemsPaginatedPageJumpModal()"
+                                    class="btn btn-danger btn-xs"
+                                  >
+                                    Close
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                        <li
+                          class="page-item"
+                          *ngIf="
+                            this.pagination.pageNum < this.pagination.maxPage
+                          "
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="
+                              getItemsPaginatedSearch(
+                                this.pagination.searchTerm,
+                                this.pagination.pageSize,
+                                pagination.pageNum + 1
+                              )
+                            "
+                            >Next</a
+                          >
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+
+                  <div
+                    *ngIf="pagination.totalRecords > 0"
+                    aria-live="polite"
+                    style="
+                      padding-left: 18px;
+                      font-size: 13px;
+                      margin-top: -8px;
+                    "
+                  >
+                    Showing
+                    {{
+                      (pagination.pageNum - 1) * pagination.pageSize + 1
+                        | number : "1.0-0"
+                    }}
+                    -
+                    {{
+                      (pagination.pageNum - 1) * pagination.pageSize +
+                        pagination.count | number : "1.0-0"
+                    }}
+                    of
+                    {{ pagination.totalRecords | number : "1.0-0" }}
+                    record(s)
+                  </div>
+                </div>
+                <!-- /pagination Top -->
+                <br />
+
+                <ng-container *ngIf="investmentReportList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(investmentReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('investmentReportTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div class="table-reponsive" id="investmentReportTable">
+                    <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                      <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                    </div>
+
+                    <div class="report-info">
+                      <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                      <h5><span> Report Name: {{reportType}} </span></h5>
+                      <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{ EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                      <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                    </div>
+
+                    <small
+                      style="color: darkred"
+                      *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                      >*Base Currency:
+                      {{ ownerInformation?.currency?.currencyName }} ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Investor</th>
+                          <th>Amount</th>
+                          <th>Status</th>
+                          <th>Gross Interest</th>
+                          <th>Net Interest</th>
+                          <th>WHT</th>
+                          <th>Investment Type</th>
+                          <th>Period</th>
+                          <th>Current Interest Accrued</th>
+                          <th>Tenor</th>
+                          <th>Start Date</th>
+                          <th>Maturity Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of investmentReportList"
+                        >
+                          <td>{{ item?.investmentCode }}</td>
+                          <td>{{ item?.investorName }}</td>
+                          <td>{{ item?.initialDeposit }}</td>
+                          <td>{{ item?.status }}</td>
+                          <td>{{ item?.grossInterestRate }}</td>
+                          <td>{{ item?.netInterestRate }}</td>
+                          <td>{{ item?.withHoldingTax }}</td>
+                          <td>{{ item?.investmentType }}</td>
+                          <td>{{ item?.period }}</td>
+                          <td>{{ item?.currentAccruedAmount }}</td>
+                          <td>{{ item?.tenor }}</td>
+                          <td>
+                            {{
+                              item?.investmentStartDate | date : "dd-MM-yyyy"
+                            }}
+                          </td>
+                          <td>
+                            {{ item?.maturityDate | date : "dd-MM-yyyy" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container
+                  *ngIf="investmentLiquidationReportList?.length > 0"
+                >
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(investmentLiquidationReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('investmentLiquidationReportTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div class="table-reponsive" id="investmentReportTable">
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Code</th>
+                          <th>Investor</th>
+                          <th>Principal</th>
+                          <th>Amount Liquidated</th>
+                          <th>Penal Charge</th>
+                          <th>Liquidation Date</th>
+                          <th>Start Date</th>
+                          <th>Maturity Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of investmentLiquidationReportList"
+                        >
+                          <td>{{ item?.investmentCode }}</td>
+                          <td>{{ item?.investorName }}</td>
+                          <td>{{ item?.initialDeposit }}</td>
+                          <td>{{ item?.liquidatedAmount }}</td>
+                          <td>{{ item?.penalCharge }}</td>
+                          <td>
+                            {{ item?.liquidationDate | date : "dd-MM-yyyy" }}
+                          </td>
+                          <td>
+                            {{
+                              item?.investmentStartDate | date : "dd-MM-yyyy"
+                            }}
+                          </td>
+                          <td>
+                            {{ item?.maturityDate | date : "dd-MM-yyyy" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="activityList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(activityList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('activityTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div class="table-reponsive" id="activityTable">
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 12px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Description</th>
+                          <th>Activity Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="gradeX" *ngFor="let item of activityList">
+                          <td>{{ item?.activityDescription }}</td>
+                          <td>
+                            {{
+                              item?.activityDate | date : "dd-MM-yyyy h:mm a"
+                            }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="disbursementList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(disbursementList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('disbursementTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+
+                  <div
+                    class="table-reponsive"
+                    id="disbursementTable"
+                    style="overflow-x: auto"
+                  >
+                    <div class="text-center">
+                      <p>
+                        <span>
+                          <span
+                            >Total Number Disbursed:
+                            <span
+                              title="Click here to copy  to clipboard"
+                              class="clickable"
+                              (click)="copyToClipboard(pagination.totalRecords)"
+                              >{{
+                                pagination.totalRecords | number : "1.0-0"
+                              }}</span
+                            >
+                          </span>
+                          &nbsp;&nbsp;
+                          <span
+                            >Total Amount Disbursed:
+                            <span
+                              title="Click here to copy  to clipboard"
+                              class="clickable"
+                              (click)="
+                                copyToClipboard(
+                                  metricsdata?.DisbursedAmountTotal
+                                )
+                              "
+                              >{{
+                                metricsdata?.DisbursedAmountTotal
+                                  | number : "1.2-2"
+                              }}</span
+                            >
+                          </span>
+                          <br /><br />
+                        </span>
+                      </p>
+                    </div>
+
+                    <br />
+
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Loan Code</th>
+                          <th>Application Code</th>
+                          <th>Customer Code</th>
+                          <th>Firstname</th>
+                          <th>Lastname</th>
+                          <th>Phone Number</th>
+                          <th>Email</th>
+                          <th>Date of Birth</th>
+                          <th>Product Type</th>
+                          <th>Loan Term</th>
+                          <th>Rate</th>
+                          <th class="amount-field">Loan Amount</th>
+                          <th class="amount-field">Upfront Fees</th>
+                          <th class="amount-field">Total Fees Charged</th>
+                          <th class="amount-field">Parent Loan OutStanding Amount</th>
+                          <th>Parent Loan Code</th>
+                          <th class="amount-field">Disbursed Amount</th>
+                          <th>Deposit Amount</th>
+                          <th>Deposit Received</th>
+                          <th class="amount-field">
+                            Loan Periodic Installment
+                          </th>
+                          <th>Creation Date</th>
+                          <th>Created By</th>
+                          <th>Reviewer</th>
+                          <th>Date Approved</th>
+                          <th>Time Approved</th>
+                          <th>Disbursement Date</th>
+                          <th>
+                            Disbursement TAT
+                            <span
+                              ><i
+                                class="icon icon-question-circle icon-fw icon-xl"
+                                placement="top"
+                                ngbTooltip="Turnaround Around Time from application creation to its disbursement (Hour.Minute)"
+                              ></i
+                            ></span>
+                          </th>
+                          <th>Bank Account Number</th>
+                          <th>Bank Name</th>
+                          <th>Loan Start Date</th>
+                          <th>Loan Status</th>
+                          <th>Employer Name</th>
+                          <th>Employee Code</th>
+                          <th>Date of Employment</th>
+                          <th>Outlet State</th>
+                          <th>Branch</th>
+                          <th>Sales Agent Staff ID</th>
+                          <th>Sales Agent</th>
+                          <th>Loan Application Category</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of disbursementList"
+                        >
+                          <td>{{ item?.loanCode }}</td>
+                          <td>{{ item?.applicationCode }}</td>
+                          <td>{{ item?.customerCode }}</td>
+                          <td>{{ item?.firstName }}</td>
+                          <td>{{ item?.surname }}</td>
+                          <td>{{ item?.phoneNumber }}</td>
+                          <td>{{ item?.emailAddress }}</td>
+                          <td>{{ item?.dateOfBirth | date:'shortDate' }}</td>
+                          <td>{{ item?.productType }}</td>
+                          <td>{{ item?.loanTerm }}</td>
+                          <td>{{ item?.rate }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanAmount }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.upFrontFees }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.totalFeesCharged }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.parentLoanOutStandingAmount }}
+                          </td>
+                          <td>
+                            {{ item?.parentLoanCode }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.disbursedAmount }}
+                          </td>
+                          <td>{{ item?.depositAmount }}</td>
+                          <td>{{ item?.depositRecieved | titlecase }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanPeriodicInstallment }}
+                          </td>
+                          <td>{{ item?.creationDate }}</td>
+                          <td>{{ item?.createdBy }}</td>
+                          <td>{{ item?.reviewer }}</td>
+                          <td>{{ item?.dateApproved }}</td>
+                          <td>{{ item?.timeApproved }}</td>
+                          <td>{{ item?.disbursementDate }}</td>
+                          <td>{{ item?.disbursementTat }}</td>
+                          <td>{{ item?.bankAccountNumber }}</td>
+                          <td>{{ item?.bankName }}</td>
+                          <td>{{ item?.loanStartDate }}</td>
+                          <td>{{ item?.loanStatus }}</td>
+                          <td>{{ item?.employerName }}</td>
+                          <td>{{ item?.employeeCode }}</td>
+                          <td>{{ item?.dateOfEmployment }}</td>
+                          <td>{{ item?.state }}</td>
+                          <td>{{ item?.branch }}</td>
+                          <td>{{ item?.salesAgentStaffId }}</td>
+                          <td>{{ item?.salesAgent }}</td>
+                          <td>{{ item?.loanApplicationCategory }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="reductionReportList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(reductionReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('activityTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="activityTable"
+                    style="overflow-x: auto"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportType}} </span></h5>
+                    <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{ EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>Loan Code</th>
+                          <th>Employee Code</th>
+                          <th>Firstname</th>
+                          <th>Surname</th>
+                          <th class="amount-field">Loan Amount</th>
+                          <th>Loan Term</th>
+                          <th class="amount-field">Periodic Installment</th>
+                          <th>Employer Name</th>
+                          <th>State</th>
+                          <th>Creation Date</th>
+                          <th>Product Type</th>
+                          <th>Loan Status</th>
+                          <th>Sales Agent</th>
+                          <th>Branch</th>
+                          <th>Reviewer</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of reductionReportList"
+                        >
+                          <td>{{ item?.loanCode }}</td>
+                          <td>{{ item?.employeeCode }}</td>
+                          <td>{{ item?.firstName }}</td>
+                          <td>{{ item?.surname }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanAmount }}
+                          </td>
+                          <td>{{ item?.loanTerm }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanPeriodicInstallment }}
+                          </td>
+                          <td>{{ item?.employerName }}</td>
+                          <td>{{ item?.state }}</td>
+                          <td>{{ item?.creationDate }}</td>
+                          <td>{{ item?.productType }}</td>
+                          <td>{{ item?.loanStatus }}</td>
+                          <td>{{ item?.salesAgent }}</td>
+                          <td>{{ item?.branch }}</td>
+                          <td>{{ item?.reviewer }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="interestIncomeList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(interestIncomeList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('interestIncomeTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="interestIncomeTable"
+                    style="overflow-x: auto"
+                  >
+                    <div
+                      class="text-center"
+                      *ngIf="selectedOutputType == 'Breakdown'"
+                    >
+                      <p>
+                        <span>
+                          <span
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              (StartDate == '' || StartDate == null)
+                            "
+                          >
+                            Total Interest Income For Period:
+                            <span
+                              title="Click here to copy  to clipboard"
+                              class="clickable"
+                              (click)="
+                                copyToClipboard(
+                                  metricsdata?.InterestIncomeForPeriodTotal
+                                )
+                              "
+                              >{{
+                                metricsdata?.InterestIncomeForPeriodTotal
+                                  | number : "1.2-2"
+                              }}</span
+                            >
+                          </span>
+                          &nbsp;&nbsp;
+                          <span
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              (StartDate == '' || StartDate == null)
+                            "
+                            >Total Interest Income Till Period:
+                            <span
+                              title="Click here to copy  to clipboard"
+                              class="clickable"
+                              (click)="
+                                copyToClipboard(
+                                  metricsdata?.InterestIncomeTillPeriodTotal
+                                )
+                              "
+                              >{{
+                                metricsdata?.InterestIncomeTillPeriodTotal
+                                  | number : "1.2-2"
+                              }}</span
+                            > </span
+                          >&nbsp;&nbsp;
+                          <span
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              StartDate != '' &&
+                              StartDate != null &&
+                              EndDate != '' &&
+                              EndDate != null
+                            "
+                          >
+                            Total Interest Income In Period:
+                            <span
+                              title="Click here to copy  to clipboard"
+                              class="clickable"
+                              (click)="
+                                copyToClipboard(
+                                  metricsdata?.InterestIncomeForPeriodTotal
+                                )
+                              "
+                              >{{
+                                metricsdata?.InterestIncomeForPeriodTotal
+                                  | number : "1.2-2"
+                              }}</span
+                            >
+                          </span>
+                        </span>
+                      </p>
+                    </div>
+                    <br />
+
+                    <div class="text-center">
+                      <table
+                        *ngIf="selectedOutputType == 'Grouped'"
+                        class="table table-bordered table-hover table-striped"
+                        style="font-size: 10px; width: 50%; margin: 0 auto"
+                      >
+                        <thead>
+                          <tr>
+                            <th class="">
+                              <b style="font-weight: 500">
+                                Total Interest Income For Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</b
+                              >
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            class="gradeX"
+                            *ngFor="let item of interestIncomeList"
+                          >
+                            <td class="">
+                              {{
+                                item?.totalInterestIncomeForPeriod
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <table
+                      *ngIf="selectedOutputType == 'Breakdown'"
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th><b style="font-weight: 500">Loan Code</b></th>
+                          <th><b style="font-weight: 500">Customer</b></th>
+                          <th><b style="font-weight: 500">Employment Code</b></th>
+                          <th><b style="font-weight: 500">Branch</b></th>
+                          <th>
+                            <b style="font-weight: 500">Product Type</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Rate (%)</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Tenor </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">Loan Amount</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">Periodic Installment</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Loan Start Date</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Date Disbursed</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Date Approver Approved</b>
+                          </th>
+                          <th><b style="font-weight: 500">Status</b></th>
+                          <th>
+                            <b style="font-weight: 500">Account Closure Type</b>
+                          </th>
+                          <th
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              (StartDate == '' || StartDate == null)
+                            "
+                          >
+                            <b style="font-weight: 500">Period</b>
+                          </th>
+                          <th
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              (StartDate == '' || StartDate == null)
+                            "
+                            class="amount-field"
+                          >
+                            <b style="font-weight: 500"
+                              >Interest Income for Period</b
+                            >
+                          </th>
+                          <th
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              (StartDate == '' || StartDate == null)
+                            "
+                            class="amount-field"
+                          >
+                            <b style="font-weight: 500"
+                              >Interest Income till Period</b
+                            >
+                          </th>
+                          <th
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              StartDate != '' &&
+                              StartDate != null &&
+                              EndDate != '' &&
+                              EndDate != null
+                            "
+                            class="amount-field"
+                          >
+                            <b style="font-weight: 500"
+                              >Interest Income In Period</b
+                            >
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of interestIncomeList"
+                        >
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.loanCode }}
+                          </td>
+                          <td>
+                            <small>{{ item?.customerName }}</small>
+                          </td>
+                          <td>{{ item?.employmentCode }}</td>
+                          <td>{{ item?.branch }}</td>
+                          <td>{{ item?.productType }}</td>
+                          <td class="text-center">{{ item?.rate }}</td>
+                          <td class="text-center">{{ item?.loanTenor }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanAmount }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.periodicInstallment }}
+                          </td>
+                          <td>
+                            {{ item?.loanStartDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>
+                            {{ item?.dateDisbursed | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>
+                            {{ item?.dateApproverApproved | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>{{ item?.status | titlecase }}</td>
+                          <td>{{ item?.accountClosureType | titlecase }}</td>
+                          <td
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              (StartDate == '' || StartDate == null)
+                            "
+                            class="text-center"
+                          >
+                            {{ item?.currentPeriod }}
+                          </td>
+                          <td
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              (StartDate == '' || StartDate == null)
+                            "
+                            class="amount-field"
+                          >
+                            {{ item?.interestIncomeForPeriod }}
+                          </td>
+                          <td
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              (StartDate == '' || StartDate == null)
+                            "
+                            class="amount-field"
+                          >
+                            {{ item?.interestIncomeTillPeriod }}
+                          </td>
+                          <td
+                            *ngIf="
+                              reportInputDateType == 1 &&
+                              StartDate != '' &&
+                              StartDate != null &&
+                              EndDate != '' &&
+                              EndDate != null
+                            "
+                            class="amount-field"
+                          >
+                            {{ item?.interestIncomeForPeriod }}
+                          </td>
+                        </tr>
+                      </tbody>
+                      <!--    <tfoot>
+                            <td colspan="9"></td>
+                            <td *ngIf="reportInputDateType == 1    && (StartDate == '' || StartDate == null )"></td>
+                            <td  class="amount-field"> <b>Totals:</b></td>
+                            <td *ngIf="reportInputDateType == 1  && (StartDate == '' || StartDate == null )"  class="amount-field"> <b>{{ getTotalSection('interestIncomeForPeriod', interestIncomeList )  | number: '1.2-2' }}</b></td>
+                            <td  class="amount-field"> <b>{{ getTotalSection('interestIncomeTillPeriod', interestIncomeList )  | number: '1.2-2' }}</b></td>
+                        </tfoot>     -->
+                    </table>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="feesList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(feesList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('feesListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="feesListTable"
+                    style="overflow-x: auto"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportType}} </span></h5>
+                    <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      *ngIf="selectedOutputType == 'Grouped'"
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th><b style="font-weight: 500">Fee Name</b></th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Number of Loans</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">
+                              Total Fees Charged ({{ ownerInformation?.currency?.currencySymbol }})</b
+                            >
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="gradeX" *ngFor="let item of feesList">
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.feeName }}
+                          </td>
+                          <td class="text-center">
+                            <small>{{ item?.loanCount }}</small>
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.totalFeesCharged | number : "1.2-2" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <td class="amount-field"><b>Totals:</b></td>
+                        <td class="text-center">
+                          <b>{{
+                            getTotalSection("feesGroupedLoanCount", feesList)
+                          }}</b>
+                        </td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection("feesGrouped", feesList)
+                              | number : "1.2-2"
+                          }}</b>
+                        </td>
+                      </tfoot>
+                    </table>
+
+                    <table
+                      *ngIf="selectedOutputType == 'Breakdown'"
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th><b style="font-weight: 500">Branch</b></th>
+                          <th><b style="font-weight: 500">Customer</b></th>
+                          <th><b style="font-weight: 500">Loan Code</b></th>
+                          <th>
+                            <b style="font-weight: 500">Product Type</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Loan Amount ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})</b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"> Date Disbursed </b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Fee Name</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Fees Charged ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})</b
+                            >
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="gradeX" *ngFor="let item of feesList">
+                          <td>{{ item?.branch }}</td>
+                          <td>
+                            <small>{{ item?.customerName }}</small>
+                          </td>
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.loanCode }}
+                          </td>
+                          <td>{{ item?.productType }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanAmount | number : "1.2-2" }}
+                          </td>
+                          <td>
+                            {{ item?.dateDisbursed | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td class="text-center">{{ item?.feeName }}</td>
+                          <td class="amount-field">
+                            {{ item?.feesCharged | number : "1.2-2" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <td colspan="6"></td>
+                        <td class="amount-field"><b>Totals:</b></td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection("feesBreakdown", feesList)
+                              | number : "1.2-2"
+                          }}</b>
+                        </td>
+                      </tfoot>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="loanbookList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(loanbookList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('loanbookListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="loanbookListTable"
+                    style="overflow-x: auto"
+                  >
+                    <div
+                      class="text-center"
+                      *ngIf="selectedOutputType == 'Breakdown'"
+                    >
+                      <p>
+                        <span>
+                          <span
+                            >Total Interest Income Till Period:
+                            <span
+                              title="Click here to copy  to clipboard"
+                              class="clickable"
+                              (click)="
+                                copyToClipboard(
+                                  metricsdata?.InterestIncomeTillPeriodTotal
+                                )
+                              "
+                              >{{
+                                metricsdata?.InterestIncomeTillPeriodTotal
+                                  | number : "1.2-2"
+                              }}
+                            </span></span
+                          >
+                          &nbsp;&nbsp;
+                          <span
+                            >Total Repaid:
+                            <span
+                              title="Click here to copy to clipboard"
+                              class="clickable"
+                              (click)="
+                                copyToClipboard(metricsdata?.TotalRepayedTotal)
+                              "
+                              >{{
+                                metricsdata?.TotalRepayedTotal
+                                  | number : "1.2-2"
+                              }}
+                            </span></span
+                          >
+                          &nbsp;&nbsp;
+                          <span
+                            >Settlement Amount:
+                            <span
+                              title="Click here to copy to clipboard"
+                              class="clickable"
+                              (click)="
+                                copyToClipboard(
+                                  metricsdata?.SettlementAmountTotal
+                                )
+                              "
+                              >{{
+                                metricsdata?.SettlementAmountTotal
+                                  | number : "1.2-2"
+                              }}
+                            </span></span
+                          >
+                          <br /><br />
+                        </span>
+                      </p>
+                    </div>
+
+                    <div class="text-center">
+                      <table
+                        *ngIf="selectedOutputType == 'Grouped'"
+                        class="table table-bordered table-hover table-striped"
+                        style="font-size: 10px; width: 50%; margin: 0 auto"
+                      >
+                        <thead>
+                          <tr>
+                            <th class="">
+                              <b style="font-weight: 500">
+                                Total InterestIncome Till Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</b
+                              >
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr class="gradeX" *ngFor="let item of loanbookList">
+                            <td class="">
+                              {{
+                                item?.totalInterestIncomeTillPeriod
+                                  | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <table
+                      *ngIf="selectedOutputType == 'Breakdown'"
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th><b style="font-weight: 500">Loan Code</b></th>
+                          <th><b style="font-weight: 500">Customer</b></th>
+                          <th><b style="font-weight: 500">Employment Code</b></th>
+                          <th><b style="font-weight: 500">Branch</b></th>
+                          <th>
+                            <b style="font-weight: 500">Product Type</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Rate (%)</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Tenor </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">Loan Amount</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">Periodic Installment</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Loan Start Date</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Date Disbursed</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Date Approver Approved</b>
+                          </th>
+                          <th><b style="font-weight: 500">Status</b></th>
+                          <th>
+                            <b style="font-weight: 500">Account Closure Type</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Interest Income Till Period</b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Interest Paid Till Period</b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Principal Paid Till Period</b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">Total Repaid</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">Settlement Amount</b>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="gradeX" *ngFor="let item of loanbookList">
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.loanCode }}
+                          </td>
+                          <td>
+                            <small>{{ item?.customerName }}</small>
+                          </td>
+                          <td>{{ item?.employmentCode }}</td>
+                          <td>{{ item?.branch }}</td>
+                          <td>{{ item?.productType }}</td>
+                          <td class="text-center">{{ item?.rate }}</td>
+                          <td class="text-center">{{ item?.loanTenor }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanAmount | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.periodicInstallment | number : "1.2-2" }}
+                          </td>
+
+                          <td>
+                            {{ item?.loanStartDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>
+                            {{ item?.dateDisbursed | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>
+                            {{ item?.dateApproverApproved | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>{{ item?.status | titlecase }}</td>
+                          <td>{{ item?.accountClosureType | titlecase }}</td>
+                          <td class="amount-field">
+                            {{
+                              item?.interestIncomeTillPeriod | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.interestPaidUp | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.principalPaidUp | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.totalRepayed | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.settlementAmount | number : "1.2-2" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                      <!-- <tfoot>
+                        <td colspan="9"></td>
+                        <td  class="amount-field"> <b>Totals:</b></td>
+                        <td  class="amount-field"> <b>{{ getTotalSection('interestIncomeTillPeriod', loanbookList )  | number: '1.2-2' }}</b></td>
+                        <td class="amount-field"> <b>{{ getTotalSection('totalRepayed', loanbookList )  | number: '1.2-2' }}</b></td>
+                        <td  class="amount-field"> <b>{{ getTotalSection('settlementAmount', loanbookList )  | number: '1.2-2' }}</b></td>
+                    </tfoot>  -->
+                    </table>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="paymentsList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(paymentsList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('paymentsListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="paymentsListTable"
+                    style="overflow-x: auto"
+                  > 
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportType}} </span></h5>
+                    <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th><b style="font-weight: 500">Branch</b></th>
+                          <th>
+                            <b style="font-weight: 500">Payment Code</b>
+                          </th>
+                          <th><b style="font-weight: 500">Loan Code</b></th>
+                          <th><b style="font-weight: 500">Customer</b></th>
+                          <th>
+                            <b style="font-weight: 500">Payment Type</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Payment Mode</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Created By</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Payment Date</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Date Recorded</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">Payment Amount</b>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="gradeX" *ngFor="let item of paymentsList">
+                          <td>{{ item?.branch }}</td>
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.paymentCode }}
+                          </td>
+                          <td>{{ item?.loanCode }}</td>
+                          <td>
+                            <small>{{ item?.customerName }}</small>
+                          </td>
+                          <td>{{ item?.paymentType }}</td>
+                          <td>{{ item?.paymentMode }}</td>
+                          <td>{{ item?.createdBy }}</td>
+                          <td>
+                            {{ item?.paymentDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>
+                            {{ item?.createdAt | date : "dd/MM/yyyy" }}
+                          </td>
+
+                          <td class="amount-field">
+                            {{ item?.paymentAmount | number : "1.2-2" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <td colspan="8"></td>
+                        <td class="amount-field"><b>Total:</b></td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection("paymentAmount", paymentsList)
+                              | number : "1.2-2"
+                          }}</b>
+                        </td>
+                      </tfoot>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="repaymentsDueList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(repaymentsDueList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('repaymentsDueListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="repaymentsDueListTable"
+                    style="overflow-x: auto"
+                  >
+                    <!-- Grouped -->
+                    <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                      <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                    </div>
+
+                    <div class="report-info">
+                      <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                      <h5><span> Report Name: {{reportType}} </span></h5>
+                      <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                      <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                    </div>
+
+                    <small
+                      style="color: darkred"
+                      *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                      >*Base Currency:
+                      {{ ownerInformation?.currency?.currencyName }} ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Loan Code</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Product</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Outlet</small></b
+                            >
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>Date Disbursed</small></b></th> -->
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Loan Amount ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Expected Principal Portion In Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Expected Interest Portion In Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Expected Total Repayment In Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Reconciled Repayments Made In Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Schedule Repayments Due In Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Total Repayments Made Till Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Total Accum Repayments Due Till
+                                Period ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of repaymentsDueList"
+                        >
+                          <td class="">{{ item?.customerName }}</td>
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.loanCode }}
+                          </td>
+                          <td>{{ item?.productType }}</td>
+                          <td>{{ item?.outlet }}</td>
+                          <!-- <td class="">{{item?.dateDisbursed | date : 'dd/MM/yyyy' }}</td> -->
+                          <td class="amount-field">
+                            {{ item?.loanAmount | number : "1.2-2" }}
+                          </td>
+
+                          <td class="amount-field">
+                            {{
+                              item?.expectedPrincipalPortionAmountInPeriod
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.expectedInterestPortionAmountInPeriod
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.expectedAmountInPeriod | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.reconciledRepaymentsMadeInPeriod
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.scheduleRepaymentsDueInPeriod
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.totalRepaymentsMadeTillPeriod
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.totalAccumRepaymentsDueTillPeriod
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                        </tr>
+                      </tbody>
+                      <tfoot>
+                        <td colspan="3"></td>
+                        <td class="amount-field"><b>Totals:</b></td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection("loanAmount", repaymentsDueList)
+                              | number : "1.2-2"
+                          }}</b>
+                        </td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection(
+                              "expectedPrincipalPortionAmount",
+                              repaymentsDueList
+                            ) | number : "1.2-2"
+                          }}</b>
+                        </td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection(
+                              "expectedInterestPortionAmount",
+                              repaymentsDueList
+                            ) | number : "1.2-2"
+                          }}</b>
+                        </td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection("expectedAmount", repaymentsDueList)
+                              | number : "1.2-2"
+                          }}</b>
+                        </td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection(
+                              "reconciledRepaymentsMadeInPeriod",
+                              repaymentsDueList
+                            ) | number : "1.2-2"
+                          }}</b>
+                        </td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection(
+                              "scheduleRepaymentsDueInPeriod",
+                              repaymentsDueList
+                            ) | number : "1.2-2"
+                          }}</b>
+                        </td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection(
+                              "totalRepaymentsMadeTillPeriod",
+                              repaymentsDueList
+                            ) | number : "1.2-2"
+                          }}</b>
+                        </td>
+                        <td class="amount-field">
+                          <b>{{
+                            getTotalSection(
+                              "totalAccumRepaymentsDueTillPeriod",
+                              repaymentsDueList
+                            ) | number : "1.2-2"
+                          }}</b>
+                        </td>
+                      </tfoot>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="cbnReportList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(cbnReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('cbnReportListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="cbnReportListTable"
+                    style="overflow-x: auto"
+                  >
+                    <!-- Grouped -->
+                    <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                      <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                    </div>
+
+                    <div class="report-info">
+                      <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                      <h5><span> Report Name: {{reportType}} </span></h5>
+                      <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                      <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                    </div>
+
+                    <small
+                      style="color: darkred"
+                      *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                      >*Base Currency:
+                      {{ ownerInformation?.currency?.currencyName }} ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer ID</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Account Number</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Product</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Branch</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Account Status</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Account Status Date</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Loan Effective Date</small></b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Facility Amount ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Availed Limit ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Outstanding Balance ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Outstanding Balance Interest ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Outstanding Balance Principal ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Overdue Amount ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Overdue Amount Interest ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Overdue Amount Principal ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }}) Installment Amount</small
+                              >
+                            </b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Currency</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Days In Arrears</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Loan (Facility) Type </small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Loan (Facility) Tenor </small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Repayment Frequency </small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Last Payment Date </small></b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Last Payment Amount ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Maturity Date </small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Loan Classification </small></b
+                            >
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr class="gradeX" *ngFor="let item of cbnReportList">
+                          <td class="">{{ item?.customerId }}</td>
+                          <td class="">{{ item?.customerName }}</td>
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.accountNumber }}
+                          </td>
+                          <td>{{ item?.product }}</td>
+                          <td>{{ item?.branch }}</td>
+                          <td>{{ item?.accountStatus }}</td>
+                          <td class="">
+                            {{ item?.accountStatusDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td class="">
+                            {{
+                              item?.dateOfLoanDisbursement | date : "dd/MM/yyyy"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.creditLimitAmount | number : "1.2-2" }}
+                          </td>
+
+                          <td class="amount-field">
+                            {{ item?.loanAmount | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.outstandingBalance | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.outstandingBalanceInterest
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.outstandingBalancePrincipal
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.overdueAmount | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.overdueAmountInterest | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.overdueAmountPrincipal | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.installmentAmount | number : "1.2-2" }}
+                          </td>
+                          <td class="">{{ item?.currency }}</td>
+                          <td class="">{{ item?.daysInArrears }}</td>
+                          <td class="">{{ item?.loanFaciltyType }}</td>
+                          <td class="">{{ item?.loanFaciltyTenor }}</td>
+                          <td class="">{{ item?.repaymentFrequency }}</td>
+                          <td class="">
+                            {{ item?.lastPaymentDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.lastPaymentAmount | number : "1.2-2" }}
+                          </td>
+                          <td class="">
+                            {{ item?.maturityDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td class="">{{ item?.loanClassification }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="cbnCustomerReportList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(cbnCustomerReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('cbnCustomerReportListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="cbnCustomerReportListTable"
+                    style="overflow-x: auto"
+                  >
+                    <!-- Grouped -->
+                    <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                      <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                    </div>
+
+                    <div class="report-info">
+                      <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                      <h5><span> Report Name: {{reportType}} </span></h5>
+                      <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                      <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                    </div>
+
+                    <small
+                      style="color: darkred"
+                      *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                      >*Base Currency:
+                      {{ ownerInformation?.currency?.currencyName }} ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer ID</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Branch</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Surname</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>First Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Middle Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Date of Birth</small></b
+                            >
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>NIN</small></b></th> -->
+                          <!-- <th><b style="font-weight: 500"><small>Driver's License No</small></b></th> -->
+                          <th>
+                            <b style="font-weight: 500"><small>BVN</small></b>
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>Passport No</small></b></th> -->
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Gender</small></b
+                            >
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>Nationality</small></b></th> -->
+                          <!-- <th><b style="font-weight: 500"><small>Marital Status</small></b></th> -->
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Mobile Number </small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Address</small></b
+                            >
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>City/LGA </small></b></th> -->
+                          <!-- <th><b style="font-weight: 500"><small>State</small></b></th>
+                                  <th><b style="font-weight: 500"><small>Country</small></b></th> -->
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Employment Status</small></b
+                            >
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>Occupation</small></b></th> -->
+                          <!-- <th><b style="font-weight: 500"><small>Business Category</small></b></th>
+                                  <th><b style="font-weight: 500"><small>Business Sector</small></b></th> -->
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Borrower Type</small></b
+                            >
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>Tax Id</small></b></th> -->
+                          <th>
+                            <b style="font-weight: 500"><small>Email</small></b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Employer Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Employer Address</small></b
+                            >
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>Employer City</small></b></th>
+                                  <th><b style="font-weight: 500"><small>Employer State</small></b></th> -->
+                          <th>
+                            <b style="font-weight: 500"><small>Title</small></b>
+                          </th>
+                          <!-- <th><b style="font-weight: 500"><small>Work Phone</small></b></th>
+                                  <th><b style="font-weight: 500"><small>Home Phone</small></b></th> -->
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of cbnCustomerReportList"
+                        >
+                          <td class="">{{ item?.customerId }}</td>
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.branch }}
+                          </td>
+                          <td>{{ item?.surname }}</td>
+                          <td>{{ item?.firstName }}</td>
+                          <td>{{ item?.middleName }}</td>
+                          <td class="">
+                            {{ item?.dateofBirth | date : "dd/MM/yyyy" }}
+                          </td>
+                          <!-- <td>{{ item?.nationIdentityNumber}}</td>
+                                  <td>{{ item?.driversLicenseNo}}</td> -->
+                          <td>{{ item?.bvn }}</td>
+                          <!-- <td>{{ item?.passportNo}}</td> -->
+                          <td>{{ item?.gender }}</td>
+                          <!-- <td>{{ item?.nationality}}</td> -->
+                          <!-- <td>{{ item?.maritialStatus}}</td> -->
+                          <td>{{ item?.mobileNumber }}</td>
+                          <td>{{ item?.primaryAddressLine1 }}</td>
+                          <!-- <td>{{ item?.primaryCityorLGA}}</td> -->
+                          <!-- <td>{{ item?.primaryState}}</td> -->
+                          <!-- <td>{{ item?.primaryCountry}}</td> -->
+                          <td>{{ item?.employmentStatus }}</td>
+                          <!-- <td>{{ item?.occupation}}</td> -->
+                          <!-- <td>{{ item?.businessCategory}}</td> -->
+                          <!-- <td>{{ item?.businessSector}}</td> -->
+                          <td>{{ item?.borrowerType }}</td>
+                          <!-- <td>{{ item?.taxId}}</td> -->
+                          <td>{{ item?.email }}</td>
+                          <td>{{ item?.employerName }}</td>
+                          <td>{{ item?.employerAddressLine }}</td>
+                          <!-- <td>{{ item?.employerCity}}</td> -->
+                          <!-- <td>{{ item?.employerState}}</td> -->
+                          <td>{{ item?.title }}</td>
+                          <!-- <td>{{ item?.workPhone}}</td> -->
+                          <!-- <td>{{ item?.homePhone}}</td> -->
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="topUpEligibilityList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(topUpEligibilityList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('topUpEligibilityListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="topUpEligibilityListTable"
+                    style="overflow-x: auto"
+                  >
+                    <!-- Grouped -->
+                    <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                      <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                    </div>
+
+                    <div class="report-info">
+                      <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                      <h5><span> Report Name: {{reportType}} </span></h5>
+                      <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                      <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                    </div>
+
+                    <small
+                      style="color: darkred"
+                      *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                      >*Base Currency:
+                      {{ ownerInformation?.currency?.currencyName }} ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Loan Code</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"><small>BVN</small></b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Product</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"><small>Tenor</small></b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Outlet</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Date Created</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Status</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Sales Officer</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Created By</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Date Disbursed</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Home Address</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Email Address</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Phone Number</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Employer Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Employment Code</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Employer Address</small></b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Loan Amount ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Last Payment Date</small></b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Periodic Repayment ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})
+                              </small>
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Total Expected Repayment ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Total Repayments Made ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500"
+                              ><small>Repayments Count</small>
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Total Accum Repayments Due ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              >
+                            </b>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of topUpEligibilityList"
+                        >
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.loanCode }}
+                          </td>
+                          <td class="">{{ item?.customerName }}</td>
+                          <td class="">{{ item?.bVN }}</td>
+                          <td>{{ item?.productType }}</td>
+                          <td>{{ item?.loanDuration }}</td>
+                          <td>{{ item?.outlet }}</td>
+                          <td class="">
+                            {{ item?.createdAt | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>{{ item?.status }}</td>
+                          <td>{{ item?.salesOfficer }}</td>
+                          <td>{{ item?.createdBy }}</td>
+                          <td class="">
+                            {{ item?.dateDisbursed | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>{{ item?.homeAddress }}</td>
+                          <td>{{ item?.emailAddress }}</td>
+                          <td>{{ item?.phoneNumber }}</td>
+                          <td>{{ item?.employerName }}</td>
+                          <td>{{ item?.employmentCode }}</td>
+                          <td>{{ item?.employerAddress }}</td>
+
+                          <td class="amount-field">
+                            {{ item?.loanAmount | number : "1.2-2" }}
+                          </td>
+                          <td class="">
+                            {{ item?.lastPaymentDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.periodicRepaymentAmount | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.expectedRepaymentAmount | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.totalRepaymentsMade | number : "1.2-2" }}
+                          </td>
+                          <td class="text-center">
+                            {{ item?.repaymentsCount }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.totalAccumRepaymentsDue | number : "1.2-2"
+                            }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="customerReportList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(customerReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('customerReportListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="customerReportListTable"
+                    style="overflow-x: auto"
+                  >
+                    <!-- Grouped -->
+                    <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                      <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                    </div>
+
+                    <div class="report-info">
+                      <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                      <h5><span> Report Name: {{reportType}} </span></h5>
+                      <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                      <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                    </div>
+
+                    <small
+                      style="color: darkred"
+                      *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                      >*Base Currency:
+                      {{ ownerInformation?.currency?.currencyName }} ({{
+                        ownerInformation?.currency?.currencySymbol
+                      }})
+                    </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer Code</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"><small>BVN</small></b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Email Address</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Phone Number</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Address</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Next of kin Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Next of kin Phone number</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Next of kin Address</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Date Created</small></b
+                            >
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of customerReportList"
+                        >
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.personCode }}
+                          </td>
+                          <td>{{ item?.firstName }} {{ item?.lastName }}</td>
+                          <td>{{ item?.bvn }}</td>
+                          <td>{{ item?.emailAddress }}</td>
+                          <td>{{ item?.phoneNumber }}</td>
+                          <td>{{ item?.address }}</td>
+                          <td>
+                            {{ item?.residentialInfo?.nextOfKinName }}
+                          </td>
+                          <td>
+                            {{ item?.residentialInfo?.nextOfKinPhoneNumber }}
+                          </td>
+                          <td>
+                            {{ item?.residentialInfo?.nextOfKinAddress }}
+                          </td>
+                          <td class="">
+                            {{ item?.createdAt | date : "dd/MM/yyyy" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="redraftReportList?.length > 0">
+                  <header
+                    class="d-flex justify-content-between align-items-center mb-4"
+                  >
+                    <div id="btns">
+                      <button
+                        *ngIf="selectedOutputType !== 'Grouped'"
+                        class="btn btn-xs btn-primary mr-2"
+                        (click)="exportLog(redraftReportList)"
+                      >
+                        Export
+                      </button>
+                      <button
+                        *ngIf="selectedOutputType !== 'Grouped'"
+                        class="btn btn-xs btn-warning"
+                        (click)="printReport('redraftReportListTable')"
+                      >
+                        Print
+                      </button>
+                    </div>
+                  </header>
+
+                  <div
+                    *ngIf="selectedOutputType === 'Grouped'"
+                    class="table-reponsive"
+                    id="redraftReportListTable"
+                    style="overflow-x: auto"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportType}} </span></h5>
+                    <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer Name</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer Id</small></b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Loan Amount</small
+                              ></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Frequency</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Product Type</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Outlet</small></b
+                            >
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of redraftReportList"
+                        >
+                          <td>
+                            {{ item?.firstName }} {{ item?.middleName }}
+                            {{ item?.surname }}
+                          </td>
+                          <td>{{ item?.customerId }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanAmount | number : "1.2-2" }}
+                          </td>
+                          <td>{{ item?.frequency }}</td>
+                          <td>{{ item?.productType }}</td>
+                          <td>{{ item?.branch }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div
+                    *ngIf="selectedOutputType === 'Breakdown'"
+                    class="table-reponsive"
+                    id="redraftReportListTable"
+                    style="overflow-x: auto"
+                  >
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Application Code</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Loan Code</small></b
+                            >
+                          </th>
+
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer First name</small></b
+                            >
+                          </th>
+
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Customer Last name</small></b
+                            >
+                          </th>
+
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Product Type</small></b
+                            >
+                          </th>
+                          <th class="text-right">
+                            <b style="font-weight: 500"
+                              ><small
+                                >Loan Amount ({{
+                                  ownerInformation?.currency?.currencySymbol
+                                }})</small
+                              ></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Branch</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Redraft Reason</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Requested At</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Requested By</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Completed By</small></b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Completed At</small></b
+                            >
+                          </th>
+
+                          <th>
+                            <b style="font-weight: 500"
+                              ><small>Team Lead</small></b
+                            >
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let loan of redraftReportList"
+                        >
+                          <td class="code">{{ loan?.applicationCode }}</td>
+                          <td class="code">{{ loan?.loanCode }}</td>
+                          <td>{{ loan?.firstName }}</td>
+                          <td>{{ loan?.lastName }}</td>
+                          <td>{{ loan?.productType }}</td>
+                          <td class="text-right">
+                            {{ loan?.loanAmount | number : "1.2-2" }}
+                          </td>
+                          <td>{{ loan?.branch }}</td>
+                          <td>{{ loan?.reason }}</td>
+                          <td>{{ loan?.requestedAt | customDatePipe }}</td>
+                          <td>{{ loan?.requestedBy }}</td>
+                          <td>{{ loan?.completedBy }}</td>
+                          <td>{{ loan?.completedAt | customDatePipe }}</td>
+
+                          <td>{{ loan?.teamLead }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="collectionsReportList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(collectionsReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('collectionsReportListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="collectionsReportListTable"
+                    style="overflow-x: auto"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportType}} </span></h5>
+                    <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th><b style="font-weight: 500">Loan Code</b></th>
+                          <th>
+                            <b style="font-weight: 500">First Name</b>
+                          </th>
+                          <th><b style="font-weight: 500">Last Name</b></th>
+                          <th>
+                            <b style="font-weight: 500">Phone Number</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              >Alternative Phone Number</b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Date of Birth</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Email Address</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Employer Name</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Employer Code</b>
+                          </th>
+                          <th><b style="font-weight: 500">Loan Type</b></th>
+                          <th>
+                            <b style="font-weight: 500">Date Disbursed</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Interest Rate</b>
+                          </th>
+                          <th><b style="font-weight: 500">Tenor</b></th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">Loan Amount</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500">
+                              Periodic Installment Amount ({{ ownerInformation?.currency?.currencySymbol }})</b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Repayment Start Date</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Maturity Date</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Expected Amount In Period ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Total Repayment Made Till Period ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})
+                            </b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Total Accumulated Repayment Due Till Period ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})
+                            </b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Next Of Kin Name</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              >Next Of Kin PhoneNumber
+                            </b>
+                          </th>
+                          <th><b style="font-weight: 500">Outlet</b></th>
+
+                          <th><b style="font-weight: 500">BVN</b></th>
+                          <th>
+                            <b style="font-weight: 500">Days Delinquent</b>
+                          </th>
+                          <th><b style="font-weight: 500">Status</b></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of collectionsReportList"
+                        >
+                          <td class="">{{ item?.loanCode }}</td>
+                          <td
+                            [style.color]="currentTheme?.secondaryColor"
+                            [style.color]="currentTheme?.secondaryColor"
+                          >
+                            {{ item?.firstName }}
+                          </td>
+                          <td>{{ item?.lastName }}</td>
+                          <td>{{ item?.phoneNumber }}</td>
+                          <td>{{ item?.alternativePhoneNumber }}</td>
+                          <td class="">
+                            {{ item?.dateOfBirth | date : "mediumDate" }}
+                          </td>
+                          <td>{{ item?.emailAddress }}</td>
+                          <td>{{ item?.employerName }}</td>
+                          <td>{{ item?.employerCode }}</td>
+                          <td>{{ item?.loanType }}</td>
+                          <td class="">
+                            {{ item?.dateDisbursed | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>{{ item?.interestRate }}</td>
+                          <td>{{ item?.loanTenor }}</td>
+                          <td class="amount-field">
+                            {{ item?.loanAmount | number : "1.2-2" }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.periodicInstallmentPayment
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="">
+                            {{ item?.repaymentStartDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td class="">
+                            {{ item?.maturityDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.expectedAmountInPeriod | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.totalRepaymentMadeTillPeriod
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.totalAccumulatedRepaymentDueTillPeriod
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td>{{ item?.nextOfKinName }}</td>
+                          <td>{{ item?.nextOfKinPhoneNumber }}</td>
+                          <td>{{ item?.outlet }}</td>
+                          <td>{{ item?.bvn }}</td>
+                          <td>{{ item?.daysDelinquent }}</td>
+                          <td>{{ item?.status }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <ng-container *ngIf="settlementDiffReportList?.length > 0">
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-primary mr-2"
+                    (click)="exportLog(settlementDiffReportList)"
+                  >
+                    Export
+                  </button>
+                  <button
+                    *ngIf="selectedOutputType != 'Grouped'"
+                    class="btn btn-xs btn-warning"
+                    (click)="printReport('settlementDiffReportListTable')"
+                  >
+                    Print
+                  </button>
+                  <br />
+                  <br />
+                  <div
+                    class="table-reponsive"
+                    id="settlementDiffReportListTable"
+                    style="overflow-x: auto"
+                  >
+                  <div class="logo-container" *ngIf="ownerInformation?.logoUrl">
+                    <img class="logo" [src]="ownerInformation?.logoUrl" alt="Business Logo">
+                  </div>
+
+                  <div class="report-info">
+                    <h5><span> Business Name: {{ownerInformation?.appOwnerName}}</span></h5>
+                    <h5><span> Report Name: {{reportType}} </span></h5>
+                    <h5><span> Period: From {{ StartDate | customDatePipe : "DD-MMM-YYYY" }} to {{EndDate | customDatePipe : "DD-MMM-YYYY" }}</span></h5>
+                    <h5 class="mb-0">Date Created: {{ today | customDatePipe : "DD-MMM-YYYY | h:mm a" }}</h5>
+                  </div>
+
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})
+                  </small>
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th><b style="font-weight: 500">Loan Code</b></th>
+                          <th>
+                            <b style="font-weight: 500">Loan Start Date</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Customer Name</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Customer code</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Tenor</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Repayment Type</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500"
+                              >Repayment Balance Type</b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Settlement Paid ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})</b
+                            >
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Settlement Date</b>
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Calculated Effective Settlement ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})</b
+                            >
+                          </th>
+                          <th class="amount-field">
+                            <b style="font-weight: 500"
+                              >Differential Amount ({{
+                                ownerInformation?.currency?.currencySymbol
+                              }})</b
+                            >
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of settlementDiffReportList"
+                        >
+                          <td [style.color]="currentTheme?.secondaryColor">
+                            {{ item?.loanCode }}
+                          </td>
+                          <td class="">
+                            {{ item?.loanStartDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td>
+                            {{ item?.customerName }}
+                          </td>
+                          <td [style.color]="currentTheme?.secondaryColor">
+                            {{ item?.customerCode }}
+                          </td>
+                          <td>{{ item?.tenor }}</td>
+                          <td>{{ item?.repaymentType }}</td>
+                          <td>{{ item?.repaymentBalanceType }}</td>
+                          <td class="amount-field">
+                            {{ item?.settlementPaid | number : "1.2-2" }}
+                          </td>
+                          <td class="">
+                            {{ item?.settlementDate | date : "dd/MM/yyyy" }}
+                          </td>
+                          <td class="amount-field">
+                            {{
+                              item?.calculatedEffectiveSettlement
+                                | number : "1.2-2"
+                            }}
+                          </td>
+                          <td class="amount-field">
+                            {{ item?.differentialAmount | number : "1.2-2" }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+
+                <!-- Pagination Bottom-->
+                <div
+                  class="row"
+                  *ngIf="paginated && pagination.totalRecords > 50"
+                >
+                  <div class="col-md-4">
+                    <label style="display: inline-flex"
+                      ><span style="padding: 8px 2px; font-size: 12px"
+                        >Show
+                      </span>
+                      <select
+                        [(ngModel)]="pagination.pageSize"
+                        aria-controls="data-table"
+                        (change)="
+                          getItemsPaginatedSearch(
+                            this.pagination.searchTerm,
+                            this.pagination.pageSize,
+                            1
+                          )
+                        "
+                        class="custom-select custom-select-xl form-control form-control-xl height"
+                      >
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                        <!-- <option
+                          *ngIf="!reportinvolvesCalculation"
+                          value="100000"
+                        >
+                          100,000
+                        </option> -->
+                        <option value="10000000">All</option>
+                      </select>
+                      <span style="padding: 8px 2px; font-size: 12px"
+                        >entries</span
+                      ></label
+                    >
+                  </div>
+                  <div class="col-md-4"></div>
+
+                  <div class="form-group col-md-4">
+                    <nav>
+                      <ul class="pagination pagination-sm justify-content-end">
+                        <li
+                          class="page-item"
+                          *ngIf="
+                            (pagination.pageNum - 1) * pagination.pageSize + 1 >
+                            10
+                          "
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="
+                              getItemsPaginatedSearch(
+                                this.pagination.searchTerm,
+                                this.pagination.pageSize,
+                                pagination.pageNum - 1
+                              )
+                            "
+                            tabindex="-1"
+                            >Previous</a
+                          >
+                        </li>
+                        <li class="page-item pagination-menu-wrapper">
+                          <a
+                            class="page-link page-target"
+                            (click)="getItemsPaginatedPageJumpModal()"
+                            href="javascript:void(0)"
+                            >{{ pagination.pageNum }} of
+                            {{ this.pagination.maxPage }} page<span
+                              *ngIf="pagination.pageNum > 1"
+                              >s</span
+                            ><span class="sr-only">(current)</span></a
+                          >
+
+                          <div class="pagination-menu pagination-menu-right">
+                            <div class="pagination-menu-body">
+                              <div class="h-auto">
+                                <span>Jump to Page</span>
+                                <select
+                                  aria-controls="data-table"
+                                  [(ngModel)]="pagination.pageNum"
+                                  (change)="filterReport(pagination.pageNum)"
+                                  class="custom-select custom-select-xl form-control form-control-xl height"
+                                >
+                                  <option
+                                    *ngFor="let line of pagination.jumpArray"
+                                  >
+                                    {{ line }}
+                                  </option>
+                                </select>
+                                <div class="text-center mt-3">
+                                  <button
+                                    type="button"
+                                    (click)="getItemsPaginatedPageJumpModal()"
+                                    class="btn btn-danger btn-xs"
+                                  >
+                                    Close
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                        <li
+                          class="page-item"
+                          *ngIf="
+                            this.pagination.pageNum < this.pagination.maxPage
+                          "
+                        >
+                          <a
+                            class="page-link"
+                            href="javascript:void(0)"
+                            (click)="
+                              getItemsPaginatedSearch(
+                                this.pagination.searchTerm,
+                                this.pagination.pageSize,
+                                pagination.pageNum + 1
+                              )
+                            "
+                            >Next</a
+                          >
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+
+                  <!-- <div class=""  aria-live="polite" style="padding-left: 18px;font-size: 13px; margin-top:-8px ">  Showing {{ ( (pagination.pageNum - 1) * pagination.pageSize) + 1 }} - {{ ( (pagination.pageNum - 1) * pagination.pageSize) + pagination.count | number: '1.0-0' }} of {{ pagination.totalRecords | number: '1.0-0' }} record(s)</div> -->
+                  <div
+                    class=""
+                    aria-live="polite"
+                    style="
+                      padding-left: 18px;
+                      font-size: 13px;
+                      margin-top: -8px;
+                    "
+                  >
+                    Showing
+                    {{
+                      (pagination.pageNum - 1) * pagination.pageSize + 1
+                        | number : "1.0-0"
+                    }}
+                    -
+                    {{
+                      (pagination.pageNum - 1) * pagination.pageSize +
+                        pagination.count | number : "1.0-0"
+                    }}
+                    of
+                    {{ pagination.totalRecords | number : "1.0-0" }}
+                    record(s)
+                  </div>
+
+                  <div
+                    *ngIf="this.loader"
+                    class="table-loader"
+                    style="text-align: center; color: indianred"
+                  >
+                    <span>
+                      <i class="icon icon-spin icon-spin2"></i>
+                      Loading...</span
+                    >
+                  </div>
+                </div>
+                <!-- /pagination Bottom -->
+              </div>
+              <!-- /card body -->
+            </div>
+            <!-- /card -->
+          </div>
+
+          <!-- tab 2 -->
+          <div id="tab-pane2" class="tab-pane">
+            <!-- Card -->
+            <div class="dt-card">
+              <div
+                *ngIf="requestLoader"
+                class="table-loader"
+                style="text-align: center; color: indianred"
+              >
+                <span>
+                  <i class="icon icon-spin icon-spin2"></i> Loading...Please
+                  wait</span
+                >
+              </div>
+
+              <div
+                *ngIf="queuedReportList?.length < 1 && !requestLoader"
+                class="table-loader"
+                style="text-align: center; color: indianred"
+              >
+                <span> No Report Queued </span>
+              </div>
+
+              <div
+                *ngIf="!this.requestLoader"
+                class="dt-card__body"
+                style="padding: 1.4rem 1.4rem"
+              >
+                <ng-container *ngIf="queuedReportList?.length > 0">
+                  <div class="table-reponsive" id="queuedReportListTable">
+                    <table
+                      class="table table-bordered table-hover table-striped"
+                      style="font-size: 10px"
+                    >
+                      <thead>
+                        <tr>
+                          <th>
+                            <b style="font-weight: 500">Requested By</b>
+                          </th>
+                          <th>
+                            <b style="font-weight: 500">Requested When</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Report Start Date</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Report End Date</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Filtered By Branch</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500"
+                              >Filtered By Loan Type</b
+                            >
+                          </th>
+                          <th><b style="font-weight: 500">Status</b></th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Completion Time</b>
+                          </th>
+                          <th class="text-center">
+                            <b style="font-weight: 500">Action</b>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          class="gradeX"
+                          *ngFor="let item of queuedReportList"
+                        >
+                          <td [style.color]="currentTheme?.secondaryColor">
+                            {{ item?.createdByName }}
+                          </td>
+                          <td>{{ item?.requestTime | date : "medium" }}</td>
+                          <td class="text-center">
+                            <span
+                              *ngIf="
+                                item?.parameters.startDate == null ||
+                                item?.parameters.startDate == ''
+                              "
+                            >
+                              --
+                            </span>
+                            <span
+                              *ngIf="
+                                item?.parameters.startDate != null &&
+                                item?.parameters.startDate != null
+                              "
+                            >
+                              {{ item?.parameters.startDate }}
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            {{ item?.parameters.endDate }}
+                          </td>
+                          <td class="text-center">
+                            <span *ngIf="item?.parameters.branchesList == ''">
+                              No
+                            </span>
+                            <span *ngIf="item?.parameters.branchesList != ''">
+                              Yes
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            <span *ngIf="item?.parameters.loanTypeList == ''">
+                              No
+                            </span>
+                            <span *ngIf="item?.parameters.loanTypeList != ''">
+                              Yes
+                            </span>
+                          </td>
+                          <td>
+                            <span *ngIf="item?.status == 'Requested'"
+                              >{{ item?.status }}
+                            </span>
+                            <span *ngIf="item?.status == 'Completed'">
+                              <i class="icon icon-check"> </i>
+                              {{ item?.status }}
+                            </span>
+                            <span
+                              class="grayed"
+                              *ngIf="
+                                item?.status != 'Completed' &&
+                                item?.status != 'Requested'
+                              "
+                            >
+                              <i class="icon icon-setting icon-spin"> </i>
+                              {{ item?.status }}
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            <span *ngIf="item?.completionTime == null">
+                              --
+                            </span>
+                            <span *ngIf="item?.completionTime != null">
+                              {{ item?.completionTime | date : "medium" }}
+                            </span>
+                          </td>
+                          <td class="text-center">
+                            <span *ngIf="item?.downloadPath == null"> -- </span>
+
+                            <a
+                              *ngIf="item?.downloadPath != null"
+                              href="javascript:void(0);"
+                              target="_blank"
+                              class="btn btn-xs btn-outline-secondary"
+                              (click)="downloadQueueReport(item?.downloadPath)"
+                              ><i
+                                class="mr-2 icon icon-long-arrow-down icon-fw"
+                              ></i
+                            ></a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+          <!-- tab 2 -->
+
+          <!-- tab 3 -->
+          <div id="tab-pane3" class="tab-pane">
+            <!-- <div class="dt-card p-4">
+              <div class="download">
+                <button class="btn btn-query btn-xs" *ngIf="!downloading" (click)="downloadCbnTemplate()">Download Now</button>
+                <button class="btn btn-query btn-xs" disabled *ngIf="downloading">
+                  <i class="icon icon-spin icon-spin2"></i> Downloading...
+                </button>
+              </div>
+            </div> -->
+
+            <div class="dt-card p-4">
+              <div class="download">
+                <button
+                  class="btn btn-query btn-xs"
+                  *ngIf="!downloading"
+                  (click)="downloadCbnTemplate1()"
+                >
+                  Download Now
+                </button>
+                <button
+                  class="btn btn-query btn-xs"
+                  disabled
+                  *ngIf="downloading"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Downloading...
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</lnd-aside>

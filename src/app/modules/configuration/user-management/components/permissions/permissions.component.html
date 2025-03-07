@@ -1,0 +1,98 @@
+<main>
+  <div *ngIf="isFetching" class="d-flex justify-content-center">
+    <lnd-spinner text="Fetching Permissions" />
+  </div>
+
+  <ng-container *ngIf="!isFetching">
+    <header>
+      <p>
+        Select the appropriate permissions for this role to define what actions
+        users can perform.
+      </p>
+      <p>
+        Choose carefully to ensure they have the right level of access. You can
+        customize or adjust these permissions at any time
+      </p>
+
+      <div class="top-section">
+        <div class="btns">
+          <button
+            type="button"
+            class="btn"
+            (click)="selectAllPermission()"
+            [ngClass]="{ 'selected': selectAll }"
+          >
+            Select All
+          </button>
+          <button
+            type="button"
+            class="btn"
+            [ngClass]="{ 'selected': unselectAll }"
+            [disabled]="permissionSelection.selected.length === 0"
+            (click)="unselectAllPermission()"
+          >
+            Unselect All
+          </button>
+        </div>
+
+        <lnd-search-permissions [isViewPerm]="false" [searchCount]="searchCount" (searchPermissions)="searchPermissions($event)"/>
+      </div>
+    </header>
+
+    <section>
+      <div
+        *ngFor="let pg of permissionGroup; let index = index"
+        class="permissionGroup"
+      >
+        <header>
+          <input
+            type="checkbox"
+            class="form-control"
+            [disabled]="isFetchingPerms"
+            (change)="
+              masterToggleSubgroupSelection(
+                pg?.classificationId,
+                $event.target.checked
+              )
+            "
+            [checked]="pg?.masterChecked"
+          />
+          <span class="ml-3">{{ pg?.classification }}</span>
+        </header>
+
+        <div class="display-permissions">
+          <ng-container *ngFor="let permissionArray of pg?.displayPermissions">
+            <div class="permission-wrapper">
+              <div
+                *ngFor="let permission of permissionArray"
+                class="permission"
+              >
+                <input
+                  type="checkbox"
+                  class="form-control"
+                  [disabled]="isFetchingPerms"
+                  [indeterminate]="isFetchingPerms"
+                  (change)="togglePermissionSelection(pg?.classificationId, permission?.id)"
+                  [checked]="
+                    permissionSelection.isSelected({
+                      classificationId: pg?.classificationId,
+                      permissionId: permission?.id
+                    })
+                  "
+                />
+                <span class="ml-3" [ngClass]="{'active':permission?.active}">{{ permission?.name }}</span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <button type="button" class="btn cancel-btn" (click)="onCloseAside()">
+        Cancel
+      </button>
+      <button type="button" class="btn" (click)="save()">Save</button>
+    </footer>
+  </ng-container>
+</main>

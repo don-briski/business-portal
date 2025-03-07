@@ -1,0 +1,28 @@
+.field-set {
+  background: #f3f4f6;
+  border-radius: 6px;
+}
+
+.top-margin {
+  margin-top: 40px;
+}
+
+.show {
+  display: block;
+}
+
+.open {
+  transform: rotate(0);
+}
+
+.close {
+  transform: rotate(180deg);
+}
+
+.card-header {
+  background-color: #fff !important;
+}
+
+.icon-lg {
+  font-size: 25px !important;
+}

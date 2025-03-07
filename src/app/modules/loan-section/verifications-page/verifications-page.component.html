@@ -1,0 +1,1392 @@
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">
+    Disbursement Verifications
+    <span class="float-right role-add"> </span>
+  </h1>
+</div>
+
+<!-- Grid -->
+<div class="row">
+  <!-- Grid Item -->
+  <div class="col-xl-12">
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div
+          *ngIf="
+            this.currentview == 1 &&
+            currentuser?.permission?.includes('View Disbursement Verifications')
+          "
+          class="tab-pane"
+        >
+          <lnd-table
+            [isLoading]="gettingUnverifiedApps"
+            [config]="unverifiedAppsTableConfig"
+            [pagination]="unverifiedAppsPagination"
+            [headers]="unverifiedAppsTableHeaders"
+            [data]="unverifiedAppsTableData"
+            [searchColumns]="unverifiedAppsPagination?.searchColumns"
+            (retrieveRowDetails)="getLoanDetailsById($event)"
+            (paginationChange)="onPaginationChange($event)"
+            (searchParams)="onSearchParams($event)"
+          />
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+<!-- Customizer Sidebar -->
+<aside style="display: block" class="dt-customizer dt-drawer position-right">
+  <div *ngIf="viewloandetails" class="dt-customizer__inner">
+    <!-- Customizer Header -->
+    <div class="dt-customizer__header">
+      <!-- Avatar Wrapper -->
+      <div class="dt-avatar-wrapper">
+        <!-- Avatar -->
+        <img
+          class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+          src="assets/images/male-default-profile.png"
+          alt="Default"
+        />
+        <!-- /avatar -->
+
+        <!-- Info -->
+        <div class="dt-avatar-info">
+          <span class="display-5 mb-2 font-weight-light">
+            {{ loaninformation?.person?.displayName }} &nbsp;
+            <span
+              *ngIf="loaninformation?.statusString == 'Approved'"
+              class="badge badge-warning mb-1 mr-1"
+            >
+              <i class="icon icon-mail-open"></i> Open
+            </span>
+            <span
+              *ngIf="loaninformation?.statusString != 'Approved'"
+              class="badge badge-success mb-1 mr-1"
+            >
+              <i class="icon icon-circle-check-o"></i> Verified
+            </span>
+          </span>
+          <span class="f-12"
+            ><span style="color: #1e5a8a">
+              {{ loaninformation?.applicationCode }}</span
+            > </span
+          ><br />
+          <span
+            ><span *ngIf="loaninformation?.person?.emailAddress != null">
+              <i class="icon icon-email icon-xl mr-5"></i>&nbsp;
+              {{ loaninformation?.person?.emailAddress }}</span
+            >
+            &nbsp;&nbsp;<span
+              *ngIf="loaninformation?.person?.phoneNumber != null"
+            >
+              <i class="icon icon-phone icon-xl mr-5"></i> &nbsp;{{
+                loaninformation?.person?.phoneNumber
+              }}
+            </span>
+          </span>
+        </div>
+        <!-- /info -->
+      </div>
+      <!-- /avatar wrapper -->
+
+      <!-- Close Button -->
+      <button type="button" class="close" onClick="viewLoan()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <!-- /close button -->
+    </div>
+    <!-- /customizer header -->
+
+    <!-- Customizer Body -->
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <div class="row">
+        <div class="col-md-12" style="padding: 20px">
+          <!-- List -->
+          <ul class="dt-list dt-list-one-second padded-left">
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Loan Amount</span
+                  >
+                  <h5 class="mb-0">
+                    <b
+                      >{{ ownerInformation?.currency?.currencySymbol
+                      }}{{ loaninformation?.loanAmount | number : "1.2-2" }}</b
+                    >
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-datepicker icon-2x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1">Tenor</span>
+                  <h5 class="mb-0">
+                    {{ loaninformation?.loanTenor }}
+                    {{ loaninformation?.repaymentScheduleType
+                    }}{{ loaninformation?.loanTenor === 1 ? "" : "s" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-datepicker icon-2x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Application Date</span
+                  >
+                  <h5 class="mb-0">
+                    {{ loaninformation?.createdAt | date : "mediumDate" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-datepicker icon-2x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Date Approved</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      loaninformation?.dateApproverApproved
+                        | date : "mediumDate"
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-timepicker icon-2x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Lag Period</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      getDateDiff(
+                        loaninformation?.dateApproverApproved,
+                        currentdate
+                      )
+                    }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-editor icon-3x mr-5 align-self-center text-warning"
+                ></i>
+
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Loan Type</span
+                  >
+                  <h5 class="mb-0">
+                    {{ loaninformation?.loanType?.loanName }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+
+            <!-- /list item -->
+          </ul>
+          <!-- /list -->
+        </div>
+      </div>
+      <!-- Customizer Body Inner  -->
+      <div class="">
+        <br />
+        <!-- Section -->
+        <div class="dt-card__body">
+          <form
+            [formGroup]="AddResponseForm"
+            (ngSubmit)="submitResponseForm(AddResponseForm.value)"
+          >
+            <ul
+              class="nav nav-underline flex-row border-bottom nav-card-tabs"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <!-- <a class="nav-link active" data-toggle="tab" href="#tab-pane1" role="tab" aria-controls="tab-pane1"
+                  aria-selected="true">Loan Application Info</a> -->
+                <a
+                  class="nav-link active"
+                  (mouseover)="hover_rti = true"
+                  (mouseleave)="hover_rti = false"
+                  [ngStyle]="
+                    hover_rti ? { color: currentTheme?.secondaryColor } : {}
+                  "
+                  data-toggle="tab"
+                  href="#tab-pane1"
+                  role="tab"
+                  aria-controls="tab-pane1"
+                  aria-selected="true"
+                  >Repayment Type Information</a
+                >
+              </li>
+
+              <!-- <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab-pane4" role="tab" aria-controls="tab-pane3"
+                        aria-selected="true">Approval Comments</a>
+                  </li> -->
+              <!-- <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#tab-pane5" role="tab" aria-controls="tab-pane3"
+                        aria-selected="true">Internal Files</a>
+                  </li> -->
+            </ul>
+
+            <div class="tab-content mt-4">
+              <!-- tab 1-->
+              <div id="tab-pane1" class="tab-pane active">
+                <div class="row">
+                  <!-- Grid Item -->
+                  <div class="col-xl-3">
+                    <!-- Card -->
+                    <div class="card">
+                      <!-- Card Header -->
+                      <div
+                        class="card-header card-nav bg-transparent d-flex justify-content-between"
+                      >
+                        <ul
+                          class="card-header-links nav nav-underline"
+                          role="tablist"
+                        >
+                          <li class="nav-item">
+                            <a
+                              class="nav-link"
+                              style="padding: 0"
+                              data-toggle="tab"
+                              href="#account-tab"
+                              role="tab"
+                              (mouseover)="hover_rm = true"
+                              (mouseleave)="hover_rm = false"
+                              [ngStyle]="
+                                hover_rm
+                                  ? { color: currentTheme?.secondaryColor }
+                                  : {}
+                              "
+                              aria-controls="account-tab"
+                              aria-selected="true"
+                              >Repayment Method</a
+                            >
+                          </li>
+                        </ul>
+                      </div>
+                      <!-- /card header -->
+
+                      <!-- Card Body -->
+                      <div class="card-body pb-2">
+                        <!-- Tab Content-->
+                        <div class="tab-content mt-5">
+                          <!-- Tab panel -->
+                          <div id="account-tab" class="tab-pane active">
+                            <!-- List -->
+                            <ul class="dt-list">
+                              <!-- List Item -->
+                              <li class="dt-list__item">
+                                <!-- Media -->
+                                <div class="media">
+                                  <i
+                                    class="icon icon-card icon-2x mr-3 align-self-center text-warning"
+                                  ></i>
+
+                                  <!-- Media Body -->
+                                  <div class="media-body">
+                                    <!-- <span class="d-block text-light-gray f-12 mb-1">Repayment Method</span> -->
+                                    <h5 class="mb-0">
+                                      {{
+                                        getFromJson(
+                                          loaninformation?.repaymentInfo,
+                                          "repaymentMethod"
+                                        )
+                                      }}
+                                    </h5>
+                                  </div>
+                                  <!-- /media body -->
+                                </div>
+                                <!-- /media -->
+                              </li>
+                              <!-- /list item -->
+
+                              <!-- /list item -->
+                            </ul>
+                            <!-- /list -->
+                          </div>
+                          <!-- /tab panel -->
+                        </div>
+                        <!-- /tab content-->
+                      </div>
+                      <!-- /card body -->
+                    </div>
+                    <!-- /card -->
+                  </div>
+                  <!-- /grid item -->
+
+                  <div class="col-xl-9">
+                    <div class="card">
+                      <!-- Card Header -->
+                      <div
+                        class="card-header card-nav bg-transparent d-flex justify-content-between"
+                      >
+                        <ul
+                          class="card-header-links nav nav-underline"
+                          role="tablist"
+                        >
+                          <li
+                            class="nav-item"
+                            *ngIf="
+                              getFromJson(
+                                loaninformation?.repaymentInfo,
+                                'repaymentMethod'
+                              ) == 'Cheque'
+                            "
+                          >
+                            <a
+                              class="nav-link active"
+                              data-toggle="tab"
+                              href="#cheque-tab"
+                              role="tab"
+                              (mouseover)="hover_cheq = true"
+                              (mouseleave)="hover_cheq = false"
+                              [ngStyle]="
+                                hover_cheq
+                                  ? { color: currentTheme?.secondaryColor }
+                                  : {}
+                              "
+                              aria-controls="cheque-tab"
+                              aria-selected="true"
+                              >Cheque</a
+                            >
+                          </li>
+                          <li
+                            class="nav-item"
+                            *ngIf="
+                              getFromJson(
+                                loaninformation?.repaymentInfo,
+                                'repaymentMethod'
+                              ) === 'Card - Paystack'
+                            "
+                          >
+                            <a
+                              class="nav-link"
+                              data-toggle="tab"
+                              href="#card-tab"
+                              role="tab"
+                              aria-controls="card-tab"
+                              (mouseover)="hover_card = true"
+                              (mouseleave)="hover_card = false"
+                              [ngStyle]="
+                                hover_card
+                                  ? { color: currentTheme?.secondaryColor }
+                                  : {}
+                              "
+                              aria-selected="true"
+                              >Card</a
+                            >
+                          </li>
+                          <li
+                            class="nav-item"
+                            *ngIf="
+                              getFromJson(
+                                loaninformation?.repaymentInfo,
+                                'repaymentMethod'
+                              ) == 'Automatic Direct Debit - Remita'
+                            "
+                          >
+                            <a
+                              class="nav-link"
+                              data-toggle="tab"
+                              href="#add-tab"
+                              role="tab"
+                              aria-controls="add-tab"
+                              (mouseover)="hover_add = true"
+                              (mouseleave)="hover_add = false"
+                              [ngStyle]="
+                                hover_add
+                                  ? { color: currentTheme?.secondaryColor }
+                                  : {}
+                              "
+                              aria-selected="true"
+                              >Automatic Direct Debit
+                            </a>
+                          </li>
+                          <li
+                            class="nav-item"
+                            *ngIf="
+                              loaninformation?._repaymentInfo
+                                ?.repaymentMethod === 'Wacs'
+                            "
+                          >
+                            Wacs Disbursement Account
+                          </li>
+                        </ul>
+                      </div>
+                      <!-- /card header -->
+
+                      <!-- Card Body -->
+                      <div class="card-body pb-2">
+                        <!-- Tab Content-->
+                        <div class="tab-content mt-5">
+                          <!-- Tab panel -->
+                          <div
+                            id="cheque-tab"
+                            *ngIf="
+                              getFromJson(
+                                loaninformation?.repaymentInfo,
+                                'repaymentMethod'
+                              ) == 'Cheque'
+                            "
+                            class="tab-pane active"
+                          >
+                            <div class="">
+                              <button
+                                (mouseover)="hover_gcs = true"
+                                (mouseleave)="hover_gcs = false"
+                                [ngStyle]="
+                                  hover_gcs
+                                    ? {
+                                        border: currentTheme?.secondaryColor,
+                                        background: currentTheme?.secondaryColor
+                                      }
+                                    : {}
+                                "
+                                class="btn btn-query mb-3 mt-1"
+                                type="button"
+                                (click)="generateSchedules(loaninformation)"
+                              >
+                                Generate Cheque Schedule
+                              </button>
+                            </div>
+
+                            <div
+                              *ngIf="this.requestLoader"
+                              class="table-loader"
+                              style="text-align: center; color: indianred"
+                            >
+                              <span>
+                                <i class="icon icon-spin icon-spin2"></i>
+                                Loading...</span
+                              >
+                            </div>
+                            <!-- Schedules-->
+                            <div>
+                              <table class="table table-striped" id="table">
+                                <thead>
+                                  <tr>
+                                    <!-- <th>
+
+                                            </th> -->
+                                    <th style="text-align: center">
+                                      Cheque No
+                                      <b class="help-block"> *</b>&nbsp;
+                                      <i class="icon icon-ckeditor"></i>
+                                    </th>
+
+                                    <th style="text-align: center">
+                                      Bank &nbsp;
+                                      <i class="icon icon-ckeditor"></i>
+                                    </th>
+
+                                    <th style="text-align: center">
+                                      Cash Date (M/D/Y) &nbsp;
+                                      <i class="icon icon-ckeditor"></i>
+                                    </th>
+
+                                    <th style="text-align: center">
+                                      ({{
+                                        ownerInformation?.currency
+                                          ?.currencySymbol
+                                      }}) Amount &nbsp;
+                                      <i class="icon icon-ckeditor"></i>
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody id="tbody">
+                                  <tr
+                                    *ngFor="
+                                      let line of schedulelines;
+                                      let i = index
+                                    "
+                                  >
+                                    <!--  <td  style="width: 5%">
+
+                                              <button *ngIf="i == 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeCreditRow(i)">
+                                                  <i class="icon icon-close icon-lg"></i>
+                                                </button>
+                                              <button *ngIf="i > 0" type="button" style="border-radius: 15px;" class="btn btn-floating btn-warning btn-xs" (click)="removeCreditRow(i)">
+                                                <i class="icon icon-close icon-lg"></i>
+                                              </button>
+                                            </td> -->
+
+                                    <td style="width: 35%">
+                                      <input
+                                        class="form-control"
+                                        type="text"
+                                        value="{{
+                                          schedulelines[i].ChequeNumber
+                                        }}"
+                                        (change)="
+                                          setCheque($event.target.value, i)
+                                        "
+                                      />
+                                    </td>
+                                    <td style="width: 25%">
+                                      <!-- <input class="form-control " type="text" value="{{schedulelines[i].Bank}}"  > -->
+                                      <select
+                                        class="form-control"
+                                        [(ngModel)]="line.Bank"
+                                        (change)="selected('bank', $event, i)"
+                                      >
+                                        <option value="" selected>
+                                          Selct a bank
+                                        </option>
+                                        <option
+                                          *ngFor="let item of banksArray"
+                                          value="{{ item?.text }}"
+                                        >
+                                          {{ item?.text }}
+                                        </option>
+                                      </select>
+                                      <!-- <slct-2 [allowClear]="false" [data]="banksArray"
+                                        (selected)="selected('bank', $event, i)" placeholder="Select a bank"
+                                        [active]="selectedBankArray" [customSearchEnabled]="true"> </slct-2> -->
+                                    </td>
+                                    <td style="width: 10%">
+                                      <input
+                                        lndInvalidDateChecker
+                                        class="form-control"
+                                        type="date"
+                                        value="{{ schedulelines[i].CashDate }}"
+                                        min="{{ minimumDate }}"
+                                        (change)="
+                                          setDate($event.target.value, i)
+                                        "
+                                      />
+                                    </td>
+                                    <td style="width: 25%">
+                                      <input
+                                        class="form-control"
+                                        type="text"
+                                        value="{{ schedulelines[i].Amount }}"
+                                        currencyMask
+                                        [options]="{
+                                          prefix: '',
+                                          thousands: ',',
+                                          decimal: '.'
+                                        }"
+                                        [(ngModel)]="line.Amount"
+                                        [ngModelOptions]="{ standalone: true }"
+                                        readonly
+                                      />
+                                    </td>
+                                  </tr>
+                                </tbody>
+                                <tfoot>
+                                  <td colspan="4">
+                                    <!-- <button type="button" style="border-radius: 15px;"class="btn btn-floating btn-success btn-xs" (click)="addScheduleRow()">
+                                              <i class="icon icon-add"></i> Add new line
+                                            </button> -->
+                                  </td>
+                                  <td></td>
+                                </tfoot>
+                              </table>
+                            </div>
+                          </div>
+                          <!-- /tab panel -->
+
+                          <div
+                            id="card-tab"
+                            *ngIf="
+                              getFromJson(
+                                loaninformation?.repaymentInfo,
+                                'repaymentMethod'
+                              ) == 'Card - Paystack' ||
+                              getFromJson(
+                                loaninformation?.repaymentInfo,
+                                'repaymentMethod'
+                              ) == 'Card - Monnify'
+                            "
+                            class="tab-pane active"
+                          >
+                            <button
+                              class="btn btn-query btn-xs mb-3 mt-1"
+                              type="button"
+                              [disabled]="sendingMail"
+                              (click)="
+                                resendCardAuthEmail(loaninformation?.loanId)
+                              "
+                            >
+                              <span
+                                ><i
+                                  class="icon icon-spin icon-spin2"
+                                  *ngIf="sendingMail"
+                                ></i>
+                                {{
+                                  !sendingMail
+                                    ? "Resend Card Authorization Email"
+                                    : "Sending..."
+                                }}</span
+                              >
+                            </button>
+                          </div>
+
+                          <div
+                            id="add-tab"
+                            *ngIf="
+                              getFromJson(
+                                loaninformation?.repaymentInfo,
+                                'repaymentMethod'
+                              ) == 'Automatic Direct Debit - Remita'
+                            "
+                            class="tab-pane active"
+                          >
+                            <div class="text-center">
+                              <button
+                                *ngIf="
+                                  externalidentifier == '' &&
+                                  !setupMandate &&
+                                  canVerifyWithRemita()
+                                "
+                                class="btn btn-query mb-3 mt-1"
+                                type="button"
+                                (click)="generateRemitaMandate(loaninformation)"
+                              >
+                                Generate Mandate
+                              </button>
+                              <span
+                                *ngIf="
+                                  externalidentifier == '' &&
+                                  !canVerifyWithRemita()
+                                "
+                                ><span class="text-danger">*</span>Please ensure
+                                the mandate is created manually on the
+                                <b>remita platform</b> before proceeding. Once
+                                this is done, kindly enter any unique identifier
+                                gotten from the remita platform (e.g RRR no)
+                                into the internal note section below and then
+                                clicking the verify application button for this
+                                loan application to be approved.
+                              </span>
+                              <!-- <button  *ngIf="externalidentifier != ''"   class="btn btn-query btn-xs mb-3 mt-1 " type="button" (click)="submitQueryRequest(loaninformation, 2, queryProcessModal)" >Request OTP Activation </button>  -->
+
+                              <button
+                                *ngIf="
+                                  externalidentifier != '' &&
+                                  canVerifyWithRemita()
+                                "
+                                class="btn btn-claim btn-xs mb-3 mt-1"
+                                type="button"
+                                (click)="openModal(documentViewerModal)"
+                              >
+                                View Mandate
+                              </button>
+
+                              <!-- <button  *ngIf="externalidentifier != ''"   class="btn btn-query btn-xs mb-3 mt-1 " type="button" (click)="submitQueryRequest(loaninformation, 2, queryProcessModal)" >Verify Mandate Status</button> -->
+
+                              <button
+                                *ngIf="
+                                  externalidentifier != '' &&
+                                  !setupMandate &&
+                                  canVerifyWithRemita()
+                                "
+                                class="btn btn-query btn-xs mb-3 mt-1"
+                                type="button"
+                                (click)="
+                                  checkRemitaMandateStatus(
+                                    loaninformation?.loanId
+                                  )
+                                "
+                              >
+                                Check Mandate Status
+                              </button>
+                              <button
+                                class="btn btn-query btn-xs mb-3 mt-1 mr-2"
+                                disabled
+                                *ngIf="setupMandate"
+                              >
+                                <i class="icon icon-spin icon-spin2"></i>
+                                Checking...
+                              </button>
+
+                              <div
+                                class="alert alert-primary w-50 mx-auto"
+                                role="alert"
+                                *ngIf="remitaStatusMessage !== null"
+                              >
+                                {{ remitaStatusMessage }}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div
+                            id="wacs"
+                            *ngIf="
+                              loaninformation?._repaymentInfo
+                                ?.repaymentMethod === 'Wacs'
+                            "
+                          >
+                            <button
+                              *ngIf="!wacsDisbursementConfirmation"
+                              class="btn btn-query"
+                              (click)="confirmWacsDisbursementAccount()"
+                              [disabled]="confirmingDisbAcc"
+                            >
+                              {{confirmingDisbAcc ? 'Processing...' : 'Confirm Disbursement Account'}}
+                              <i *ngIf="confirmingDisbAcc" class="icon icon-spin icon-spin2"></i>
+                            </button>
+
+                            <div *ngIf="wacsDisbursementConfirmation">
+                              <h3>Disbursement Account Details</h3>
+                              <p>Loan Offer accepted successfully, an invoice will be sent to your email</p>
+
+                              <div id="details">
+                                <div class="disb-info">
+                                  <p>Reference:</p>
+                                  <p>{{wacsDisbursementConfirmation?.reference}}</p>
+                                </div>
+
+                                <div class="disb-info">
+                                  <p>Amount:</p>
+                                  <p>{{wacsDisbursementConfirmation?.amount | number:'1.2-2'}}</p>
+                                </div>
+
+                                <div class="disb-info">
+                                  <p>Bank Name:</p>
+                                  <p>{{wacsDisbursementConfirmation?.bankName}}</p>
+                                </div>
+
+                                <div class="disb-info">
+                                  <p>Account Number:</p>
+                                  <p>{{wacsDisbursementConfirmation?.accountNumber}}</p>
+                                </div>
+
+                                <div class="disb-info">
+                                  <p>Account Name:</p>
+                                  <p>{{wacsDisbursementConfirmation?.accountName}}</p>
+                                </div>
+
+                                <div class="disb-info">
+                                  <p>Loan Id:</p>
+                                  <p>{{wacsDisbursementConfirmation?.loanId}}</p>
+                                </div>
+
+                                <div class="disb-info">
+                                  <p>Created At:</p>
+                                  <p>{{wacsDisbursementConfirmation?.createdAt}}</p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- /tab content-->
+                      </div>
+                      <!-- /card body -->
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-xl-12">
+                    <div class="card">
+                      <!-- Card Body -->
+                      <div class="card-body pb-2">
+                        <div class="row">
+                          <div class="col-xl-12 col-md-12">
+                            <!-- /grid item -->
+
+                            <label class="input-group">Internal Note</label>
+                            <textarea
+                              class="form-control"
+                              formControlName="InternalNote"
+                              rows="4"
+                              cols="150"
+                              aria-label="With textarea"
+                            ></textarea>
+                          </div>
+                          <!-- col-md-6-->
+                          <!--   <div class="col-xl-6 col-md-6 mt-4">
+                              <div class="form-group">
+                                <label class="">Supporting Documents</label>
+                                <div class="custom-file input-group" data-provides="fileinput">
+                                  <span class="input-group-addon btn btn-default btn-file">
+                                    <input class="" type="file" id="files" multiple (change)="handleFileInput($event.target.files)" />
+                                  </span>
+                                  </div>
+                              </div>
+                            </div> -->
+                        </div>
+
+                        <br />
+                      </div>
+                      <!-- /card body -->
+                    </div>
+                  </div>
+
+                  <!-- action start-->
+                  <div
+                    *ngIf="
+                      currentuser?.permission?.includes(
+                        'Verify Repayment Method'
+                      ) &&
+                      (!canVerifyWithRemita() ||
+                        getFromJson(
+                          loaninformation?.repaymentInfo,
+                          'repaymentMethod'
+                        ) == 'Cheque')
+                    "
+                    class="help-button-wrapper"
+                  >
+                    <ul class="help-list">
+                      <li>
+                        <button
+                          type="submit"
+                          *ngIf="!loader"
+                          [disabled]="AddResponseForm.invalid"
+                          class="btn btn-success text-uppercase success-alert"
+                        >
+                          Verify Application
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-claim btn-sm"
+                          *ngIf="loader"
+                          [disabled]="true"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i>
+                          Processing...
+                        </button>
+                      </li>
+                    </ul>
+                    <button
+                      type="button"
+                      class="help-button"
+                      (click)="showActions()"
+                    >
+                      <span>?</span>
+                      Action
+                    </button>
+                  </div>
+
+                  <!-- action end-->
+                </div>
+
+                <hr />
+              </div>
+
+              <!-- tab 4 -->
+              <div id="tab-pane4" class="tab-pane">
+                <div class="dt-card__body">
+                  <br />
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <!-- /section -->
+      </div>
+      <!-- /customizer body inner -->
+    </div>
+    <!-- /customizer body -->
+
+    <!-- /form -->
+  </div>
+</aside>
+<!-- /customizer sidebar -->
+
+<ng-template #queryProcessModal>
+  <!-- Modal -->
+  <!-- Modal Body -->
+  <div class="modal-body" style="background-color: beige">
+    <div
+      *ngIf="this.requestLoader"
+      class="table-loader"
+      style="text-align: center; color: indianred"
+    >
+      <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+    </div>
+
+    <!-- Login Content Inner -->
+    <div class="dt-login__content-inner">
+      <span> {{ feedbackdata }} </span>
+
+      <!-- Tables -->
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <tbody>
+            <tr *ngFor="let row of possibleResults; let i = index">
+              <!-- <th class="code small">{{ row?. }}</th>
+                                 <th class="code small">{{row?. }}</th> -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- /tables -->
+
+      <!-- /form group -->
+
+      <!-- /form -->
+    </div>
+    <!-- /login content inner -->
+  </div>
+  <!-- /modal body -->
+
+  <div class="modal-footer" style="background-color: beige">
+    <button
+      type="button"
+      class="btn orange-bg btn-xs text-white"
+      (click)="closeModal()"
+    >
+      Abort
+    </button>
+    <button
+      *ngIf="!this.requestLoader"
+      type="button"
+      class="btn btn-claim btn-xs text-white"
+      (click)="ResetPage()"
+    >
+      Proceed
+    </button>
+  </div>
+
+  <!-- /modal -->
+</ng-template>
+
+<ng-template #viewDocument>
+  <!-- Modal Header -->
+  <!--<div class="modal-header border-0">
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mt-3 ml-3">
+                    <img class="dt-brand__logo-img mb-3" src="assets/images/logo.png" alt="Logo">
+                    <h3 class="dt-card__title mb-2">{{ ownerInformation?.appOwnerName | uppercase}}</h3>
+                    <h6 class="dt-card__title mb-2 text-light-gray ft-12">
+                        <i class="icon icon-company mr-2"></i>{{ ownerInformation?.appOwnerBillingAddress }} </h6>
+                    <h6 class="dt-card__title mb-2 text-light-gray ft-12">
+                      <i class="icon icon-email mr-2"></i>{{ ownerInformation?.appOwnerEmail }}</h6>
+                    <h6 class="dt-card__title mb-2 text-light-gray ft-12">
+                      <i class="icon icon-phone mr-2"></i>{{ ownerInformation?.appOwnerPhone }}</h6>
+
+                  </div>
+                </div>
+                <div class="col-md-4 pull-right text-right" >
+
+                </div>
+              </div>
+            </div>-->
+
+  <div id="print_content">
+    <div class="modal-body" style="background-color: #fffbf6">
+      <h4 class="text-center mb-7 mt-4">
+        <i class="icon icon-mail-open icon-fw icon-xl mr-1"></i>
+        <span class="align-middle text-uppercase">REMITA MANDATE</span>
+      </h4>
+
+      <div class="row ml-1 border-bottom">
+        <div class="col-md-6 border-right">
+          <div class="mb-3 text-light-gray">
+            <i class="icon icon-profile text-warning"></i>&nbsp; Name:
+            <span>{{ loaninformation?.person?.displayName | uppercase }}</span>
+          </div>
+          <div class="mb-3 text-light-gray">
+            <i class="icon icon-email text-warning"></i>&nbsp; Email:
+            <span>{{ loaninformation?.person?.emailAddress | uppercase }}</span>
+          </div>
+          <div class="mb-3 text-light-gray">
+            <i class="icon icon-phone text-warning"></i>&nbsp; Phone:
+            <span>{{ loaninformation?.person?.phoneNumber | uppercase }}</span>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3 text-light-gray">
+            <i class="icon icon-profile text-warning"></i>&nbsp; REQUESTID:
+            <span>{{ loaninformation?.identifier | uppercase }} </span>
+          </div>
+          <div class="mb-3 text-light-gray">
+            <i class="icon icon-email text-warning"></i>&nbsp; LOAN STAGE:
+            <span>{{ loaninformation?.loanStage }} </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="m-8">
+        <!-- <h3 class="dt-card__title mt-1 mb-3">Loan Repayments</h3> -->
+        <!-- Tables -->
+        <div class="table-responsive">
+          <table class="table table-striped mb-0">
+            <thead class="thead-light">
+              <tr>
+                <th class="text-uppercase pt-1 pb-1" scope="col">MandateID</th>
+                <th class="text-uppercase pt-1 pb-1" scope="col">
+                  Loan Amount
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  {{
+                    getFromJson(
+                      getFromJson(
+                        loaninformation?.externalIntegrationIdentifier,
+                        "Content"
+                      ),
+                      "mandateId"
+                    )
+                  }}
+                </td>
+                <td>{{ loaninformation?.loanAmount | number : "1.2-2" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- /tables -->
+      </div>
+    </div>
+    <!-- /modal body -->
+
+    <div>
+      <!-- <span style="font-size: 10px; text-align: left !important" align="left"><b>
+                    Printed Date: {{ currentdate | date : "medium" }} </b>
+                </span>
+                <span class="pull-right text-right" style="font-size: 10px; text-align: right !important" align="right">Printed
+                  by : <b>{{currentuser?.person?.displayName | uppercase}}</b></span><br/>
+                 -->
+    </div>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer border-0">
+    <button
+      type="button"
+      class="btn btn-danger btn-xs text-white"
+      data-dismiss="modal"
+    >
+      Close
+    </button>
+    <button type="button" (click)="printDocument()" class="btn btn-dark btn-xs">
+      <i class="icon icon-mail-open icon-fw icon-sm mr-1"></i>Print
+    </button>
+    <!-- <button type="button" class="btn btn-secondary btn-xs text-white"><i class="icon icon-mail-open icon-fw icon-sm mr-1"></i>Print without header</button> -->
+  </div>
+  <!-- /modal footer -->
+</ng-template>
+
+<ng-template #documentViewerModal>
+  <!-- Modal -->
+  <!-- Modal Header -->
+
+  <!-- Modal Body -->
+  <div class="modal-body" id="printExternalDoc1withHeader">
+    <div class="modal-header border-0">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mt-3 ml-3">
+            <img
+              class="dt-brand__logo-img mb-3"
+              width="100px"
+              src="assets/images/logo-blue.png"
+              alt="Logo"
+            />
+            <h3 class="dt-card__title mb-2">
+              {{ ownerInformation?.appOwnerName | uppercase }}
+            </h3>
+            <span
+              class="dt-card__title mb-2 text-light-gray ft-12"
+              *ngIf="ownerInformation?.appOwnerBillingAddress != null"
+            >
+              <!-- <i class="icon icon-company mr-2"></i>-->{{
+                ownerInformation?.appOwnerBillingAddress
+              }} </span
+            ><br />
+            <span class="dt-card__title mb-2 text-light-gray ft-12">
+              <i class="icon icon-email mr-2"></i
+              >{{ ownerInformation?.appOwnerEmail }}</span
+            ><br />
+            <span class="dt-card__title mb-2 text-light-gray ft-12">
+              <i class="icon icon-phone mr-2"></i
+              >{{ ownerInformation?.appOwnerPhone }}</span
+            ><br />
+          </div>
+        </div>
+        <div class="col-md-4 pull-right text-right"></div>
+      </div>
+    </div>
+
+    <div class="modal-body m-2" id="printExternalDoc1">
+      <div class="mt-3 ml-1">
+        <img
+          class="dt-brand__logo-img mb-3"
+          src="assets/images/remita.png"
+          alt="Logo"
+        />
+      </div>
+
+      <h4 class="mb-7 f-18 mt-2">
+        <span class="align-middle black">
+          Your Remita Retrieval Reference (RRR) is:
+          <span class="orange">{{
+            getFromJson(
+              getFromJson(
+                loaninformation?.externalIntegrationIdentifier,
+                "Content"
+              ),
+              "MandateId"
+            )
+          }}</span></span
+        >
+      </h4>
+
+      <p class="black">
+        You can complete the activation of your Standing Order By:
+      </p>
+      <ul>
+        <li>Printing this form, signing and taking it to your Bank or</li>
+        <li>
+          Logging in to your Internet Bank site and select Remita Payments.
+          Supply your RRR and confirm this mandate
+        </li>
+      </ul>
+      <br />
+
+      <p class="black mb-5">
+        Your instruction will become effective only after you have completed the
+        activation
+      </p>
+
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="dt-card dt-card__full-height">
+            <h4 class="mt-6 text-center orange">Beneficiary Information</h4>
+
+            <ul class="ml--20">
+              <li class="f-12 td-0 mr-6">
+                <span class="black">Name of Beneficiary: </span
+                >{{
+                  getFromJson(
+                    ownerInformation?.bankInformation,
+                    "AppOwnerAccountName"
+                  )
+                }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Bank: </span
+                >{{
+                  getFromJson(
+                    ownerInformation?.bankInformation,
+                    "AppOwnerBankName"
+                  )
+                }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Account No: </span
+                >{{
+                  getFromJson(
+                    ownerInformation?.bankInformation,
+                    "AppOwnerAccountNumber"
+                  )
+                }}
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="dt-card dt-card__full-height">
+            <h4 class="mt-6 text-center orange">Payer Information</h4>
+
+            <ul class="ml--20">
+              <li class="f-12 td-0">
+                <span class="black">Name: </span
+                >{{ loaninformation?.person?.displayName | uppercase }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Phone Number: </span
+                >{{ loaninformation?.person?.phoneNumber | uppercase }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Email: </span
+                >{{ loaninformation?.person?.emailAddress | uppercase }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Bank: </span
+                >{{ getFromJson(loaninformation?.bankInfo, "bankName") }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Account Number: </span
+                >{{
+                  getFromJson(loaninformation?.bankInfo, "bankAccountNumber")
+                }}
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <div class="dt-card dt-card__full-height">
+            <h4 class="mt-6 text-center orange">Payer Information</h4>
+
+            <ul class="ml--20">
+              <li class="f-12 td-0">
+                <span class="black">Description of Payment: </span>LENDER LOAN
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Amount: </span
+                >{{ loaninformation?.loanAmount | number : "1.2-2" }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Processing Fee: </span
+                >{{ ownerInformation?.currency?.currencySymbol }}
+                {{ loaninformation?.loanAmount * 0.015 | number : "1.2-2" }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">Total Payable: </span
+                >{{ ownerInformation?.currency?.currencySymbol }}
+                {{
+                  this.getFromJson(
+                    loaninformation?.externalIntegrationIdentifier,
+                    "RepaymentAmount"
+                  ) | number : "1.2-2"
+                }}
+              </li>
+              <li class="f-12 td-0"><span class="black">Every: </span>Month</li>
+              <li class="f-12 td-0">
+                <span class="black">Start Date: </span
+                >{{
+                  this.getFromJson(
+                    loaninformation?.externalIntegrationIdentifier,
+                    "StartDate"
+                  )
+                }}
+              </li>
+              <li class="f-12 td-0">
+                <span class="black">End Date: </span
+                >{{
+                  this.getFromJson(
+                    loaninformation?.externalIntegrationIdentifier,
+                    "EndDate"
+                  )
+                }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- /modal body -->
+  <div
+    *ngIf="this.requestLoader"
+    class="table-loader"
+    style="text-align: center; color: indianred"
+  >
+    <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-warning btn-xs text-white"
+      (click)="closeModal()"
+    >
+      Dismiss
+    </button>
+    <button
+      type="button"
+      class="btn btn-claim btn-xs text-white"
+      (click)="printThisDocument('printExternalDoc1', 'document_1')"
+    >
+      Print
+    </button>
+    <button
+      type="button"
+      class="btn orange-bg btn-xs text-white"
+      (click)="printThisDocument('printExternalDoc1withHeader', 'document_1')"
+    >
+      Print with header
+    </button>
+    <button
+      type="button"
+      class="btn btn-query btn-xs text-white"
+      (click)="mailDocument('remita', 'printExternalDoc1withHeader')"
+    >
+      Mail Customer
+    </button>
+  </div>
+  <!-- /modal footer -->
+</ng-template>
+
+<!--Modals Section-->

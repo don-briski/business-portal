@@ -1,0 +1,62 @@
+<form class="p-5" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="d-flex align-items-center mb-3">
+    <span
+      class="dt-avatar mr-4 size-35 rounded-circle bg-light-blue text-white"
+      >{{ user?.person?.initials }}</span
+    >
+    <h3 class="m-0">{{ user?.person?.displayName }}</h3>
+  </div>
+  <div class="form-group top-margin">
+    <label><small>Select new Payment Officer</small></label>
+    <slct-2
+      *ngIf="!isFetchingPaymentOfficers"
+      [data]="paymentOfficers"
+      placeholder="Select payment officer"
+      (selected)="onSelectPaymentOfficer($event)"
+      [customSearchEnabled]="true"
+    ></slct-2>
+    <lnd-spinner
+      class="d-block"
+      *ngIf="isFetchingPaymentOfficers"
+    ></lnd-spinner>
+  </div>
+  <div class="form-group">
+    <label for="trans-pin"><small>Enter Transaction Pin</small></label>
+    <input
+      id="trans-pin"
+      type="password"
+      class="form-control"
+      formControlName="transactionPin"
+      autocomplete="off"
+    />
+  </div>
+  <p class="text-secondary">
+    You're about to reassign this batch to another officer
+  </p>
+  <div class="d-flex justify-content-end mb-5">
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm mr-3"
+      (click)="closeModal()"
+      style="color: #fff"
+    >
+      Close
+    </button>
+    <button
+      type="submit"
+      class="btn btn-claim btn-sm"
+      *ngIf="!isSubmitting"
+      [disabled]="form.invalid"
+    >
+      Reassign
+    </button>
+    <button
+      type="button"
+      class="btn btn-claim btn-sm"
+      *ngIf="isSubmitting"
+      disabled
+    >
+      <i class="icon icon-spin icon-spin2"></i> Processing...
+    </button>
+  </div>
+</form>

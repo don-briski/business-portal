@@ -1,0 +1,13 @@
+<div class="mb-5" [ngClass]="classes">
+  <div class="d-flex lnd-tabs">
+    <lnd-tab
+      *ngFor="let tab of tabs"
+      [text]="tab.text"
+      [active]="currentTabId === tab.id"
+      [tabId]="tab.id"
+      [tabBarId]="tabBarId"
+      [hideTab]="tab?.hide"
+    ></lnd-tab>
+  </div>
+  <hr class="mb-0" />
+</div>

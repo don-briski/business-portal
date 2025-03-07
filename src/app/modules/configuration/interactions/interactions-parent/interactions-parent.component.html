@@ -1,0 +1,95 @@
+<div class="row">
+  <div class="col-xl-10 offset-md-1">
+    <div class="card">
+      <div class="bg-transparent card-header card-nav">
+        <h3 class="mb--20">Interactions</h3>
+      </div>
+
+      <div *ngIf="accounts?.length > 0 && appOwner" class="pb-2 card-body">
+        <p>Enable interactions between the Finance & other modules</p>
+        <div id="accordion">
+          <div>
+            <div
+              class="card-header d-flex justify-content-between"
+              id="headingOne"
+            >
+              <h1 class="mb-0">Loan Module</h1>
+
+              <span
+                (click)="checkValue(module.Loan)"
+                [ngClass]="
+                  selectedModule === module.Loan && accordionState === 'Open'
+                    ? 'open'
+                    : 'close'
+                "
+                class="cursor"
+                data-toggle="collapse"
+                data-target="#loan"
+                ><i class="icon icon-chevron-down icon-lg"></i
+              ></span>
+            </div>
+            <div class="content">
+              <div
+                id="loan"
+                class="collapse show"
+                aria-labelledby="headingOne"
+                data-parent="#accordion"
+              >
+                <loan-interactions
+                  [user]="user"
+                  [selectedModule]="selectedModule"
+                  [statuses]="statuses"
+                  [modes]="modes"
+                  [accounts]="accounts"
+                  [appOwner]="appOwner"
+                  (getAppowner)="getAppOwnerDetails()"
+                ></loan-interactions>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div
+              class="card-header d-flex justify-content-between"
+              id="headingOne"
+            >
+              <h1 class="mb-0">Investment Module</h1>
+
+              <span
+                (click)="checkValue(module.Investment)"
+                [ngClass]="
+                  selectedModule === module.Investment &&
+                  accordionState === 'Open'
+                    ? 'open'
+                    : 'close'
+                "
+                class="cursor"
+                data-toggle="collapse"
+                data-target="#inv"
+                ><i class="icon icon-chevron-down icon-lg"></i
+              ></span>
+            </div>
+
+            <div class="content">
+              <div
+                id="inv"
+                class="collapse"
+                aria-labelledby="headingOne"
+                data-parent="#accordion"
+              >
+                <inv-interactions
+                  [user]="user"
+                  [selectedModule]="selectedModule"
+                  [statuses]="statuses"
+                  [modes]="modes"
+                  [appOwner]="appOwner"
+                  [accounts]="accounts"
+                  (getNewAppowner)="getAppOwnerDetails()"
+                ></inv-interactions>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

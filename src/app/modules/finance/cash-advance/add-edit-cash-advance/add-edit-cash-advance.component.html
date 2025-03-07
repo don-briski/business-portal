@@ -1,0 +1,216 @@
+<div class="row m-0">
+  <div class="col-md-6 offset-md-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="dt-page__title clearfix mb-0">
+        {{ !isEditing ? "Create" : "Edit" }} Cash Advance
+      </h1>
+      <a
+      class="btn btn-primary btn-sm mr-2 text-white"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [style.borderColor]="currentTheme?.secondaryColor"
+        [routerLink]="['/finance/cash-advance/all']"
+        routerLinkActive="active"
+        href="javascript:void(0)"
+        >Cancel</a
+      >
+    </div>
+
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <span
+          class="ml-5 text-danger text-sm text-center"
+          *ngIf="loadingCashAdv"
+        >
+          <i class="icon icon-spin icon-spin2"></i> Retrieving cash
+          advance...</span
+        >
+        <div
+          class="form-wrapper"
+          *ngIf="(isEditing && cashAdvanceInformation) || !isEditing"
+        >
+          <form
+            [formGroup]="cashAdvanceForm"
+            (ngSubmit)="submitForm()"
+            *ngIf="!loadingCashAdv"
+          >
+            <div class="row">
+              <div class="form-group col-md-6">
+                <label>Staff<b class="help-block">*</b></label>
+                <slct-2
+                  [data]="staffList"
+                  formControlName="staff"
+                  [placeholder]="'Search Staff'"
+                  (selected)="selectStaff($event)"
+                  [customSearchEnabled]="true"
+                  [searchService]="getStaffService()"
+                  (searchResult)="updateDropdown($event, 'staff')"
+                ></slct-2>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label>Amount</label><b class="help-block"> *</b>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="amount"
+                  currencyMask
+                  [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                  placeholder="Type amount"
+                />
+              </div>
+              <div class="form-group col-md-6">
+                <label>Staff Account<b class="help-block"> *</b></label>
+                <slct-2
+                  [data]="staffAccounts"
+                  (selected)="selectAccount($event, 'staff')"
+                  [active]="
+                    cashAdvanceInformation
+                      ? [
+                          {
+                            id: cashAdvanceInformation.staffAccountId,
+                            text: cashAdvanceInformation.staffAccount
+                          }
+                        ]
+                      : null
+                  "
+                  placeholder="Select Staff Account"
+                  [customSearchEnabled]="true"
+                  [searchService]="getAccountService('staff')"
+                  (searchResult)="updateDropdown($event, 'staffAccount')"
+                ></slct-2>
+              </div>
+              <div class="form-group col-md-6">
+                <label>Account paid through<b class="help-block"> *</b></label>
+                <slct-2
+                  *ngIf="bankAccounts.length > 0"
+                  [data]="bankAccounts"
+                  (selected)="selectAccount($event, 'bank')"
+                  [active]="
+                    cashAdvanceInformation
+                      ? [
+                          {
+                            id: cashAdvanceInformation.paidThroughAccountId,
+                            text: cashAdvanceInformation.paidThroughAccount
+                          }
+                        ]
+                      : null
+                  "
+                  placeholder="Select Bank Account"
+                  [customSearchEnabled]="true"
+                  [searchService]="getAccountService('bank')"
+                  (searchResult)="updateDropdown($event, 'paidThrough')"
+                ></slct-2>
+              </div>
+
+              <div class="form-group col-md-6">
+                <label for="date"
+                  >Expected Recipient Date <b class="help-block">*</b></label
+                >
+                <input
+                lndInvalidDateChecker
+                  formControlName="expectedCashAdvanceReceiptDate"
+                  type="date"
+                  class="form-control"
+                  id="date"
+                />
+              </div>
+
+              <div class="form-group col-md-12">
+                <label>Description</label>
+                <textarea
+                  class="form-control"
+                  formControlName="description"
+                  rows="3"
+                  placeholder="Type a description"
+                >
+                </textarea>
+              </div>
+
+              <div class="form-group col-md-12">
+                <div class="mb-6">
+                  <div class="d-flex">
+                    <small>Supporting Documents</small>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn btn-xs btn-secondary text-white"
+                    (click)="files.click()"
+                  >
+                    Attach File
+                  </button>
+
+                  <input
+                    #files
+                    type="file"
+                    multiple
+                    (change)="handleFileInput($event.target.files)"
+                    style="display: none"
+                  />
+                </div>
+
+                <div class="mt-3">
+                  <span
+                    *ngFor="
+                      let file of cashAdvanceFormViewFiles;
+                      let fileIndex = index
+                    "
+                    class="badge badge-pill badge-outline ml-2 px-4 mb-1"
+                    >{{ file.name || file.originalName }}
+                    <i
+                      class="icon icon-trash ml-2 cursor text-danger"
+                      (click)="removeFile(fileIndex)"
+                    ></i>
+                  </span>
+                </div>
+              </div>
+              <footer class="col-md-12 py-5">
+                <div class="d-flex">
+                  <button
+                    type="submit"
+                    class="btn btn-success btn-sm ml-auto"
+                    [ngClass]="loader ? 'btn-warning' : 'btn-primary'"
+                    [disabled]="cashAdvanceForm.invalid || loader"
+                  >
+                    <i class="icon icon-spin icon-spin2" *ngIf="loader"></i>
+                    {{ loader ? "Processing..." : "Send For Approval" }}
+                  </button>
+                </div>
+              </footer>
+            </div>
+            <div
+              class="comments table-responsive"
+              *ngIf="
+                isEditing && cashAdvanceInformation?.reviewComment.length > 0
+              "
+            >
+              <hr />
+              <div class="card">
+                <h5 class="p-3 m-0">Approval Comment(s)</h5>
+                <table class="table table-striped mb-0" style="font-size: 11px">
+                  <thead class="thead-light">
+                    <tr>
+                      <th class="text-uppercase" scope="col">Comment</th>
+                      <th class="text-uppercase" scope="col">Date Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      *ngFor="let item of cashAdvanceInformation.reviewComment"
+                    >
+                      <td>{{ item?.comment }}</td>
+                      <td>
+                        {{ item?.createdAt | customDatePipe }}
+                        <i class="icon icon-timepicker ml-3"></i>
+                        {{ item?.createdAt | date : "shortTime" }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

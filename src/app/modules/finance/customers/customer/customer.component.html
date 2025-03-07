@@ -1,0 +1,544 @@
+<div class="wrapper single-view">
+  <div class="d-flex flex-row">
+    <div class="left pr-4">
+      <div class="top">
+        <header
+          class="w-100 d-flex align-items-center justify-content-between mb-3"
+        >
+          <h1 class="dt-page__title mb-0">Customer</h1>
+          <span class="float-right role-add">
+            <a
+              *ngIf="user?.permission?.includes('Manage Finance Customers')"
+              class="btn btn-primary mr-2 text-white"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [routerLink]="['/finance/customers/create']"
+              routerLinkActive="router-link-active"
+              href="javascript:void(0)"
+            >
+              <i class="icon icon-add-circle mr-2"></i>Add Customer</a
+            >
+          </span>
+        </header>
+      </div>
+
+      <div class="body">
+        <div class="card">
+          <div class="card-body p-0">
+            <ul class="inv-list">
+              <li
+                *ngFor="let customer of customers"
+                (click)="viewCustomer(customer?.id)"
+                [ngClass]="{
+                  selected: selectedCustomer?.id === customer?.id
+                }"
+                [style.border-left]="
+                  selectedCustomer.id === customer?.id
+                    ? '5px solid ' + currentTheme.secondaryColor
+                    : ''
+                "
+                (mouseover)="customer.hover = true"
+                (mouseleave)="
+                  selectedCustomer.id !== customer?.id
+                    ? (customer.hover = false)
+                    : null
+                "
+                [ngStyle]="customer.hover ? hoverStyle : {}"
+              >
+                <span class="d-flex justify-content-between align-items-center">
+                  <span>
+                    <span class="title">{{ customer?.fullName }}</span>
+
+                    <div class="mt-2 sub-title">
+                      <span *ngIf="customer?.financePersonCode"
+                        >{{ customer?.financePersonCode }} |</span
+                      >
+                      {{ customer?.phoneNumber }}
+                    </div>
+                  </span>
+
+                  <span
+                    class="badge badge-sm"
+                    [ngClass]="{
+                      'badge-success': customer.isActive,
+                      'badge-danger': !customer.isActive
+                    }"
+                    >{{ customer.isActive ? "Active" : "Inactive" }}</span
+                  >
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedCustomer && !isLoading; else loader" class="right px-2">
+      <div class="top card mb-3">
+        <div class="card-body">
+          <header class="d-flex justify-content-between">
+            <ul
+              id="active-div"
+              class="card-header-pills nav nav-pill justify-content-center"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  [ngClass]="{ 'active-tab': currentTabId === 'Overview' }"
+                  class="nav-link pool-nav"
+                  href="javascript:void(0)"
+                  (click)="currentTabId = 'Overview'"
+                >
+                  Overview
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  [ngClass]="{ 'active-tab': currentTabId === 'Transactions' }"
+                  class="nav-link pool-nav"
+                  href="javascript:void(0)"
+                  (click)="currentTabId = 'Transactions'"
+                >
+                  Transactions
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a
+                  [ngClass]="{ 'active-tab': currentTabId === 'Statement' }"
+                  class="nav-link pool-nav"
+                  href="javascript:void(0)"
+                  (click)="currentTabId = 'Statement'"
+                >
+                  Statement
+                </a>
+              </li>
+            </ul>
+            <div>
+              <button
+                *ngIf="user?.permission?.includes('Manage Finance Customers')"
+                class="btn btn-xs btn-light"
+                [routerLink]="'/finance/customers/edit/' + selectedCustomer?.id"
+              >
+                Edit
+              </button>
+              <button class="btn btn-xs btn-outline-dark" (click)="closeView()">
+                Close
+              </button>
+            </div>
+          </header>
+        </div>
+      </div>
+
+      <div class="card p-3" *ngIf="currentTabId === 'Overview'">
+        <div class="d-flex justify-content-between">
+          <h3>Profile</h3>
+          <lnd-payables-receivables
+            [outstandingReceivables]="outstandingReceivables"
+            [unusedCredits]="unusedCredits"
+            [currencySymbol]="ownerInformation?.currency?.currencySymbol"
+            type="receivables"
+          >
+          </lnd-payables-receivables>
+        </div>
+        <section id="profile-section">
+          <div class="row">
+            <div *ngIf="selectedCustomer?.fullName" class="col-md-4">
+              <header class="d-flex align-items-center mb-2">
+                <span><i class="icon icon-user-o icon-1x mr-1"></i></span>
+                <span>
+                  <p class="mb-0"><b>Full Name</b></p>
+                  <p>{{ selectedCustomer?.fullName }}</p>
+                </span>
+              </header>
+            </div>
+            <div *ngIf="selectedCustomer?.emailAddress" class="col-md-4">
+              <header class="d-flex align-items-center mb-2">
+                <span><i class="icon icon-email icon-1x mr-1"></i></span>
+                <span>
+                  <p class="mb-0"><b>Email Address</b></p>
+                  <p>{{ selectedCustomer?.emailAddress }}</p>
+                </span>
+              </header>
+            </div>
+
+            <div class="col-md-4">
+              <header class="d-flex flex-wrap align-items-center mb-2">
+                <span
+                  ><i
+                    [ngClass]="
+                      selectedCustomer?.isOrganisation
+                        ? 'icon-company'
+                        : 'icon-user'
+                    "
+                    class="icon icon-1x mr-1"
+                  ></i
+                ></span>
+                <span>
+                  <p class="mb-0"><b>Account Type</b></p>
+                  <p>
+                    {{
+                      selectedCustomer?.isOrganisation
+                        ? "Organisation"
+                        : "Individual"
+                    }}
+                  </p>
+                </span>
+              </header>
+            </div>
+
+            <div *ngIf="selectedCustomer?.phoneNumber" class="col-md-4">
+              <header class="d-flex flex-wrap align-items-center mb-2">
+                <span><i class="icon icon-phone icon-1x ml-1"></i></span>
+                <span>
+                  <p class="mb-0"><b>Phone Number</b></p>
+                  <p>
+                    {{ selectedCustomer?.phoneNumber }}
+                  </p>
+                </span>
+              </header>
+            </div>
+          </div>
+        </section>
+
+        <div class="mt-6">
+          <div id="accordion">
+            <div class="card">
+              <div class="card-header px-0" id="headingOne">
+                <h5
+                  class="mb-0 cursor"
+                  data-toggle="collapse"
+                  data-target="#contact-details"
+                >
+                  <button
+                    class="btn btn-link"
+                    aria-expanded="true"
+                    aria-controls="contact-details"
+                  >
+                    Contact Details
+                  </button>
+                </h5>
+              </div>
+
+              <div
+                id="contact-details"
+                class="collapse"
+                aria-labelledby="headingOne"
+                data-parent="#accordion"
+              >
+                <div class="card-body p-0">
+                  <ng-container
+                    *ngIf="
+                      selectedCustomer.contactDetails.length > 0;
+                      else noContactDetails
+                    "
+                  >
+                    <div
+                      class="row border-bottom my-3 mx-1"
+                      *ngFor="
+                        let contact of selectedCustomer.contactDetails;
+                        let i = index
+                      "
+                    >
+                      <div class="col-4">
+                        <div>
+                          <small>Salutation</small>
+                          <p>
+                            {{
+                              !contact?.salutation ? "-" : contact?.salutation
+                            }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Firstname</small>
+                          <p>
+                            {{ !contact?.firsName ? "-" : contact?.firsName }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Lastname</small>
+                          <p>
+                            {{ !contact?.lastName ? "-" : contact?.lastName }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Phone Number</small>
+                          <p>
+                            {{
+                              !contact?.phoneNumber ? "-" : contact?.phoneNumber
+                            }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Email</small>
+                          <p>
+                            {{ !contact?.email ? "-" : contact?.email }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-template #noContactDetails>
+                    <p>No details added</p>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header px-0" id="headingOne">
+                <h5
+                  class="mb-0 cursor"
+                  data-toggle="collapse"
+                  data-target="#address"
+                >
+                  <button
+                    class="btn btn-link"
+                    aria-expanded="true"
+                    aria-controls="address"
+                  >
+                    Address
+                  </button>
+                </h5>
+              </div>
+
+              <div
+                id="address"
+                class="collapse"
+                aria-labelledby="headingOne"
+                data-parent="#accordion"
+              >
+                <div class="card-body p-0">
+                  <ng-container
+                    *ngIf="
+                      selectedCustomer.addresses.length > 0;
+                      else noAddress
+                    "
+                  >
+                    <div
+                      class="row mx-1 mt-3"
+                      *ngFor="
+                        let address of selectedCustomer.addresses;
+                        let i = index
+                      "
+                    >
+                      <div class="col-4">
+                        <div>
+                          <small>Recipient</small>
+                          <p>
+                            {{ !address?.attention ? "-" : address?.attention }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Zip Code</small>
+                          <p>
+                            {{ !address?.zipCode ? "-" : address?.zipCode }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Phone Number</small>
+                          <p>
+                            {{ !address?.phone ? "-" : address?.phone }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Phone Number</small>
+                          <p>
+                            {{ !address?.phone ? "-" : address?.phone }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Fax</small>
+                          <p>
+                            {{ !address?.fax ? "-" : address?.fax }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Country</small>
+                          <p>
+                            {{ !address?.country ? "-" : address?.country }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>State</small>
+                          <p>
+                            {{ !address?.state ? "-" : address?.state }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>City</small>
+                          <p>
+                            {{ !address?.city ? "-" : address?.city }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Street 1</small>
+                          <p>
+                            {{ !address?.street1 ? "-" : address?.street1 }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Street 2</small>
+                          <p>
+                            {{ !address?.street2 ? "-" : address?.street2 }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Address</small>
+                          <p>
+                            {{ !address?.address ? "-" : address?.address }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-template #noAddress>
+                    <p>No details added</p>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header px-0" id="headingOne">
+                <h5
+                  class="mb-0 cursor"
+                  data-toggle="collapse"
+                  data-target="#bank"
+                >
+                  <button
+                    class="btn btn-link"
+                    aria-expanded="true"
+                    aria-controls="bank"
+                  >
+                    Bank Details
+                  </button>
+                </h5>
+              </div>
+
+              <div
+                id="bank"
+                class="collapse"
+                aria-labelledby="headingOne"
+                data-parent="#accordion"
+              >
+                <div class="card-body p-0">
+                  <ng-container
+                    *ngIf="
+                      selectedCustomer.bankDetails.length > 0;
+                      else noBankDetails
+                    "
+                  >
+                    <div
+                      class="row border-bottom my-3 mx-1"
+                      *ngFor="let bank of selectedCustomer.bankDetails"
+                    >
+                      <div class="col-4">
+                        <div>
+                          <small>Bank Name</small>
+                          <p>
+                            {{ !bank?.bankName ? "-" : bank?.bankName }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Account Name</small>
+                          <p>
+                            {{ !bank?.accountName ? "-" : bank?.accountName }}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div class="col-4">
+                        <div>
+                          <small>Account Number</small>
+                          <p>
+                            {{
+                              !bank?.accountNumber ? "-" : bank?.accountNumber
+                            }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-template #noBankDetails>
+                    <p>No details added</p>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <lnd-customer-transactions
+        *ngIf="currentTabId === 'Transactions'"
+        [colorTheme]="currentTheme"
+        [customerId]="selectedCustomer.id"
+      ></lnd-customer-transactions>
+
+      <div class="card p-3" *ngIf="currentTabId === 'Statement'">
+        <lnd-account-statement
+          *ngIf="selectedCustomer"
+          [selectedCustomer]="selectedCustomer"
+          [appOwnerName]="ownerInformation?.appOwnerName"
+          [currencySymbol]="ownerInformation?.currency?.currencySymbol"
+          [currentTheme]="currentTheme"
+          type="customer"
+        ></lnd-account-statement>
+      </div>
+    </div>
+
+    <ng-template #loader>
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="text-center right px-2"
+      >
+        Retrieving Customer... <i class="icon icon-spin icon-spin2"></i>
+      </p>
+    </ng-template>
+  </div>
+</div>

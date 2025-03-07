@@ -1,0 +1,815 @@
+<div class="row m-0">
+  <header
+    [ngClass]="{ 'p-3 dashed': !showHeader }"
+    class="dt-page__header d-flex w-100 mb-3"
+  >
+    <div class="d-flex justify-content-between align-items-center w-100">
+      <h1 class="dt-page__title clearfix mb-0">
+        {{ isEditing ? "Edit Vendor  " : "Add New Vendor  " }}
+      </h1>
+      <div class="text-primary">
+        <i
+          class="icon icon-spin icon-spin2 mr-2"
+          *ngIf="isEditing && !vendor"
+        ></i>
+        <small *ngIf="isEditing && !vendor"> Retrieving vendor... </small>
+      </div>
+      <span *ngIf="showHeader" class="float-right role-add">
+        <div style="position: relative; right: -5px; bottom: 5px; float: right">
+          <a
+            class="btn btn-primary mr-2 text-white"
+            [routerLink]="['/finance/vendors']"
+            routerLinkActive="router-link-active"
+            [style.background]="currentTheme?.secondaryColor"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            href="javascript:void(0)"
+            >Back</a
+          >
+        </div>
+      </span>
+
+      <span *ngIf="!showHeader" class="float-right role-add">
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="closeModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </span>
+    </div>
+  </header>
+
+  <div [ngClass]="{ 'dt-card': showHeader }" class="w-100">
+    <div class="dt-card__body" *ngIf="(isEditing && vendor) || !isEditing">
+      <form [formGroup]="vendorForm">
+        <div id="vendorInfo">
+          <h3>Vendor Info</h3>
+          <div class="form-row">
+            <div class="col-md-3">
+              <label for="name">Vendor Name <b class="text-danger">*</b></label>
+              <input
+                type="text"
+                id="name"
+                formControlName="name"
+                class="form-control"
+                placeholder="Vendor Name"
+              />
+
+              <span
+                *ngIf="
+                  vendorFormControl.name.invalid &&
+                  (vendorFormControl.name.dirty ||
+                    vendorFormControl.name.touched)
+                "
+                class="text-danger"
+              >
+                <span *ngIf="vendorFormControl.name.errors?.required">
+                  Name is required.
+                </span>
+              </span>
+            </div>
+
+            <div class="col-md-3">
+              <label for="email"
+                >Vendor Email <b class="text-danger">*</b></label
+              >
+              <input
+                type="email"
+                formControlName="emailAddress"
+                id="email"
+                class="form-control"
+                placeholder="Vendor Email"
+              />
+
+              <span
+                *ngIf="
+                  vendorFormControl.emailAddress.invalid &&
+                  (vendorFormControl.emailAddress.dirty ||
+                    vendorFormControl.emailAddress.touched)
+                "
+                class="text-danger"
+              >
+                <span *ngIf="vendorFormControl.emailAddress.errors?.required">
+                  Email is required.
+                </span>
+
+                <span *ngIf="vendorFormControl.emailAddress.errors?.email">
+                  Must be a valid email address.
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="col-md-6">
+              <label for="vendor-address">Vendor Address </label>
+              <textarea
+                placeholder="Vendor Address"
+                formControlName="address"
+                class="form-control"
+              ></textarea>
+
+              <span
+                *ngIf="
+                  vendorFormControl.address.invalid &&
+                  (vendorFormControl.address.dirty ||
+                    vendorFormControl.address.touched)
+                "
+                class="text-danger"
+              >
+                <span *ngIf="vendorFormControl.address.errors?.required">
+                  Address is required.
+                </span>
+              </span>
+            </div>
+          </div>
+          <div class="form-row dashed">
+            <div class="col-md-6">
+              <label for="website">Website</label>
+              <input
+                type="text"
+                formControlName="websiteUrl"
+                id="website"
+                class="form-control"
+                placeholder="Website"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div id="primaryContact">
+          <h3>Primary Contact</h3>
+          <div class="form-row dashed flex-wrap">
+            <div class="col-md-3">
+              <slct-2
+                [data]="salutations"
+                formControlName="salutations"
+                [placeholder]="'Salutation'"
+              ></slct-2>
+            </div>
+
+            <div class="col-md-3">
+              <input
+                type="text"
+                formControlName="firsName"
+                class="form-control"
+                placeholder="Enter FirstName"
+              />
+            </div>
+
+            <div class="col-md-3">
+              <input
+                type="text"
+                formControlName="lastName"
+                class="form-control"
+                placeholder="Enter LastName"
+              />
+            </div>
+
+            <div class="col-md-3"></div>
+            <div class="col-md-3 mt-3">
+              <input
+                type="email"
+                formControlName="email"
+                class="form-control"
+                placeholder="Email"
+              />
+            </div>
+
+            <div class="col-md-3 mt-3">
+              <input
+                type="tel"
+                formControlName="phoneNumber"
+                id="phone"
+                class="form-control"
+                placeholder="Phone Number"
+              />
+
+              <lnd-input-errors
+                label="Phone number"
+                [control]="vendorForm.get('phoneNumber')"
+              ></lnd-input-errors>
+            </div>
+          </div>
+        </div>
+        <div id="tabs">
+          <ul
+            id="active-div"
+            class="card-header-pills nav nav-pill justify-content-center my-4"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                id="nav-other-details"
+                class="nav-link pool-nav active-tab"
+                data-toggle="tab"
+                href="#tab-other-details"
+                role="tab"
+                aria-controls="tab-other-details"
+                aria-selected="false"
+                (click)="switchTabs('other-details')"
+                >Other Details
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a
+                id="nav-address"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                href="#tab-address"
+                role="tab"
+                aria-controls="tab-address"
+                aria-selected="false"
+                (click)="switchTabs('address')"
+                >Address</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                id="nav-contact"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                href="#tab-contact"
+                role="tab"
+                aria-controls="tab-contact"
+                aria-selected="false"
+                (click)="switchTabs('contact')"
+                >Contact Person</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                id="nav-bank-details"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                href="#tab-bank-details"
+                role="tab"
+                aria-controls="tab-bank-details"
+                aria-selected="false"
+                (click)="switchTabs('bank-details')"
+                >Bank Details</a
+              >
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <div id="tab-other-details" class="tab-pane active show">
+              <div class="form-row">
+                <div class="col-md-3">
+                  <label for="taxIdNumber">Tax Identification Number </label>
+                  <input
+                    type="text"
+                    formControlName="taxIdNumber"
+                    id="taxIdNumber"
+                    class="form-control"
+                    placeholder="Tax Id Number"
+                  />
+
+                  <span
+                    *ngIf="
+                      vendorFormControl.taxIdNumber.invalid &&
+                      (vendorFormControl.taxIdNumber.dirty ||
+                        vendorFormControl.taxIdNumber.touched)
+                    "
+                    class="text-danger"
+                  >
+                    <span
+                      *ngIf="vendorFormControl.taxIdNumber.errors?.required"
+                    >
+                      Tax Id is required.
+                    </span>
+                  </span>
+                </div>
+
+                <div class="col-md-3">
+                  <label for="payment-terms"
+                    >Payment Terms <b class="text-danger">*</b></label
+                  >
+                  <slct-2
+                    [data]="terms"
+                    id="payment-terms"
+                    formControlName="paymentTerm"
+                    [placeholder]="'Due on Receipt'"
+                  ></slct-2>
+                </div>
+              </div>
+            </div>
+
+            <div id="tab-address" class="tab-pane">
+              <div class="form-row mt-5">
+                <div class="col-md-5">
+                  <h3 class="font-weight-light">Billing Address</h3>
+
+                  <div class="col-12 px-0" style="margin-top: 35.19px">
+                    <label for="attention">Recipient</label>
+                    <input
+                      type="text"
+                      formControlName="billingAttention"
+                      class="form-control"
+                      placeholder="Recipient"
+                      id="attention"
+                    />
+                  </div>
+
+                  <div class="col-12 px-0">
+                    <label for="countries">Country/Region</label>
+                    <slct-2
+                      [data]="countries"
+                      id="countries"
+                      [customSearchEnabled]="true"
+                      (selected)="selectCountry($event, 'billing')"
+                      [placeholder]="'Search Country'"
+                      [active]="
+                        isEditing && vendor?.billingAddress?.country
+                          ? [
+                              {
+                                id: null,
+                                text: vendor?.billingAddress?.country
+                              }
+                            ]
+                          : null
+                      "
+                    ></slct-2>
+                  </div>
+                  <div
+                    *ngIf="vendorForm.get('billingCountryId').value || vendor"
+                    class="col-12 px-0"
+                  >
+                    <label for="state">State</label>
+                    <slct-2
+                      [data]="states"
+                      id="states"
+                      [customSearchEnabled]="true"
+                      (selected)="selectState($event, 'billing')"
+                      [placeholder]="'Search State'"
+                      [active]="
+                        isEditing && vendor?.billingAddress?.state
+                          ? [{ id: null, text: vendor?.billingAddress?.state }]
+                          : null
+                      "
+                    ></slct-2>
+                  </div>
+
+                  <div class="col-12 px-0">
+                    <label for="address1">Address</label>
+                    <textarea
+                      id="address1"
+                      formControlName="billingAddress"
+                      placeholder="Address 1"
+                      class="form-control"
+                    ></textarea>
+                  </div>
+
+                  <div class="col-12 px-0">
+                    <label for="street1">Street 1</label>
+                    <input
+                      type="text"
+                      formControlName="billingStreet1"
+                      class="form-control"
+                      placeholder="Street1"
+                    />
+                  </div>
+
+                  <div class="col-12 px-0">
+                    <label for="street2">Street 2</label>
+                    <input
+                      type="text"
+                      formControlName="billingStreet2"
+                      class="form-control"
+                      placeholder="Street2"
+                    />
+                  </div>
+
+                  <div class="col-12 px-0">
+                    <label for="city">City</label>
+                    <input
+                      type="text"
+                      formControlName="billingCity"
+                      class="form-control"
+                      placeholder="city"
+                      id="city"
+                    />
+                  </div>
+
+                  <div class="col-12 px-0">
+                    <label for="zip">Zip Code</label>
+                    <input
+                      type="text"
+                      formControlName="billingZipcode"
+                      class="form-control"
+                      placeholder="Zip Code"
+                      id="zip"
+                    />
+                  </div>
+
+                  <div class="col-12 px-0">
+                    <label for="phone">Phone</label>
+                    <input
+                      type="tel"
+                      formControlName="billingPhone"
+                      class="form-control"
+                      placeholder="Phone"
+                      id="phone"
+                    />
+                  </div>
+
+                  <div class="col-12 px-0">
+                    <label for="fax">Fax</label>
+                    <input
+                      type="text"
+                      formControlName="billingFax"
+                      class="form-control"
+                      placeholder="Fax"
+                      id="fax"
+                    />
+                  </div>
+                </div>
+                <div class="col-md-2"></div>
+                <div class="col-md-5">
+                  <h3 class="font-weight-light mb-0">Shipping Address</h3>
+                  <div class="d-flex align-items-center my-2">
+                    <input
+                      type="checkbox"
+                      [checked]="showShipping"
+                      class="mr-2"
+                      (change)="toggleShipping()"
+                    />
+                    <span>Different Shipping Address</span>
+                  </div>
+                  <div>
+                    <ng-container>
+                      <div class="col-12 px-0">
+                        <label for="attention">Recipient</label>
+                        <input
+                          type="text"
+                          formControlName="shippingAttention"
+                          class="form-control"
+                          placeholder="Recipient"
+                          id="attention"
+                        />
+                      </div>
+
+                      <div class="col-12 px-0">
+                        <label for="countries">Country/Region</label>
+                        <slct-2
+                          [data]="showShipping ? countries : []"
+                          id="countries"
+                          [customSearchEnabled]="true"
+                          (selected)="selectCountry($event, 'shipping')"
+                          placeholder="Search Country"
+                          [active]="
+                            isEditing && vendor?.shippingAddress?.country
+                              ? [
+                                  {
+                                    id: null,
+                                    text: vendor.shippingAddress.country
+                                  }
+                                ]
+                              : null
+                          "
+                        ></slct-2>
+                      </div>
+
+                      <div
+                        *ngIf="
+                          vendorForm.get('shippingCountryId').value || vendor
+                        "
+                        class="col-12 px-0"
+                      >
+                        <label for="states">State</label>
+                        <slct-2
+                          [data]="states"
+                          id="states"
+                          [customSearchEnabled]="true"
+                          (selected)="selectState($event, 'shipping')"
+                          [placeholder]="'Search State'"
+                          [active]="
+                            isEditing && vendor?.shippingAddress?.state
+                              ? [
+                                  {
+                                    id: null,
+                                    text: vendor?.shippingAddress?.state
+                                  }
+                                ]
+                              : null
+                          "
+                        ></slct-2>
+                      </div>
+
+                      <div class="col-12 px-0">
+                        <label for="address1">Address</label>
+                        <textarea
+                          id="address1"
+                          formControlName="shippingAddress"
+                          placeholder="Address 1"
+                          class="form-control"
+                        ></textarea>
+                      </div>
+
+                      <div class="col-12 px-0">
+                        <label for="street1">Street 1</label>
+                        <input
+                          type="text"
+                          formControlName="shippingStreet1"
+                          id="street1"
+                          class="form-control"
+                          placeholder="Street 2"
+                        />
+                      </div>
+
+                      <div class="col-12 px-0">
+                        <label for="street2">Street 2</label>
+                        <input
+                          type="text"
+                          formControlName="shippingStreet2"
+                          id="street2"
+                          class="form-control"
+                          placeholder="Street 2"
+                        />
+                      </div>
+
+                      <div class="col-12 px-0">
+                        <label for="city">City</label>
+                        <input
+                          type="text"
+                          formControlName="shippingCity"
+                          class="form-control"
+                          placeholder="city"
+                          id="city"
+                        />
+                      </div>
+
+                      <div class="col-12 px-0">
+                        <label for="zip">Zip Code</label>
+                        <input
+                          type="text"
+                          formControlName="shippingZipcode"
+                          class="form-control"
+                          placeholder="Zip Code"
+                          id="zip"
+                        />
+                      </div>
+
+                      <div class="col-12 px-0">
+                        <label for="phone">Phone</label>
+                        <input
+                          type="tel"
+                          formControlName="shippingPhone"
+                          class="form-control"
+                          placeholder="Phone"
+                          id="phone"
+                        />
+                      </div>
+
+                      <div class="col-12 px-0">
+                        <label for="fax">Fax</label>
+                        <input
+                          type="text"
+                          formControlName="shippingFax"
+                          class="form-control"
+                          placeholder="Fax"
+                          id="fax"
+                        />
+                      </div>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="tab-contact" class="tab-pane">
+              <table
+                id="data-table"
+                class="table mt-5 table-bordered table-sm shadow-sm p-3 mb-5 bg-white rounded"
+              >
+                <thead>
+                  <tr>
+                    <th>Salutation</th>
+                    <th>FirstName</th>
+                    <th>LastName</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                  </tr>
+                </thead>
+
+                <tbody formArrayName="contactDetails">
+                  <ng-container
+                    *ngFor="
+                      let contactControls of contacts().controls;
+                      let i = index
+                    "
+                  >
+                    <tr [formGroup]="contactControls">
+                      <td>
+                        <slct-2
+                          [data]="salutations"
+                          [active]="
+                            vendor?.contactDetails[i]
+                              ? patchSalutation(
+                                  vendor.contactDetails[i].salutation
+                                )
+                              : null
+                          "
+                          [customSearchEnabled]="true"
+                          [placeholder]="'Salutation'"
+                          (selected)="selectSalutation($event, 'contact', i)"
+                        ></slct-2>
+                      </td>
+
+                      <td>
+                        <input
+                          type="text"
+                          class="form-control"
+                          formControlName="firsName"
+                          placeholder="Firstname"
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="text"
+                          class="form-control"
+                          formControlName="lastName"
+                          placeholder="Lastname"
+                        />
+                      </td>
+
+                      <td>
+                        <input
+                          type="email"
+                          class="form-control"
+                          formControlName="email"
+                          placeholder="Email"
+                        />
+                      </td>
+
+                      <td class="d-flex align-items-center">
+                        <div>
+                          <input
+                          type="tel"
+                          class="form-control"
+                          formControlName="phoneNumber"
+                          placeholder="Mobile"
+                          [ngClass]="{'mb-2':contactControls.get('phoneNumber').errors}"
+                        />
+                        <lnd-input-errors
+                          label="Phone number"
+                          [control]="contactControls.get('phoneNumber')"
+                        ></lnd-input-errors>
+                        </div>
+                        <span class="remove-btn" (click)="removeContact(i)">
+                          <i class="icon icon-trash icon-lg"></i>
+                        </span>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+
+                <button
+                  class="btn add-btn btn-xs text-white my-5 mx-1"
+                  (click)="addContact()"
+                >
+                  <i class="icon icon-add"></i> Add New Contact
+                </button>
+              </table>
+            </div>
+
+            <div id="tab-bank-details" class="tab-pane">
+              <ng-container formArrayName="bankDetails">
+                <ng-container
+                  *ngFor="let bankControls of banks().controls; let i = index"
+                >
+                  <div [formGroup]="bankControls" class="form-row mb-2">
+                    <div class="col-md-3">
+                      <label for="bankName">Bank Name</label>
+
+                      <div class="d-flex align-items-center">
+                        <slct-2
+                          class="w-100"
+                          *ngIf="!bankControls.get('newBank')?.value"
+                          [data]="allBanks"
+                          (selected)="selectBank($event, i)"
+                          [placeholder]="'Search Bank'"
+                          [customSearchEnabled]="true"
+                          [active]="
+                            vendor?.bankDetails[i]
+                              ? [
+                                  {
+                                    id: vendor?.bankDetails[i].id,
+                                    text: vendor?.bankDetails[i].bankName
+                                  }
+                                ]
+                              : null
+                          "
+                        ></slct-2>
+                        <a
+                          href="javascript:void(0)"
+                          (click)="openModal(bank, i)"
+                        >
+                          <i
+                            [style.color]="currentTheme?.secondaryColor"
+                            class="icon icon-add-circle ml-2 icon-lg"
+                          ></i
+                        ></a>
+                      </div>
+
+                      <slct-2
+                        *ngIf="bankControls.get('newBank')?.value"
+                        [data]="allBanks"
+                        (selected)="selectBank($event, i)"
+                        [placeholder]="'Search Bank'"
+                        [customSearchEnabled]="true"
+                        [active]="[
+                          {
+                            id: selectedBank.bankId,
+                            text: selectedBank.bankName
+                          }
+                        ]"
+                      ></slct-2>
+                    </div>
+
+                    <div class="col-md-3">
+                      <label for="accountName">Account Name</label>
+                      <input
+                        type="text"
+                        formControlName="accountName"
+                        id="accountName"
+                        class="form-control"
+                        placeholder="Account Name"
+                      />
+                    </div>
+                    <div class="col-md-3 d-flex">
+                      <div>
+                        <label for="accountNumber">Account Number</label>
+                        <input
+                          type="text"
+                          formControlName="accountNumber"
+                          id="accountNumber"
+                          class="form-control"
+                          placeholder="Account Number"
+                        />
+                      </div>
+                      <span class="remove-btn" (click)="removeBank(i)">
+                        <i
+                          class="icon icon-trash icon-lg"
+                          style="padding-top: 24px"
+                        ></i>
+                      </span>
+                    </div>
+                  </div>
+                </ng-container>
+              </ng-container>
+
+              <button
+                class="btn add-btn btn-xs text-white mx-1"
+                (click)="addBank()"
+              >
+                <i class="icon icon-add"></i> Add New Line
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+      <footer *ngIf="(isEditing && vendor) || !isEditing">
+        <div
+          *ngIf="isEditing && vendor.status !== 'Active'"
+          class="form-group mt-5"
+        >
+          <div class="col-md-4">
+            <lnd-switch
+              [value]="vendorForm.get('isActive').value"
+              [text]="'Activate User'"
+              (emittedValue)="activateUser($event)"
+            ></lnd-switch>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button
+            *ngIf="!isLoading; else processing"
+            [disabled]="vendorForm.invalid || isLoading"
+            class="btn btn-xs btn-primary"
+            (click)="submit()"
+          >
+            {{ !isEditing ? "Submit" : "Update" }}
+            <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+          </button>
+
+          <ng-template #processing>
+            <button class="btn btn-xs btn-warning mx-1" disabled>
+              <i class="icon icon-spin icon-spin2"></i> Processing..
+            </button>
+          </ng-template>
+        </div>
+      </footer>
+    </div>
+  </div>
+</div>
+
+<ng-template #bank>
+  <app-bank (close)="closeModal()" (newBank)="newBank($event)"></app-bank>
+</ng-template>

@@ -1,0 +1,92 @@
+header {
+  background-color: #f9f9f9;
+  padding: 40px;
+}
+
+#title {
+  max-width: 41px;
+  padding-bottom: 7px;
+}
+
+#l-badge {
+  padding: 3px;
+  border-radius: 3px;
+  width: 100px;
+  small {
+    font-size: 14px;
+    margin-top: 3px;
+  }
+
+  #dot {
+    width: 9px;
+    height: 9px;
+    margin-right: 4px;
+  }
+}
+
+.done {
+  background-color: #00d8a210;
+  small {
+    color: #00d8a2;
+  }
+  #dot {
+    background-color: #00d8a2;
+  }
+}
+
+.waiting {
+  background-color: #ff960010;
+  small {
+    color: #ff9600;
+  }
+  #dot {
+    background-color: #ff9600;
+  }
+}
+
+.ripple {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  position: relative;
+}
+.ripple::after,
+.ripple::before {
+  content: "";
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #be084e;
+  position: absolute;
+  left: 0;
+  // top: 0;
+  bottom: 5px;
+  animation: animripple 2s linear infinite;
+}
+.ripple::after {
+  animation-delay: 1s;
+}
+
+@keyframes animripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.card-header:first-child {
+  border-radius: 0 !important;
+}
+
+.content {
+  padding: 16px !important;
+}
+
+.icon-lg {
+  font-size: 25px !important;
+}

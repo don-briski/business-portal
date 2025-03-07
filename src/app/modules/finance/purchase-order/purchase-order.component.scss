@@ -1,0 +1,81 @@
+.add {
+  &:hover {
+    background-color: #ff015b !important;
+  }
+}
+
+.dropdown-item {
+  cursor: pointer;
+}
+
+.nav-link {
+  &:hover {
+    color: #545454;
+  }
+}
+
+.nav-item a {
+  margin-bottom: 0;
+}
+
+.single-view {
+  .left {
+    width: 25%;
+    position: fixed;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+    border-right: 2.5px solid #b3b3b3;
+    ul.bill-list {
+      padding: 0px;
+      list-style: none;
+      li {
+        cursor: pointer;
+        padding: 15px 20px;
+        margin-bottom: 2px;
+        border-left: 5px solid #fff;
+        border-radius: 5px;
+        .title {
+          font-size: 14px;
+          font-weight: bold;
+        }
+        .sub-title {
+          font-size: 11px;
+        }
+        &.selected,
+        &:not(:last-child) {
+          border-bottom: 1px solid #ccc;
+        }
+      }
+    }
+  }
+
+  .right {
+    width: 73%;
+    position: relative;
+    left: 28%;
+
+    .paper {
+      .card {
+        box-shadow: none !important;
+        .content {
+          margin-top: 80px;
+
+          .img-container {
+            max-width: 150px;
+          }
+        }
+      }
+    }
+  }
+
+  .w-65 {
+    width: 60%;
+  }
+  .w-10 {
+    width: 10%;
+  }
+}
+
+.items-table th {
+  color: #fff;
+}

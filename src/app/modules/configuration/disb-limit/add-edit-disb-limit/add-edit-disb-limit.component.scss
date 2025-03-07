@@ -1,0 +1,50 @@
+form{
+  margin-top: 20px;
+  div{
+    margin-bottom: 25px;
+
+    &.constraint{
+      border-top: 1px solid var(--border-grey);
+      border-bottom: 1px solid var(--border-grey);
+      margin-top: 25px;
+      padding: 20px 0;
+      color: var(--primary-color);
+      p{
+        margin-top: 10px;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  footer{
+    display: flex;
+    justify-content: flex-end;
+
+    button{
+      background-color: var(--primary-color);
+      color: var(--white);
+    }
+  }
+
+  .threshold{
+    display: flex;
+    align-items: center;
+    slct-2{
+      width: 100%;
+    }
+    input{
+      margin: 0 10px;
+    }
+  }
+
+  .add-threshold-btn-wrapper{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--primary-color);
+
+    button{
+      border: 1px solid var(--primary-color);
+    }
+  }
+}

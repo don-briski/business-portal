@@ -1,0 +1,6 @@
+/.angular/cache
+/node_modules
+/.vs
+/admin
+/diss
+**/.DS_Store

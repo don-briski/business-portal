@@ -1,0 +1,127 @@
+<form [formGroup]="refundForm" (ngSubmit)="onSubmit()">
+  <header class="px-3 py-3 d-flex justify-content-between align-items-center">
+    <h1>Credit Refund</h1>
+    <button
+      type="button"
+      class="close-btn"
+      (click)="close.emit({ creditsRefunded: false })"
+    >
+      <i class="icon icon-close"></i>
+    </button>
+  </header>
+  <hr class="divider" />
+  <section class="px-3">
+    <h3 class="mt-4 refundable-credits-text p-2 text-warning">
+      Max Refundable Credits: {{ ownerInfo?.currency?.currencySymbol
+      }}{{ maxAmount | number: "1.2-2" }}
+    </h3>
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <label for="amt">Amount <b class="text-danger">*</b></label>
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">{{
+              ownerInfo?.currency?.currencySymbol
+            }}</span>
+          </div>
+          <input
+            id="amt"
+            type="text"
+            formControlName="amount"
+            class="form-control"
+            currencyMask
+            [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+            placeholder="Amount"
+          />
+        </div>
+      </div>
+      <div class="col-md-6">
+        <label for="ref">Reference#</label>
+        <input
+          id="ref"
+          type="text"
+          formControlName="reference"
+          class="form-control"
+          placeholder="Reference"
+          readonly
+        />
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <label for="payment-mode"
+          >Payment Mode <b class="text-danger">*</b></label
+        >
+        <slct-2
+          [data]="paymentModes"
+          formControlName="paymentMode"
+          (removed)="onDeselectPMode()"
+          id="payment-mode"
+          [customSearchEnabled]="true"
+          [placeholder]="
+            gettingPModes ? 'Loading Payment Modes...' : 'Select Mode'
+          "
+          [disabled]="gettingPModes"
+        ></slct-2>
+      </div>
+      <div class="col-md-6">
+        <label for="date">Payment Date <b class="text-danger">*</b></label>
+        <input
+        lndInvalidDateChecker
+          id="date"
+          type="date"
+          formControlName="refundDate"
+          class="form-control"
+        />
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-md-6">
+        <label for="paid-through"
+          >Paid Through <b class="text-danger">*</b></label
+        >
+        <account-slct
+          [data]="accounts"
+          (selectedAccount)="onSelect('paidThrough', $event)"
+          [placeholder]="
+            gettingAccs ? 'Loading Accounts...' : 'Select an account'
+          "
+          [disabled]="gettingAccs || !accounts.length"
+        ></account-slct>
+      </div>
+    </div>
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <label>Description</label>
+        <textarea
+          class="form-control"
+          formControlName="transactionDescription"
+          rows="3"
+          placeholder="Enter some text"
+        ></textarea>
+      </div>
+    </div>
+    <div class="row mt-4 mb-5">
+      <div class="col-md-6">
+        <label for="txPin">Transaction Pin <b class="text-danger">*</b></label>
+        <input
+          id="txPin"
+          type="password"
+          formControlName="transactionPin"
+          class="form-control"
+          placeholder="Enter Pin"
+        />
+      </div>
+    </div>
+  </section>
+  <footer class="px-3 mb-5 d-flex justify-content-end">
+    <div *ngIf="!refunding">
+      <button class="btn btn-xs btn-success" [disabled]="refundForm.invalid">
+        Create Refund
+      </button>
+    </div>
+    <button *ngIf="refunding" class="btn btn-warning btn-xs" disabled>
+      <i class="icon icon-spin icon-spin2"></i> Processing...
+    </button>
+  </footer>
+</form>

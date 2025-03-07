@@ -1,0 +1,116 @@
+<section class="p-5" #InvCertPaper>
+  <main class="p-5">
+    <img
+      class="float-right cursor"
+      src="assets/images/close.svg"
+      alt="close button"
+      (click)="activeModal.dismiss()"
+    />
+    <header>
+      <img
+        *ngIf="ownerInformation?.logoUrl"
+        [src]="ownerInformation?.logoUrl"
+        alt="Business Logo"
+        class="img-fluid"
+        width="134"
+      />
+
+      <div class="text-center mt-5">
+        <h1 class="mb-1" [style.color]="currentTheme?.secondaryColor">
+          {{ ownerInformation?.appOwnerName | titlecase }}
+        </h1>
+        <h1>Investment Certificate</h1>
+      </div>
+      <div id="info" class="mt-5 row">
+        <div id="inv-info" class="col-md-4" *ngFor="let info of investmentInfo">
+          <p>{{ info?.title }}</p>
+          <div [ngSwitch]="info?.type">
+            <div *ngSwitchCase="'amount'">
+              <p>{{ info?.value | number : "1.2-2" }}</p>
+            </div>
+            <div *ngSwitchCase="'date'">
+              <p>{{ info?.value | date }}</p>
+            </div>
+            <div *ngSwitchDefault>
+              <p>{{ info?.value }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div id="inv-breakdown" *ngIf="invCertConfig">
+      <h1 class="mb-0">Investment Breakdown</h1>
+
+      <lnd-table
+        [config]="invCertConfig"
+        [headers]="invCertHeaders"
+        [data]="invCertData"
+        [summationData]="summationData"
+      ></lnd-table>
+    </div>
+  </main>
+
+  <ng-container *ngIf="invCertConfig">
+    <div id="total">
+      <span class="d-flex align-items-center">
+        <p class="mr-6">Total (Principal + Interest)</p>
+        <h1>{{ data?.total | number : "1.2-2" }}</h1>
+      </span>
+    </div>
+
+    <div
+      class="termsAndConditions"
+      *ngIf="showTnC && termsnConditions.length > 0"
+    >
+      <p class="f-14 text-dark font-weight-bold mb-3">Terms And Conditions</p>
+      <ol type="i">
+        <li *ngFor="let terms of termsnConditions">{{ terms?.description }}</li>
+      </ol>
+    </div>
+
+    <section class="footer">
+      <div class="info w-75">
+        <p class="f-14 text-dark font-weight-bold">
+          {{ ownerInformation?.appOwnerName }}
+        </p>
+        <p>
+          {{ ownerInformation?.appOwnerEmail }} |
+          {{ ownerInformation?.appOwnerShippingAddress }}
+        </p>
+        <p>
+          &copy; {{ year }} {{ ownerInformation?.appOwnerName }}. All rights
+          reserved.
+        </p>
+      </div>
+      <div
+        class="signatory"
+        *ngIf="data?.investmentCertSetup?.displaySignatoryName"
+      >
+        <div class="border py-1 px-2 rounded">
+          <p class="mb-0">Signed by:</p>
+          <p class="signature">
+            {{ data?.investmentCertSetup?.signatoryName }}
+          </p>
+          <p class="role">{{ data?.investmentCertSetup?.signatoryRole }}</p>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+</section>
+<div class="d-flex mt-4">
+  <button
+    class="btn py-3 px-6 d-flex text-white align-items-center mx-auto print-button"
+    [style.backgroundColor]="currentTheme?.secondaryColor"
+    [style.borderColor]="currentTheme?.secondaryColor"
+    [disabled]="printStatus === 'Processing'"
+    (click)="printCertificate()"
+  >
+    <i
+      *ngIf="printStatus === 'Processing'"
+      class="icon icon-spin icon-spin2 ml-2"
+    ></i>
+    {{ printStatus }}
+    <img src="assets/images/download.svg" alt="download-svg" class="ml-2" />
+  </button>
+</div>

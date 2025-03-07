@@ -1,0 +1,215 @@
+<div class="d-flex justify-content-center pt-6">
+  <p [style.color]="currentTheme.secondaryColor" *ngIf="isLoading">
+    <i class="icon icon-spin icon-spin2"></i> Retrieving Request...
+  </p>
+</div>
+
+<div *ngIf="request" class="dt-customizer__inner">
+  <div class="dt-customizer__header">
+    <!-- Avatar Wrapper -->
+    <div class="dt-avatar-wrapper">
+      <!-- Avatar -->
+      <img
+        class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+        src="assets/images/male-default-profile.png"
+        alt="avatar"
+      />
+
+      <div>
+        <div class="d-flex align-items-center">
+          <span class="mr-2"><h3 class="mb-0">Request Information</h3></span>
+          <span
+            class="badge badge-sm"
+            [ngClass]="{
+              'badge-warning': request.requestApprovalStatus === 'Draft',
+              'badge-approval':
+                request.requestApprovalStatus === 'SentForApproval',
+              'badge-success': request.requestApprovalStatus === 'APPROVED',
+              'badge-redraft': request.requestApprovalStatus === 'ReDraft',
+              'badge-danger': request.requestApprovalStatus === 'Rejected'
+            }"
+          >
+            <div [ngSwitch]="request.requestApprovalStatus">
+              <div *ngSwitchCase="'TREATED'">Closed</div>
+              <div *ngSwitchCase="'REVIEWED'">Opened</div>
+              <div *ngSwitchCase="'APPROVED'">New</div>
+              <div *ngSwitchDefault></div>
+            </div>
+          </span>
+        </div>
+      </div>
+      <!-- /avatar -->
+    </div>
+    <!-- /avatar wrapper -->
+
+    <!-- Close Button -->
+    <button type="button" class="close" (click)="toggleAside()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <!-- /close button -->
+  </div>
+
+  <div class="dt-customizer__body ps-custom-scrollbar">
+    <div class="row">
+      <div class="col-md-12" style="padding: 20px">
+        <ul class="dt-list dt-list-one-second padded-left">
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="mr-5 icon icon-folder-o icon-3x align-self-center text-warning"
+              ></i>
+
+              <div class="media-body">
+                <span class="mb-1 d-block text-light-gray f-12"
+                  >Request Code</span
+                >
+                <h5 class="mb-0">
+                  {{ request?.requestCode }}
+                </h5>
+              </div>
+            </div>
+          </li>
+
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="mr-5 icon icon-user-o icon-3x align-self-center text-warning"
+              ></i>
+
+              <div class="media-body">
+                <span class="mb-1 d-block text-light-gray f-12"
+                  >Requester Name</span
+                >
+                <h5 class="mb-0">
+                  {{ request?.vendorName }}
+                </h5>
+              </div>
+            </div>
+          </li>
+
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="mr-5 icon icon-editor icon-3x align-self-center text-warning"
+              ></i>
+
+              <div class="media-body">
+                <span class="mb-1 d-block text-light-gray f-12"
+                  >Request Name</span
+                >
+                <h5 class="mb-0">
+                  {{ request?.requestName }}
+                </h5>
+              </div>
+            </div>
+          </li>
+
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="mr-5 icon icon-editor icon-3x align-self-center text-warning"
+              ></i>
+
+              <div class="media-body">
+                <span class="mb-1 d-block text-light-gray f-12"
+                  >Final Approval</span
+                >
+                <h5 class="mb-0">
+                  {{ request?.nextApproverName }}
+                </h5>
+              </div>
+            </div>
+          </li>
+
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="mr-5 icon icon-revenue-new icon-3x align-self-center text-warning"
+              ></i>
+
+              <div class="media-body">
+                <span class="mb-1 d-block text-light-gray f-12">Amount</span>
+                <h5 class="mb-0">
+                  {{ request?.totalAmount | number : "1.2-2" }}
+                </h5>
+              </div>
+            </div>
+          </li>
+
+          <li class="dt-list__item">
+            <div class="media">
+              <i
+                class="mr-5 icon icon-editor icon-3x align-self-center text-warning"
+              ></i>
+
+              <div class="media-body">
+                <span class="mb-1 d-block text-light-gray f-12"
+                  >Description</span
+                >
+                <h5 class="mb-0">
+                  {{ request?.description }}
+                </h5>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="dt-card__body">
+        <header>
+          <p><b>Items</b></p>
+          <hr />
+        </header>
+
+        <button
+          (click)="goToJournal()"
+          [style.backgroundColor]="currentTheme.secondaryColor"
+          class="btn btn-xs my-3 text-white"
+          [disabled]="selectedItems.length === 0"
+        >
+          Create Journal
+        </button>
+
+        <table class="table">
+          <thead>
+            <th class="d-flex align-items-center">
+              <span
+                ><input
+                  (change)="onCheckMaster($event.target.checked)"
+                  type="checkbox"
+                  class="checkbox form-control"
+                  [(ngModel)]="masterInputValue"
+              /></span>
+              <span class="ml-1"><small>Select All</small></span>
+            </th>
+            <th>Reference Code</th>
+            <th>Item</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of items">
+              <td>
+                <input
+                  type="checkbox"
+                  class="checkbox form-control"
+                  [checked]="item.selected"
+                  (change)="onCheckChild($event.target.checked, item)"
+                />
+              </td>
+              <td [style.color]="currentTheme.secondaryColor">
+                {{ item?.itemCode }}
+              </td>
+              <td>{{ item.itemName }}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.amount | number : "1.2-2" }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</div>

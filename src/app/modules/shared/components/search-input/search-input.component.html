@@ -1,0 +1,12 @@
+<div class="search">
+  <span class="magnifier"><i class="icon icon-search"></i></span>
+  <input
+    type="text"
+    class="form-control"
+    placeholder="Search Permission"
+    #search
+    (keydown.enter)="searchHandler.emit(search.value)"
+    (keyup)="valueChanges(search.value)"
+  />
+  <button [disabled]="search.value.length === 0" class="btn ml-1" (click)="searchHandler.emit(search.value)"><i class="icon icon-search"></i></button>
+</div>

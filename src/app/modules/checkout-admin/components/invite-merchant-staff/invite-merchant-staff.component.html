@@ -1,0 +1,63 @@
+<section>
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <header class="py-3 px-5 d-flex justify-content-between align-items-center">
+      <h4 class="d-flex align-items-center m-0">
+        <i class="icon icon-email mr-2"></i>
+        <span>Invite Merchant Admin</span>
+      </h4>
+      <button
+        type="button"
+        class="close-btn"
+        aria-label="Close"
+        (click)="onClose()"
+      >
+        <i class="icon icon-close"></i>
+      </button>
+    </header>
+    <hr class="divider m-0" />
+    <p class="px-5 mt-5">
+      This user will receive an email that will allow them create a profile and
+      access the merchant portal.
+    </p>
+    <div class="row mt-5 px-5">
+      <div class="col-md-12">
+        <label for="email" class="font-weight-bold">Email Address</label>
+        <input
+          id="email"
+          placeholder="Enter email address"
+          class="form-control"
+          formControlName="email"
+        />
+      </div>
+    </div>
+    <hr class="divider my-5" />
+    <footer class="px-5 mb-5 d-flex justify-content-end align-items-center">
+      <button
+        type="button"
+        class="btn btn-xs px-6 text-dark mr-4 btn-outline-light"
+        (click)="onClose()"
+        [disabled]="loading ? true : false"
+      >
+        Close
+      </button>
+      <button
+        *ngIf="!loading"
+        class="btn btn-xs btn-primary"
+        [style.borderColor]="theme.secondaryColor"
+        [style.backgroundColor]="theme.secondaryColor"
+        [disabled]="form.invalid"
+      >
+        Invite User
+      </button>
+      <button
+        *ngIf="loading"
+        type="button"
+        class="btn btn-xs text-white"
+        [style.borderColor]="theme.secondaryColor"
+        [style.backgroundColor]="theme.secondaryColor"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Loading...
+      </button>
+    </footer>
+  </form>
+</section>

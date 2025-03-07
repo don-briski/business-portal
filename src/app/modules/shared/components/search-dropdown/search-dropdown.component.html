@@ -1,0 +1,70 @@
+<section
+  class="d-flex"
+  [ngClass]="{
+    'origin-table': addTopRule,
+    'align-items-baseline': displayDropdown && searchValue,
+    'align-items-center': !displayDropdown && !searchValue,
+    'useRelativePosition':useRelativePosition
+  }"
+>
+  <div class="w-100">
+    <div
+      class="w-100 d-flex align-items-center justify-content-between form-control custom-input"
+    >
+      <div class="d-flex align-items-center w-100">
+        <span class="d-flex align-items-center">
+          <i *ngIf="showSearchIconInInput" class="icon icon-search mr-2"></i>
+          <span
+            *ngIf="searchColumn && !searchFocused"
+            class="badge badge-sm mx-2 cursor"
+            (click)="searchInput.focus()"
+            >By: {{ searchColumn }}
+          </span>
+        </span>
+        <input
+          id="dropdown-input"
+          #searchInput
+          type="text"
+          [ngClass]="searchColumn ? 'border-none' : 'form-control'"
+          [placeholder]="placeholder"
+          (focus)="toggleDropdown()"
+          (focusout)="toggleDropdown()"
+          [(ngModel)]="searchValue"
+          (change)="onValueChange($event)"
+        />
+      </div>
+      <span
+        *ngIf="searchColumn && !searchFocused"
+        class="clear"
+        (click)="resetInput()"
+        >x</span
+      >
+    </div>
+
+    <div
+      id="dropdown"
+      class="shadow"
+      [ngClass]="displayDropdown && searchValue ? 'd-block' : 'd-none'"
+    >
+      <div
+        class="dropdown-list mb-1 py-2 pl-4 cursor"
+        *ngFor="let column of searchColumns"
+        (click)="setSelectedColumn(column)"
+      >
+        <i class="icon icon-search icon-lg"></i>
+        <span class="mx-2">{{ searchValue }}</span>
+        <span class="badge badge-sm">by: {{ column }}</span>
+      </div>
+    </div>
+  </div>
+
+  <button
+    class="btn btn-sm text-white ml-3"
+    type="button"
+    [disabled]="!searchColumn || !searchValue"
+    [style.background]="currentTheme.secondaryColor"
+    (click)="emitSelectedColumn(true)"
+  >
+    <i class="icon icon-search"></i>
+  </button>
+</section>

@@ -1,0 +1,556 @@
+<form
+  *ngIf="user.permission.includes('View Risk Engine Configuration')"
+  class="checkout-config p-6"
+  [formGroup]="form"
+  (ngSubmit)="submit()"
+>
+  <div
+    *ngIf="fetching"
+    [style.color]="currentTheme?.secondaryColor"
+    class="d-flex justify-content-center"
+  >
+    <span> <i class="icon icon-spin icon-spin2"></i> Fetching Config... </span>
+  </div>
+  <div class="d-flex justify-content-end" *ngIf="!fetching">
+    <button
+      *ngIf="
+        user.permission.includes('Edit Risk Engine Configuration') &&
+        (mode === riskAssessmentModeEnum.View ||
+          mode === riskAssessmentModeEnum.None)
+      "
+      class="btn btn-sm px-6 text-white mr-1 mb-5"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      (click)="
+        onModeChange(
+          mode === riskAssessmentModeEnum.None
+            ? riskAssessmentModeEnum.Configure
+            : riskAssessmentModeEnum.Edit
+        )
+      "
+    >
+      {{ haveConfig ? "Edit" : "Configure" }}
+    </button>
+  </div>
+  <no-data
+    *ngIf="mode === riskAssessmentModeEnum.None && !fetching"
+    title="Not Yet Configured"
+    desc="Click on the button above to set the configuration"
+  ></no-data>
+  <ng-container *ngIf="!fetching && mode !== riskAssessmentModeEnum.None">
+    <div class="shadow px-4 pb-6 rounded">
+      <lnd-accordion
+        accordionId="ccfa"
+        [title]="
+          mode === riskAssessmentModeEnum.View
+            ? 'Credit File Assessment'
+            : 'Configure Credit File Assessment'
+        "
+        [open]="true"
+      >
+        <div class="mt-5">
+          <p class="subtitle">
+            These set of parameters guides the risk engine when it is
+            determining how recent a customer's credit information is and the
+            decision to take based on the outcome of the assessment.
+          </p>
+
+          <div id="tips" class="mb-6">
+            <p
+              [style.color]="currentTheme?.secondaryColor"
+              class="text-underline"
+            >
+              Hints
+            </p>
+
+            <ul>
+              <li>
+                <b>Credit file recency threshold:</b>
+                <span class="hint-color">
+                  The maximum days allowed since the customer's credit file
+                  obtained from a credit bureau agency was last updated</span
+                >
+              </li>
+              <li>
+                <b>Customer profile recency threshold:</b>
+                <span class="hint-color">
+                  The maximum days allowed since the customer's Credit Profile
+                  on Checkout by Lendastack was last updated</span
+                >
+              </li>
+
+              <li>
+                <b>Credit History threshold: </b>
+                <span class="hint-color">
+                  This setting determines the number of years the system will
+                  consider when spooling loans from the customer's credit
+                  history.</span
+                >
+              </li>
+
+              <li>
+                <b>Loan recency (Years): </b>
+                <span class="hint-color">
+                  Any loan older than this value will not be considered when
+                  determining the highest and total installment value.</span
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="form-row">
+            <div
+              *ngIf="
+                mode === riskAssessmentModeEnum.Configure ||
+                mode === riskAssessmentModeEnum.Edit
+              "
+              class="col-md-6"
+            >
+              <label for="cfrt">Credit file recency threshold (Days)</label>
+              <input
+                id="cfrt"
+                type="number"
+                class="form-control"
+                placeholder="Set number of Days"
+                formControlName="creditFileRecencyThresholdInDays"
+              />
+            </div>
+            <div *ngIf="mode === riskAssessmentModeEnum.View" class="col-md-6">
+              <p class="title-text mb-1">Credit file recency threshold</p>
+              <p class="subtitle-text">
+                {{ config.creditFileRecencyThresholdInDays }} Day{{
+                  config.creditFileRecencyThresholdInDays > 1 ? "s" : ""
+                }}
+              </p>
+            </div>
+            <div
+              *ngIf="
+                mode === riskAssessmentModeEnum.Configure ||
+                mode === riskAssessmentModeEnum.Edit
+              "
+              class="col-md-6"
+            >
+              <label for="cprt">Credit profile recency threshold (Days)</label>
+              <input
+                id="cprt"
+                type="number"
+                class="form-control"
+                placeholder="Set number of Days"
+                formControlName="creditProfileRecencyThresholdInDays"
+              />
+            </div>
+            <div *ngIf="mode === riskAssessmentModeEnum.View" class="col-md-6">
+              <p class="title-text mb-1">Credit profile recency threshold</p>
+              <p class="subtitle-text">
+                {{ config.creditProfileRecencyThresholdInDays }} Day{{
+                  config.creditProfileRecencyThresholdInDays > 1 ? "s" : ""
+                }}
+              </p>
+            </div>
+            <div
+              *ngIf="
+                mode === riskAssessmentModeEnum.Configure ||
+                mode === riskAssessmentModeEnum.Edit
+              "
+              class="col-md-6 mt-6"
+            >
+              <label for="chrt">Credit History threshold (Years)</label>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Set number of Days"
+                formControlName="creditHistoryThresholdInYears"
+              />
+            </div>
+            <div *ngIf="mode === riskAssessmentModeEnum.View" class="col-md-6">
+              <p class="title-text mb-1">Credit History threshold</p>
+              <p class="subtitle-text">
+                {{ config.creditHistoryThresholdInYears }} Year{{
+                  config.creditHistoryThresholdInYears > 1 ? "s" : ""
+                }}
+              </p>
+            </div>
+            <div
+              *ngIf="
+                mode === riskAssessmentModeEnum.Configure ||
+                mode === riskAssessmentModeEnum.Edit
+              "
+              class="col-md-6 mt-6"
+            >
+              <label>Loan Recency (Years)</label>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Set number of Years"
+                formControlName="loanRecencyYearsForInstallmentMetrics"
+              />
+            </div>
+            <div *ngIf="mode === riskAssessmentModeEnum.View" class="col-md-6">
+              <p class="title-text mb-1">Loan Recency</p>
+              <p class="subtitle-text">
+                {{ config.loanRecencyYearsForInstallmentMetrics }} Year{{
+                  config.loanRecencyYearsForInstallmentMetrics > 1 ? "s" : ""
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </lnd-accordion>
+    </div>
+
+    <div class="shadow px-4 pb-6 rounded">
+      <lnd-accordion
+        accordionId="closed-loans"
+        [title]="
+          mode === riskAssessmentModeEnum.View
+            ? 'Closed Loans'
+            : 'Manage Closed Loans'
+        "
+        [open]="true"
+      >
+        <div class="mt-5">
+          <p class="subtitle">
+            The parameters below are used to guide the risk engine when dealing
+            with closed loans encountered in a customer's credit file from the
+            credit bureau agency
+          </p>
+
+          <div id="tips" class="mb-6">
+            <p
+              [style.color]="currentTheme?.secondaryColor"
+              class="text-underline"
+            >
+              Hints
+            </p>
+
+            <ul>
+              <li>
+                <b>Closed loan age limit:</b>
+                <span class="hint-color">
+                  Closed loan age limit is used to set the maximum age in days
+                  that the start date of a closed loan should be to be
+                  considered during the customer's risk assessment. Any closed
+                  loan that is older that the limit set in days is not
+                  considered during risk assessment</span
+                >
+              </li>
+            </ul>
+          </div>
+
+          <div class="form-row">
+            <div
+              *ngIf="
+                mode === riskAssessmentModeEnum.Configure ||
+                mode === riskAssessmentModeEnum.Edit
+              "
+              class="col-md-6"
+            >
+              <label>Closed loan age limit</label>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Set number of Days"
+                formControlName="closedLoanAgeThresholdInDays"
+              />
+            </div>
+            <div *ngIf="mode === riskAssessmentModeEnum.View" class="col-md-6">
+              <p class="title-text mb-1">Closed loan age limit</p>
+              <p class="subtitle-text">
+                {{ config.closedLoanAgeThresholdInDays }} Day{{
+                  config.closedLoanAgeThresholdInDays > 1 ? "s" : ""
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </lnd-accordion>
+    </div>
+
+    <div class="shadow px-4 rounded">
+      <lnd-accordion
+        accordionId="open-loans"
+        [title]="
+          mode === riskAssessmentModeEnum.View
+            ? 'Open Loans Filter'
+            : 'Configure Open Loans Filter'
+        "
+        [open]="true"
+      >
+        <div class="mt-5">
+          <p class="subtitle">
+            The parameters below are used to guide the risk engine when dealing
+            with open loans encountered in a customer's credit file from the
+            credit bureau agency
+          </p>
+
+          <div id="tips" class="mb-6">
+            <p
+              [style.color]="currentTheme?.secondaryColor"
+              class="text-underline"
+            >
+              Hints
+            </p>
+
+            <ul>
+              <li>
+                <b>Product Tenor:</b>
+                <span class="hint-color">
+                  Include the tenor iterations of the product name that should
+                  not be considered during the customer's risk assessment.</span
+                >
+              </li>
+
+              <li>
+                <b>Product Cycle:</b>
+                <span class="hint-color">
+                  Select the relative frequency of the product tenors that will
+                  be exempted during the customer's risk assessment.</span
+                >
+              </li>
+
+              <li>
+                <b>Product Type:</b>
+                <span class="hint-color">
+                  Type in the name of the product you want to be filtered out of
+                  the customer's credit file.</span
+                >
+              </li>
+            </ul>
+          </div>
+
+          <button
+            *ngIf="
+              mode === riskAssessmentModeEnum.Configure ||
+              mode === riskAssessmentModeEnum.Edit
+            "
+            class="btn btn-primary mb-6"
+            type="button"
+            (click)="addFilter()"
+          >
+            Add Filter
+          </button>
+          <div
+            *ngIf="
+              mode === riskAssessmentModeEnum.Configure ||
+              mode === riskAssessmentModeEnum.Edit
+            "
+            formArrayName="openLoanFilter"
+          >
+            <ng-container
+              *ngFor="let control of openLoanFilters().controls; let i = index"
+            >
+              <div class="form-row mb-6" [formGroup]="control">
+                <div class="col-md-3">
+                  <label>Attribute</label>
+                  <slct-2
+                    [data]="attributes"
+                    [customSearchEnabled]="true"
+                    formControlName="attribute"
+                    placeholder="Select Attribute"
+                  ></slct-2>
+                </div>
+
+                <div class="col-md-5">
+                  <label>Operator</label>
+                  <slct-2
+                    [data]="operators"
+                    [customSearchEnabled]="true"
+                    formControlName="operator"
+                    placeholder="Select Operator"
+                  ></slct-2>
+                </div>
+
+                <div class="col-md-4">
+                  <label>Value</label>
+                  <div class="d-flex align-items-center">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Enter Value"
+                      formControlName="value"
+                    />
+                    <i
+                      *ngIf="openLoanFilters().controls.length > 1"
+                      class="icon icon-trash text-danger ml-4 cursor"
+                      (click)="removeFilter(i)"
+                    ></i>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <div *ngIf="mode === riskAssessmentModeEnum.View" class="row">
+            <ng-container *ngFor="let item of openLoanFilter">
+              <div class="col-md-4">
+                <p class="title-text mb-1">Attribute</p>
+                <p class="subtitle-text">
+                  {{ item.attribute }}
+                </p>
+              </div>
+              <div class="col-md-4">
+                <p class="title-text mb-1">Operator</p>
+                <p class="subtitle-text">
+                  {{ item.operator }}
+                </p>
+              </div>
+              <div class="col-md-4">
+                <p class="title-text mb-1">Value</p>
+                <p class="subtitle-text">
+                  {{ item.value }}
+                </p>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+      </lnd-accordion>
+    </div>
+
+    <div class="shadow px-4 pb-6 rounded">
+      <lnd-accordion
+        accordionId="loan-ex"
+        title="Loan Exclusions"
+        [open]="true"
+      >
+        <div class="mt-5">
+          <p
+            *ngIf="
+              mode === riskAssessmentModeEnum.Configure ||
+              mode === riskAssessmentModeEnum.Edit
+            "
+            class="subtitle"
+          >
+            Update the loan types to be excluded for this configuration
+          </p>
+
+          <div id="tips" class="mb-6">
+            <p
+              [style.color]="currentTheme?.secondaryColor"
+              class="text-underline"
+            >
+              Hints
+            </p>
+
+            <ul>
+              <li>
+                <b>External KYC Check:</b>
+                <span class="hint-color">
+                  Connect to external system for KYC verification</span
+                >
+              </li>
+
+              <li>
+                <b>Excluded loan products: </b>
+                <span class="hint-color">
+                  {{
+                    mode === riskAssessmentModeEnum.Configure ||
+                    mode === riskAssessmentModeEnum.Edit
+                      ? "Enter a comma separated list of loan products you want to be included in the exception list. "
+                      : ""
+                  }}Customers who have any of the checked products will be
+                  automatically declined from getting a facility through
+                  Checkout by Lendastack</span
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="row" *ngIf="mode === riskAssessmentModeEnum.View">
+            <div class="col-md-4">
+              <p class="title-text mb-1">Run KYC Check</p>
+              <p class="subtitle-text">
+                {{ config.runKycCheck ? "On" : "Off" }}
+              </p>
+            </div>
+            <div class="col-md-6">
+              <p class="title-text mb-1">Loan Type Exceptions</p>
+              <span class="d-flex align-items-center flex-wrap">
+                <span
+                  *ngFor="let item of config.loanTypeExceptions"
+                  [style.backgroundColor]="
+                    getLightenedColor(currentTheme?.primaryColor)
+                  "
+                  [style.color]="currentTheme?.primaryColor"
+                  class="badge badge-pill my-1 mr-1"
+                  >{{ item }}</span
+                >
+              </span>
+            </div>
+          </div>
+          <div
+            *ngIf="
+              mode === riskAssessmentModeEnum.Configure ||
+              mode === riskAssessmentModeEnum.Edit
+            "
+            class="d-flex flex-column justify-content-center"
+          >
+            <div class="mb-5">
+              <lnd-switch
+                [value]="form.value.runKYCCheck"
+                text="External KYC Check"
+                (emittedValue)="toggleSwitch($event, 'runKYCCheck')"
+              ></lnd-switch>
+            </div>
+
+            <div
+              *ngIf="
+                mode === riskAssessmentModeEnum.Configure ||
+                mode === riskAssessmentModeEnum.Edit
+              "
+              class="d-flex align-items-center mb-5"
+            >
+              <input
+                [value]="form.value.loanTypeExceptions"
+                type="text"
+                class="form-control mr-3"
+                placeholder="Loan products separated by comma"
+                #loanExcluded
+              />
+              <button
+                type="button"
+                class="btn add-btn text-white mt-0"
+                (click)="excludeLoans(loanExcluded.value)"
+              >
+                Exclude
+              </button>
+            </div>
+
+            <div
+              *ngIf="
+                mode === riskAssessmentModeEnum.Configure ||
+                mode === riskAssessmentModeEnum.Edit
+              "
+              class="d-flex flex-wrap align-items-center mb-5"
+            >
+              <span
+                class="badge badge-pill badge-xs badge-warning mr-3 mb-3 px-3"
+                *ngFor="let loan of loansExcluded"
+                >{{ loan }}</span
+              >
+            </div>
+          </div>
+        </div>
+      </lnd-accordion>
+    </div>
+    <ng-container
+      *ngIf="
+        user.permission.includes('Edit Risk Engine Configuration') &&
+        (mode === riskAssessmentModeEnum.Configure ||
+          mode === riskAssessmentModeEnum.Edit)
+      "
+    >
+      <button
+        class="btn btn-danger mt-6 mr-3"
+        [disabled]="isLoading"
+        (click)="onModeChange(riskAssessmentModeEnum.View)"
+      >
+        Cancel
+      </button>
+      <button
+        class="btn mt-6"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        type="submit"
+        [disabled]="!form.valid"
+      >
+        {{ isLoading ? "Processing..." : "Update" }}
+        <i *ngIf="isLoading" class="icon icon-spin2 icon-spin"></i>
+      </button>
+    </ng-container>
+  </ng-container>
+</form>

@@ -1,0 +1,30 @@
+<div>
+  <p class="param-text">
+    <i *ngIf="hasMinChars" class="icon icon-circle-check mr-2 text-success"></i
+    ><i *ngIf="!hasMinChars" class="icon icon-close-circle mr-2"></i>Length
+    greater than or equal to 8 characters
+  </p>
+  <p class="param-text">
+    <i *ngIf="hasUppercase" class="icon icon-circle-check mr-2 text-success"></i
+    ><i *ngIf="!hasUppercase" class="icon icon-close-circle mr-2"></i> Upper
+    case character
+  </p>
+  <p class="param-text">
+    <i *ngIf="hasLowercase" class="icon icon-circle-check mr-2 text-success"></i
+    ><i *ngIf="!hasLowercase" class="icon icon-close-circle mr-2"></i>Lower case
+    character
+  </p>
+  <p class="param-text">
+    <i *ngIf="hasNumber" class="icon icon-circle-check mr-2 text-success"></i
+    ><i *ngIf="!hasNumber" class="icon icon-close-circle mr-2"></i>Numeric
+    character
+  </p>
+  <p class="param-text">
+    <i
+      *ngIf="hasSpecialChar"
+      class="icon icon-circle-check mr-2 text-success"
+    ></i
+    ><i *ngIf="!hasSpecialChar" class="icon icon-close-circle mr-2"></i>Special
+    character
+  </p>
+</div>

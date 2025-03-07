@@ -1,0 +1,102 @@
+<ng-container
+  *ngIf="
+    !isSingleView && user?.permission?.includes('View Invoice');
+    else singleView
+  "
+>
+  <header class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Invoices</h1>
+
+    <a
+      *ngIf="user?.permission?.includes('Create Invoice')"
+      class="btn btn-primary mr-2 text-white"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [routerLink]="['/finance/invoices/create']"
+      routerLinkActive="router-link-active"
+      href="javascript:void(0)"
+    >
+      <i class="icon icon-add-circle mr-2"></i>Add New</a
+    >
+  </header>
+
+  <ul
+    id="active-div"
+    class="card-header-pills nav nav-pill justify-content-center mb-2"
+    role="tablist"
+  >
+    <li class="nav-item">
+      <a
+        id="nav-open"
+        class="nav-link pool-nav active-tab"
+        href="javascript:void(0)"
+        (click)="switchViews('open')"
+      >
+        Open
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        id="nav-closed"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="switchViews('closed')"
+      >
+        Closed
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        id="nav-all"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="switchViews('all')"
+      >
+        All
+      </a>
+    </li>
+  </ul>
+
+  <div class="dt-card w-100">
+    <div class="dt-card__body">
+      <div>
+        <lnd-table
+          [isLoading]="isLoading"
+          [config]="invoiceTableConfig"
+          [pagination]="pagination"
+          [headers]="invoiceTableHeaders"
+          [data]="invoiceTableData"
+          [filters]="filterStatuses"
+          [selectedFilters]="selectedFilters"
+          [searchColumns]="pagination?.searchColumns"
+          (retrieveRowDetails)="viewInvoice($event)"
+          (paginationChange)="getInvoices($event)"
+          (searchParams)="getInvoices($event)"
+          (filter)="getInvoices($event[0])"
+        ></lnd-table>
+      </div>
+    </div>
+  </div>
+</ng-container>
+
+<ng-template #singleView>
+  <app-invoice
+    [user]="user"
+    [invoices]="invoices"
+    [selectedInvoiceId]="selectedInvoiceId"
+    [currentTheme]="currentTheme"
+    (closeInvView)="closeInvoice()"
+    (fetchInvoices)="getInvoices()"
+  ></app-invoice>
+</ng-template>
+
+<ng-template #financePayment>
+  <fin-payment
+    [invoiceDetails]="selectedInvoice"
+    [user]="user"
+    paymentType="Invoice"
+    (closeModal)="closeModal()"
+    (fetchData)="getInvoices()"
+  ></fin-payment>
+</ng-template>

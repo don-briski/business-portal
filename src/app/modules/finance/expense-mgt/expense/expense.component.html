@@ -1,0 +1,447 @@
+<div class="wrapper d-flex">
+  <div class="sidebar pr-4">
+    <header
+      *ngIf="!fetchingExpense"
+      class="d-flex align-items-center justify-content-between mb-3"
+    >
+      <span><h1 class="dt-page__title mb-0">Expense</h1></span>
+
+      <span class="float-right">
+        <button
+          *ngIf="user?.permission?.includes('Create Expense')"
+          class="btn btn-sm py-2 btn-primary mr-2 text-white"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [routerLink]="['/finance/expenses/create']"
+          routerLinkActive="router-link-active"
+          href="javascript:void(0)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New
+        </button>
+      </span>
+    </header>
+
+    <div class="body" *ngIf="!fetchingExpense">
+      <div class="card">
+        <div class="card-body p-0">
+          <ul class="expense-list">
+            <li
+              *ngFor="let expense of expenses; let i = index"
+              class="border-bottom px-2"
+              (click)="showExpenseInfo(expense?.expenseId)"
+              [ngStyle]="{
+                'border-left':
+                  expense?.expenseId === selectedExpense?.expenseId ||
+                  expense.hover
+                    ? hoverStyle
+                    : ''
+              }"
+              (mouseover)="expense.hover = true"
+              (mouseleave)="expense.hover = false"
+            >
+              <span
+                class="d-flex justify-content-between align-items-center title w-100"
+              >
+                <span>{{ expense.expenseCode }}</span>
+                <span
+                  >{{ currency }}
+                  {{ expense?.totalAmount | number : "1.2-2" }}</span
+                >
+              </span>
+              <span
+                class="d-flex justify-content-between align-items-center sub-title mt-2 w-100"
+              >
+                <span>{{
+                  expense?.createdAt | customDatePipe : "DD-MMM-YY"
+                }}</span>
+                <span
+                  class="badge badge-sm"
+                  [ngClass]="{
+                    'badge-warning': expense.status === 'Draft',
+                    'badge-approval': expense.status === 'SentForApproval',
+                    'badge-success': expense.status === 'Posted',
+                    'badge-danger': expense.status === 'Rejected',
+                    'badge-redraft': expense.status === 'ReDraft'
+                  }"
+                  >{{
+                    expense?.status === "SentForApproval"
+                      ? "Awaiting Approval"
+                      : expense?.status
+                  }}
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="main-content">
+    <ng-container *ngIf="!fetchingExpense">
+      <header class="card mb-3">
+        <div class="card-body">
+          <div class="float-right">
+            <button
+              *ngIf="
+                selectedExpense?.status === 'SentForApproval' &&
+                user?.permission?.includes('Approve Expense')
+              "
+              class="btn btn-xs btn-review"
+              (click)="openModal(approval)"
+            >
+              Review Request
+            </button>
+            <button
+              class="btn btn-xs btn-primary"
+              (click)="printExpense(selectedExpense?.customer)"
+            >
+              {{ printStatus }}
+              <i
+                *ngIf="printStatus === 'Processing'"
+                class="icon icon-spin icon-spin2"
+              ></i>
+            </button>
+            <button
+              *ngIf="
+                user?.permission?.includes('Create Expense') &&
+                selectedExpense?.status === 'Posted'
+              "
+              class="btn btn-xs clone-btn"
+              (click)="cloneExpense()"
+            >
+              Clone
+            </button>
+            <button
+              *ngIf="
+                user?.permission?.includes('Edit Expense') &&
+                (selectedExpense?.status === 'ReDraft' ||
+                  selectedExpense?.status === 'Draft')
+              "
+              [routerLink]="
+                '/finance/expenses/edit/' + selectedExpense?.expenseId
+              "
+              class="btn btn-xs btn-light"
+            >
+              Edit
+            </button>
+            <button class="btn btn-xs btn-outline-dark" (click)="close()">
+              Close
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div
+        id="tabs"
+        class="d-flex justify-content-between align-items-center py-2"
+        style="padding-left: 30px"
+      >
+        <ul
+          id="active-div"
+          class="card-header-pills nav nav-pill justify-content-center align-items-center"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              id="nav-overview"
+              class="nav-link pool-nav active-tab"
+              data-toggle="tab"
+              href="#tab-overview"
+              role="tab"
+              aria-controls="tab-overview"
+              aria-selected="false"
+              (click)="switchTabs('overview')"
+              >Overview</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-comments"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-comments"
+              role="tab"
+              aria-controls="tab-comments"
+              aria-selected="false"
+              (click)="switchTabs('comments')"
+              >Comments</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-activity"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-activity"
+              role="tab"
+              aria-controls="tab-activity"
+              aria-selected="false"
+              (click)="switchTabs('activity')"
+              >Activity Logs</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-files"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-files"
+              role="tab"
+              aria-controls="tab-files"
+              aria-selected="false"
+              (click)="switchTabs('files')"
+              >Files</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="tab-content">
+        <div id="tab-overview" class="tab-pane active show">
+          <div class="paper p-5">
+            <div class="card" #expensePaper>
+              <div class="card-body">
+                <div
+                  class="card-header d-flex justify-content-between"
+                  style="background-color: #fff"
+                >
+                  <lnd-ribbon [status]="selectedExpense?.status"></lnd-ribbon>
+                  <header class="d-flex justify-content-between p-4">
+                    <div>
+                      <span>
+                        <span class="mr-5">
+                          {{ selectedExpense?.createdAt | date : "longDate" }}
+                          &nbsp;
+                          {{ selectedExpense?.createdAt | date : "shortTime" }}
+                        </span>
+                        <span>
+                          {{ "Expense Created For " + currency }}
+                          {{ selectedExpense?.totalAmount | number : "1.2-2" }}
+                          By
+                          {{ selectedExpense?.createdBy }}
+                        </span>
+                      </span>
+                    </div>
+                  </header>
+                </div>
+
+                <div class="basic-info d-flex flex-wrap my-5">
+                  <div class="p-4" style="width: 33.33%">
+                    <p class="font-weight-light">Expense Amount</p>
+                    <p class="text-danger val">
+                      {{ currency }}
+
+                      {{ selectedExpense.totalAmount | number : "1.2-2" }}
+                      <span
+                        class="font-weight-light"
+                        style="font-size: 14px; color: #545454"
+                      >
+                        on {{ selectedExpense.date | date : "fullDate" }}
+                      </span>
+                    </p>
+                  </div>
+
+                  <div class="p-4" style="width: 33.33%">
+                    <p class="font-weight-light">Paid Through</p>
+                    <p class="val">
+                      {{ selectedExpense.paidThroughAccount }}
+                    </p>
+                  </div>
+
+                  <div class="p-4" style="width: 33.33%">
+                    <p
+                      *ngIf="selectedExpense.reference"
+                      class="font-weight-light"
+                    >
+                      Reference #
+                    </p>
+                    <p class="val">{{ selectedExpense.reference }}</p>
+                  </div>
+
+                  <div
+                    *ngIf="selectedExpense.customer"
+                    class="p-4"
+                    style="width: 33.33%"
+                  >
+                    <p class="font-weight-light">Customer</p>
+                    <p class="val">{{ selectedExpense.customer }}</p>
+                  </div>
+
+                  <div
+                    *ngIf="selectedExpense.vendor"
+                    class="p-4"
+                    style="width: 33.33%"
+                  >
+                    <p class="font-weight-light">Paid To</p>
+                    <p class="val">{{ selectedExpense.vendor }}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <header class="d-flex p-3 justify-content-between">
+                    <p class="font-weight-bold mb-0">Expense Account</p>
+                    <p class="font-weight-bold mb-0">Amount</p>
+                  </header>
+                  <div *ngFor="let line of selectedExpense.expenseLines">
+                    <div class="p-3 border-top">
+                      <div class="d-flex justify-content-between">
+                        <div>
+                          <p class="mb-0">
+                            {{ line?.expenseAccount?.name }}
+                          </p>
+                        </div>
+
+                        <div class="text-right">
+                          <p class="mb-0">
+                            {{ currency }}{{ line?.amount | number : "1.2-2" }}
+                          </p>
+                          <p *ngIf="line.tax" class="font-weight-light mb-0">
+                            {{ line?.tax?.name }} ({{
+                              (line?.tax?.value / line?.amount) * 100
+                            }}%) {{ currency
+                            }}{{ line?.tax?.value | number : "1.2-2" }}
+                          </p>
+                        </div>
+                      </div>
+                      <p *ngIf="line.notes" class="font-weight-light mb-0">
+                        {{ line?.notes }}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="d-flex p-3 border-top justify-content-between">
+                    <div>
+                      <p>Sub Total</p>
+                      <small>(Tax Exclusive)</small>
+                    </div>
+
+                    <div class="text-right">
+                      <p>
+                        {{ currency
+                        }}{{ selectedExpense.totalAmount | number : "1.2-2" }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div
+                    class="d-flex p-3 justify-content-between"
+                    style="background-color: gainsboro"
+                  >
+                    <div>
+                      <p>Expense Total</p>
+                    </div>
+
+                    <div class="text-right">
+                      <p>
+                        {{ currency
+                        }}{{ selectedExpense.totalAmount | number : "1.2-2" }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-comments" class="tab-pane">
+          <div class="p-5 paper">
+            <div class="card">
+              <table
+                class="table table-striped mb-0"
+                *ngIf="selectedExpense?.comments.length > 0"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th class="text-uppercase" scope="col">Username</th>
+                    <th class="text-uppercase" scope="col">Comment</th>
+                    <th class="text-uppercase" scope="col">Date Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of selectedExpense?.comments">
+                    <td *ngIf="item?.comment">{{ item?.name }}</td>
+                    <td *ngIf="item?.comment">{{ item?.comment }}</td>
+                    <td *ngIf="item?.comment">
+                      {{ item?.dateCreated | customDatePipe }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <no-data
+                *ngIf="selectedExpense?.comments.length === 0"
+                [currentTheme]="currentTheme"
+                [title]="'No Comments'"
+              ></no-data>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-activity" class="tab-pane">
+          <div class="p-5">
+            <div class="card">
+              <table
+                *ngIf="activityLogs.length > 0"
+                class="table mb-0 table-striped"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Activity</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of activityLogs">
+                    <td [style.color]="currentTheme?.secondaryColor">
+                      {{ row?.relatedObjectInitiatorCode }}
+                    </td>
+                    <td>{{ row?.activityDescription }}</td>
+                    <td>
+                      {{ row?.activityDate | customDatePipe }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <no-data
+                *ngIf="activityLogs.length === 0"
+                [currentTheme]="currentTheme"
+                [title]="'No Comments'"
+              ></no-data>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-files" class="tab-pane w-100">
+          <lnd-uploaded-files
+            [files]="selectedExpense.files"
+          ></lnd-uploaded-files>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="fetchingExpense">
+      <div class="d-flex justify-content-center">
+        <p [style.color]="currentTheme.secondaryColor" class="text-center">
+          <span>Retrieving Expense...</span>
+          <i class="icon icon-spin icon-spin2"></i>
+        </p>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [isLoading]="loading"
+    [comments]="selectedExpense?.comments"
+    [isLoading]="loading"
+    feature="expense"
+    [canApprove]="user?.permission?.includes('Approve Expense')"
+    (sendPayload)="submit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>

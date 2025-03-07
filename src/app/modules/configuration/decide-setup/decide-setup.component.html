@@ -1,0 +1,263 @@
+<form
+  *ngIf="setupForm"
+  [formGroup]="setupForm"
+  (ngSubmit)="submit()"
+  class="setupForm"
+>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <p class="mb-0">
+        Decide is currently
+
+        <span
+          class="badge badge-pill badge-success"
+          *ngIf="decideInfo?.isActive"
+          >Active</span
+        >
+        <span
+          class="badge badge-pill badge-danger"
+          *ngIf="!decideInfo?.isActive"
+          >Inactive</span
+        >
+      </p>
+    </div>
+
+    <div id="decide-balance">
+      <span *ngIf="decideWalletBalance" id="balance"
+        >{{ currencySymbol }}{{ decideWalletBalance | number: "1.2-2" }}</span
+      >
+      <span
+        (click)="initiateDecideTopupProcess(topup)"
+        id="btn"
+        [style.background-color]="currentTheme.secondaryColor"
+        >Topup</span
+      >
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="state"
+          >Status
+          <ng-template #tipStatus
+            >When <span class="text-success">active</span> bank statements would
+            be analized<br />
+          </ng-template>
+          <i
+            class="icon icon-question-circle mx-1"
+            placement="right"
+            [ngbTooltip]="tipStatus"
+          ></i
+        ></label>
+        <slct-2
+          [data]="activeStates"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Status'"
+          formControlName="isactive"
+        ></slct-2>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="state"
+          >Trigger
+          <ng-template #tipTrigger
+            >When set to <span class="text-success">Manual</span> bank
+            statements analysis would have to be triggered manually <br />
+          </ng-template>
+          <i
+            class="icon icon-question-circle mx-1"
+            placement="right"
+            [ngbTooltip]="tipTrigger"
+          ></i
+        ></label>
+        <slct-2
+          [data]="triggerStates"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Trigger'"
+          formControlName="triggerObj"
+        ></slct-2>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-md-6 my-3">
+      <input
+        type="checkbox"
+        formControlName="autoapprove"
+        [checked]="setupForm.get('autoapprove')?.value"
+      />
+      Auto-Approve
+      <ng-template #tipContent
+        >This Option Approves Loans Without Waiting For Users(Staff)<br />
+      </ng-template>
+      <i
+        class="icon icon-question-circle mx-1"
+        placement="top"
+        [ngbTooltip]="tipContent"
+      ></i>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-md-12 mb-3">
+      <p>Approval Basis</p>
+
+      <table
+        class="table mt-5 table-bordered table-sm shadow-sm p-3 bg-white rounded"
+      >
+        <thead>
+          <th>
+            Criteria
+            <ng-template #tipCriteria>
+              <span>(CA) - Cashflow Analysis</span><br />
+              <span>(IA) - Income Analysis</span><br />
+              <span>(SA) - Spend Analysis</span><br />
+            </ng-template>
+            <i
+              class="icon icon-question-circle mx-1"
+              placement="right"
+              [ngbTooltip]="tipCriteria"
+            ></i>
+          </th>
+          <th>Comparator</th>
+          <th>Value</th>
+        </thead>
+
+        <tbody formArrayName="autoApproveCriteria">
+          <ng-container *ngFor="let controls of criteriaLines().controls">
+            <tr [formGroup]="controls">
+              <td style="width: 250px">
+                <slct-2
+                  [data]="criterias"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Search Criteria'"
+                  formControlName="keyVal"
+                ></slct-2>
+              </td>
+
+              <td style="width: 200px">
+                <slct-2
+                  [data]="comparators"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Search Comparator'"
+                  formControlName="comparatorVal"
+                ></slct-2>
+              </td>
+
+              <td>
+                <input
+                  type="text"
+                  formControlName="value"
+                  class="form-control"
+                  currencyMask
+                  [options]="{
+                    prefix: '',
+                    thousands: ',',
+                    decimal: '.'
+                  }"
+                />
+              </td>
+            </tr>
+          </ng-container>
+        </tbody>
+      </table>
+
+      <div
+        class="w-100 my-2 cursor d-flex justify-content-end"
+        (click)="addCriteria()"
+      >
+        <i
+          [style.color]="currentTheme.secondaryColor"
+          class="icon icon-add-circle icon-lg"
+        ></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="col-md-12">
+      <button
+        [style.background]="currentTheme.secondaryColor"
+        class="btn btn-xs text-white"
+        type="submit"
+        [disabled]="setupForm.invalid"
+      >
+        {{ !isLoading ? "Update" : "Processing..." }}
+        <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+      </button>
+    </div>
+  </div>
+</form>
+
+<ng-template #topup>
+  <div class="px-4 py-6">
+    <header class="d-flex justify-content-between align-items-center mb-6">
+      <h3 class="modal-title" id="model-2">
+        <i
+          class="mr-2 icon icon-setting icon-2x align-self-center text-warning"
+        ></i
+        >Top Up Balance
+      </h3>
+      <button
+        type="button"
+        class="close"
+        (click)="closeModal()"
+        aria-label="Close"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </header>
+
+    <form [formGroup]="topupForm" (ngSubmit)="topupDecideWallet()">
+      <div class="form-row">
+        <div class="col-7 mb-6">
+          <label for="email">Email <b class="text-danger">*</b></label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-control"
+            placeholder="Enter Email Address"
+          />
+        </div>
+
+        <div class="col-5">
+          <label for="amount">Amount <b class="text-danger">*</b></label>
+          <input
+            id="amount"
+            type="text"
+            formControlName="amount"
+            class="form-control"
+            currencyMask
+            [options]="{
+              prefix: '',
+              thousands: ',',
+              decimal: '.'
+            }"
+          />
+        </div>
+      </div>
+
+      <button
+        *ngIf="!isLoading; else processing"
+        class="btn btn-xs btn-success"
+        type="submit"
+        [disabled]="topupForm.invalid || topupForm.get('amount').value === 0"
+      >
+        Top Up
+      </button>
+
+      <ng-template #processing>
+        <button class="btn btn-xs btn-warning text-white" disabled>
+          <i class="icon icon-spin icon-spin2"></i> {{ btnText }}...
+        </button>
+      </ng-template>
+    </form>
+  </div>
+</ng-template>

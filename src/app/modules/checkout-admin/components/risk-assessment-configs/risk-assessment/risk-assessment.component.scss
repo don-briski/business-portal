@@ -1,0 +1,44 @@
+form {
+  background-color: #fff;
+  border-radius: 12px;
+  .card-header {
+    background-color: #fff;
+    border-bottom: 1px solid #ecebed;
+  }
+
+  .card-body {
+    p {
+      color: var(--lenda-grey);
+    }
+
+    .form-row {
+      margin: 30px 0;
+    }
+  }
+
+  .shadow {
+    margin-bottom: 30px;
+  }
+
+  .query-bg {
+    background-color: #fff4e5;
+  }
+
+  button[type="submit"] {
+    color: #fff;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+}
+
+.title-text {
+  color: #979797;
+  font-size: 14px;
+}
+
+.subtitle-text {
+  color: #545454;
+  font-size: 15px;
+}

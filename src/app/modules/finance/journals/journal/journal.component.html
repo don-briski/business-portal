@@ -1,0 +1,418 @@
+<div class="wrapper d-flex">
+  <div class="sidebar pr-4">
+    <header class="d-flex align-items-center justify-content-between mb-3">
+      <span><h1 class="dt-page__title mb-0">Journal</h1></span>
+
+      <span class="float-right">
+        <button
+          *ngIf="user?.permission?.includes('Create Journal')"
+          class="btn btn-sm py-2 btn-primary mr-2 text-white"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [routerLink]="['/finance/journals/create']"
+          routerLinkActive="router-link-active"
+          href="javascript:void(0)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New Journal
+        </button>
+      </span>
+    </header>
+
+    <div class="body">
+      <div class="card">
+        <div class="card-body p-0">
+          <ul class="journal-list">
+            <li
+              *ngFor="let journal of journals; let i = index"
+              class="border-bottom"
+              (click)="showJournalInfo(journal?.journalId)"
+              [ngStyle]="{
+                'border-left':
+                  journal?.journalId === selectedJournal?.journalId
+                    ? '5px solid' + currentTheme.secondaryColor
+                    : ''
+              }"
+            >
+              <span
+                class="d-flex justify-content-between align-items-center title w-100"
+              >
+                <span>{{ journal.journalCode }}</span>
+                <span
+                  >{{ currency }}
+                  {{ journal?.totalAmount | number : "1.2-2" }}</span
+                >
+              </span>
+              <span
+                class="d-flex justify-content-between align-items-center sub-title mt-2 w-100"
+              >
+                <span>{{
+                  journal?.date | customDatePipe : "DD-MMM-YY"
+                }}</span>
+                <span
+                  class="badge badge-sm"
+                  [ngClass]="{
+                    'badge-warning': journal.status === 'Draft',
+                    'badge-approval': journal.status === 'SentForApproval',
+                    'badge-success': journal.status === 'Posted',
+                    'badge-danger': journal.status === 'Rejected',
+                    'badge-redraft': journal.status === 'Redraft'
+                  }"
+                  >{{
+                    journal?.status === "SentForApproval"
+                      ? "Awaiting Approval"
+                      : journal?.status
+                  }}
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="main-content">
+    <ng-container *ngIf="!fetchingJournal && selectedJournal">
+      <header class="card mb-3">
+        <div class="card-body">
+          <div class="float-right">
+            <button
+              *ngIf="
+                selectedJournal?.status === 'SentForApproval' &&
+                user?.permission?.includes('Approve Journal')
+              "
+              class="btn btn-xs btn-review"
+              (click)="openModal(approval)"
+            >
+              Review Request
+            </button>
+            <button
+              class="btn py-1 btn-primary"
+              (click)="printJournal(selectedJournal?.journalCode)"
+            >
+              {{ printStatus }}
+              <i
+                *ngIf="printStatus === 'Processing'"
+                class="icon icon-spin icon-spin2"
+              ></i>
+            </button>
+            <button
+              *ngIf="
+                user?.permission?.includes('Create Journal') &&
+                selectedJournal?.status === 'Posted'
+              "
+              class="btn btn-xs clone-btn"
+              (click)="cloneJournal()"
+            >
+              Clone
+            </button>
+            <button
+              *ngIf="
+                (user?.permission?.includes('Edit Journal') &&
+                  selectedJournal?.status === 'Draft') ||
+                selectedJournal?.status === 'Redraft'
+              "
+              [routerLink]="
+                '/finance/journals/edit/' + selectedJournal?.journalId
+              "
+              class="btn btn-light"
+            >
+              Edit
+            </button>
+            <button class="btn btn-secondary" (click)="close()">
+              Close
+            </button>
+          </div>
+        </div>
+      </header>
+      <div
+        id="tabs"
+        class="d-flex justify-content-between align-items-center py-2"
+        style="padding-left: 30px"
+      >
+        <ul
+          id="active-div"
+          class="card-header-pills nav nav-pill justify-content-center align-items-center"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              id="nav-overview"
+              class="nav-link pool-nav active-tab"
+              data-toggle="tab"
+              href="#tab-overview"
+              role="tab"
+              aria-controls="tab-overview"
+              aria-selected="false"
+              (click)="switchTabs('overview')"
+              >Overview</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-comments"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-comments"
+              role="tab"
+              aria-controls="tab-comments"
+              aria-selected="false"
+              (click)="switchTabs('comments')"
+              >Comments</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-activity"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-activity"
+              role="tab"
+              aria-controls="tab-activity"
+              aria-selected="false"
+              (click)="switchTabs('activity')"
+              >Activity Logs</a
+            >
+          </li>
+
+          <li class="nav-item">
+            <a
+              id="nav-files"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              href="#tab-files"
+              role="tab"
+              aria-controls="tab-files"
+              aria-selected="false"
+              (click)="switchTabs('files')"
+              >Files</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="tab-content">
+        <div id="tab-overview" class="tab-pane active show">
+          <header class="d-flex justify-content-between p-4 head">
+            <div>
+                <span>
+                  {{ "Journal Created For " + "" + currency }}
+                  {{ selectedJournal?.totalAmount | number : "1.2-2"
+                  }}{{ " By " + selectedJournal?.createdBy }} at {{ selectedJournal?.createdAt | customDatePipe : "MMMM, Do YYYY h:mm a" }}
+                </span>
+            </div>
+          </header>
+          <div class="p-5 paper">
+            <div class="card">
+              <lnd-ribbon [status]="selectedJournal?.status"></lnd-ribbon>
+              <div class="card-body">
+                <div class="content bg-white" #JournalPaper>
+                  <h1 class="text-right">Journal</h1>
+                  <p class="text-right">
+                    {{ "#" + selectedJournal?.journalCode }}
+                  </p>
+                  <div
+                    class="d-flex justify-content-between"
+                    style="margin-top: 70px"
+                  >
+                    <div class="w-75">
+                      <p>Notes</p>
+                      {{ selectedJournal?.notes }}
+                    </div>
+                    <div>
+                      <p class="text-right">
+                        Date: {{ selectedJournal?.date | customDatePipe }}
+                      </p>
+                      <p class="text-right">
+                        Amount:
+                        {{ currency }}
+                        {{ selectedJournal?.totalAmount | number : "1.2-2" }}
+                      </p>
+                      <p class="text-right">
+                        Reference
+                        {{ selectedJournal?.reference }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <table class="table mt-6">
+                    <thead [style.background]="currentTheme.primaryColor">
+                      <th>Account</th>
+                      <th style="width: 15%">Contact</th>
+                      <th style="width: 20%" class="text-right">
+                        Debit ({{ currency }})
+                      </th>
+                      <th style="width: 20%" class="text-right">
+                        Credit ({{ currency }})
+                      </th>
+                    </thead>
+
+                    <tbody>
+                      <tr *ngFor="let journal of selectedJournal?.journalLines">
+                        <td>
+                          <p class="font-weight-medium">{{ journal?.account?.name }} -
+                              {{ journal?.account?.reference }}
+                          </p>
+                          <span class="text-muted">{{
+                            journal?.description
+                          }}</span>
+                        </td>
+                        <td>{{ journal?.contact?.name }}</td>
+
+                        <td class="text-right">
+                          <span *ngIf="journal?.debitAmount > 0">{{
+                            journal?.debitAmount | number : "1.2-2"
+                          }}</span>
+                        </td>
+                        <td class="text-right">
+                          <span *ngIf="journal?.creditAmount > 0">{{
+                            journal?.creditAmount | number : "1.2-2"
+                          }}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td></td>
+                        <td
+                          style="background-color: gainsboro"
+                          class="text-right"
+                        >
+                          <strong>Total</strong>
+                        </td>
+                        <td
+                          style="background-color: gainsboro"
+                          class="text-right"
+                        >
+                          <strong>{{ currency }} {{ totalDebits | number : "1.2-2" }}</strong>
+                        </td>
+                        <td
+                          style="background-color: gainsboro"
+                          class="text-right"
+                        >
+                          <strong>{{ currency }} {{ totalCredits | number : "1.2-2" }}</strong>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-comments" class="tab-pane">
+          <div class="p-5">
+            <div class="card">
+              <table
+                *ngIf="selectedJournal?.comments.length > 0"
+                class="table table-striped mb-0"
+                style="font-size: 11px"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th class="text-uppercase text-dark" scope="col">Username</th>
+                    <th class="text-uppercase text-dark" scope="col">Comment</th>
+                    <th class="text-uppercase text-dark" scope="col">Date Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of selectedJournal?.comments">
+                    <td *ngIf="item?.comment">{{ item?.name }}</td>
+                    <td *ngIf="item?.comment">{{ item?.comment }}</td>
+                    <td *ngIf="item?.comment">
+                      {{ item?.dateCreated | customDatePipe }}
+                      <i class="icon icon-timepicker ml-3"></i>
+                      {{ item?.dateCreated | date : "shortTime" }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <no-data
+                *ngIf="selectedJournal?.comments.length === 0"
+                [currentTheme]="currentTheme"
+                [title]="'No Comments'"
+              ></no-data>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-activity" class="tab-pane">
+          <div class="p-5">
+            <div class="card">
+              <table
+                *ngIf="activityLogs.length > 0"
+                class="table mb-0 table-striped"
+                style="font-size: 11px"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th class="text-dark" scope="col">Activity</th>
+                    <th class="text-dark" scope="col">Description</th>
+                    <th class="text-dark" scope="col">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of activityLogs">
+                    <td [style.color]="currentTheme?.secondaryColor">
+                      {{ row?.relatedObjectInitiatorCode }}
+                    </td>
+                    <td>{{ row?.activityDescription }}</td>
+                    <td>
+                      {{ row?.activityDate | customDatePipe }}
+                      <i class="icon icon-timepicker ml-3"></i>
+                      {{ row?.activityDate | date : "shortTime" }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div
+                *ngIf="activityLogs.length === 0"
+                class="d-flex flex-column align-items-center w-100 py-3"
+              >
+                <p class="display-4 text-center font-weight-light mb-0">
+                  No Activities Available
+                </p>
+                <img
+                  src="assets/images/no data.svg"
+                  alt="no-data-svg"
+                  width="200px"
+                  class="py-5"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-files" class="tab-pane">
+          <lnd-uploaded-files
+            [files]="selectedJournal.files"
+          ></lnd-uploaded-files>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="fetchingJournal">
+      <div
+        class="d-flex justify-content-center"
+        [style.color]="currentTheme.secondaryColor"
+      >
+        <p class="text-center">
+          <i class="icon icon-spin icon-spin2 mr-2"></i>
+          <span>Retrieving Journal...</span>
+        </p>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [comments]="selectedJournal?.comments"
+    [isLoading]="loading"
+    feature="journal"
+    [canApprove]="user?.permission?.includes('Approve Journal')"
+    (sendPayload)="submit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>

@@ -1,0 +1,25 @@
+<section>
+  <span class="border border-warning badge-wrapper">
+    <span
+      ><small
+        >Oustanding {{ type === "payables" ? "Payables" : "Receivables" }} :
+      </small></span
+    >
+    <span class="badge badge-warning ml-3"
+      >{{ currencySymbol }}
+      {{
+        type === "payables"
+          ? (outstandingPayables | number : "1.2-2")
+          : (outstandingReceivables | number : "1.2-2")
+      }}</span
+    >
+  </span>
+
+  <span class="border border-success badge-wrapper ml-3">
+    <span><small>Unused Credits : </small></span>
+    <span class="badge badge-success ml-3">
+      {{ currencySymbol }}
+      {{ unusedCredits | number : "1.2-2" }}</span
+    >
+  </span>
+</section>

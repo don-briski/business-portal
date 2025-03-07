@@ -1,0 +1,136 @@
+ <section >
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h3 class="m-0">Bank Check Configuration</h3>
+      <button
+        *ngIf="
+          user.permission.includes('Edit Risk Engine Configuration') &&
+          (mode === creditAffordModeEnum.View ||
+            mode === creditAffordModeEnum.None)
+        "
+        class="btn btn-sm px-6 text-white mr-1"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        (click)="
+          onModeChange(
+            mode === creditAffordModeEnum.None
+              ? creditAffordModeEnum.Configure
+              : creditAffordModeEnum.Edit
+          )
+        "
+      >
+        {{ config ? "Edit" : "Configure" }}
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <no-data
+      *ngIf="mode === creditAffordModeEnum.None"
+      title="Not Yet Configured"
+      desc="Click on the button above to set the configuration"
+    ></no-data>
+    <p
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+      class="hint-color"
+    >
+      {{ mode === creditAffordModeEnum.Edit ? "Update" : "Set" }} the parameters
+      for bank check configuration
+    </p>
+    <div id="tips" *ngIf="mode !== creditAffordModeEnum.None">
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="cursor text-underline"
+        (click)="hideHints = !hideHints"
+      >
+        {{ hideHints ? "Show" : "Hide" }} Hints
+      </p>
+
+      <ul *ngIf="!hideHints">
+        <li>
+          <b>Bank Statement Length: </b
+          ><span class="hint-color"
+            >This configuration allows user set the length of the bank
+            statements to be considered during the assessment.</span
+          >
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="mode === creditAffordModeEnum.View" class="row">
+      <div class="col-md-4">
+        <p class="title-text mb-1">Bank Statement Length</p>
+        <p class="subtitle-text">
+          {{ config.bankStatementLengthMonths }} Month{{
+            config.bankStatementLengthMonths > 1 ? "s" : ""
+          }}
+        </p>
+      </div>
+      <div class="col-md-4">
+        <p class="title-text mb-1">Bank Spool Recency Threshold</p>
+        <p class="subtitle-text">
+          {{ config.bankSpoolRecencyThresholdInDays }} Day{{
+            config.bankSpoolRecencyThresholdInDays > 1 ? "s" : ""
+          }}
+        </p>
+      </div>
+    </div>
+    <form
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+    >
+      <div class="form-row">
+        <div class="col-md-4">
+          <label>Bank Statement Length (months) </label>
+
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Set Bank Statement Length"
+            formControlName="bankStatementLengthMonths"
+          />
+          <lnd-input-errors
+            label="Bank Statement Length"
+            [control]="form.get('bankStatementLengthMonths')"
+          ></lnd-input-errors>
+        </div>
+        <div class="col-md-4">
+          <label>Bank Spool Recency Threshold (days) </label>
+
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Set Bank Spool Recency Threshold"
+            formControlName="bankSpoolRecencyThresholdInDays"
+          />
+          <lnd-input-errors
+            label="Bank Spool Recency Threshold"
+            [control]="form.get('bankSpoolRecencyThresholdInDays')"
+          ></lnd-input-errors>
+        </div>
+      </div>
+      <div>
+        <button
+          class="btn btn-danger mt-6 mr-3"
+          [disabled]="isLoading"
+          (click)="onModeChange(creditAffordModeEnum.View)"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn mt-6"
+          [style.backgroundColor]="currentTheme.secondaryColor"
+          [disabled]="form.invalid"
+          type="submit"
+        >
+          {{ isLoading ? "Processing..." : "Update" }}
+          <i *ngIf="isLoading" class="icon icon-spin2 icon-spin"></i>
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

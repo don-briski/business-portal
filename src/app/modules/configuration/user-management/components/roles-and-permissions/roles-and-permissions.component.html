@@ -1,0 +1,24 @@
+<header class="mb-5">
+  <h1 class="mb-0">Roles And Permissions</h1>
+
+  <button
+    routerLink="/configurations/roles-and-permissions/add"
+    routerLinkActive="router-link-active"
+  >
+    <i class="icon icon-add"></i> Add New
+  </button>
+</header>
+
+<main class="card p-5">
+  <lnd-table
+    [config]="config"
+    [headers]="tableHeaders"
+    [data]="tableData"
+    [isLoading]="isLoading"
+    [pagination]="pagination"
+    [searchColumns]="pagination?.searchColumns"
+    (retrieveRowDetails)="viewRole($event)"
+    (paginationChange)="fetchRoles($event)"
+    (searchParams)="fetchRoles($event)"
+  />
+</main>

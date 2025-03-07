@@ -1,0 +1,104 @@
+<form *ngIf="shortTermPlacement">
+  <!-- Form -->
+  <div class="form-row">
+    <div class="col form-group">
+      <label for="type">Type</label>
+      <input class="form-control" type="text" readonly value="{{ camelPad(shortTermPlacement.type) }}">
+    </div>
+
+    <div class="col form-group" *ngIf="shortTermPlacement.financialInstitution != null">
+      <label for="type">Financial Insitution</label>
+      <input class="form-control" type="text" readonly value="{{ shortTermPlacement.financialInstitution.name }}">
+    </div>
+
+    <div class="col form-group">
+      <label for="TenorPeriod">Tenor Period</label>
+      <input class="form-control" type="text" disabled value="{{shortTermPlacement.tenorPeriod}}">
+    </div>
+
+    <div class="form-group col">
+      <label for="Tenor">Tenor</label>
+      <input class="form-control" type="text" disabled value="{{shortTermPlacement.tenor}}">
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group col">
+      <label for="InterestRate">Annual Interest Rate (%)</label>
+      <input type="text" currencyMask [options]="{ prefix: '', thousands: ',', decimal: '.' }"  disabled value="{{shortTermPlacement.interestRate}}" id="InterestRate"
+        class="form-control" />
+    </div>
+
+    <div class="col form-group">
+      <label for="InterestType">Interest Type</label>
+      <input class="form-control" type="text" disabled value="{{shortTermPlacement.interestType}}">
+    </div>
+
+  </div>
+
+  <div class="form-row">
+
+    <div class="form-group col">
+      <label for="Principal">Principal</label>
+      <input type="text" disabled value="{{shortTermPlacement.principal | currency: currencySymbol}}" id="Principal"
+        class="form-control" />
+    </div>
+
+    <div class="col form-group">
+      <label for="MaturityAction">Maturity Action</label>
+      <input class="form-control" type="text" disabled value="{{ camelPad(shortTermPlacement.maturityAction)}}">
+    </div>
+
+    <div class="form-group col">
+      <label for="PreLiquidationCharge">PreLiquidationCharge</label>
+      <input type="number" value="{{shortTermPlacement.preLiquidationCharge}}" disabled class="form-control" />
+    </div>
+
+  </div>
+
+  <hr *ngIf="shortTermPlacement.status != 'Inactive'" class="border-dashed mb-3">
+  <div *ngIf="shortTermPlacement.status != 'Inactive'">
+    <h3>Accrual Details</h3>
+    <div *ngIf="shortTermPlacement.interestType == 'Flat'" class="row" >
+      <div class="col form-group">
+        <label for="AccruedInterest">AccruedInterest</label>
+        <input class="form-control" type="text" disabled value="{{shortTermPlacement.interestAccrued | currency: currencySymbol}}">
+      </div>
+      <div class="col form-group">
+        <label for="AccruedInterest">Current Value</label>
+        <input class="form-control" type="text" disabled value="{{shortTermPlacement.interestAccrued + shortTermPlacement.principal | currency: currencySymbol}}">
+      </div>
+    </div>
+
+    <div *ngIf="shortTermPlacement.interestType == 'Compound'" class="row" >
+      <div class="col form-group">
+        <label for="AccruedInterest">Accrued Interest In Current Compounding Cycle</label>
+        <input class="form-control" type="text" disabled value="{{shortTermPlacement.interestAccrued | currency: currencySymbol}}">
+      </div>
+
+      <div class="col form-group">
+        <label for="AccruedInterest">Current Value</label>
+        <input class="form-control" type="text" disabled value="{{shortTermPlacement.compoundingCurrentPrincipal | currency: currencySymbol}}">
+      </div>
+    </div>
+  </div>
+
+  <hr *ngIf="shortTermPlacement.approvalDetails && shortTermPlacement.approvalDetails.length > 0" class="border-dashed mb-3">
+  <div *ngIf="shortTermPlacement.approvalDetails && shortTermPlacement.approvalDetails.length > 0">
+    <h3>Approval Details</h3>
+    <div class="row" >
+      <ul>
+        <li *ngFor="let item of shortTermPlacement.approvalDetails">
+          <label>Username:</label> <strong>{{item.username}}</strong><br>
+          <p><label>Comment:</label> <em>{{item.comment}}</em><br><label>Status:</label>{{item.status}}</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+
+</form>
+
+<div *ngIf="!shortTermPlacement">
+  <i class="icon icon-spin icon-spin2"></i> Processing...
+</div>

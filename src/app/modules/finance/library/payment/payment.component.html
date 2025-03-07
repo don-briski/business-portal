@@ -1,0 +1,178 @@
+<div class="p-3">
+  <header class="d-flex justify-content-between align-items-center py-5">
+    <h3 class="mb-0"
+      >Payment For
+      <strong>{{
+        paymentType === "Invoice"
+          ? invoiceDetails?.invoiceCode
+          : selectedBill?.billCode
+      }}</strong></h3
+    >
+    <button class="close" (click)="closeModal.emit()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </header>
+
+  <form [formGroup]="paymentForm">
+    <div class="form-row mb-5">
+      <div class="col-md-6">
+        <label for="paymentMadeDate"
+          >Payment Date <b class="text-danger">*</b></label
+        >
+        <input
+        lndInvalidDateChecker
+          id="paymentMadeDate"
+          type="date"
+          formControlName="paymentMadeDate"
+          class="form-control"
+        />
+      </div>
+      <div class="col-md-6">
+        <label for="reference">Reference#</label>
+        <input
+          type="text"
+          formControlName="paymentReference"
+          class="form-control"
+          placeholder="Reference"
+        />
+      </div>
+    </div>
+    <div class="form-row mb-5">
+      <div class="col-md-6">
+        <label for="amountDue">Amount Due</label>
+        <input
+          id="amountDue"
+          readonly
+          [value]="
+            paymentType === 'Invoice'
+              ? invoiceDetails.balanceDue
+              : selectedBill.balanceDue
+          "
+          class="form-control"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+        />
+      </div>
+      <div class="col-md-6">
+        <label for="amount"
+          >Amount {{ paymentType === "Invoice" ? "Received" : "Paid" }}
+          <b class="text-danger">*</b></label
+        >
+        <div class="input-group mb-3">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">{{
+              appOwner?.currency?.currencySymbol
+            }}</span>
+          </div>
+          <input
+            type="text"
+            formControlName="paymentAmount"
+            class="form-control"
+            currencyMask
+            [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+            placeholder="Amount"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row mb-5">
+      <div class="col-md-6">
+        <label for="reference">Withholding Tax</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="whtAmount"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+        />
+      </div>
+      <div class="col-md-6">
+        <label for="payment-mode"
+          >Payment Mode <b class="text-danger">*</b></label
+        >
+        <slct-2
+          [data]="paymentModes"
+          formControlName="paymentMode"
+          id="payment-mode"
+          customSearchEnabled="true"
+          placeholder="Search Mode"
+        ></slct-2>
+      </div>
+    </div>
+
+    <div class="form-row mb-5">
+      <div class="col-md-12 mb-5">
+        <label for="paid-through">Tax <span *ngIf="paymentType === 'Invoice'">Asset</span> Account</label>
+        <account-slct
+          *ngIf="accounts.length > 0"
+          [data]="accounts"
+          (selectedAccount)="selectAccount($event)"
+        ></account-slct>
+      </div>
+
+      <div class="col-md-12">
+        <label for="paid-through"
+          >Paid Through <b class="text-danger">*</b></label
+        >
+        <slct-2
+          *ngIf="bankAccounts.length > 0"
+          placeholder="Select an account"
+          [data]="bankAccounts"
+          formControlName="paidThroughAccount"
+        ></slct-2>
+      </div>
+    </div>
+
+    <div
+      *ngIf="paymentForm.get('status').value === 'Posted'"
+      class="form-row mb-5"
+    >
+      <div class="col-md-8 offset-md-4">
+        <div class="lnd-border">
+          <input
+            formControlName="transactionPin"
+            type="password"
+            class="form-control"
+            placeholder="Transaction Pin"
+          />
+
+          <p
+            *ngIf="paymentForm.get('transactionPin')?.errors?.required"
+            class="mt-3 mb-0"
+          >
+            Please enter a transaction pin.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="d-flex justify-content-end border-top py-5">
+        <button
+          [disabled]="paymentForm.invalid"
+          class="btn btn-xs btn-primary mx-1"
+          *ngIf="!isLoading"
+          type="button"
+          (click)="createLine('SentForApproval')"
+        >
+          Send For Approval
+        </button>
+        <button
+          [disabled]="paymentForm.invalid"
+          class="btn btn-xs btn-success mx-1"
+          *ngIf="
+            !isLoading && user?.permission?.includes('Approve Finance Payment')
+          "
+          type="button"
+          (click)="createLine('Posted')"
+        >
+          Post Payment
+        </button>
+        <button class="btn btn-xs btn-warning mx-1" disabled *ngIf="isLoading">
+          <i class="icon icon-spin icon-spin2"></i> Processing..
+        </button>
+      </div>
+    </footer>
+  </form>
+</div>

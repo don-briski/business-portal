@@ -1,0 +1,447 @@
+<header class="d-flex justify-content-between align-items-center mb-6">
+  <h1 class="mb-0">Short Term Placement</h1>
+  <a
+    *ngIf="user?.permission?.includes('Create Short Term Placement')"
+    class="btn btn-primary mr-2 orange-bg text-white"
+    [style.borderColor]="currentTheme?.secondaryColor"
+    [style.backgroundColor]="currentTheme?.secondaryColor"
+    href="javascript:void(0)"
+    (click)="openModal(addShortTermPlacement)"
+  >
+    <i class="icon icon-add-circle mr-2"></i>Add New</a
+  >
+</header>
+<ul
+  id="active-div"
+  class="card-header-pills nav nav-pill justify-content-center mb-2"
+  role="tablist"
+>
+  <li class="nav-shortTermPlacement">
+    <a
+      [id]="'nav-' + tabsEnum.pool"
+      class="nav-link pool-nav active-tab"
+      href="javascript:void(0)"
+      (click)="
+        switchViews(tabsEnum.pool, ['Draft', 'Redraft', 'SentForApproval'])
+      "
+    >
+      Pool
+    </a>
+  </li>
+
+  <li class="nav-shortTermPlacement">
+    <a
+      [id]="'nav-' + tabsEnum.active"
+      class="nav-link pool-nav"
+      href="javascript:void(0)"
+      (click)="switchViews(tabsEnum.active, ['Approved', 'Matured'])"
+    >
+      Active
+    </a>
+  </li>
+
+  <li class="nav-shortTermPlacement">
+    <a
+      [id]="'nav-' + tabsEnum.liquidated"
+      class="nav-link pool-nav"
+      href="javascript:void(0)"
+      (click)="switchViews(tabsEnum.liquidated, ['Liquidated'])"
+    >
+      Liquidated
+    </a>
+  </li>
+
+  <li class="nav-shortTermPlacement">
+    <a
+      [id]="'nav-' + tabsEnum.terminated"
+      class="nav-link pool-nav"
+      href="javascript:void(0)"
+      (click)="switchViews(tabsEnum.terminated, ['Terminated'])"
+    >
+      Terminated
+    </a>
+  </li>
+</ul>
+<div class="dt-card w-100">
+  <div class="dt-card__body">
+    <div class="row">
+      <div class="col-md-4">
+        <label style="display: inline-flex"
+          ><span style="padding: 8px 2px; font-size: 12px">Show </span
+          ><select
+            [(ngModel)]="pagination.pageSize"
+            aria-controls="data-table"
+            class="custom-select custom-select-xl form-control form-control-xl height"
+            (change)="getShortTermPlacements()"
+          >
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+          <span style="padding: 8px 2px; font-size: 12px">entries</span></label
+        >
+      </div>
+      <div class="col-md-4">
+        <div
+          *ngIf="isLoading"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+      </div>
+      <lnd-search-dropdown
+        [searchColumns]="pagination.searchColumns"
+        [currentTheme]="currentTheme"
+        (searchParams)="onSearchParams($event)"
+      ></lnd-search-dropdown>
+      <div
+        class="d-flex justify-content-between w-100 align-items-center mt-5"
+        style="padding: 0 18px"
+      >
+        <div
+          class=""
+          aria-live="polite"
+          style="font-size: 13px; margin-top: -8px"
+        >
+          Showing
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + 1
+              | number : "1.0-0"
+          }}
+          -
+          {{
+            (pagination.pageNumber - 1) * pagination.pageSize + pagination.count
+              | number : "1.0-0"
+          }}
+          of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+        </div>
+      </div>
+    </div>
+    <div class="table-responsive" *ngIf="!isLoading">
+      <table
+        id="data-table"
+        class="table mt-5 table-striped"
+        *ngIf="shortTermPlacements.length > 0; else noData"
+      >
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th class="text-right">
+              Amount ({{ ownerInformation?.currency?.currencySymbol }})
+            </th>
+            <th *ngIf="selectedTab === tabsEnum.liquidated" class="text-right">
+              Liquidated Amount ({{
+                ownerInformation?.currency?.currencySymbol
+              }})
+            </th>
+            <th *ngIf="selectedTab === tabsEnum.liquidated" class="text-right">
+              Penal Charge ({{ ownerInformation?.currency?.currencySymbol }})
+            </th>
+            <th>Placement Type</th>
+            <th *ngIf="selectedTab !== tabsEnum.liquidated">Start Date</th>
+            <th *ngIf="selectedTab === tabsEnum.pool">Created By</th>
+            <th *ngIf="selectedTab === tabsEnum.pool">Created At</th>
+            <th
+              *ngIf="
+                selectedTab !== tabsEnum.pool &&
+                selectedTab !== tabsEnum.liquidated
+              "
+            >
+              End Date
+            </th>
+            <th
+              *ngIf="
+                selectedTab !== tabsEnum.pool &&
+                selectedTab !== tabsEnum.liquidated
+              "
+            >
+              Days to Maturity
+            </th>
+            <th class="text-right" *ngIf="selectedTab !== tabsEnum.pool">
+              Interest Accrued ({{
+                ownerInformation?.currency?.currencySymbol
+              }})
+            </th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let shortTermPlacement of shortTermPlacements"
+            class="cursor"
+            (click)="viewShortTermPlacement(shortTermPlacement, dropdownToggle)"
+          >
+            <td
+              class="copy_icon_wrapper"
+              [style.color]="currentTheme?.secondaryColor"
+            >
+              {{ shortTermPlacement.shortTermPlacementCode }}
+              <img
+                (mouseover)="copy_hover = true"
+                (mouseleave)="copy_hover = false"
+                class="copy_icon"
+                src="assets/images/copy.png"
+                alt="copy icon"
+                width="15"
+                height="15"
+                (click)="copyCode(shortTermPlacement?.shortTermPlacementCode)"
+                placement="right"
+                ngbTooltip="Copy STP Investment Code"
+              />
+            </td>
+            <td class="text-right">
+              {{ shortTermPlacement.principal | number : "1.2-2" }}
+            </td>
+            <td *ngIf="selectedTab === tabsEnum.liquidated" class="text-right">
+              {{ shortTermPlacement.liquidationAmount | number : "1.2-2" }}
+            </td>
+            <td *ngIf="selectedTab === tabsEnum.liquidated" class="text-right">
+              {{ shortTermPlacement.penalCharge | number : "1.2-2" }}
+            </td>
+            <td>
+              {{ shortTermPlacement.parsedShortTermPlacementTypeInfo?.PlacementName }}
+            </td>
+            <td *ngIf="selectedTab !== tabsEnum.liquidated">
+              {{ shortTermPlacement.startDate | date : "dd/MM/yyyy" }}
+            </td>
+            <td *ngIf="selectedTab === tabsEnum.pool">
+              {{ shortTermPlacement.createdBy }}
+            </td>
+            <td *ngIf="selectedTab === tabsEnum.pool">
+              {{ shortTermPlacement.createdAt | date : "dd/MM/yyyy" }}
+            </td>
+            <td
+              *ngIf="
+                selectedTab !== tabsEnum.pool &&
+                selectedTab !== tabsEnum.liquidated
+              "
+            >
+              {{ shortTermPlacement.maturityDate | date : "dd/MM/yyyy" }}
+            </td>
+            <td
+              *ngIf="
+                selectedTab !== tabsEnum.pool &&
+                selectedTab !== tabsEnum.liquidated
+              "
+            >
+              {{ shortTermPlacement.daysTillMaturity }}
+            </td>
+            <td class="text-right" *ngIf="selectedTab !== tabsEnum.pool">
+              {{ shortTermPlacement.interestAccrued | number : "1.2-2" }}
+            </td>
+            <td>
+              <span
+                class="badge"
+                [ngClass]="{
+                  'badge-warning': shortTermPlacement?.status == 'Approved',
+                  'badge-success': shortTermPlacement?.status == 'Matured',
+                  'badge-info': shortTermPlacement?.status == 'Liquidated',
+                  'badge-light': shortTermPlacement?.status == 'Draft',
+                  'badge-danger':
+                    shortTermPlacement?.status === 'Rejected' ||
+                    shortTermPlacement?.status == 'Terminated',
+                  'badge-primary': shortTermPlacement?.status == 'Redraft',
+                  'badge-secondary text-white':
+                    shortTermPlacement?.status == 'SentForApproval'
+                }"
+              >
+                <i
+                  *ngIf="shortTermPlacement?.status === 'Redraft'"
+                  class="icon icon-folder-o"
+                ></i>
+                <i
+                  *ngIf="shortTermPlacement?.status === 'Approved'"
+                  class="icon icon-setting icon-spin"
+                ></i>
+                {{
+                  shortTermPlacement?.status === "Approved"
+                    ? "Investment Active"
+                    : shortTermPlacement?.status === "SentForApproval"
+                    ? "Awaiting Approval"
+                    : shortTermPlacement?.status
+                }}
+              </span>
+            </td>
+            <td>
+              <div #dropdownToggle class="dropdown mr-2 mb-2 d-inline-block">
+                <button
+                  class="btn btn-warning btn-xs dropdown-toggle"
+                  type="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                ></button>
+
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="javascript:void(0)"
+                    ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+                  >
+                  <a
+                    *ngIf="
+                      shortTermPlacement.status === 'Draft' ||
+                      shortTermPlacement.status === 'Redraft'
+                    "
+                    class="dropdown-item"
+                    (click)="
+                      openModal(addShortTermPlacement, shortTermPlacement);
+                      $event.stopPropagation()
+                    "
+                    href="javascript:void(0)"
+                    ><i class="icon icon-edit icon-fw mr-2"></i>Edit</a
+                  >
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ng-template #noData>
+        <h1
+          *ngIf="!isLoading && shortTermPlacements.length === 0"
+          class="display-4 text-center font-weight-light p-5"
+        >
+          No Data Available
+        </h1>
+      </ng-template>
+    </div>
+    <footer>
+      <nav>
+        <ul class="pagination pagination-sm justify-content-end">
+          <li class="page-item" *ngIf="pagination.hasPreviousPage">
+            <a
+              class="page-link"
+              href="javascript:void(0)"
+              (click)="
+                pagination.pageNumber = pagination.pageNumber - 1;
+                getShortTermPlacements()
+              "
+              >Previous</a
+            >
+          </li>
+          <li class="page-item pagination-menu-wrapper">
+            <a
+              class="page-link page-target"
+              href="javascript:void(0)"
+              (click)="itemPaginatedJumpModal()"
+            >
+              {{ pagination.pageNumber }} of {{ pagination.totalPages }} page{{
+                pagination.pageNumber > 1 ? "s" : ""
+              }}
+              <span class="sr-only">(current)</span>
+            </a>
+            <div
+              class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+            >
+              <div class="pagination-menu-body">
+                <div class="h-auto">
+                  <span>Jump to Page</span>
+                  <select
+                    aria-controls="data-table"
+                    [(ngModel)]="pagination.pageNumber"
+                    (change)="getShortTermPlacements()"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option
+                      (click)="pagination.pageNumber = line"
+                      *ngFor="let line of pagination.jumpArray"
+                    >
+                      {{ line }}
+                    </option>
+                  </select>
+                  <div class="text-center mt-3">
+                    <button
+                      (click)="itemPaginatedJumpModal()"
+                      type="button"
+                      class="btn btn-danger btn-xs"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="page-item" *ngIf="pagination.hasNextPage">
+            <a
+              class="page-link"
+              href="javascript:void(0)"
+              (click)="
+                pagination.pageNumber = pagination.pageNumber + 1;
+                getShortTermPlacements()
+              "
+            >
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </footer>
+  </div>
+</div>
+<lnd-aside
+  [isOpen]="viewSTP"
+  (closeAside)="viewSTP = false; shortTermPlacement = null"
+>
+  <div header *ngIf="shortTermPlacement">
+    <div class="d-flex align-items-center">
+      <div class="dt-avatar-wrapper">
+        <img
+          class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+          src="assets/images/male-default-profile.png"
+          alt="avatar"
+        />
+      </div>
+      <div>
+        <div class="d-flex">
+          <h3 class="mb-0 mr-3">
+            {{ shortTermPlacement?.createdBy }}
+          </h3>
+          <span
+            class="badge"
+            [ngClass]="{
+              'badge-success':
+                shortTermPlacement?.status === 'Matured' ||
+                shortTermPlacement?.status === 'Approved',
+              'badge-info': shortTermPlacement?.status == 'Liquidated',
+              'badge-light': shortTermPlacement?.status == 'Draft',
+              'badge-danger':
+                shortTermPlacement?.status === 'Rejected' ||
+                shortTermPlacement?.status == 'Terminated',
+              'badge-primary': shortTermPlacement?.status == 'Redraft',
+              'badge-secondary': shortTermPlacement?.status == 'SentForApproval'
+            }"
+          >
+            {{
+              shortTermPlacement?.status === "Approved"
+                ? "Investment Active"
+                : shortTermPlacement?.status === "SentForApproval"
+                ? "Awaiting Approval"
+                : shortTermPlacement?.status
+            }}
+          </span>
+        </div>
+        <h5 class="mt-1" [style.color]="currentTheme?.secondaryColor">
+          {{ shortTermPlacement?.shortTermPlacementCode }}
+        </h5>
+      </div>
+    </div>
+  </div>
+  <short-term-placement
+    *ngIf="shortTermPlacement"
+    [shortTermPlacementId]="shortTermPlacement?.shortTermPlacementId"
+    [user]="user"
+    [currentTheme]="currentTheme"
+    (closeModal)="toggleAside($event)"
+  ></short-term-placement>
+</lnd-aside>
+<ng-template #addShortTermPlacement>
+  <addedit-short-term-placement
+    [user]="user"
+    [shortTermPlacementId]="shortTermPlacement?.shortTermPlacementId"
+    [currentTheme]="currentTheme"
+    (closeModelEvent)="closeModal($event)"
+  ></addedit-short-term-placement>
+</ng-template>

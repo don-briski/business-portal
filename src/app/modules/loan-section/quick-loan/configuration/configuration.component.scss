@@ -1,0 +1,29 @@
+.hints {
+  p {
+    text-decoration: underline;
+  }
+  li > span {
+    font-weight: bold;
+  }
+}
+
+.tenor {
+  display: flex;
+  width: 75px;
+  height: 54px;
+  padding: 10px 16px;
+  align-items: center;
+  gap: 16px;
+  border-radius: 8px;
+  background: #eaeaea;
+}
+
+#accordion {
+  h5 {
+    font-size: 20px;
+  }
+
+  .card-header {
+    border-bottom: 1px solid #8692a683;
+  }
+}

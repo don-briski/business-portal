@@ -1,0 +1,72 @@
+.upload-section {
+  border: 1px dashed #d9d9d9;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #979797;
+  width: 100%;
+  height: 100%;
+
+  .link-text {
+    color: var(--lenda-blue);
+  }
+
+  p {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  #file-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--lenda-green);
+    border-radius: 5px;
+    padding: 15px 30px;
+
+    p {
+      color: #000;
+    }
+  }
+
+  #summary {
+    min-width: 80%;
+    p {
+      text-align: left;
+      color: var(--lenda-green);
+      font-size: 16px;
+      font-weight: 400;
+    }
+    .summary-pill {
+      background-color: rgba(36, 78, 151, 0.1);
+      color: var(--lenda-blue);
+      padding: 5px 15px;
+      border-radius: 5px;
+      margin-right: 5px;
+    }
+    .mx-5 {
+      min-width: 75%;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      font-weight: 500;
+
+      &:first-child {
+        border: 1px solid var(--lenda-blue);
+        color: var(--lenda-blue);
+      }
+
+      &:last-child {
+        background-color: var(--lenda-blue);
+        color: #fff;
+      }
+    }
+  }
+}
+
+.upload-border-color {
+  border-color: blue;
+}

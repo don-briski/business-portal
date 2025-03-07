@@ -1,0 +1,125 @@
+<div class="dt-page__header">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Create Fixed Deposit Plan</h1>
+    <button
+      class="btn btn-primary orange-bg text-white"
+      routerLink="/deposits/accounts"
+    >
+      Back
+    </button>
+  </div>
+</div>
+<div class="row">
+  <div class="col-6 offset-md-3">
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <div class="p-3">
+          <div *ngIf="gettingAppOwner" class="text-primary text-center p-4">
+            <h4 class="m-0">
+              <i class="icon icon-spin icon-spin2"></i> Initializing...
+            </h4>
+          </div>
+          <form
+            *ngIf="!gettingAppOwner"
+            [formGroup]="form"
+            (ngSubmit)="onSubmit()"
+          >
+            <div class="mb-3 form-group">
+              <label for="opening-bal"
+                >Opening balance <b class="text-danger">*</b></label
+              >
+              <input
+                id="opening-bal"
+                class="form-control"
+                currencyMask
+                [options]="{
+                  prefix: appOwner.currency.currencySymbol,
+                  thousands: ',',
+                  decimal: '.'
+                }"
+                formControlName="openingBalance"
+              />
+              <lnd-input-errors
+                label="Opening balance"
+                [control]="form.get('openingBalance')"
+              ></lnd-input-errors>
+            </div>
+            <div class="mb-3 form-group">
+              <label for="term-length"
+                >Term length <b class="text-danger">*</b></label
+              >
+              <input
+                id="term-length"
+                type="number"
+                class="form-control"
+                placeholder="e.g. 30 days"
+                formControlName="termLength"
+              />
+              <small class="form-text text-muted"
+                >Term length is between 30 - 90 days</small
+              >
+              <lnd-input-errors
+                label="Term length"
+                [control]="form.get('termLength')"
+              ></lnd-input-errors>
+            </div>
+            <div class="mb-3 form-group">
+              <label for="dep-source"
+                >Deposit source <b class="text-danger">*</b></label
+              >
+              <select
+                id="dep-source"
+                class="form-control"
+                formControlName="depositSource"
+              >
+                <option value="" selected>
+                  ~~~ Select your preferred deposit source ~~~
+                </option>
+                <option value="0">Deduction from card</option>
+                <option value="1">Deduction from wallet/savings account</option>
+              </select>
+              <lnd-input-errors
+                label="Deposit source"
+                [control]="form.get('depositSource')"
+              ></lnd-input-errors>
+            </div>
+            <div class="mb-3 form-group">
+              <label for="desc">Description <b class="text-danger">*</b></label>
+              <textarea
+                class="form-control"
+                id="description"
+                formControlName="description"
+                rows="3"
+                placeholder="Enter description"
+              ></textarea>
+              <lnd-input-errors
+                label="Description"
+                [control]="form.get('description')"
+              ></lnd-input-errors>
+            </div>
+            <div class="text-center">
+              <button
+                [style.backgroundColor]="colorTheme?.secondaryColor"
+                [style.borderColor]="colorTheme?.secondaryColor"
+                class="mt-3 mb-3 btn btn-primary orange-bg"
+                type="submit"
+                [disabled]="form.invalid"
+                *ngIf="!creating"
+              >
+                Create Account
+              </button>
+              <button
+                class="mt-3 mb-3 btn btn-primary orange-bg"
+                type="button"
+                *ngIf="creating"
+                disabled
+              >
+                <i class="icon icon-spin icon-spin2"></i> Loading ...
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

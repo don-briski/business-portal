@@ -1,0 +1,11 @@
+<div>
+  <div class="search-section d-flex justify-content-between align-items-center">
+    <p *ngIf="isViewPerm">These are the permissions this role has access to</p>
+    <lnd-search-input (searchHandler)="searchPermissions.emit($event)" (clearSearch)="searchPermissions.emit($event)"/>
+  </div>
+
+  <div class="d-flex justify-content-end my-3">
+    <p *ngIf="searchCount > 0"><span class="search-count">({{searchCount}})</span> permissions found</p>
+    <p *ngIf="searchCount === 0">No permissions found</p>
+  </div>
+</div>

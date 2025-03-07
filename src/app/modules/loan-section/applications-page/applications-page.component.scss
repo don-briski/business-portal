@@ -1,0 +1,166 @@
+app-sidebar {
+    width: 240px;   
+}
+
+@media screen and (max-width: 991px) { 
+    app-sidebar {
+        width: auto;   
+    }
+}
+
+.dt-content-wrapper {
+    margin-top: 74px;
+  }
+
+.ui-select-choices {
+    display: block;
+}
+
+
+.filter-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 6000;
+    display: none;
+    float: left;
+    min-width: 10rem;
+    padding: .5rem 0;
+    margin: .5rem 1.5rem 0;
+    font-size: 1.4rem;
+    color: #545454;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 0 solid transparent;
+    border-radius: .4rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175)
+}
+
+.filter-menu-right {
+    right: 150px;
+    left: auto;
+    top: -50px;
+}
+    
+.filter-menu {
+    width: 500px !important;
+}
+
+.filter-menu-header {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    font-size: 13px;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding: 1.2rem 1.8rem
+}
+    
+.filter-menu-header {
+    box-shadow: 0 2px 2px 0 rgba(84, 84, 84, 0.05)
+}
+    
+.filter-menu-header .title {
+    font-size: 15px;
+    margin-bottom: 0
+}
+
+.filter-menu-body {
+    padding: 1.5rem 1.8rem
+}
+    
+.filter-menu-footer {
+    box-shadow: 0 -2px 2px 0 rgba(84, 84, 84, 0.05);
+    justify-content: flex-end;
+}
+    
+.filter-menu-header, .filter-menu-footer {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    font-size: 13px;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    padding: 1.5rem 1.8rem
+}
+ 
+.ripple {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    position: relative;
+  }
+  .ripple::after,
+  .ripple::before {
+    content: "";
+    box-sizing: border-box;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #be084e;
+    position: absolute;
+    left: 0;
+    // top: 0;
+    bottom: 5px;
+    animation: animripple 2s linear infinite;
+  }
+  .ripple::after {
+    animation-delay: 1s;
+  }
+  
+  @keyframes animripple {
+    0% {
+      transform: scale(0);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0;
+    }
+  }
+
+  #loan-approval-flow {
+    padding: 0 20px;
+  }
+
+  #loan-approval-flow h5 {
+    color: var(--lenda-grey);
+  }
+
+  .black-list-btn {
+    background: #393A3B;
+    color: #fff;
+  }
+
+  .nav-link:hover {
+    color: var(--secondary-color) 
+  }
+
+  .doc-upload-btn {
+    outline: none;
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 8px;
+    background: none;
+  }
+
+  .doc-upload-btn:hover {
+    background: var(--secondary-color);
+    color: #fff;
+  }
+
+  .docs-upload-input {
+    display: none;
+  }
+
+  .reviewers-list-info-text {
+    color: var(--lenda-orange)
+  }
+
+  .arrow-icon {
+    width: 15px;
+}

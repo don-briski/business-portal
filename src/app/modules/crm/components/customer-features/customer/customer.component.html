@@ -1,0 +1,220 @@
+<main class="card">
+  <div *ngIf="isLoading" class="d-flex justify-content-center">
+    <lnd-spinner text="Retrieving Customer Details..." />
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <header class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-center">
+        <img
+          src="assets/images/male-default-profile.png"
+          alt="profile-pic"
+          width="70"
+        />
+        <div class="ml-4">
+          <h3 class="mb-2">
+            {{ customer?.firstName }} {{ customer?.lastName }}
+            <span
+              class="badge badge-xs ml-3"
+              [ngClass]="{
+                'badge-warning':
+                  customer?.status === CUSTOMER_TYPE.Prospect,
+                'badge-success':
+                  customer?.status === CUSTOMER_TYPE.Customer
+              }"
+              >{{ customer?.status }}</span
+            >
+          </h3>
+          <p class="mb-2">
+            <i class="icon icon-email"></i>
+            {{ customer?.email }}
+          </p>
+          <p class="mb-2">
+            <i class="icon icon-phone"></i>
+            {{ customer?.phoneNumber }}
+          </p>
+        </div>
+      </div>
+
+      <button class="btn btn-outline-dark" routerLink="/crm/customers">
+        Back
+      </button>
+    </header>
+    <lnd-tab-bar [tabs]="tabs" [currentTabId]="currentTab" />
+
+    <div class="tabs">
+      <ng-container *ngIf="currentTab === 'profile'">
+        <section class="py-1">
+          <h3>Personal Information</h3>
+
+          <ul class="mt-0">
+            <lnd-dt-list-item
+              *ngIf="customer?.firstName"
+              title="First Name"
+              [value]="customer?.firstName"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.lastName"
+              title="Last Name"
+              [value]="customer?.lastName"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.gender"
+              title="Gender"
+              [value]="customer?.gender"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.phoneNumber"
+              title="Phone Number"
+              [value]="customer?.phoneNumber"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.bvn"
+              title="BVN"
+              [value]="customer?.bvn"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.dateOfBirth"
+              title="Date Of Birth"
+              [value]="customer?.dateOfBirth"
+              [ignoreIcon]="true"
+              type="date"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.maritalStatus"
+              title="Marital Status"
+              [value]="customer?.maritalStatus"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.employmentStatus"
+              title="Employment Status"
+              [value]="customer?.employmentStatus"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.email"
+              title="Email Address"
+              [value]="customer?.email"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              class="address"
+              *ngIf="customer?.address"
+              title="Address"
+              [value]="customer?.address"
+              [ignoreIcon]="true"
+            />
+          </ul>
+        </section>
+
+        <section class="pt-4">
+          <h3>Next Of Kin Information</h3>
+
+          <ul class="mt-0">
+            <lnd-dt-list-item
+              *ngIf="customer?.nextOfKinFirstName"
+              title="First Name"
+              [value]="customer?.nextOfKinFirstName"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.nextOfKinLastName"
+              title="Last Name"
+              [value]="customer?.nextOfKinLastName"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.nextOfKinRelationship"
+              title="Relation"
+              [value]="customer?.nextOfKinRelationship"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.nextOfKinPhoneNumber"
+              title="Phone Number"
+              [value]="customer?.nextOfKinPhoneNumber"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.nextOfKinDateOfBirth"
+              title="Date Of Birth"
+              [value]="customer?.nextOfKinDateOfBirth"
+              type="date"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.nextOfKinEmailAddress"
+              title="Email Address"
+              [value]="customer?.nextOfKinEmailAddress"
+              [ignoreIcon]="true"
+            />
+          </ul>
+        </section>
+
+        <section class="pt-4">
+          <h3>Bank Information</h3>
+
+          <ul class="mt-0">
+            <lnd-dt-list-item
+              *ngIf="customer?.bankName"
+              title="Bank"
+              [value]="customer?.bankName"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.bankAccountName"
+              title="Bank Account Name"
+              [value]="customer?.bankAccountName"
+              [ignoreIcon]="true"
+            />
+
+            <lnd-dt-list-item
+              *ngIf="customer?.bankAccountNumber"
+              title="Bank Account Number"
+              [value]="customer?.bankAccountNumber"
+              [ignoreIcon]="true"
+            />
+          </ul>
+        </section>
+        <footer class="d-flex justify-content-between align-items-center">
+          <button *ngIf="permissions.includes('Edit Prospect')" [routerLink]="'/crm/customers/edit/'+customer?.id" class="btn text-white" [style.backgroundColor]="colorTheme?.secondaryColor">Update Customer Info</button>
+
+          <p *ngIf="customer?.modifiedAt" class="mb-0">Last Updated - {{customer?.modifiedAt | date:"MMM d, YYYY.  h:mm a"}}</p>
+
+          <div>
+            <small>Profile Created By</small>
+
+            <p>{{customer?.createdBy}}</p>
+          </div>
+        </footer>
+      </ng-container>
+
+      <crm-interactions *ngIf="currentTab === 'interactions'" [id]="customerId" [permissions]="permissions" />
+
+      <lnd-crm-customer-products *ngIf="currentTab === 'products'" [customer]="customer" [permissions]="permissions" />
+    </div>
+
+  </ng-container>
+
+</main>

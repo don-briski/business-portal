@@ -1,0 +1,17 @@
+section{
+  p{
+    font-weight: 400;
+    &:first-child{
+      color: #979797;
+      font-size: 14px;
+    }
+
+    &:last-child{
+      color: #393A3B;
+      font-size: 18px;
+    }
+  }
+}
+.tc_50{
+  min-width: 300px !important;
+}

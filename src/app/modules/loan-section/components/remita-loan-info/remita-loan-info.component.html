@@ -1,0 +1,55 @@
+<section>
+  <div class="p-5">
+    <div class="card">
+      <table
+        class="table mb-0 table-striped"
+        *ngIf="loanHistory && loanHistory?.length"
+      >
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">Loan Provider</th>
+            <th scope="col">Repayment Frequency</th>
+            <th scope="col">Disbursement Date</th>
+            <th scope="col" class="text-right">Loan Amount</th>
+            <th scope="col" class="text-right">Repayment Amount</th>
+            <th scope="col" class="text-right">Outstanding Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of loanHistory">
+            <td>
+              {{ row.loanProvider }}
+            </td>
+            <td>{{ row.repaymentFreq }}</td>
+            <td>
+              {{ row?.loanDisbursementDate | customDatePipe }}
+            </td>
+            <td class="text-right">
+              {{ row.loanAmount | number : "1.2-2" }}
+            </td>
+            <td class="text-right">
+              {{ row.repaymentAmount | number : "1.2-2" }}
+            </td>
+            <td class="text-right">
+              {{ row.outstandingAmount | number : "1.2-2" }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        *ngIf="!loanHistory || loanHistory?.length < 1"
+        class="d-flex flex-column align-items-center w-100 py-3"
+      >
+        <p class="display-4 text-center font-weight-light mb-0">
+          No Loan History Available
+        </p>
+        <img
+          src="assets/images/no data.svg"
+          alt="no-data-svg"
+          width="200px"
+          class="py-5"
+        />
+      </div>
+    </div>
+  </div>
+</section>

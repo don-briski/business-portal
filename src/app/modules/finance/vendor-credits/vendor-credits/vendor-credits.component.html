@@ -1,0 +1,952 @@
+<div *ngIf="!viewingSingleVCN; else singleVCN">
+  <header class="w-100 d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Vendor Credit Notes</h1>
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <a
+          *ngIf="user?.permission.includes('Create Vendor Credit Note')"
+          class="btn btn-primary mr-2 text-white"
+          [style.borderColor]="colorTheme.secondaryColor"
+          [style.backgroundColor]="colorTheme.secondaryColor"
+          [routerLink]="['/finance/vendor-credit-notes/create']"
+          routerLinkActive="router-link-active"
+          href="javascript:void(0)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New</a
+        >
+      </div>
+    </span>
+  </header>
+  <ul
+    id="active-div"
+    class="card-header-pills nav nav-pill justify-content-center mb-2"
+    role="tablist"
+  >
+    <li class="nav-item">
+      <a
+        [ngClass]="{ 'active-tab': currentView === 'open' }"
+        class="nav-link pool-nav active-tab"
+        href="javascript:void(0)"
+        (click)="onSwitchTableView('open')"
+      >
+        Open
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        [ngClass]="{ 'active-tab': currentView === 'closed' }"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="onSwitchTableView('closed')"
+      >
+        Closed
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        [ngClass]="{ 'active-tab': currentView === 'all' }"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="onSwitchTableView('all')"
+      >
+        All
+      </a>
+    </li>
+  </ul>
+  <div class="dt-card w-100">
+    <div class="dt-card__body">
+      <header class="my-4">
+        <div class="form-row">
+          <div class="col-md-4">
+            <label style="display: inline-flex"
+              ><span style="padding: 8px 2px; font-size: 12px">Show </span
+              ><select
+                [(ngModel)]="pagination.pageSize"
+                [ngModelOptions]="{ standalone: true }"
+                aria-controls="data-table"
+                class="custom-select custom-select-xl form-control form-control-xl height mx-2"
+                (change)="fetchVCNotes()"
+              >
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span style="padding: 8px 2px; font-size: 12px"
+                >entries</span
+              ></label
+            >
+          </div>
+          <div class="col-md-4">
+            <app-loader *ngIf="fetchingVCNs" message="Loading..."></app-loader>
+          </div>
+          <lnd-search-dropdown
+            [searchColumns]="pagination.searchColumns"
+            [currentTheme]="colorTheme"
+            [currentView]="currentView"
+            (searchParams)="onSearchParams($event)"
+          ></lnd-search-dropdown>
+        </div>
+        <lnd-selected-filters
+          (initialized)="onSelectedFiltersInit($event)"
+        ></lnd-selected-filters>
+        <div *ngIf="!fetchingVCNs" class="d-flex justify-content-between mt-4">
+          <div aria-live="polite">
+            Showing
+            {{
+              (pagination.pageNumber - 1) * pagination.pageSize + 1
+                | number : "1.0-0"
+            }}
+            -
+            {{
+              (pagination.pageNumber - 1) * pagination.pageSize +
+                pagination.count | number : "1.0-0"
+            }}
+            of {{ pagination.totalCount | number : "1.0-0" }} records
+          </div>
+          <div>
+            <lnd-filter-btn
+              (filterModalOpen)="onOpenFilterModal()"
+            ></lnd-filter-btn>
+            <lnd-filter
+              [filterOptions]="filterOptions"
+              (optionSelected)="onOptionSelected($event)"
+            >
+            </lnd-filter>
+          </div>
+        </div>
+      </header>
+
+      <table
+        *ngIf="haveVCNotes && !fetchingVCNs"
+        id="data-table"
+        class="table table-striped"
+      >
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Vendor</th>
+            <th>Date</th>
+            <th class="text-right">Total Amount ({{ currencySymbol }})</th>
+            <th class="text-right">Credits Remaining ({{ currencySymbol }})</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let vcnote of vcnotes; let i = index"
+            class="cursor"
+            (click)="viewSingleVCN(vcnote, null, dropdownToggle)"
+          >
+            <td
+              [style.color]="colorTheme.secondaryColor"
+              class="copy_icon_wrapper"
+            >
+              {{ vcnote.code }}
+
+              <img
+                (mouseover)="copy_hover = true"
+                (mouseleave)="copy_hover = false"
+                class="copy_icon"
+                src="assets/images/copy.png"
+                alt="copy icon"
+                width="15"
+                height="15"
+                (click)="copyCode(vcnote.code)"
+                placement="right"
+                ngbTooltip="Copy VCN Code"
+              />
+            </td>
+            <td>{{ vcnote.vendor }}</td>
+            <td>
+              {{ vcnote.date | customDatePipe : "DD-MMM-YY" }}
+            </td>
+            <td class="text-right">
+              {{ currencySymbol }}{{ vcnote.totalAmount | number : "1.2-2" }}
+            </td>
+            <td class="text-right">
+              {{ currencySymbol
+              }}{{ vcnote.creditsRemaining | number : "1.2-2" }}
+            </td>
+            <td>
+              <span
+                class="badge mb-1 mr-1"
+                [ngClass]="{
+                  'badge-warning': vcnote.status === 'Draft',
+                  'badge-redraft': vcnote.status === 'Redraft',
+                  'badge-approval': vcnote.status === 'SentForApproval',
+                  'badge-success': vcnote.status === 'Posted',
+                  'badge-danger': vcnote.status === 'Rejected'
+                }"
+                >{{ getVCNStatus(vcnote.status) }}</span
+              >
+            </td>
+            <td class="text-center">
+              <div #dropdownToggle class="dropdown mr-2 mb-2 d-inline-block">
+                <button
+                  class="btn btn-warning btn-xs dropdown-toggle"
+                  data-toggle="dropdown"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                ></button>
+                <div class="dropdown-menu">
+                  <a
+                    *ngIf="
+                      user?.permission?.includes('View Vendor Credit Note')
+                    "
+                    class="dropdown-item"
+                    href="javascript:void(0)"
+                    ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+                  >
+                  <a
+                    *ngIf="
+                      user?.permission?.includes('Edit Vendor Credit Note') &&
+                      (vcnote.status === 'Draft' || vcnote.status === 'Redraft')
+                    "
+                    class="dropdown-item"
+                    [routerLink]="
+                      '/finance/vendor-credit-notes/edit/' + vcnote.id
+                    "
+                    ><i class="icon icon-edit icon-fw mr-2"></i>Edit</a
+                  >
+                  <a
+                    *ngIf="
+                      user?.permission?.includes('Create Credit Refund') &&
+                      vcnote.creditsRemaining > 0 &&
+                      vcnote.status === 'Posted'
+                    "
+                    class="dropdown-item cursor"
+                    (click)="onOpenRefundModal(refundView, vcnote, $event)"
+                    ><i class="icon icon-feedback mr-2"></i>Refund</a
+                  >
+                  <a
+                    *ngIf="
+                      user?.permission?.includes('Edit Vendor Credit Note') &&
+                      (vcnote.status === 'Draft' || vcnote.status === 'Redraft')
+                    "
+                    class="dropdown-item text-danger"
+                    (click)="attemptVCNDelete(vcnote.id)"
+                    href="javascript:void(0)"
+                    ><i class="icon icon-trash icon-fw mr-2"></i>Delete
+                  </a>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        *ngIf="!haveVCNotes && !fetchingVCNs"
+        class="d-flex flex-column align-items-center w-100"
+      >
+        <h1 class="display-4 text-center font-weight-light pt-5">
+          {{
+            errorOccured
+              ? "Couldn't load vendor credit notes, please try again"
+              : "No Vendor Credit Notes Available"
+          }}
+        </h1>
+        <button
+          *ngIf="errorOccured"
+          class="btn btn-sm mb-5"
+          [style.background]="colorTheme.secondaryColor"
+          (click)="fetchVCNotes()"
+        >
+          Retry
+        </button>
+      </div>
+      <nav>
+        <ul class="pagination pagination-sm justify-content-end">
+          <li class="page-item" *ngIf="pagination.hasPreviousPage">
+            <a
+              class="page-link"
+              href="javascript:void(0)"
+              (click)="
+                fetchVCNotes({
+                  pageSize: +pagination.pageSize,
+                  pageNumber: +pagination.pageNumber - 1,
+                  keyword: '',
+                  selectedSearchColumn: ''
+                })
+              "
+              tabindex="-1"
+              >Previous</a
+            >
+          </li>
+          <li class="page-item pagination-menu-wrapper">
+            <a
+              class="page-link page-target"
+              href="javascript:void(0)"
+              (click)="itemPaginatedJumpModal()"
+            >
+              {{ pagination.pageNumber }} of {{ pagination.totalPages }}
+              {{ pagination.totalPages > 1 ? "pages" : "page" }}
+              <span class="sr-only">(current)</span>
+            </a>
+            <div
+              class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+            >
+              <div class="pagination-menu-body">
+                <div class="h-auto">
+                  <span>Jump to Page</span>
+                  <select
+                    aria-controls="data-table"
+                    [(ngModel)]="pagination.pageNumber"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                    (change)="fetchVCNotes()"
+                  >
+                    <option
+                      *ngFor="let line of pagination.jumpArray"
+                      (click)="pagination.pageNumber = line"
+                    >
+                      {{ line }}
+                    </option>
+                  </select>
+                  <div class="text-center mt-3">
+                    <button type="button" class="btn btn-danger btn-xs">
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li class="page-item" *ngIf="pagination.hasNextPage">
+            <a
+              class="page-link"
+              href="javascript:void(0)"
+              (click)="
+                fetchVCNotes({
+                  pageSize: +pagination.pageSize,
+                  pageNumber: +pagination.pageNumber + 1,
+                  keyword: '',
+                  selectedSearchColumn: ''
+                })
+              "
+            >
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<ng-template #refundView>
+  <lnd-add-edit-credit-refund
+    relatedObject="VendorCreditNote"
+    [relatedObjectId]="selectedVCN.id"
+    [maxAmount]="selectedVCN.creditsRemaining"
+    (close)="onCloseRefundModal($event)"
+  ></lnd-add-edit-credit-refund>
+</ng-template>
+
+<ng-template #singleVCN>
+  <div class="wrapper single-view">
+    <div class="d-flex flex-row">
+      <div class="left pr-4">
+        <div class="top">
+          <header
+            class="w-100 d-flex align-items-center justify-content-between mb-3"
+          >
+            <h1 class="dt-page__title">Vendor Credits</h1>
+            <span class="float-right role-add">
+              <a
+                *ngIf="user?.permission.includes('Create Vendor Credit Note')"
+                class="btn btn-primary mr-2 text-white"
+                [style.borderColor]="colorTheme.secondaryColor"
+                [style.backgroundColor]="colorTheme.secondaryColor"
+                [routerLink]="['/finance/vendor-credit-notes/create']"
+                routerLinkActive="router-link-active"
+                href="javascript:void(0)"
+              >
+                <i class="icon icon-add-circle mr-2"></i>Add New
+              </a>
+            </span>
+          </header>
+        </div>
+        <div class="body">
+          <div class="card">
+            <div class="card-body p-0">
+              <ul class="bill-list">
+                <li
+                  *ngFor="let vcn of vcnotes"
+                  (click)="viewSingleVCN(vcn)"
+                  [ngClass]="{
+                    selected: vcnDetails.vendorCreditNoteId === vcn.id
+                  }"
+                  [style.border-left]="
+                    vcnDetails?.vendorCreditNoteId === vcn?.id
+                      ? '5px solid ' + colorTheme.secondaryColor
+                      : ''
+                  "
+                  (mouseover)="vcn.hover = true"
+                  (mouseleave)="
+                    vcnDetails?.vendorCreditNoteId !== vcn?.id
+                      ? (vcn.hover = false)
+                      : null
+                  "
+                  [ngStyle]="vcn.hover ? hoverStyle : {}"
+                >
+                  <span
+                    class="d-flex justify-content-between align-items-center title"
+                  >
+                    <span>{{ vcn.vendor }}</span>
+                    <span
+                      >{{ currencySymbol
+                      }}{{ vcn.creditsRemaining | number : "1.2-2" }}</span
+                    >
+                  </span>
+                  <span
+                    class="d-flex justify-content-between align-items-center sub-title mt-2"
+                  >
+                    <span>
+                      {{ vcn.code }} |
+                      {{ vcn.date | customDatePipe : "DD-MMM-YY" }}
+                    </span>
+                    <span>
+                      <span
+                        class="badge badge-sm"
+                        [ngClass]="{
+                          'badge-warning': vcn.status === 'Draft',
+                          'badge-approval': vcn.status === 'SentForApproval',
+                          'badge-success': vcn.status === 'Posted',
+                          'badge-danger': vcn.status === 'Rejected',
+                          'badge-redraft': vcn.status === 'Redraft'
+                        }"
+                        >{{ getVCNStatus(vcn.status) }}</span
+                      >
+                    </span>
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="right px-2">
+        <div class="top card mb-3">
+          <div class="card-body">
+            <div class="float-right">
+              <button
+                *ngIf="
+                  vcnDetails.status === 'SentForApproval' &&
+                  user?.permission.includes('Approve Vendor Credit Note')
+                "
+                class="btn btn-review btn-xs"
+                (click)="openApprovalModal(approval)"
+              >
+                Review Request
+              </button>
+              <button
+                *ngIf="
+                  vcnDetails.status === 'Posted' &&
+                  user?.permission.includes('Apply Vendor Credit Note')
+                "
+                class="btn btn-xs btn-success"
+                (click)="openModal(applyToBillView, vcnDetails)"
+              >
+                Apply To Bill(s)
+              </button>
+              <button
+                *ngIf="
+                  user?.permission?.includes('Create Vendor Credit Note') &&
+                  vcnDetails?.status === 'Posted'
+                "
+                class="btn btn-xs clone-btn"
+                (click)="cloneVCN()"
+              >
+                Clone
+              </button>
+              <button
+                *ngIf="
+                  user?.permission.includes('Edit Vendor Credit Note') &&
+                  (vcnDetails.status === 'Draft' ||
+                    vcnDetails.status === 'Redraft')
+                "
+                class="btn btn-xs btn-light"
+                [routerLink]="
+                  '/finance/vendor-credit-notes/edit/' +
+                  vcnDetails.vendorCreditNoteId
+                "
+              >
+                Edit
+              </button>
+              <button
+                class="btn btn-xs btn-primary"
+                (click)="printVCN(vcnDetails?.vendor)"
+              >
+                {{ printStatus }}
+                <i
+                  *ngIf="printStatus === 'Processing'"
+                  class="icon icon-spin icon-spin2"
+                ></i>
+              </button>
+              <button
+                class="btn btn-xs btn-outline-dark"
+                (click)="closeSingleVCNView()"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+        <div
+          id="tabs"
+          class="d-flex justify-content-between align-items-center py-2"
+          style="padding-left: 30px"
+        >
+          <ul
+            id="active-div"
+            class="card-header-pills nav nav-pill justify-content-center align-items-center"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                [ngClass]="currentTab === 'overview' ? 'active-tab' : ''"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                role="tab"
+                aria-controls="tab-overview"
+                aria-selected="false"
+                (click)="onSwitchTab('overview')"
+                >Overview</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                [ngClass]="currentTab === 'comments' ? 'active-tab' : ''"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                role="tab"
+                aria-controls="tab-comments"
+                aria-selected="false"
+                (click)="onSwitchTab('comments')"
+                >Comments</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                [ngClass]="currentTab === 'activity' ? 'active-tab' : ''"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                role="tab"
+                aria-controls="tab-activity"
+                aria-selected="false"
+                (click)="onSwitchTab('activity')"
+                >Activity Logs</a
+              >
+            </li>
+
+            <li class="nav-item">
+              <a
+                [ngClass]="currentTab === 'files' ? 'active-tab' : ''"
+                class="nav-link pool-nav"
+                data-toggle="tab"
+                role="tab"
+                aria-controls="tab-files"
+                aria-selected="false"
+                (click)="onSwitchTab('files')"
+                >Files</a
+              >
+            </li>
+          </ul>
+        </div>
+        <div *ngIf="fetchingVCN" class="d-flex justify-content-center">
+          <lnd-spinner
+            text="Retrieving Vendor Credits..."
+            [color]="colorTheme?.secondaryColor"
+          ></lnd-spinner>
+        </div>
+        <div *ngIf="!fetchingVCN" class="tab-content">
+          <div
+            class="tab-pane"
+            [ngClass]="{ 'active show': currentTab === 'overview' }"
+            *ngIf="currentTab === 'overview'"
+          >
+            <div class="paper p-5" #vcnPaper>
+              <div class="card">
+                <lnd-ribbon [status]="vcnDetails.status"></lnd-ribbon>
+                <div class="card-body">
+                  <div class="content">
+                    <div class="d-flex justify-content-between mb-5">
+                      <span>
+                        <header class="row">
+                          <div class="col-md-4">
+                            <img
+                              class="img-fluid d-block mb-4"
+                              [src]="base64Image"
+                            />
+                          </div>
+                        </header>
+                        <p class="h3 mb-1">{{ appOwner.appOwnerName }}</p>
+                        <p class="mb-1">{{ appOwner.appOwnerEmail }}</p>
+                        <p class="mb-1">
+                          {{ appOwner.appOwnerBillingAddress }}
+                        </p>
+                      </span>
+                      <span class="text-right">
+                        <h3 class="display-1">Vendor Credits</h3>
+                        <p>Credit Note# {{ vcnDetails.code }}</p>
+
+                        <br />
+                        <br />
+                        <p class="mb-1">Credits Remaining</p>
+                        <p class="display-3">
+                          {{ currencySymbol
+                          }}{{
+                            vcnDetails.totalCreditsRemaining | number : "1.2-2"
+                          }}
+                        </p>
+                      </span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-3 mb-3">
+                      <span>
+                        <p class="mb-1">Vendor</p>
+                        <p class="mb-3 text-primary">
+                          {{ vcnDetails.vendor }}
+                        </p>
+                      </span>
+                      <span>
+                        <table class="table table-borderless">
+                          <tbody>
+                            <tr>
+                              <td>Vendor Credit Date:</td>
+                              <td>
+                                {{
+                                  vcnDetails.vendorCreditNoteDate
+                                    | customDatePipe : "DD-MMM-YYYY"
+                                }}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </span>
+                    </div>
+                    <div class="text-center">
+                      <div
+                        *ngIf="fetchingVCN"
+                        class="table-loader"
+                        style="text-align: center; color: indianred"
+                      >
+                        <span>
+                          <i class="icon icon-spin icon-spin2"></i> Loading
+                          items...</span
+                        >
+                      </div>
+                    </div>
+                    <div class="line" *ngIf="vcnDetails.lines.length">
+                      <table class="table items-table">
+                        <thead [style.background]="colorTheme.primaryColor">
+                          <tr>
+                            <th>#</th>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th class="text-right">
+                              Rate ({{ currencySymbol }})
+                            </th>
+                            <th class="text-right">
+                              Amount ({{ currencySymbol }})
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            *ngFor="let row of vcnDetails.lines; let i = index"
+                          >
+                            <td>{{ i + 1 }}</td>
+                            <td class="w-65">
+                              {{ row.itemName }} ({{ row.itemCode }})
+                            </td>
+                            <td class="w-10">{{ row.quantity }}</td>
+                            <td class="text-right">
+                              {{ row.unitPrice | number : "1.2-2" }}
+                            </td>
+                            <td class="text-right">
+                              {{ row.amountAfterTax | number : "1.2-2" }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="5"></td>
+                          </tr>
+                          <tr>
+                            <td colspan="3"></td>
+                            <td>Sub total</td>
+                            <td class="text-right">
+                              {{ currencySymbol
+                              }}{{ vcnDetails.subTotal | number : "1.2-2" }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="3"></td>
+                            <td>Tax</td>
+                            <td class="text-right">
+                              {{ currencySymbol
+                              }}{{
+                                vcnDetails.taxTotalAmount | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="3"></td>
+                            <td>Discount</td>
+                            <td class="text-danger text-right">
+                              {{ currencySymbol
+                              }}{{
+                                vcnDetails.discountAmount | number : "1.2-2"
+                              }}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colspan="3"></td>
+                            <td>Balance Due</td>
+                            <td class="text-right">
+                              {{ currencySymbol
+                              }}{{ vcnDetails.totalAmount | number : "1.2-2" }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane"
+            [ngClass]="{ 'active show': currentTab === 'comments' }"
+            *ngIf="currentTab === 'comments'"
+          >
+            <div class="p-5 paper">
+              <div class="card">
+                <table
+                  class="table table-striped mb-0"
+                  *ngIf="vcnDetails.comments.length; else noComments"
+                >
+                  <thead class="thead-light">
+                    <tr>
+                      <th class="text-uppercase" scope="col">Username</th>
+                      <th class="text-uppercase" scope="col">Comment</th>
+                      <th class="text-uppercase" scope="col">Date Created</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let c of vcnDetails.comments">
+                      <td>{{ c.name }}</td>
+                      <td>{{ c.comment }}</td>
+                      <td>{{ c.dateCreated | customDatePipe }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <ng-template #noComments>
+                  <div class="d-flex flex-column align-items-center w-100 py-3">
+                    <p class="display-4 text-center font-weight-light mb-0">
+                      No Comments Available
+                    </p>
+                    <img
+                      src="assets/images/no data.svg"
+                      alt="no-data-svg"
+                      width="200px"
+                      class="py-5"
+                    />
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane"
+            [ngClass]="{ 'active show': currentTab === 'activity' }"
+            *ngIf="currentTab === 'activity'"
+          >
+            <div class="p-5">
+              <div class="card">
+                <table
+                  *ngIf="selectedVCNActivities.length"
+                  class="table mb-0 table-striped"
+                >
+                  <thead class="thead-light">
+                    <tr>
+                      <th scope="col">Code</th>
+                      <th scope="col">Description</th>
+                      <th scope="col">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let activi of selectedVCNActivities">
+                      <td [style.color]="colorTheme.secondaryColor">
+                        {{ activi.relatedObjectInitiatorCode }}
+                      </td>
+                      <td>{{ activi.activityDescription }}</td>
+                      <td>
+                        {{ activi.activityDate | customDatePipe }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div
+                  *ngIf="!selectedVCNActivities.length"
+                  class="d-flex flex-column align-items-center w-100 py-3"
+                >
+                  <p class="display-4 text-center font-weight-light mb-0">
+                    <span *ngIf="fetchingSelectedVCNActivities">
+                      <i class="icon icon-spin icon-spin2 mr-2"></i>
+                      Fetching Activities...
+                    </span>
+                    <span *ngIf="!fetchingSelectedVCNActivities"
+                      >No Activities Available</span
+                    >
+                  </p>
+                  <img
+                    *ngIf="!fetchingSelectedVCNActivities"
+                    src="assets/images/no data.svg"
+                    alt="no-data-svg"
+                    width="200px"
+                    class="py-5"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="tab-pane"
+            [ngClass]="{ 'active show': currentTab === 'files' }"
+          >
+            <lnd-uploaded-files [files]="vcnDetails.files"></lnd-uploaded-files>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [comments]="vcnDetails?.comments"
+    feature="vendor credit notes"
+    [isLoading]="approving"
+    [canApprove]="user?.permission?.includes('Approve Vendor Credit Note')"
+    (sendPayload)="onApproveVCN($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>
+
+<ng-template #applyToBillView>
+  <div class="p-5">
+    <div class="d-flex justify-content-between mb-5">
+      <h2>Apply credits from {{ vcnDetails.code }}</h2>
+      <span
+        class="display-3 cursor"
+        (click)="closeApplyCreditsModal()"
+        aria-hidden="true"
+        >&times;</span
+      >
+    </div>
+    <div class="d-flex justify-content-end mb-5">
+      <span class="text-right">
+        <p class="mb-1">Credits Remaining:</p>
+        <p class="display-3">
+          {{ currencySymbol }}{{ amount?.creditsRemaining | number : "1.2-2" }}
+        </p>
+      </span>
+    </div>
+    <div *ngIf="!bills.length" class="text-center p-5">
+      <div class="table-loader" style="text-align: center; color: indianred">
+        <span *ngIf="fetchingBills">
+          <i class="icon icon-spin icon-spin2"></i> Loading Bills...</span
+        >
+        <p *ngIf="!fetchingBills">No Bill(s) for this vendor</p>
+      </div>
+    </div>
+    <form [formGroup]="applyCreditsForm">
+      <table class="table items-table" *ngIf="!fetchingBills && bills.length">
+        <thead [style.background]="colorTheme.primaryColor">
+          <tr>
+            <th></th>
+            <th>Bill#</th>
+            <th>Due Date</th>
+            <th class="text-right">Bill Amount ({{ currencySymbol }})</th>
+            <th class="text-right">Bill Balance ({{ currencySymbol }})</th>
+            <th class="text-right">Amount To Credit ({{ currencySymbol }})</th>
+          </tr>
+        </thead>
+        <tbody formArrayName="lines">
+          <tr
+            *ngFor="let b of bills; let i = index"
+            [formGroup]="lines.controls[i]"
+          >
+            <td>{{ i + 1 }}</td>
+            <td>{{ b.billCode }}</td>
+            <td>{{ b.billDueDate | customDatePipe : "DD-MMM-YY" }}</td>
+            <td class="text-right">{{ b.totalAmount | number : "1.2-2" }}</td>
+            <td class="text-right">
+              {{ b.balanceDue | number : "1.2-2" }}
+            </td>
+            <td class="text-right">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Amount"
+                formControlName="amount"
+                (keyup)="onAmountChange(b, lines.controls[i])"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+    <footer>
+      <div class="d-flex justify-content-end">
+        <h4>
+          Amount To Credit: {{ currencySymbol
+          }}{{ amount.amountToCredit | number : "1.2-2" }}
+        </h4>
+      </div>
+      <div class="d-flex justify-content-end">
+        <h4>
+          Remaining Credits: {{ currencySymbol
+          }}{{ amount.creditsRemaining | number : "1.2-2" }}
+        </h4>
+      </div>
+    </footer>
+    <div class="d-flex justify-content-end mt-3">
+      <button
+        type="button"
+        class="btn btn-light btn-xs"
+        (click)="closeApplyCreditsModal()"
+        *ngIf="!applying"
+      >
+        Cancel
+      </button>
+      <button
+        class="btn btn-xs ml-3 text-white"
+        [style.background]="colorTheme.secondaryColor"
+        (click)="onApplyToBills()"
+        [disabled]="!haveLinesWithAmount"
+        *ngIf="
+          !applying && user?.permission?.includes('Apply Vendor Credit Note')
+        "
+      >
+        Apply
+      </button>
+      <button class="btn btn-xs btn-warning mx-1" disabled *ngIf="applying">
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </div>
+</ng-template>

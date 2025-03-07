@@ -1,0 +1,120 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <div class="business-loading" *ngIf="businessLoader">
+        <div
+            class="table-loader"
+            style="text-align: center; color: indianred"
+          >
+            <span> <i class="icon icon-spin icon-spin2"></i> Loading your business...</span>
+          </div>
+      </div>
+      <div class="business-error" *ngIf="!businessLoader">
+        <div
+          class="alert alert-danger"
+          role="alert"
+          *ngIf="appOwner === null || businessErrMsg !== ''"
+        >
+          {{ businessErrMsg }}
+        </div>
+      </div>
+
+      <div class="logo mb-5 mx-auto" *ngIf="appOwner !== null">
+        <a [routerLink]="['/modules']" routerLinkActive="active">
+          <img
+            *ngIf="appOwner?.logoUrl !== ''"
+            id="logoUrl"
+            src="{{ appOwner?.logoUrl }}"
+            alt="logo"
+          />
+        </a>
+      </div>
+      <div class="card shadow-lg my-5" *ngIf="appOwner !== null">
+        <div class="card-body">
+          <div
+            *ngIf="requestLoader"
+            class="table-loader"
+            style="text-align: center; color: indianred"
+          >
+            <span> <i class="icon icon-spin icon-spin2"></i> Loading process log...</span>
+          </div>
+          <table class="table" *ngIf="!requestLoader">
+            <tbody>
+              <tr>
+                <th>Code</th>
+                <td class="code">{{ openedLogResult?.code }}</td>
+              </tr>
+              <tr>
+                <th>File Uploaded</th>
+                <td>
+                  <span
+                    *ngIf="openedLogResult?.file"
+                    class="badge badge-pill badge-primary pointer"
+                    title="Click to download file"
+                    (click)="downloadFile(openedLogResult?.file?.filePath)"
+                  >
+                    {{ openedLogResult?.file?.fileName }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>Status</th>
+                <td>
+                  <span
+                    class="badge badge-pill badge-sm"
+                    [ngClass]="
+                      openedLogResult?.status.toLowerCase() === 'done'
+                        ? 'badge-success'
+                        : openedLogResult?.status.toLowerCase() === 'failed'
+                        ? 'badge-danger'
+                        : openedLogResult?.status.toLowerCase() === 'created'
+                        ? 'badge-primary'
+                        : 'badge-light'
+                    "
+                  >
+                    {{ openedLogResult?.status }}
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <th>Type</th>
+                <td>{{ openedLogResult?.type }}</td>
+              </tr>
+              <tr>
+                <th>Uploaded by</th>
+                <td>{{ openedLogResult?.personName }}</td>
+              </tr>
+              <tr>
+                <th>Branch</th>
+                <td>{{ openedLogResult?.branchName }}</td>
+              </tr>
+              <tr>
+                <th>Message</th>
+                <td>{{ openedLogResult?.resultData?.message }}</td>
+              </tr>
+              <tr>
+                <th>Errors</th>
+                <td>
+                  <ul class="pl-0">
+                    <li *ngFor="let err of openedLogResult?.resultData?.errors">
+                      {{ err }}
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="text-center" *ngIf="appOwner !== null">
+        <a
+          [routerLink]="['/modules']"
+          routerLinkActive="active"
+          [style.color]="currentTheme?.secondaryColor"
+          class="mt-5"
+          >Enter Lendastack</a
+        >
+      </div>
+    </div>
+  </div>
+</div>

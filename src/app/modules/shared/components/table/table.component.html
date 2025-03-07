@@ -1,0 +1,547 @@
+<div
+  *ngIf="isLoading"
+  class="d-flex justify-content-center"
+  [style.color]="currentTheme?.secondaryColor"
+>
+  <span>Loading... <i class="icon icon-spin icon-spin2"></i></span>
+</div>
+<section
+  *ngIf="headers && config"
+  class="table"
+  [ngClass]="{ 'shadow-lg border-rounded': config?.shadow }"
+>
+  <header *ngIf="pagination">
+    <div *ngIf="pagination.pageSize && pagination.pageNumber">
+      <span>Show</span>
+      <select
+        [(ngModel)]="pagination.pageSize"
+        aria-controls="data-table"
+        (change)="
+          paginationChange.emit({
+            pageNumber: pagination.pageNumber,
+            pageSize: pagination.pageSize,
+            filter: pagination.filter,
+          })
+        "
+        class="custom-select form-control mx-2"
+      >
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+      <span>entries</span>
+    </div>
+    <div
+      *ngIf="allowSearch"
+      class="justify-content-end"
+      [ngClass]="{
+        '': pagination.pageSize && pagination.pageNumber,
+      }"
+    >
+      <ng-container *ngIf="config.legacySearch">
+        <input
+          type="text"
+          (keyup)="setSearchFilter($event.target.value)"
+          [(ngModel)]="pagination.keyword"
+          (keydown.enter)="
+            paginationChange.emit({
+              filter: pagination.filter,
+              keyword: pagination.keyword,
+              pageNumber: pagination.pageNumber,
+              pageSize: +pagination.pageSize,
+            })
+          "
+          class="form-control legacy-input"
+          [placeholder]="config?.searchPlaceholder"
+          aria-controls="data-table"
+        />
+
+        <button
+          class="btn btn-xs text-white ml-3 p-2"
+          [style.background]="currentTheme.secondaryColor"
+          (click)="
+            paginationChange.emit({
+              filter: pagination.filter,
+              keyword: pagination.keyword,
+              pageNumber: pagination.pageNumber,
+              pageSize: +pagination.pageSize,
+            })
+          "
+        >
+          <i class="icon icon-search"></i>
+        </button>
+      </ng-container>
+
+      <ng-container *ngIf="!config.legacySearch">
+        <lnd-search-dropdown
+          [searchColumns]="searchColumns"
+          [currentTheme]="currentTheme"
+          [addTopRule]="addTopRule"
+          [useRelativePosition]="useRelativePosition"
+          (searchParams)="onSearchParams($event)"
+        ></lnd-search-dropdown>
+      </ng-container>
+    </div>
+  </header>
+  <div
+    class="mt-5"
+    *ngIf="selectedFilters || (useComplexFilters && complexFilters.length) && !useNewFilter"
+  >
+    <lnd-selected-filters
+      [useFilterModel]="useFilterModel"
+      (initialized)="onSelectedFiltersInit($event)"
+    ></lnd-selected-filters>
+  </div>
+  <lnd-filter-selection *ngIf="useNewFilter" (filterParams)="filterParams.emit($event)" />
+
+
+  <div
+    *ngIf="pagination"
+    class="d-flex justify-content-between align-items-center mt-4"
+    [ngClass]="{'mb-4': !filters?.length && !complexFilters?.length}"
+  >
+    <span *ngIf="!(pagination.pageSize && pagination.pageNumber)"></span>
+    <p
+      *ngIf="pagination.pageSize && pagination.pageNumber && !isLoading"
+      class="mb-0"
+    >
+      Showing
+      {{
+        (pagination.pageNumber - 1) * pagination.pageSize + 1 | number : "1.0-0"
+      }}
+      -
+      {{
+        (pagination.pageNumber - 1) * pagination.pageSize + pagination.count
+          | number : "1.0-0"
+      }}
+      of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+    </p>
+
+    <div class="d-flex align-items-center" style="gap: 10px">
+      <div *ngIf="subTabs.length > 0" class="sub-tabs">
+        <button
+          *ngFor="let tab of subTabs"
+          class="btn btn-sm"
+          (click)="switchSubTab.emit(tab?.currentTab)"
+          [ngClass]="{ 'active-sub-tab': tab?.activeTab }"
+        >
+          {{ tab?.text }}
+        </button>
+      </div>
+      <lnd-filter-btn
+        *ngIf="
+          (filters?.length > 0 || complexFilters?.length > 0) && !isLoading || (useNewFilter && !isLoading)
+        "
+        (filterModalOpen)="openFilterModal()"
+      />
+    </div>
+    <div class="filter-menu filter-menu-right">
+      <div class="filter-menu-header">
+        <h4 class="title"><i class="mr-2 icon icon-ckeditor"></i>Filter</h4>
+      </div>
+      <div class="filter-menu-body">
+        <div class="h-auto">
+          <div class="form-row">
+            <br />
+            <div *ngIf="!useComplexFilters" class="mb-3 col-sm-12">
+              <label>{{ filerLabel }} </label>
+              <div>
+                <slct-2
+                  [(ngModel)]="selectedFilters"
+                  [data]="filters"
+                  [placeholder]="filerLabel"
+                  [customSearchEnabled]="enableFiltersSearch"
+                  [multiple]="allowMultipleFilters"
+                ></slct-2>
+              </div>
+            </div>
+            <ng-container *ngIf="useStartAndEndDate">
+              <div class="form-row">
+                <div class="col-sm-6 mb-3">
+                  <label for="validationDefault02"
+                    >Start Date <span class="text-danger">*</span></label
+                  >
+                  <div
+                    class="input-group date"
+                    id="date-time-picker-1"
+                    data-target-input="nearest"
+                  >
+                    <input
+                      lndInvalidDateChecker
+                      type="date"
+                      [(ngModel)]="startDate"
+                      class="form-control"
+                    />
+                    <div class="input-group-append">
+                      <div class="input-group-text">
+                        <i class="icon icon-calendar"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 mb-3">
+                  <label for="validationDefault02"
+                    >End Date <span class="text-danger">*</span></label
+                  >
+                  <div
+                    class="input-group date"
+                    id="date-time-picker-1"
+                    data-target-input="nearest"
+                  >
+                    <input
+                      lndInvalidDateChecker
+                      type="date"
+                      [(ngModel)]="endDate"
+                      class="form-control"
+                    />
+                    <div class="input-group-append">
+                      <div class="input-group-text">
+                        <i class="icon icon-calendar"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="useComplexFilters">
+              <div *ngFor="let filter of complexFilters" class="mb-3 col-sm-12">
+                <label>{{ filter.label }}</label>
+                <div>
+                  <slct-2
+                    [data]="filter.data"
+                    (selected)="onComplexFilterSelected(filter.id, $event)"
+                    (removed)="onComplexFilterRemoved(filter.id, $event)"
+                    [placeholder]="filter.placeholder"
+                    [customSearchEnabled]="enableFiltersSearch"
+                  ></slct-2>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="filter-menu-footer">
+          <div class="footer-right">
+            <button
+              type="button"
+              (click)="onFilter()"
+              class="mr-2 btn btn-xs text-white"
+              *ngIf="!loader"
+              [disabled]="filterForm && filterForm.invalid"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [style.borderColor]="currentTheme?.secondaryColor"
+            >
+              Filter
+            </button>
+            <button
+              type="button"
+              class="mr-2 btn btn-primary btn-xs"
+              [disabled]="true"
+              *ngIf="loader"
+            >
+              <i class="icon icon-spin icon-spin2"></i> Filtering ...
+            </button>
+            <button
+              type="button"
+              (click)="closeFilterModal()"
+              class="btn btn-danger btn-xs"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table
+      *ngIf="!isLoading"
+      [ngStyle]="config.style ? config.style : null"
+      [ngClass]="{
+        'table-striped': config?.striped,
+        'table-bordered': config?.bordered,
+        'table-sm': config?.small,
+      }"
+    >
+      <thead
+        [ngStyle]="
+          config.theadBg
+            ? { backgroundColor: currentTheme?.primaryColor }
+            : null
+        "
+        [ngClass]="{
+          'thead-light': config.theadLight,
+          'table-sm': config.small
+        }"
+      >
+        <tr>
+          <th
+            *ngFor="let th of headers"
+            [ngClass]="{
+              'text-left': th.alignment === 'left',
+              'text-center': th.centered || th.alignment === 'center',
+              'text-right': th.alignment === 'right',
+            }"
+            [ngStyle]="{ 'font-weight': 'bold' }"
+          >
+            <span
+              [ngClass]="{
+                'text-right float-right': th.type === 'amount',
+              }"
+            >
+              {{ th.name | titlecase }}
+              <span *ngIf="th.type === 'amount'">({{ config?.currency }})</span>
+              <span *ngIf="th.type === 'percent'">(%)</span>
+            </span>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <ng-container *ngIf="data?.length > 0">
+          <tr
+            *ngFor="let value of data"
+            [ngClass]="{
+              cursor: config?.rowClickable
+            }"
+            (click)="rowClick(value)"
+          >
+            <td
+              *ngFor="let keyVal of value | keyvalue : originalOrder"
+              [ngClass]="{
+                copy_icon_wrapper: keyVal.value.type === 'code',
+                'text-center':
+                  keyVal?.value?.centered ||
+                  keyVal?.value?.alignment === 'center',
+                'text-left': keyVal?.value?.alignment === 'left',
+                'text-right': keyVal?.value?.alignment === 'right'
+              }"
+              [ngStyle]="config?.tdStyle"
+            >
+              <span
+                *ngIf="!keyVal.value.type"
+                [ngStyle]="
+                  keyVal.value?.defaultConfig?.style
+                    ? keyVal.value?.defaultConfig?.style
+                    : {}
+                "
+                >{{ keyVal.value.tdValue }}</span
+              >
+              <span
+                *ngIf="keyVal.value.type === 'status'"
+                [ngClass]="
+                  keyVal.value.statusConfig.class
+                    ? 'badge badge-xs ' + keyVal.value.statusConfig.class
+                    : ''
+                "
+                [ngbTooltip]="keyVal.value?.codeConfig?.tooltip || ''"
+                [placement]="
+                  keyVal.value?.codeConfig?.tooltipPlacement || 'top'
+                "
+                >{{ keyVal.value.tdValue | humanify
+                }}{{ statusConfig?.color }}</span
+              >
+              <span *ngIf="keyVal.value.type === 'stage'">{{
+                keyVal.value.tdValue | humanify
+              }}</span>
+              <span
+                *ngIf="keyVal.value.type === 'code'"
+                [style.color]="currentTheme?.secondaryColor"
+                >{{ keyVal.value.tdValue }}
+                <img
+                  (mouseover)="copy_hover = true"
+                  (mouseleave)="copy_hover = false"
+                  class="copy_icon"
+                  src="assets/images/copy.png"
+                  alt="copy icon"
+                  width="15"
+                  height="15"
+                  (click)="copyCode($event, keyVal.value.tdValue)"
+                  placement="right"
+                  [ngbTooltip]="keyVal.value?.codeConfig?.tooltip || 'Copy'"
+                />
+              </span>
+              <span *ngIf="keyVal.value.type === 'date'"
+                >{{
+                  keyVal.value.tdValue | date : keyVal.value?.dateConfig?.format
+                }}
+                <span
+                  *ngIf="
+                    keyVal.value.tdValue && keyVal.value?.dateConfig?.showTime
+                  "
+                >
+                  <i class="icon icon-timepicker ml-1"></i>
+                  {{ keyVal.value.tdValue | date : "shortTime" }}
+                </span>
+              </span>
+              <span
+                *ngIf="keyVal.value.type === 'amount'"
+                class="float-right"
+                [ngClass]="keyVal.value?.defaultConfig?.class"
+                >{{ keyVal.value.tdValue | number : "1.2-2" }}</span
+              >
+              <span
+                *ngIf="keyVal.value.type === 'link'"
+                class="cursor"
+                [style.color]="currentTheme?.secondaryColor"
+                (click)="viewFile(keyVal.value.tdValue)"
+                >View File</span
+              >
+              <span *ngIf="keyVal.value.type === 'action'">
+                <button
+                  [matMenuTriggerFor]="menu"
+                  (click)="toggleDropdown($event)"
+                  class="btn btn-warning btn-xs dropdown-toggle"
+                ></button>
+                <mat-menu #menu="matMenu" xPosition="before">
+                  <ng-container
+                    *ngFor="let actionConfig of keyVal.value?.actionConfig"
+                  >
+                    <a
+                      mat-menu-item
+                      style="min-height: auto"
+                      *ngIf="actionConfig.showBtn"
+                      class="dropdown-item cursor"
+                      (click)="actionConfig?.funcRef()"
+                      [disabled]="actionConfig?.disable"
+                      ><span>
+                        <i
+                          class="icon icon-fw mr-2"
+                          [ngClass]="
+                            actionConfig.iconClass
+                              ? actionConfig.iconClass
+                              : null
+                          "
+                        ></i
+                        >{{ actionConfig.btnText }}
+                      </span></a
+                    >
+                  </ng-container>
+                </mat-menu>
+              </span>
+            </td>
+          </tr>
+
+          <tr *ngIf="config?.summations">
+            <td *ngFor="let summation of summationData; let i = index">
+              <span [ngClass]="{ 'float-right': i > 1 }">
+                <b>
+                  <span *ngIf="summation.value && !summation.isLabel"
+                    >{{ config?.currency }}{{ summation.value }}</span
+                  >
+                  <span *ngIf="summation.value && summation.isLabel">{{
+                    summation.value
+                  }}</span>
+                </b>
+              </span>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+  <footer
+    class="mt-5"
+    *ngIf="pagination && (pagination.hasPreviousPage || pagination.hasNextPage)"
+  >
+    <ul class="pagination pagination-sm justify-content-end">
+      <li class="page-item" *ngIf="pagination.hasPreviousPage">
+        <a
+          class="page-link"
+          href="javascript:void(0)"
+          (click)="
+            paginationChange.emit({
+              pageNumber: pagination.pageNumber - 1,
+              filter: pagination.filter,
+              pageSize: +pagination.pageSize
+            })
+          "
+          >Previous</a
+        >
+      </li>
+      <li class="page-item pagination-menu-wrapper">
+        <a
+          class="page-link page-target"
+          href="javascript:void(0)"
+          (click)="itemPaginatedJumpModal()"
+        >
+          {{ pagination.pageNumber }} of {{ pagination.totalPages }} page{{
+            pagination.totalPages > 1 ? "s" : ""
+          }}
+          <span class="sr-only">(current)</span>
+        </a>
+        <div
+          class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+        >
+          <div class="pagination-menu-body">
+            <div class="h-auto">
+              <span>Jump to Page</span>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="pagination.pageNumber"
+                (change)="
+                  paginationChange.emit({
+                    pageNumber: pagination.pageNumber,
+                    filter: pagination.filter,
+                    pageSize: +pagination.pageSize
+                  });
+                  itemPaginatedJumpModal()
+                "
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option
+                  (click)="pagination.pageNumber = line"
+                  *ngFor="let line of pagination.jumpArray"
+                >
+                  {{ line }}
+                </option>
+              </select>
+              <div class="text-center mt-3">
+                <button
+                  (click)="itemPaginatedJumpModal()"
+                  type="button"
+                  class="btn btn-danger btn-xs"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="page-item" *ngIf="pagination.hasNextPage">
+        <a
+          class="page-link"
+          href="javascript:void(0)"
+          (click)="
+            paginationChange.emit({
+              pageNumber: pagination.pageNumber + 1,
+              filter: pagination.filter,
+              pageSize: +pagination.pageSize
+            })
+          "
+        >
+          Next
+        </a>
+      </li>
+    </ul>
+  </footer>
+  <ng-container *ngIf="data?.length === 0 && !isLoading">
+    <no-data
+      [title]="noDataTitle"
+      [desc]="noDataDesc"
+      [createLinkInfo]="createLinkInfo"
+    ></no-data>
+  </ng-container>
+</section>
+
+<lnd-filter-menu
+  *ngIf="filterTypes.length > 0"
+  [showPopup]="showFilterPopup"
+  [filterTypes]="filterTypes"
+  [statuses]="filters"
+  [isLoading]="isLoading"
+  [customTableTopPosition]="customTableTopPosition"
+  (closePopup)="showFilterPopup = false"
+/>

@@ -1,0 +1,15 @@
+.badge {
+  border: 1px solid var(--secondary-color);
+  color: var(--secondary-color);
+}
+
+.view-more{
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--primary-color);
+}
+
+main{
+  max-height: 300px;
+  overflow-y: auto;
+}

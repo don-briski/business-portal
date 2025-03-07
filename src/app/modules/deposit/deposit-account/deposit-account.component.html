@@ -1,0 +1,2449 @@
+<div class="dt-page__header">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Deposit Accounts</h1>
+    <button class="btn btn-primary orange-bg text-white" data-toggle="dropdown">
+      <i class="icon icon-add-circle mr-2"></i> Add New
+    </button>
+
+    <div class="dropdown-menu" x-placement="auto">
+      <a
+        class="dropdown-item"
+        [routerLink]="['/deposits/accounts/create-savings-account']"
+        >Savings Account
+      </a>
+      <a
+        class="dropdown-item"
+        href="#"
+        data-toggle="modal"
+        data-target="#add-new-fd"
+        (click)="setAccountToCreate('savings-plan')"
+        >Savings Plan
+      </a>
+      <a
+        class="dropdown-item"
+        href="#"
+        data-toggle="modal"
+        data-target="#add-new-fd"
+        (click)="setAccountToCreate('fixed-deposit')"
+        >Fixed Deposit Plan
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xl-12">
+    <ul
+      id="active-div"
+      class="nav justify-content-center"
+      *ngIf="currentview == views.applications || currentview == views.accounts"
+    >
+      <li class="nav-item">
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{ 'active-tab': currentview == views.applications }"
+          (click)="switchViews(views.applications)"
+        >
+          Applications
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{ 'active-tab': currentview == views.accounts }"
+          (click)="switchViews(views.accounts)"
+        >
+          Deposit Accounts
+        </a>
+      </li>
+    </ul>
+    <ul
+      id="active-div"
+      class="nav justify-content-center"
+      *ngIf="currentview == views.transactions"
+    >
+      <li class="nav-item">
+        <a
+          class="nav-link pool-nav active-tab"
+          (click)="switchViews(views.accounts)"
+        >
+          Back
+        </a>
+      </li>
+    </ul>
+
+    <!-- Card -->
+    <div class="dt-card" *ngIf="currentview == views.applications">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <!-- Tables -->
+        <div
+          *ngIf="depositApplicationsRequestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div>
+          <!-- Pagination Top-->
+          <div class="row align-items-center">
+            <!-- <div class="col-md-4">
+              <label style="display: inline-flex">
+                <span style="padding: 8px 2px; font-size: 12px">Show </span>
+                <select aria-controls="data-table" class="
+                  custom-select custom-select-xl
+                  form-control form-control-xl
+                  height
+                ">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px">entries</span></label>
+            </div> -->
+            <div class="col-md-3 mb-2">
+              <label>Deposit Product</label>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="
+                  depositAccountApplicationFetchModel.depositProductId
+                "
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option value="{{ null }}">-- Select Deposit Product --</option>
+                <option
+                  *ngFor="let row of depositProductsForSelect"
+                  value="{{ row.id }}"
+                >
+                  {{ row.text }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-3 mb-2">
+              <label>Customer Type</label>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="depositAccountApplicationFetchModel.customerType"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option value="{{ null }}">-- Select Customer Type --</option>
+                <option
+                  *ngFor="let row of depositAccountCustomerTypes"
+                  value="{{ row }}"
+                >
+                  {{ row }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-3 mb-2">
+              <label>Status</label>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="depositAccountApplicationFetchModel.status"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option value="{{ null }}">-- Select Status --</option>
+                <option
+                  *ngFor="let row of depositAccountTempDetailsStatuses"
+                  value="{{ row }}"
+                >
+                  {{ row }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-3 mb-2">
+              <label>Category</label>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="
+                  depositAccountApplicationFetchModel.depositAccountCategory
+                "
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option value="{{ null }}">-- Select Category --</option>
+                <option
+                  *ngFor="let row of depositAccountCategories"
+                  value="{{ row }}"
+                >
+                  {{ row | humanify }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-md-3 mb-2">
+              <label>Product Type</label>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="
+                  depositAccountApplicationFetchModel.depositProductType
+                "
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option value="{{ null }}">-- Select Product Type --</option>
+                <option
+                  *ngFor="let row of depositProductTypes"
+                  value="{{ row }}"
+                >
+                  {{ row }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3 my-4">
+              <button
+                class="btn btn-primary btn-xs text-white"
+                (click)="fetchDepositAccountApplications(1)"
+              >
+                Search
+              </button>
+              <!-- <label style="display: inline-flex; float: right"><span
+                  style="padding: 10px 2px; font-size: 12px">Search:</span><input type="search"
+                  class="form-control form-control-sm" placeholder="" aria-controls="data-table" /></label> -->
+            </div>
+          </div>
+          <div class="row">
+            <!-- <div class="" aria-live="polite" style="padding-left: 18px; font-size: 13px; margin-top: -8px">
+              Showing {{ depositApplicationPagination.count }} of {{ depositApplicationPagination.totalRecords }} record(s)
+            </div> -->
+          </div>
+          <!-- /pagination Top -->
+
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Customer name</th>
+                  <th>Customer Type</th>
+                  <th>Product</th>
+                  <!-- <th>Available balance</th> -->
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="!depositApplicationsRequestLoader">
+                <tr *ngFor="let row of depositAccountApplications">
+                  <td>
+                    <span>{{ row.customerName }}</span>
+                  </td>
+                  <td>
+                    <span>{{ row.customerType }}</span>
+                  </td>
+                  <td>
+                    <span style="overflow-wrap: break-word">{{
+                      row.depositProductName
+                    }}</span>
+                  </td>
+                  <!-- <td><span>{{row.balance | number: "1.2-2" }}</span></td>
+                  <td><span>{{row.availableBalance | number: "1.2-2" }}</span></td> -->
+                  <td>
+                    <span>{{ row.status }}</span>
+                  </td>
+                  <td>
+                    <div class="dropdown mr-2 mb-2 d-inline-block">
+                      <button
+                        class="btn btn-primary orange-bg text-white btn-xs dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                      ></button>
+                      <div class="dropdown-menu" x-placement="auto">
+                        <a
+                          class="dropdown-item"
+                          (click)="
+                            editDepositAccountApplicationFormInit(
+                              editDepositAccountApplicationModal,
+                              row
+                            )
+                          "
+                          >Edit
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                          (click)="
+                            depositApplicationStatusFormInit(
+                              depositApplicationStatusModal,
+                              row
+                            )
+                          "
+                        >
+                          Change Status
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                          (click)="
+                            viewDepositApplication(
+                              viewDepositAccountApplicationModal,
+                              row.tempDepositDetailsId
+                            )
+                          "
+                        >
+                          View Application
+                        </a>
+                        <!-- <a class="dropdown-item" href="javascript:void(0)">View</a> -->
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- <tr>
+              <td>
+                <span>Ada Ada</span>
+              </td>
+              <td>
+                <span>DA20210321</span>
+              </td>
+              <td>
+                <span>Deposit Plans</span>
+              </td>
+              <td>
+                <span>Naira</span>
+              </td>
+              <td>
+                <span class="badge badge-success btn-xs mb-1 mr-1">Active</span>
+              </td>
+              <td><span>Bukky Felix</span></td>
+
+            </tr> -->
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="depositApplicationPagination.hasPreviousPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      fetchDepositAccountApplications(
+                        depositApplicationPagination.pageNumber - 1
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="depositApplicationpaginatedJumpModal()"
+                    href="javascript:void(0)"
+                    >{{ depositApplicationPagination.pageNumber }} of
+                    {{ depositApplicationPagination.maxPage }} page
+                    <span *ngIf="depositApplicationPagination.pageNumber > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+
+                  <div
+                    class="depositApplicationpaginatedJumpModal pagination-menu pagination-menu-right"
+                  >
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="depositApplicationPagination.pageNumber"
+                          (change)="
+                            fetchDepositAccountApplications(
+                              depositApplicationPagination.pageNumber
+                            )
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option
+                            *ngFor="
+                              let line of depositApplicationPagination.jumpArray
+                            "
+                          >
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="depositApplicationpaginatedJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="depositApplicationPagination.hasNextPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      fetchDepositAccountApplications(
+                        depositApplicationPagination.pageNumber + 1
+                      )
+                    "
+                  >
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+          <!-- Pagination Bottom -->
+          <!-- <div>
+        <br />
+        <nav>
+          <ul class="pagination pagination-sm justify-content-end">
+            <li class="page-item">
+              <a class="page-link" href="javascript:void(0)" tabindex="-1"
+                >Previous</a
+              >
+            </li>
+            <li class="page-item pagination-menu-wrapper">
+              <a class="page-link page-target" href="javascript:void(0)"
+                >1 of 1 pages <span></span
+                ><span class="sr-only">(current)</span></a
+              >
+
+              <div class="pagination-menu pagination-menu-right">
+                  <div class="pagination-menu-body">
+                    <div class="h-auto">
+                      <span>Jump to Page</span>
+                      <select aria-controls="data-table" [(ngModel)]="pagination.pageNum"
+                        (change)="getFinancialInstitutions(pagination.pageNum)"
+                        class="custom-select custom-select-xl form-control form-control-xl height">
+                        <option *ngFor="let line of pagination.jumpArray">{{line}}</option>
+                      </select>
+                      <div class="text-center mt-3">
+                        <button type="button" (click)="paginatedJumpModal()"
+                          class="btn btn-danger btn-xs ">Close</button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="javascript:void(0)"> Next </a>
+            </li>
+          </ul>
+        </nav>
+      </div> -->
+          <!-- /pagination Bottom -->
+        </div>
+        <!-- /tables -->
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+
+    <!-- Card -->
+    <div class="dt-card" *ngIf="currentview == views.accounts">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <!-- Tables -->
+        <div
+          *ngIf="depositAccountRequestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div>
+          <!-- Pagination Top-->
+          <div class="row align-items-center">
+            <div class="col-md-3">
+              <label>Deposit Product</label>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="depositAccountFetchModel.depositProductId"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option value="{{ null }}">-- Select Deposit Product --</option>
+                <option
+                  *ngFor="let row of depositProductsForSelect"
+                  value="{{ row.id }}"
+                >
+                  {{ row?.text }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3 my-4">
+              <button
+                class="btn btn-primary btn-xs text-white"
+                (click)="fetchDepositAccounts(1)"
+              >
+                Search
+              </button>
+            </div>
+            <!-- <div class="col-md-4">
+              <label style="display: inline-flex"><span style="padding: 8px 2px; font-size: 12px">Show </span><select
+                  aria-controls="data-table" class="
+                custom-select custom-select-xl
+                form-control form-control-xl
+                height
+              ">
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px">entries</span></label>
+            </div> -->
+
+            <!-- <div class="form-group col-md-4">
+              <label style="display: inline-flex; float: right"><span
+                  style="padding: 10px 2px; font-size: 12px">Search:</span><input type="search"
+                  class="form-control form-control-sm" placeholder="" aria-controls="data-table" /></label>
+            </div>
+            <div class="" aria-live="polite" style="padding-left: 18px; font-size: 13px; margin-top: -8px">
+              Showing 1 of 1 record(s)
+            </div> -->
+          </div>
+          <!-- /pagination Top -->
+
+          <!-- Tables -->
+          <div>
+            <table id="data-table" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Product Name</th>
+                  <th>Balance</th>
+                  <th>Available balance</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="!depositAccountRequestLoader">
+                <tr class="gradeX" *ngFor="let row of depositAccounts">
+                  <td>
+                    <span>{{ row.depositAccountCode }}</span>
+                  </td>
+                  <td>
+                    <span style="overflow-wrap: break-word">
+                      {{ row.depositProductName }}
+                    </span>
+                  </td>
+                  <td>
+                    <span>{{ row.balance | number: "1.2-2" }}</span>
+                  </td>
+                  <td>
+                    <span>{{ row.availableBalance | number: "1.2-2" }}</span>
+                  </td>
+                  <td>
+                    <span>{{ row.status }}</span>
+                  </td>
+                  <td>
+                    <div class="dropdown mr-2 mb-2 d-inline-block">
+                      <button
+                        class="btn btn-primary orange-bg text-white btn-xs dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      ></button>
+                      <div class="dropdown-menu">
+                        <a
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                          (click)="
+                            viewTransactionsByDepositAccountId(
+                              row.depositAccountId
+                            )
+                          "
+                        >
+                          View Transactions
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                          (click)="
+                            depositTransactionFormInit(
+                              depositTransactionModal,
+                              row
+                            )
+                          "
+                        >
+                          Create Transaction
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                          (click)="
+                            depositAccountFeeFormInit(
+                              depositApplicationFeeModal,
+                              row
+                            )
+                          "
+                        >
+                          Create Fee
+                        </a>
+                        <a
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                          (click)="
+                            viewDepositAccount(
+                              viewDepositAccountModal,
+                              row.depositAccountId
+                            )
+                          "
+                        >
+                          View Details
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- <tr>
+              <td>
+                <span>Ada Ada</span>
+              </td>
+              <td>
+                <span>DA20210321</span>
+              </td>
+              <td>
+                <span>Deposit Plans</span>
+              </td>
+              <td>
+                <span>Naira</span>
+              </td>
+              <td>
+                <span class="badge badge-success btn-xs mb-1 mr-1">Active</span>
+              </td>
+              <td><span>Bukky Felix</span></td>
+
+            </tr> -->
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="depositAccountPagination.hasPreviousPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      fetchDepositAccounts(depositAccountPagination.pageNumber)
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="depositAccountpaginatedJumpModal()"
+                    href="javascript:void(0)"
+                    >{{ depositAccountPagination.pageNumber }} of
+                    {{ depositAccountPagination.maxPage }} page
+                    <span *ngIf="depositAccountPagination.pageNumber > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+
+                  <div
+                    class="depositAccountpaginatedJumpModal pagination-menu pagination-menu-right"
+                  >
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="depositAccountPagination.pageNumber"
+                          (change)="
+                            fetchDepositAccounts(
+                              depositAccountPagination.pageNumber
+                            )
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option
+                            *ngFor="
+                              let line of depositAccountPagination.jumpArray
+                            "
+                          >
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="depositAccountpaginatedJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="depositAccountPagination.hasNextPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      fetchDepositAccounts(
+                        depositAccountPagination.pageNumber + 1
+                      )
+                    "
+                  >
+                    <!-- (click)="getFinancialInstitutionsPaginatedSearch(depositAccountPagination.searchTerm, depositAccountPagination.pageSize, depositAccountPagination.pageNumber + 1)"> -->
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+          <!-- Pagination Bottom -->
+          <!-- <div>
+        <br />
+        <nav>
+          <ul class="pagination pagination-sm justify-content-end">
+            <li class="page-item">
+              <a class="page-link" href="javascript:void(0)" tabindex="-1"
+                >Previous</a
+              >
+            </li>
+            <li class="page-item pagination-menu-wrapper">
+              <a class="page-link page-target" href="javascript:void(0)"
+                >1 of 1 pages <span></span
+                ><span class="sr-only">(current)</span></a
+              >
+
+              <div class="pagination-menu pagination-menu-right">
+                  <div class="pagination-menu-body">
+                    <div class="h-auto">
+                      <span>Jump to Page</span>
+                      <select aria-controls="data-table" [(ngModel)]="pagination.pageNum"
+                        (change)="getFinancialInstitutions(pagination.pageNum)"
+                        class="custom-select custom-select-xl form-control form-control-xl height">
+                        <option *ngFor="let line of pagination.jumpArray">{{line}}</option>
+                      </select>
+                      <div class="text-center mt-3">
+                        <button type="button" (click)="paginatedJumpModal()"
+                          class="btn btn-danger btn-xs ">Close</button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+            </li>
+            <li class="page-item">
+              <a class="page-link" href="javascript:void(0)"> Next </a>
+            </li>
+          </ul>
+        </nav>
+      </div> -->
+          <!-- /pagination Bottom -->
+        </div>
+        <!-- /tables -->
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+
+    <!-- Card -->
+    <div class="dt-card" *ngIf="currentview == views.transactions">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <!-- Tables -->
+        <div
+          *ngIf="transactionsRequestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div>
+          <!-- Pagination Top-->
+          <div class="row align-items-center">
+            <div class="col-md-3">
+              <label>Transaction Type</label>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="
+                  depositAccountTransactionFetchModel.transactionType
+                "
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option value="{{ null }}">-- Select Trasaction Type --</option>
+                <option
+                  *ngFor="let row of depositAccountTransactionTypes"
+                  value="{{ row }}"
+                >
+                  {{ row }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label>Start Date</label>
+              <input
+              lndInvalidDateChecker
+                type="date"
+                class="form-control"
+                [(ngModel)]="transRawStartDate"
+              />
+            </div>
+            <div class="col-md-3">
+              <label>End Date</label>
+              <input
+              lndInvalidDateChecker
+                type="date"
+                class="form-control"
+                [(ngModel)]="transRawEndDate"
+              />
+            </div>
+            <div class="col-md-3 my-4">
+              <button
+                class="btn btn-primary btn-xs text-white"
+                (click)="fetchDepositTransactions(1)"
+              >
+                Search
+              </button>
+            </div>
+          </div>
+          <!-- /pagination Top -->
+
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Amount</th>
+                  <th>Balance</th>
+                  <th>Transaction Type</th>
+                  <th>Created by</th>
+                  <th>Comment</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="!transactionsRequestLoader">
+                <tr *ngFor="let row of depositAccountTransactions">
+                  example here
+                  <td>
+                    <span>{{
+                      row.createdAt | customDatePipe: "DD/MMM/YYYY"
+                    }}</span>
+                  </td>
+                  <td>
+                    <span
+                      [ngClass]="
+                        row.transactionType === 'Deposit'
+                          ? 'text-success'
+                          : 'text-danger'
+                      "
+                      >{{ row.amount | number: "1.2-2" }}</span
+                    >
+                  </td>
+                  <td>
+                    <span>{{ row.balance | number: "1.2-2" }}</span>
+                  </td>
+                  <td>
+                    <span
+                      [ngClass]="
+                        row.transactionType === 'Deposit'
+                          ? 'text-success'
+                          : 'text-danger'
+                      "
+                      >{{ row.transactionType }}</span
+                    >
+                  </td>
+                  <td>
+                    <span>{{ row.createdBy }}</span>
+                  </td>
+                  <td>
+                    <span>{{ row.comment }}</span>
+                  </td>
+                  <!-- <td>
+                    <div class="dropdown mr-2 mb-2 d-inline-block">
+                      <button class="
+                      btn btn-primary
+                      orange-bg
+                      text-white
+                      btn-xs
+                      dropdown-toggle
+                    " type="button" data-toggle="dropdown"></button>
+                      <div class="dropdown-menu" x-placement="auto">
+                        <a class="dropdown-item" href="javascript:void(0)">Deactive</a>
+                        <a class="dropdown-item" href="javascript:void(0)">Delete Plan</a>
+                        <a class="dropdown-item" href="javascript:void(0)">View/Manage Plan</a>
+                      </div>
+                    </div>
+                  </td> -->
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="depositTransactionPagination.hasPreviousPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      fetchDepositTransactions(
+                        depositTransactionPagination.pageNumber
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="depositTransactionspaginatedJumpModal()"
+                    href="javascript:void(0)"
+                    >{{ depositTransactionPagination.pageNumber }} of
+                    {{ depositTransactionPagination.maxPage }} page
+                    <span *ngIf="depositTransactionPagination.pageNumber > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+
+                  <div
+                    class="depositAccountpaginatedJumpModal pagination-menu pagination-menu-right"
+                  >
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="depositTransactionPagination.pageNumber"
+                          (change)="
+                            fetchDepositTransactions(
+                              depositTransactionPagination.pageNumber
+                            )
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option
+                            *ngFor="
+                              let line of depositTransactionPagination.jumpArray
+                            "
+                          >
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="depositTransactionspaginatedJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="depositTransactionPagination.hasNextPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      fetchDepositTransactions(
+                        depositTransactionPagination.pageNumber + 1
+                      )
+                    "
+                  >
+                    <!-- (click)="getFinancialInstitutionsPaginatedSearch(depositAccountPagination.searchTerm, depositAccountPagination.pageSize, depositAccountPagination.pageNumber + 1)"> -->
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+        <!-- /tables -->
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+<!-- Modals -->
+
+<!-- Add Deposit Account -->
+<ng-template #createDepositAccountModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Create Deposit Account Application
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="CreateDepositAccountForm"
+    (ngSubmit)="submitCreateDepositAccountForm()"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div class="form-row mt-3">
+          <div class="col-sm-4 mb-3">
+            <label>Deposit Product<b class="help-block"> *</b></label>
+            <slct-2
+              (selected)="onSelectAddDepositProductId($event)"
+              [hideSelectedItems]="true"
+              placeholder="Select One"
+              [data]="depositProductsForSelect"
+            >
+            </slct-2>
+          </div>
+
+          <!-- <div class="col-sm-4 mb-3">
+              <label>Min Amount</label>
+              <div class="input-group">
+                <input type="text" class="form-control"  [readOnly]="true"
+                  value="{{selectedLoanType?.minAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+              </div>
+            </div>
+            <div class="col-sm-4 mb-3">
+              <label>Max Amount</label>
+              <div class="input-group">
+                <input type="text" class="form-control" [readOnly]="true"
+                  value="{{selectedLoanType?.maxAmount?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+              </div>
+            </div> -->
+
+          <div class="col-sm-4 mb-3">
+            <label>Amount</label><b class="help-block"> *</b>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="depositAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Amount"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Customer Type<b class="help-block">*</b></label>
+            <select
+              class="custom-select custom-select-xl form-control form-control-xl height"
+              formControlName="customerType"
+            >
+              <option
+                *ngFor="let row of depositAccountCustomerTypes"
+                value="{{ row }}"
+              >
+                {{ row }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Opening balance</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="openingBalance"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                placeholder="Opening Balance"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Start date</label>
+            <input
+            lndInvalidDateChecker
+              type="date"
+              class="form-control"
+              formControlName="startDate"
+            />
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Term Length</label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="termLength"
+              min="0"
+            />
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Deposit Source</label>
+            <select
+              class="custom-select custom-select-xl form-control form-control-xl height"
+              formControlName="depositSource"
+            >
+              <option
+                *ngFor="let row of depositAccountSources"
+                value="{{ row }}"
+              >
+                {{ row }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Debit Frequency<b class="help-block">*</b></label>
+            <select
+              class="custom-select custom-select-xl form-control form-control-xl height"
+              formControlName="debitFrequency"
+            >
+              <option
+                *ngFor="let row of depositAccountDebitFrequencies"
+                value="{{ row }}"
+              >
+                {{ row }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Description</label>
+            <textarea
+              class="form-control"
+              formControlName="description"
+              rows="3"
+              placeholder="description"
+            >
+            </textarea>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Savings Goal Target</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="savingsGoalTarget"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Title</label>
+            <input type="text" class="form-control" formControlName="title" />
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Firstname</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="firstName"
+            />
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Middlename</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="lastName"
+            />
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Lastname</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="middleName"
+            />
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Gender</label>
+            <select
+              class="custom-select custom-select-xl form-control form-control-xl height"
+              formControlName="gender"
+            >
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Phonenumber</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="phoneNumber"
+            />
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Emailaddress</label>
+            <input
+              type="email"
+              class="form-control"
+              formControlName="emailAddress"
+            />
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Date of birth</label>
+            <input
+            lndInvalidDateChecker
+              type="date"
+              class="form-control"
+              formControlName="dateOfBirth"
+            />
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Residential Address</label>
+            <textarea
+              class="form-control"
+              formControlName="residentialAddress"
+              rows="3"
+              placeholder="residentialAddress"
+            >
+            </textarea>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Maximum Withdrawal Amount<b class="help-block">*</b></label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="maximumWithdrawalAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Recommended Deposit Amount<b class="help-block">*</b></label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="recommendedDepositAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Interest Rate<b class="help-block">*</b></label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="interestRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+
+          <!-- <div class="col-sm-4 mb-3">
+              <label>Interest Rate</label>
+              <div class="input-group">
+                <input type="text" class="form-control"  [readOnly]="true"
+                  value="{{selectedLoanType?.interestRate?.toLocaleString(undefined, { minimumFractionDigits: 2 }) }}">
+                <div class="input-group-append">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-sm-4 mb-3">
+              <label>Tenor</label>
+              <div class="input-group">
+                <input type="text" class="form-control" [readOnly]="true" value="{{selectedLoanType?.loanTypeTenor}}">
+              </div>
+            </div> -->
+
+          <!-- <div class="col-sm-24 mb-3">
+              <label>Offer Amount</label><b class="help-block"> *</b>
+              <div class="input-group">
+                <input type="text" class="form-control" formControlName="LoanAmount" currencyMask
+                  [options]="{ prefix: '', thousands: ',', decimal: '.' }" placeholder="Interest rate">
+              </div>
+              <span class="help-block"
+                *ngIf="AddLoanOfferForm.get('LoanAmount').errors && AddLoanOfferForm.get('LoanAmount').touched">
+                What is the amount for this offer?
+              </span>
+              <span class="help-block"
+                *ngIf="AddLoanOfferForm.get('LoanAmount').touched && showAddFormLoanAmountError()">
+                Amount Exceeds Boundaries of loan type
+              </span>
+            </div> -->
+
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="CreateDepositAccountForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<!-- Edit Deposit Account Application -->
+<ng-template #editDepositAccountApplicationModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Edit Application
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="EditDepositAccountApplicationForm"
+    (ngSubmit)="submitEditDepositAccountApplicationForm()"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div class="form-row mt-3">
+          <div class="col-sm-4 mb-3">
+            <label>Maximum Withdrawal Amount</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="maximumWithdrawalAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Recommended Deposit Amount</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="recommendedDepositAmount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Interest Rate</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="interestRate"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Savings Goal Target</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="savingsGoalTarget"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Description</label>
+            <textarea
+              class="form-control"
+              formControlName="description"
+              rows="3"
+              placeholder="description"
+            >
+            </textarea>
+          </div>
+
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="EditDepositAccountApplicationForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<!-- View Deposit Application -->
+<ng-template #viewDepositAccountApplicationModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >View Application
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <!-- Modal Body -->
+  <div class="modal-body" style="background-color: #f5f5f5">
+    <div class="container-fluid">
+      <div
+        *ngIf="requestLoader || depositAccountApplication == null"
+        class="table-loader"
+        style="text-align: center; color: indianred"
+      >
+        <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+      </div>
+
+      <div
+        *ngIf="!requestLoader && depositAccountApplication != null"
+        class="form-row mt-3"
+      >
+        <div class="col-sm-4 mb-3">
+          <label class="label">Application Code</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ depositAccountApplication.applicationCode }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Customer</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ depositAccountApplication.customerName }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Created At</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ depositAccountApplication.createdAt | date }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Created By</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.createdBy
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Reviewed By</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.reviewedBy
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Review Date</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.reviewDate | date
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Branch</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.branchName
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Status</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.status
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Product</label><br />
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            style="overflow-wrap: break-word"
+            >{{ depositAccountApplication.depositProductName }}</span
+          >
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Amount</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.depositAmount | number: "1.2-2"
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Interest Rate</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.interestRate | number: "1.2-2"
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Maximum Withdrawal Amount</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.maximumWithdrawalAmount | number: "1.2-2"
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Recommended Deposit Amount</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.recommendedDepositAmount | number: "1.2-2"
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Savings Goal Target</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.savingsGoalTarget | number: "1.2-2"
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Debit Frequency</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.debitFrequency
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Deposit Account Category</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.depositAccountCategory
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Deposit Product Type</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.depositProductType
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Deposit Source</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.depositSource
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Description</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccountApplication.description
+          }}</span>
+        </div>
+
+        <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer" style="background-color: #f5f5f5">
+    <button
+      type="button"
+      class="btn btn-warning btn-sm"
+      (click)="closeModal()"
+      style="color: #fff"
+    >
+      Close
+    </button>
+  </div>
+  <!-- /modal footer -->
+  <!-- /modal body -->
+  <!-- /form -->
+</ng-template>
+
+<!-- View Deposit Account -->
+<ng-template #viewDepositAccountModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >View Account Details
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <!-- Modal Body -->
+  <div class="modal-body" style="background-color: #f5f5f5">
+    <div class="container-fluid">
+      <div
+        *ngIf="requestLoader || depositAccount == null"
+        class="table-loader"
+        style="text-align: center; color: indianred"
+      >
+        <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+      </div>
+
+      <div
+        *ngIf="!requestLoader && depositAccount != null"
+        class="form-row mt-3"
+      >
+        <div class="col-sm-4 mb-3">
+          <label class="label">Code</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ depositAccount.depositAccountCode }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Customer</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ depositAccount.tempDepositDetails.customerName }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Created At</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">
+            {{ depositAccount.createdAt | date }}
+          </span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Approved By</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccount.approvedBy
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Branch</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccount.branchName
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Status</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccount.status
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Product</label><br />
+          <span
+            [style.color]="currentTheme?.secondaryColor"
+            style="overflow-wrap: break-word"
+          >
+            {{ depositAccount.depositProductName }}</span
+          >
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Available Balance</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccount.availableBalance | number: "1.2-2"
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Balance</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccount.balance | number: "1.2-2"
+          }}</span>
+        </div>
+
+        <div class="col-sm-4 mb-3">
+          <label class="label">Interest Accrued</label><br />
+          <span [style.color]="currentTheme?.secondaryColor">{{
+            depositAccount.interestAccrued | number: "1.2-2"
+          }}</span>
+        </div>
+        <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Footer -->
+  <div class="modal-footer" style="background-color: #f5f5f5">
+    <button
+      type="button"
+      class="btn btn-warning btn-sm"
+      (click)="closeModal()"
+      style="color: #fff"
+    >
+      Close
+    </button>
+  </div>
+  <!-- /modal footer -->
+  <!-- /modal body -->
+  <!-- /form -->
+</ng-template>
+
+<!-- Deposit Application Status -->
+<ng-template #depositApplicationStatusModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Application Status
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="DepositApplicationStatusForm"
+    (ngSubmit)="submitDepositApplicationStatusForm()"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div class="form-row mt-3">
+          <div class="col-sm-4 mb-3">
+            <label>Transaction Pin</label>
+            <input
+              type="password"
+              class="form-control"
+              formControlName="transactionPin"
+            />
+          </div>
+          <div class="col-sm-4 mb-3">
+            <label>Status</label>
+            <select
+              class="custom-select custom-select-xl form-control form-control-xl height"
+              formControlName="status"
+            >
+              <option
+                *ngFor="let row of depositAccountTempDetailsStatuses"
+                value="{{ row }}"
+              >
+                {{ row }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Comment</label>
+            <textarea
+              class="form-control"
+              formControlName="comment"
+              rows="3"
+              placeholder="comment"
+            >
+            </textarea>
+          </div>
+
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="DepositApplicationStatusForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<!-- Deposit Transaction -->
+<ng-template #depositTransactionModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Transaction
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="DepositTransactionForm"
+    (ngSubmit)="submitDepositTransactionForm()"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+        <div class="form-row mt-3">
+          <div class="col-sm-4 mb-3">
+            <label>Amount</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="amount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Back date</label>
+            <input
+            lndInvalidDateChecker
+              type="date"
+              class="form-control"
+              formControlName="backDate"
+            />
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Booking date</label>
+            <input
+            lndInvalidDateChecker
+              type="date"
+              class="form-control"
+              formControlName="bookingDate"
+            />
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Channel Id</label>
+            <input
+              type="number"
+              class="form-control"
+              formControlName="channelId"
+            />
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Transaction Type</label>
+            <select
+              class="custom-select custom-select-xl form-control form-control-xl height"
+              formControlName="transactionType"
+            >
+              <option
+                *ngFor="let row of newDepositAccountTransactionTypes"
+                value="{{ row }}"
+              >
+                {{ row }}
+              </option>
+            </select>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Comment</label>
+            <textarea
+              class="form-control"
+              formControlName="comment"
+              rows="3"
+              placeholder="comment"
+            >
+            </textarea>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Notes</label>
+            <textarea
+              class="form-control"
+              formControlName="comment"
+              rows="3"
+              placeholder="notes"
+            >
+            </textarea>
+          </div>
+
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="DepositTransactionForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<!-- Deposit Application Fee -->
+<ng-template #depositApplicationFeeModal>
+  <!-- Modal Header -->
+  <div class="modal-header" style="background-color: #f5f5f5">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Fee
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="DepositAccountFeeForm"
+    (ngSubmit)="submitDepositAccountFeeForm()"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body" style="background-color: #f5f5f5">
+      <div class="container-fluid">
+        <div class="form-row mt-3">
+          <div class="col-sm-4 mb-3">
+            <label>Amount</label>
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                formControlName="amount"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              />
+            </div>
+          </div>
+
+          <div class="col-sm-4 mb-3">
+            <label>Comment</label>
+            <textarea
+              class="form-control"
+              formControlName="comment"
+              rows="3"
+              placeholder="comment"
+            >
+            </textarea>
+          </div>
+          <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer" style="background-color: #f5f5f5">
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="DepositAccountFeeForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+    <!-- /modal body -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<!-- Confirmation modal-->
+<div class="modal fade" id="add-new-fd" role="dialog">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="container">
+          <div class="d-flex justify-content-end" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </div>
+          <section style="min-height: 200px" class="d-flex flex-column">
+            <h3 style="text-align: center" class="mt-5">
+              Does Customer Have an Existing <br />Account?
+            </h3>
+            <div
+              class="d-flex justify-content-around align-items-center mt-auto"
+            >
+              <button
+                class="btn btn-primary orange-bg text-white"
+                (click)="openModal(searchCustomerModal, 'md')"
+                data-toggle="modal"
+                data-dismiss="modal"
+              >
+                Existing Account
+              </button>
+              <a
+                [routerLink]="['/deposits/accounts/new-customer']"
+                class="btn btn-primary mr-2 orange-bg text-white"
+                data-dismiss="modal"
+                >New Account</a
+              >
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Customer Search Modal -->
+<ng-template #searchCustomerModal>
+  <div class="modal-header">
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <h3 class="mb-3 text-center">Search for Existing Customer</h3>
+    <div class="tab">
+      <ul class="nav nav-underline flex-row border-bottom mb-5" role="tablist">
+        <li class="nav-item">
+          <a
+            class="nav-link active"
+            (click)="switchCustomerSearchTab('Email')"
+            data-toggle="tab"
+            href="#tab-pane1"
+            role="tab"
+            aria-controls="tab-pane1"
+            aria-selected="true"
+            >Email Address</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            (click)="switchCustomerSearchTab(UniqueId)"
+            data-toggle="tab"
+            href="#tab-pane2"
+            role="tab"
+            aria-controls="tab-pane2"
+            aria-selected="true"
+            >BVN</a
+          >
+        </li>
+
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            (click)="switchCustomerSearchTab(3)"
+            data-toggle="tab"
+            href="#tab-pane3"
+            role="tab"
+            aria-controls="tab-pane3"
+            aria-selected="true"
+            >First Name</a
+          >
+        </li>
+      </ul>
+
+      <div class="tab-content">
+        <div id="tab-pane1" class="tab-pane active">
+          <div class="form">
+            <form
+              [formGroup]="customerSearchForm"
+              (ngSubmit)="searchCustomer()"
+            >
+              <div class="form-row">
+                <div class="offset-md-3 col-md-6">
+                  <div class="form-group mb-5">
+                    <label for="searchBox">Keyword to search for</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="parameter"
+                      placeholder="Enter a customer email"
+                    />
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="searchType"
+                      hidden
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group text-center">
+                <button
+                  class="btn btn-primary orange-bg text-white"
+                  type="submit"
+                  *ngIf="!loading"
+                  [disabled]="customerSearchForm.invalid"
+                >
+                  Search
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary orange-bg text-white"
+                  *ngIf="loading"
+                  [disabled]="true"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Searching...
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="tab-pane2" class="tab-pane">
+          <div class="form">
+            <form
+              [formGroup]="customerSearchForm"
+              (ngSubmit)="searchCustomer()"
+            >
+              <div class="form-row">
+                <div class="offset-md-3 col-md-6">
+                  <div class="form-group mb-5">
+                    <label for="searchBox">Keyword to search for</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="parameter"
+                      placeholder="Enter  customer BVN"
+                    />
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="searchType"
+                      hidden
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group text-center">
+                <button
+                  class="btn btn-primary orange-bg text-white"
+                  type="submit"
+                  *ngIf="!loading"
+                  [disabled]="customerSearchForm.invalid"
+                >
+                  Search
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary orange-bg text-white"
+                  *ngIf="loading"
+                  [disabled]="true"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Searching...
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div id="tab-pane3" class="tab-pane">
+          <div class="form">
+            <form
+              [formGroup]="customerSearchForm"
+              (ngSubmit)="searchCustomer()"
+            >
+              <div class="form-row">
+                <div class="offset-md-3 col-md-6">
+                  <div class="form-group mb-5">
+                    <label for="searchBox">Keyword to search for</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="parameter"
+                      placeholder="Enter a customer first name"
+                    />
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="searchType"
+                      hidden
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group text-center">
+                <button
+                  class="btn btn-primary orange-bg text-white"
+                  type="submit"
+                  *ngIf="!loading"
+                  [disabled]="customerSearchForm.invalid"
+                >
+                  Search
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-primary orange-bg text-white"
+                  *ngIf="loading"
+                  [disabled]="true"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Searching...
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="searchResult table-responsive"
+        *ngIf="customerSearchResults?.length > 0"
+      >
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+              <th>Email</th>
+              <!-- <th>DoB</th> -->
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of customerSearchResults">
+              <td>{{ item?.personCode }}</td>
+              <td>
+                {{ item?.firstName | titlecase }}
+                {{ item?.lastName | titlecase }}
+              </td>
+              <td>{{ item?.emailAddress }}</td>
+              <!-- <td>{{ item?.dateOfBirth | customDatePipe }}</td> -->
+              <td>
+                <button
+                  class="btn btn-xs btn-warning"
+                  (click)="selectCustomer(item)"
+                >
+                  Select
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- /modal header -->
+</ng-template>
+<!-- /Modals -->

@@ -1,0 +1,24 @@
+<aside
+  class="dt-customizer dt-drawer position-right"
+  [ngClass]="{'open' : isOpen, 'shrink-width':shrinkWidth}"
+>
+  <div class="dt-customizer__inner">
+    <div *ngIf="!usesCustomHeader" class="dt-customizer__header">
+      <div class="header">
+        <ng-container *ngIf="!useCustomHeader">
+          <div><ng-content select="[header]"></ng-content></div>
+          <button type="button" class="close" (click)="onCloseAside()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </ng-container>
+        <ng-container *ngIf="useCustomHeader">
+          <div class="w-100"><ng-content select="[customHeader]"></ng-content></div>
+        </ng-container>
+      </div>
+    </div>
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</aside>
+<div class="dt-backdrop cursor" (click)="onCloseAside()"></div>

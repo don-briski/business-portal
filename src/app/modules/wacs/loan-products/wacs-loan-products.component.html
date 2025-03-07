@@ -1,0 +1,30 @@
+<header class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">Loan Products</h1>
+
+  <a
+    *ngIf="permissions.includes('Create Wacs Loan Types')"
+    class="btn btn-primary mr-2 text-white"
+    routerLink="create"
+    routerLinkActive="router-link-active"
+    href="javascript:void(0)"
+  >
+    <i class="icon icon-add-circle mr-2"></i>Add New</a
+  >
+</header>
+
+<div class="card p-5">
+  <lnd-table
+    [config]="config"
+    [headers]="headers"
+    [isLoading]="isLoading"
+    [data]="data"
+    [pagination]="pagination"
+    [searchColumns]="pagination?.searchColumns"
+    [filters]="filterStatuses"
+    [selectedFilters]="selectedFilter"
+    (paginationChange)="getLoanProducts($event)"
+    (searchParams)="getLoanProducts($event)"
+    (retrieveRowDetails)="viewLoanType($event)"
+    (filter)="filter($event)"
+  />
+</div>

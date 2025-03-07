@@ -1,0 +1,111 @@
+<h3 [style.color]="currentTheme?.secondaryColor" class="mb-2 orange">
+  Update Kuda Integration Details
+</h3>
+<p *ngIf="kudaInfo !== null">
+  Kuda payment method is currently
+  <span
+    class="badge badge-pill badge-success"
+    *ngIf="kudaInfo?.isActive === true"
+    >Active</span
+  >
+  <span
+    class="badge badge-pill badge-danger"
+    *ngIf="kudaInfo?.isActive === false"
+    >Inactive</span
+  >
+</p>
+
+<!-- Form -->
+<form [formGroup]="setupForm">
+  <!-- Form Group -->
+  <div class="form-group">
+    <label>Email Address</label>
+    <input
+      type="email"
+      formControlName="emailAddress"
+      class="form-control"
+      placeholder="Email Address"
+    />
+  </div>
+  <!-- /form group -->
+
+  <!-- Form Group -->
+  <div class="form-group">
+    <label>Business Account Number</label>
+    <input
+      type="text"
+      formControlName="clientAccountNumber"
+      class="form-control"
+      placeholder="Business Account Number"
+    />
+  </div>
+  <!-- /form group -->
+  <!-- Form Group -->
+  <div class="form-group">
+    <label>API Secret Key</label>
+    <input
+      type="text"
+      formControlName="apiSecretKey"
+      class="form-control"
+      placeholder="API Secret Key"
+    />
+  </div>
+
+  <ng-container formGroupName="integrationExtraInfoDto">
+    <div class="form-group">
+      <label>Username</label>
+      <input
+        type="text"
+        formControlName="username"
+        class="form-control"
+        placeholder="Username"
+      />
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input
+        type="text"
+        formControlName="password"
+        class="form-control"
+        placeholder="Password"
+      />
+    </div>
+  </ng-container>
+  <!-- /form group -->
+
+  <!-- Form Group -->
+  <div class="form-group">
+    <button
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      (click)="updateInfo()"
+      class="btn btn-primary btn-sm text-uppercase orange-bg"
+      [disabled]="setupForm.invalid || isLoading"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="isLoading"></i>
+      {{ isLoading ? "Updating..." : "Update" }}
+    </button>
+
+    <button
+      class="btn btn-sm btn-success text-uppercase"
+      *ngIf="kudaInfo?.isActive === false"
+      [disabled]="setupForm.invalid || statusLoader"
+      (click)="toggleStatus(true)"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="statusLoader"></i>
+      {{ statusLoader ? "Activating..." : "Activate" }}
+    </button>
+    <button
+      class="btn btn-sm btn-danger text-uppercase"
+      *ngIf="kudaInfo?.isActive === true"
+      [disabled]="setupForm.invalid || statusLoader"
+      (click)="toggleStatus(false)"
+    >
+      <i class="icon icon-spin icon-spin2" *ngIf="statusLoader"></i>
+      {{ statusLoader ? "Deactivating..." : "Deactivate" }}
+    </button>
+  </div>
+  <!-- /form group -->
+</form>
+<!-- /form -->

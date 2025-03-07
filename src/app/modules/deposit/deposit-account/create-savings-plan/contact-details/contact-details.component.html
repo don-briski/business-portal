@@ -1,0 +1,50 @@
+<form [formGroup]="contactForm" (ngSubmit)="continue()">
+    <div class="mb-3 form-group">
+        <label for="validationDefault01">Phone number</label>
+        <input type="text" class="form-control" formControlName="phoneNumber" placeholder="Provide a phone number" />
+      </div>
+      <div class="mb-3 form-group">
+        <label for="validationDefault01">Email address</label>
+        <input type="email" class="form-control" formControlName="emailAddress" placeholder="Provide an email address"/>
+      </div>
+      <div class="d-flex justify-content-center">
+          <button class="btn btn-primary orange-bg text-white" type="submit" [disabled]="isLoading || contactForm.invalid">
+            <span>
+              <i class="icon icon-spin icon-spin2" *ngIf="isLoading"></i> {{ isLoading ? 'Saving...' : 'Save'}}
+            </span>
+          </button>
+      </div>
+</form>
+
+
+<!-- Modals -->
+
+<div class="modal fade" id="preview" role="dialog">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+            <div class="container">
+                <div class="d-flex justify-content-end" data-dismiss="modal">
+                  <i class="icon icon-close icon-fw icon-xl"></i>
+                </div>
+                <section>
+                  <h3>Preview Savings Plan Application</h3>
+                  <div class="grid">
+                    <p>Debit Source<span>Deduction from wallet</span></p>
+                    <p>Frequency<span>Monthly</span></p>
+                    <p>Debit Amount<span>N30,000.00</span></p>
+                    <p>Interest Rate<span>1%</span></p>
+                    <p>Term Length<span>3 months</span></p>
+                    <p>Start Date<span>15-08-2021</span></p>
+                    <p>Savings Plan Description<span>Income earners savings plan</span></p>
+                  </div>
+                </section>
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-primary orange-bg text-white" data-dismiss="modal">Submit</button>
+                </div>
+              </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- /Modals -->

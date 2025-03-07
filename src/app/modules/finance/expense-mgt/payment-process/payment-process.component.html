@@ -1,0 +1,324 @@
+<!-- Page Header -->
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">Payment Process</h1>
+</div>
+<!-- /page header -->
+
+<div class="row">
+  <div class="col-xl-12">
+    <div class="tab-content">
+      <!-- Tab Pane -->
+      <div id="tab-created" class="tab-pane active show">
+        <!-- Card -->
+        <div class="dt-card">
+          <!-- Card Body -->
+          <div class="dt-card__body">
+            <div class="payment-initiator d-none">
+              <h3 class="mb-4">Payment Initiator</h3>
+              <form>
+                <div class="form-row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Payment Type</label>
+                      <select class="form-control">
+                        <option>-- Select Payment Type --</option>
+                        <option>Payment Order / Request</option>
+                        <option>Purchase Order / Request</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Make payment to </label>
+                      <select class="form-control">
+                        <option>-- Payment to ? --</option>
+                        <option>Staff Payment</option>
+                        <option>Third-party Payment</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Staff List</label>
+                      <select class="form-control">
+                        <option>-- Select staff from list --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Full Name</label>
+                      <input
+                        type="text"
+                        placeholder="Enter your full name"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Account Name</label>
+                      <input
+                        type="text"
+                        placeholder="Enter account name"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Account Number</label>
+                      <input
+                        type="text"
+                        placeholder="Enter account number"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Select Bank</label>
+                      <select class="form-control">
+                        <option>-- Select your bank --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Transaction Type </label>
+                      <select class="form-control">
+                        <option>-- Select Transaction Type --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Payment Pattern</label>
+                      <select class="form-control">
+                        <option>-- Select Payment Pattern --</option>
+                        <option>Installment Payment</option>
+                        <option>Full Payment</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary text-white">
+                    Proceed
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div class="installment d-none">
+              <h6 class="mb-3 orange">Back</h6>
+              <h3 class="mb-4">Installment Payment</h3>
+              <form>
+                <div class="form-row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Amount</label>
+                      <input
+                        type="text"
+                        placeholder="Enter Fulll Amount"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Breakdown format</label>
+                      <select class="form-control">
+                        <option>-- Select Payment break down --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Currency</label>
+                      <select class="form-control">
+                        <option>-- Select Currency --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Originating department</label>
+                      <select class="form-control">
+                        <option>-- Select Originating department --</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label>Payment Description</label>
+                      <textarea
+                        class="form-control"
+                        cols="10"
+                        rows="10"
+                        placeholder="Payment Description"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary text-white">
+                    Submit for approval
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div class="full_payment d-none">
+              <h6 class="mb-3 orange">Back</h6>
+              <h3 class="mb-4">Full Payment</h3>
+              <form>
+                <div class="form-row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Amount</label>
+                      <input
+                        type="text"
+                        placeholder="Enter Fulll Amount"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Currency</label>
+                      <select class="form-control">
+                        <option>-- Select Currency --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Select Payment Date</label>
+                      <input
+                      lndInvalidDateChecker
+                        type="date"
+                        placeholder="Select Payment break down"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Originating department</label>
+                      <select class="form-control">
+                        <option>-- Select Originating department --</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label>Payment Description</label>
+                      <textarea
+                        class="form-control"
+                        cols="10"
+                        rows="10"
+                        placeholder="Payment Description"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary text-white">
+                    Submit for approval
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div class="purchase_order">
+              <h3 class="mb-4">Purchase Order</h3>
+              <form>
+                <div class="form-row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Payment Type</label>
+                      <select class="form-control">
+                        <option>-- Select Payment Type --</option>
+                        <option>Payment Order / Request</option>
+                        <option>Purchase Order / Request</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Vendor</label>
+                      <select class="form-control">
+                        <option>-- Select Vendors --</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Contract Amount</label>
+                      <input
+                        type="text"
+                        placeholder="Enter Contract Amount"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Payment Date</label>
+                      <input
+                      lndInvalidDateChecker
+                        type="date"
+                        placeholder="Select Payment break down"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>VAT</label>
+                      <input
+                        type="text"
+                        placeholder="VAT"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>WHT</label>
+                      <input
+                        type="text"
+                        placeholder="WHT"
+                        class="form-control"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label>Transaction Type </label>
+                      <select class="form-control">
+                        <option>-- Select Transaction Type --</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary text-white">
+                    Send Payment for approval
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+    </div>
+  </div>
+</div>

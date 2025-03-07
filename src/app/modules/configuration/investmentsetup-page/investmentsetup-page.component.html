@@ -1,0 +1,1247 @@
+<section *ngIf="!investmentType">
+  <div class="dt-page__header">
+    <h1 class="dt-page__title">
+      Investment Types
+      <span class="float-right">
+        <div style="position: relative; right: -5px; bottom: 5px; float: right">
+          <a
+            *ngIf="user?.permission?.includes('Add Investment Type')"
+            class="btn btn-primary mr-2 text-white"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [routerLink]="['/configurations/investment-types/create']"
+            routerLinkActive="router-link-active"
+            href="javascript:void(0)"
+          >
+            <i class="icon icon-add-circle mr-2"></i>Add New</a
+          >
+        </div>
+      </span>
+    </h1>
+  </div>
+
+  <!-- Grid -->
+  <div class="row">
+    <!-- Grid Item -->
+    <div class="col-xl-12">
+      <!-- Card -->
+      <div class="dt-card">
+        <!-- Card Body -->
+        <div class="dt-card__body">
+          <!-- Tables -->
+          <div class="table-responsive">
+            <div class="clearfix">
+              <div class="float-left form-group">
+                <select
+                  (change)="filterInvestmentTypes($event.target.value)"
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+              </div>
+
+              <div class="float-right d-flex">
+                <input
+                  type="text"
+                  #box
+                  (keyup.enter)="SearchTable($event.target.value)"
+                  placeholder="Code Or Name"
+                  class="form-control"
+                />
+
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.background]="currentTheme.secondaryColor"
+                  (click)="SearchTable(box.value)"
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </div>
+            </div>
+            <table id="data-table" class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Investment Code</th>
+                  <th>Investment Name</th>
+                  <th>Amount Range ({{currencySymbol}})</th>
+                  <th>Interest Rate Range (%)</th>
+                  <th>Tenor Range (Days)</th>
+                  <th>Date Created</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="gradeX cursor" *ngFor="let item of investmentTypes" (click)="viewInvestmentType(item,dropdownToggle)">
+                  <td>{{ item?.investmentCode }}</td>
+                  <td>{{ item?.investmentName }}</td>
+                  <td>
+                    {{ item?.minAmount?.toLocaleString() }} -
+                    {{ item?.maxAmount?.toLocaleString() }}
+                  </td>
+                  <td>
+                    {{ item?.minInterestRate }} - {{ item?.maxInterestRate }}
+                  </td>
+                  <td>
+                    {{ item?.minInvestmentTenor }} -
+                    {{ item?.maxInvestmentTenor }}
+                  </td>
+                  <td>{{ item?.createdAt | date : "dd/MM/yyyy" }}</td>
+                  <td>
+                    <span
+                      class="mb-1 mr-1 badge"
+                      [ngClass]="{
+                        'badge-success': item?.status == 'Active',
+                        'badge-warning': item?.status == 'NonActive'
+                      }"
+                    >
+                      {{ item?.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <!--DO NOT DELETE YET <a
+                      style="color: saddlebrown"
+                      *ngIf="user?.permission?.includes('Edit Investment Type')"
+                      href="javascript:void(0)"
+                      (click)="
+                        openEditInvestmentTypeModal(item, editInvestmentModal)
+                      "
+                    >
+                      <i class="icon icon-xs icon-setting"></i> Manage
+                    </a> -->
+
+                    <div
+                      #dropdownToggle
+                      class="dropdown mr-2 mb-2 d-inline-block"
+                    >
+                      <button
+                        class="btn btn-warning btn-xs dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      ></button>
+
+                      <div class="dropdown-menu">
+                        <a
+                          class="dropdown-item"
+                          href="javascript:void(0)"
+                          ><i class="icon icon-forward icon-fw mr-2"></i>View
+                        </a>
+
+                        <a
+                          class="dropdown-item"
+                          *ngIf="
+                            user?.permission?.includes('Edit Investment Type')
+                          "
+                          href="javascript:void(0)"
+                          [routerLink]="
+                            '/configurations/investment-types/edit/' +
+                            item?.investmentTypeId
+                          "
+                        >
+                          <i class="icon icon-xs icon-setting"></i> Manage
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+              <tbody *ngIf="investmentTypes?.length == 0">
+                <tr>
+                  <td colspan="7" class="text-center" *ngIf="!defaultloader">
+                    No investment <span *ngIf="searchTerm == ''">type Yet!</span>
+                    <span *ngIf="searchTerm != ''">type matches your search</span>
+                  </td>
+                  <td colspan="7" class="text-center" *ngIf="defaultloader">
+                    <i class="fa fa-spinner fa-4x"></i>
+                  </td>
+                </tr>
+              </tbody>
+
+              <tbody></tbody>
+            </table>
+
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="getItemsPaginatedPageJumpModal()"
+                    href="javascript:void(0)"
+                    >{{ activePage }} of {{ totalPaginate.length }} page<span
+                      *ngIf="totalPaginate.length > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+                  <div class="pagination-menu pagination-menu-right">
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          (change)="NextFetch($event.target.value)"
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option value="">Page</option>
+                          <option
+                            *ngFor="let items of totalPaginate; let i = index"
+                            value="{{ items }}"
+                          >
+                            {{ i + 1 }}
+                          </option>
+                        </select>
+                        <div class="mt-3 text-center">
+                          <button
+                            [style.backgroundColor]="currentTheme?.secondaryColor"
+                            [style.borderColor]="currentTheme?.secondaryColor"
+                            type="button"
+                            (click)="getItemsPaginatedPageJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /tables -->
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+    </div>
+    <!-- /grid item -->
+  </div>
+  <!-- /grid -->
+</section>
+
+<section *ngIf="investmentType" class="card inv_type">
+  <div header>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">
+        {{ investmentType?.investmentName }}
+        <span
+          class="badge"
+          [ngClass]="{
+            'badge-success': investmentType?.status === 'Active',
+            'badge-warning': investmentType?.status === 'NonActive'
+          }"
+          >{{
+            investmentType?.status === "Active"
+              ? investmentType?.status
+              : "Inactive"
+          }}</span
+        >
+      </h1>
+
+      <div>
+        <button
+          [routerLink]="'/configurations/investment-types/edit/' + investmentType?.investmentTypeId"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          class="btn btn-sm px-6 text-white mr-1"
+        >
+          Edit
+        </button>
+        <button
+          class="btn btn-sm px-6 text-dark ml-1 btn-outline-light"
+          (click)="investmentType = null"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+    <p class="sub_title mt-4">This investment type {{!investmentType?.approvalRequired ? 'does NOT' : ''}} requires approval</p>
+  </div>
+
+  <div *ngIf="investmentType">
+    <lnd-accordion
+      accordionId="invDetails"
+      title="Investment Details"
+      subTitle="Review Investment Information"
+      [open]="true"
+    >
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.invDetails">
+          <lnd-accordion-item
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+
+    <lnd-accordion accordionId="fees" title="Investment Fees" subTitle="Review Investment Fee terms" [open]="true">
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.fees">
+          <lnd-accordion-item
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+
+    <lnd-accordion
+      accordionId="params"
+      title="Investment Parameters"
+      subTitle="Overview of Investment criteria"
+      [open]="true"
+    >
+      <div class="d-flex flex-wrap">
+        <ng-container *ngFor="let item of accordionItems?.params">
+          <lnd-accordion-item
+            [bgColor]="lightenColor(currentTheme?.primaryColor, lightenAmount)"
+            [primaryColor]="currentTheme?.primaryColor"
+            [title]="item?.title"
+            [value]="item?.value"
+            [type]="item?.type"
+          ></lnd-accordion-item>
+        </ng-container>
+      </div>
+    </lnd-accordion>
+
+    <lnd-accordion
+      accordionId="termsAndConditionsSetupInfo"
+      title="Investment Certificate"
+      subTitle="Overview of Investment type terms and conditions on certificate"
+      [open]="true"
+    >
+      <div class="d-block mt-5">
+        <div class="setup" *ngIf="investmentType.termsAndConditionsSetupInfo; else noCertSetup">
+          <ng-container *ngFor="let item of accordionItems?.termsAndConditionsSetupInfo">
+            <lnd-accordion-item
+              [title]="item?.title"
+              [value]="item?.value"
+              [showValueAsPill]="item?.showValueAsPill"
+              [bgColor]="lightenColor(currentTheme?.primaryColor, lightenAmount)"
+            ></lnd-accordion-item>
+          </ng-container>
+          <div class="mt-3 terms" *ngIf="investmentType.termsAndConditionsSetupInfo?.TermsAndConditions.length > 0">
+            <p class="text-dark mb-3">Terms And Conditions</p>
+            <ol type="i">
+              <li class="mb-2" *ngFor="let terms of investmentType.termsAndConditionsSetupInfo?.TermsAndConditions">{{ terms?.Description }}</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </lnd-accordion>
+  </div>
+</section>
+<ng-template #noCertSetup>
+  This investment type does not have any terms and  conditions setup for its certificate.
+</ng-template>
+<ng-template #addInvestmentType>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="mr-2 icon icon-setting icon-2x align-self-center text-warning"
+      ></i
+      >investment Type Setup
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <form
+    [formGroup]="InvestmentTypeForm"
+    (ngSubmit)="saveInvestmentTypeForm(InvestmentTypeForm.value)"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="mt-3 form-row">
+          <div class="mb-3 col-sm-3">
+            <label for="investmentname"
+              >Investment name <b class="help-block">*</b></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="InvestmentName"
+              id="investmentname"
+              placeholder="Name of the investment"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('InvestmentName').errors &&
+                InvestmentTypeForm.get('InvestmentName').touched
+              "
+            >
+              What is the name of this investment?
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="investmentcode"
+              >Investment Code <b class="help-block">*</b></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="InvestmentCode"
+              id="investmentcode"
+              placeholder="E.g INV00123"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('InvestmentCode').errors &&
+                InvestmentTypeForm.get('InvestmentCode').touched
+              "
+            >
+              What is the investment code?
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="penalcharge"
+              >Penal Charge <b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="PenalCharge"
+                class="form-control"
+                id="penalcharge"
+                placeholder="Enter penal charge"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('PenalCharge').errors &&
+                InvestmentTypeForm.get('PenalCharge').touched
+              "
+            >
+              <span
+                *ngIf="
+                  InvestmentTypeForm.get('PenalCharge').getError('required')
+                "
+                >What is the penal charge?</span
+              >
+              {{
+                InvestmentTypeForm.get("PenalCharge").getError("LesserThanZero")
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="wht">WHT <b class="help-block">*</b></label>
+            <input
+              type="number"
+              formControlName="WithHoldingTax"
+              class="form-control"
+              id="wht"
+              placeholder="E.g Enter withholding tax value"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('WithHoldingTax').errors &&
+                InvestmentTypeForm.get('WithHoldingTax').touched
+              "
+            >
+              <span
+                *ngIf="
+                  InvestmentTypeForm.get('WithHoldingTax').getError('required')
+                "
+                >What is the with holding tax value of this investment?</span
+              >
+              {{
+                InvestmentTypeForm.get("WithHoldingTax").getError(
+                  "LesserThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="minamount"
+              >Min Amount <b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">&#x20a6;</span>
+              </div>
+              <input
+                type="text"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="MinAmount"
+                class="form-control"
+                id="minamount"
+                placeholder="Minimum investment amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('MinAmount').errors &&
+                InvestmentTypeForm.get('MinAmount').touched
+              "
+            >
+              <span
+                *ngIf="InvestmentTypeForm.get('MinAmount').getError('required')"
+                >What is the minimum amount allowed for this investment?</span
+              >
+              {{
+                InvestmentTypeForm.get("MinAmount").getError("LesserThanZero")
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="maxamount"
+              >Max Amount <b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">&#x20a6;</span>
+              </div>
+              <input
+                type="text"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="MaxAmount"
+                class="form-control"
+                id="maxamount"
+                placeholder="Maximum investment amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('MaxAmount').errors &&
+                InvestmentTypeForm.get('MaxAmount').touched
+              "
+            >
+              <span
+                *ngIf="InvestmentTypeForm.get('MaxAmount').getError('required')"
+                >What is the maximum amount allowed for this investment?</span
+              >
+              {{
+                InvestmentTypeForm.get("MaxAmount").getError("GreaterThanZero")
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="netinterest"
+              >Minimum Interest Rate<b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="MinNetInterest"
+                class="form-control"
+                id="netinterest"
+                placeholder="Net interest rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('MinNetInterest').errors &&
+                InvestmentTypeForm.get('MinNetInterest').touched
+              "
+            >
+              <span
+                *ngIf="
+                  InvestmentTypeForm.get('MinNetInterest').getError('required')
+                "
+                >Provide minimum interest rate</span
+              >
+              {{
+                InvestmentTypeForm.get("MinNetInterest").getError(
+                  "LesserThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="netinterest"
+              >Maximum Interest Rate<b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="MaxNetInterest"
+                class="form-control"
+                id="netinterest"
+                placeholder="Maximum Net interest rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('MaxNetInterest').errors &&
+                InvestmentTypeForm.get('MaxNetInterest').touched
+              "
+            >
+              <span
+                *ngIf="
+                  InvestmentTypeForm.get('MaxNetInterest').getError('required')
+                "
+                >Provide maximum interest rate
+              </span>
+              {{
+                InvestmentTypeForm.get("MaxNetInterest").getError(
+                  "GreaterThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="mintenor"
+              >Minimum Investment Tenor (days)<b class="help-block">*</b></label
+            >
+            <input
+              type="number"
+              formControlName="MinInvestmentTenor"
+              class="form-control"
+              id="mintenor"
+              placeholder="E.g Enter Minimum Investment Tenor"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('MinInvestmentTenor').errors &&
+                InvestmentTypeForm.get('MinInvestmentTenor').touched
+              "
+            >
+              <span
+                *ngIf="
+                  InvestmentTypeForm.get('MinInvestmentTenor').getError(
+                    'required'
+                  )
+                "
+                >Provide minimum investment tenor
+              </span>
+              {{
+                InvestmentTypeForm.get("MinInvestmentTenor").getError(
+                  "LesserThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="maxtenor"
+              >Maximum Investment Tenor (days)<b class="help-block">*</b></label
+            >
+            <input
+              type="number"
+              formControlName="MaxInvestmentTenor"
+              class="form-control"
+              id="maxtenor"
+              placeholder="E.g Enter Maximum Investment Tenor"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                InvestmentTypeForm.get('MaxInvestmentTenor').errors &&
+                InvestmentTypeForm.get('MaxInvestmentTenor').touched
+              "
+            >
+              <span
+                *ngIf="
+                  InvestmentTypeForm.get('MaxInvestmentTenor').getError(
+                    'required'
+                  )
+                "
+                >What is the maximum investment tenor?</span
+              >
+              {{
+                InvestmentTypeForm.get("MaxInvestmentTenor").getError(
+                  "GreaterThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="interestratetype"
+              >Interest Rate Type <b class="help-block">*</b></label
+            >
+            <div>
+              <select
+                formControlName="InterestRateType"
+                class="form-control"
+                id="interestratetype"
+              >
+                <option value="">Select Interest Type</option>
+                <option value="Compounding">Compounding</option>
+                <option value="Flat">Flat</option>
+              </select>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  InvestmentTypeForm.get('InterestRateType').errors &&
+                  InvestmentTypeForm.get('InterestRateType').touched
+                "
+              >
+                Select interest type
+              </span>
+            </div>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="status">Status <b class="help-block">*</b></label>
+            <div>
+              <select formControlName="Status" class="form-control" id="status">
+                <option value="">Select Status</option>
+                <option value="Active">Active</option>
+                <option value="NonActive">NonActive</option>
+              </select>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  InvestmentTypeForm.get('Status').errors &&
+                  InvestmentTypeForm.get('Status').touched
+                "
+              >
+                Select investment status
+              </span>
+            </div>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="approval">
+              <input
+                type="checkbox"
+                id="approval"
+                formControlName="ApprovalRequired"
+              />
+              Requires Approval?
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="InvestmentTypeForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </form>
+</ng-template>
+
+<ng-template #editInvestmentModal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="mr-2 icon icon-setting icon-2x align-self-center text-warning"
+      ></i
+      >investment Type Setup
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <form
+    [formGroup]="EditInvestmentTypeForm"
+    (ngSubmit)="saveEditInvestmentTypeForm(EditInvestmentTypeForm.value)"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="mt-3 form-row">
+          <div class="mb-3 col-sm-3">
+            <label for="investmentname"
+              >Investment name <b class="help-block">*</b></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="InvestmentName"
+              id="investmentname"
+              placeholder="Name of the investment"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('InvestmentName').errors &&
+                EditInvestmentTypeForm.get('InvestmentName').touched
+              "
+            >
+              What is the name of this investment?
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="investmentcode"
+              >Investment Code <b class="help-block">*</b></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="InvestmentCode"
+              id="investmentcode"
+              placeholder="E.g INV00123"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('InvestmentCode').errors &&
+                EditInvestmentTypeForm.get('InvestmentCode').touched
+              "
+            >
+              What is the investment code?
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="penalcharge"
+              >Penal Charge <b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="PenalCharge"
+                class="form-control"
+                id="penalcharge"
+                placeholder="Enter penal charge"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('PenalCharge').errors &&
+                EditInvestmentTypeForm.get('PenalCharge').touched
+              "
+            >
+              <span
+                *ngIf="
+                  EditInvestmentTypeForm.get('PenalCharge').getError('required')
+                "
+                >What is the penal charge?</span
+              >
+              {{
+                EditInvestmentTypeForm.get("PenalCharge").getError(
+                  "LesserThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="wht">WHT <b class="help-block">*</b></label>
+            <input
+              type="number"
+              formControlName="WithHoldingTax"
+              class="form-control"
+              id="wht"
+              placeholder="E.g Enter withholding tax value"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('WithHoldingTax').errors &&
+                EditInvestmentTypeForm.get('WithHoldingTax').touched
+              "
+            >
+              <span
+                *ngIf="
+                  EditInvestmentTypeForm.get('WithHoldingTax').getError(
+                    'required'
+                  )
+                "
+                >What is the with holding tax value of this investment?</span
+              >
+              {{
+                EditInvestmentTypeForm.get("WithHoldingTax").getError(
+                  "LesserThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="minamount"
+              >Min Amount <b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">&#x20a6;</span>
+              </div>
+              <input
+                type="text"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="MinAmount"
+                class="form-control"
+                id="minamount"
+                placeholder="Minimum investment amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('MinAmount').errors &&
+                EditInvestmentTypeForm.get('MinAmount').touched
+              "
+            >
+              <span
+                *ngIf="
+                  EditInvestmentTypeForm.get('MinAmount').getError('required')
+                "
+                >What is the minimum amount allowed for this investment?</span
+              >
+              {{
+                EditInvestmentTypeForm.get("MinAmount").getError(
+                  "GreaterThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="maxamount"
+              >Max Amount <b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text">&#x20a6;</span>
+              </div>
+              <input
+                type="text"
+                currencyMask
+                [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                formControlName="MaxAmount"
+                class="form-control"
+                id="maxamount"
+                placeholder="Maximum investment amount"
+              />
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('MaxAmount').errors &&
+                EditInvestmentTypeForm.get('MaxAmount').touched
+              "
+            >
+              <span
+                *ngIf="
+                  EditInvestmentTypeForm.get('MaxAmount').getError('required')
+                "
+                >What is the maximum amount allowed for this investment?</span
+              >
+              {{
+                EditInvestmentTypeForm.get("MaxAmount").getError(
+                  "GreaterThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="minnetinterest"
+              >Minimum Interest Rate<b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="MinNetInterest"
+                class="form-control"
+                id="minnetinterest"
+                placeholder="Net interest rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('MinNetInterest').errors &&
+                EditInvestmentTypeForm.get('MinNetInterest').touched
+              "
+            >
+              <span
+                *ngIf="
+                  EditInvestmentTypeForm.get('MinNetInterest').getError(
+                    'required'
+                  )
+                "
+                >Provide minimum interest rate</span
+              >
+              {{
+                EditInvestmentTypeForm.get("MinNetInterest").getError(
+                  "LesserThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="netinterest"
+              >Maximum Interest Rate<b class="help-block">*</b></label
+            >
+            <div class="input-group">
+              <input
+                type="number"
+                formControlName="MaxNetInterest"
+                class="form-control"
+                id="netinterest"
+                placeholder="Maximum Net interest rate"
+              />
+              <div class="input-group-append">
+                <span class="input-group-text">%</span>
+              </div>
+            </div>
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('MaxNetInterest').errors &&
+                EditInvestmentTypeForm.get('MaxNetInterest').touched
+              "
+            >
+              <span
+                *ngIf="
+                  EditInvestmentTypeForm.get('MaxNetInterest').getError(
+                    'required'
+                  )
+                "
+                >Provide maximum interest rate
+              </span>
+              {{
+                EditInvestmentTypeForm.get("MaxNetInterest").getError(
+                  "GreaterThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="mintenor"
+              >Minimum Investment Tenor (days)<b class="help-block">*</b></label
+            >
+            <input
+              type="number"
+              formControlName="MinInvestmentTenor"
+              class="form-control"
+              id="mintenor"
+              placeholder="E.g Enter Minimum Investment Tenor"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('MinInvestmentTenor').errors &&
+                EditInvestmentTypeForm.get('MinInvestmentTenor').touched
+              "
+            >
+              <span
+                *ngIf="
+                  EditInvestmentTypeForm.get('MinInvestmentTenor').getError(
+                    'required'
+                  )
+                "
+                >What is the minimum investment tenor?</span
+              >
+              {{
+                EditInvestmentTypeForm.get("MinInvestmentTenor").getError(
+                  "LesserThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="maxtenor"
+              >Maximum Investment Tenor (days)<b class="help-block">*</b></label
+            >
+            <input
+              type="number"
+              formControlName="MaxInvestmentTenor"
+              class="form-control"
+              id="maxtenor"
+              placeholder="E.g Enter Maximum Investment Tenor"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditInvestmentTypeForm.get('MaxInvestmentTenor').errors &&
+                EditInvestmentTypeForm.get('MaxInvestmentTenor').touched
+              "
+            >
+              <span
+                *ngIf="
+                  EditInvestmentTypeForm.get('MaxInvestmentTenor').getError(
+                    'required'
+                  )
+                "
+                >What is the maximum investment tenor?</span
+              >
+              {{
+                EditInvestmentTypeForm.get("MaxInvestmentTenor").getError(
+                  "GreaterThanZero"
+                )
+              }}
+            </span>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="interestratetype"
+              >Interest Rate Type <b class="help-block">*</b></label
+            >
+            <div>
+              <select
+                formControlName="InterestRateType"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+                id="interestratetype"
+              >
+                <option value="">Select Interest Type</option>
+                <option value="Compounding">Compounding</option>
+                <option value="Flat">Flat</option>
+              </select>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  EditInvestmentTypeForm.get('InterestRateType').errors &&
+                  EditInvestmentTypeForm.get('InterestRateType').touched
+                "
+              >
+                Select interest type
+              </span>
+            </div>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="status">Status <b class="help-block">*</b></label>
+            <div>
+              <select
+                formControlName="Status"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+                id="status"
+              >
+                <option value="">Select Status</option>
+                <option value="Active">Active</option>
+                <option value="NonActive">NonActive</option>
+              </select>
+              <span
+                class="help-block"
+                [style.color]="currentTheme?.secondaryColor"
+                *ngIf="
+                  EditInvestmentTypeForm.get('Status').errors &&
+                  EditInvestmentTypeForm.get('Status').touched
+                "
+              >
+                Select investment status
+              </span>
+            </div>
+          </div>
+          <div class="mb-3 col-sm-3">
+            <label for="approval">
+              <input
+                id="approval"
+                type="checkbox"
+                formControlName="ApprovalRequired"
+              />
+              Requires Approval?
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="EditInvestmentTypeForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </form>
+</ng-template>

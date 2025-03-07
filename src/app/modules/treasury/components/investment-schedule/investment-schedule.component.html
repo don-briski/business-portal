@@ -1,0 +1,37 @@
+<section class="p-5">
+  <main class="p-5">
+    <img
+      class="float-right cursor"
+      src="assets/images/close.svg"
+      alt="close button"
+      (click)="dismissModal()"
+    />
+    <header>
+      <img
+        *ngIf="appOwner?.logoUrl"
+        [src]="appOwner?.logoUrl"
+        alt="Business Logo"
+        class="img-fluid"
+        width="134"
+      />
+
+      <h1 [style.color]="theme?.secondaryColor">
+        {{ appOwner?.appOwnerName | titlecase }} Investment Schedule
+      </h1>
+    </header>
+    <ul class="dt-list dt-list-one-second my-5">
+      <lnd-dt-list-item
+        *ngFor="let info of investmentInfo"
+        [title]="info.title"
+        [value]="info.value"
+        [type]="info.type"
+        [currencySymbol]="appOwner?.currency?.currencySymbol"
+      ></lnd-dt-list-item>
+    </ul>
+    <lnd-table
+      [config]="tableConfig"
+      [headers]="tableHeaders"
+      [data]="tableData"
+    ></lnd-table>
+  </main>
+</section>

@@ -1,0 +1,58 @@
+section {
+  position: absolute;
+  right: 20px;
+  z-index: 2;
+  &.useRelativePosition{
+    position: relative !important;
+  }
+  .badge {
+    background-color: #8692a633;
+  }
+  input {
+    flex: auto;
+    padding-left: 0 !important;
+    border: none !important;
+    outline: none;
+    &:focus {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+  }
+
+  .custom-input {
+    padding: 12.4px 17px;
+    &.focused {
+      color: #495057;
+      background-color: #fff;
+      border-color: #64c6fd;
+      box-shadow: 0 0 0 3.2px rgba(0, 123, 255, 0.25);
+    }
+    input {
+      background: transparent;
+    }
+    .clear {
+      color: red;
+      cursor: pointer;
+      font-weight: 500;
+    }
+  }
+
+  #dropdown {
+    background-color: #fff;
+    .dropdown-list {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      padding-right: 10px;
+
+      &:hover {
+        background-color: #8692a633;
+      }
+    }
+  }
+}
+
+.origin-table {
+  top: 25px;
+}

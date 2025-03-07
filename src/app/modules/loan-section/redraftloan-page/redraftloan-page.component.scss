@@ -1,0 +1,30 @@
+app-sidebar {
+  width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+  app-sidebar {
+    width: auto;
+  }
+}
+
+.dt-content-wrapper {
+  margin-top: 74px;
+}
+
+span.ngx-text-highlight {
+  background: yellow !important;
+}
+
+.icon-lg {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.markAsRecieved{
+  width: initial !important;
+}
+
+#msform{
+  width: 100% !important;
+}

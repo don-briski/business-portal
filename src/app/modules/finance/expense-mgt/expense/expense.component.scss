@@ -1,0 +1,56 @@
+.nav-link {
+  &:hover {
+    color: #545454;
+  }
+}
+.nav-item a {
+  margin-bottom: 0;
+}
+
+.card {
+  box-shadow: none !important;
+}
+
+.wrapper {
+  .sidebar {
+    width: 25%;
+    position: fixed;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+
+    ul.expense-list {
+      padding: 0px;
+      list-style: none;
+      li {
+        cursor: pointer;
+        padding: 15px 20px;
+        margin-bottom: 2px;
+        border-left: 5px solid #fff;
+        border-radius: 5px;
+        .title {
+          font-size: 14px;
+          font-weight: bold;
+        }
+        .sub-title {
+          font-size: 11px;
+        }
+        &.selected,
+        &:not(:last-child) {
+          border-bottom: 1px solid #ccc !important;
+        }
+      }
+    }
+  }
+
+  .main-content {
+    width: 73%;
+    position: relative;
+    left: 29%;
+
+    .basic-info {
+      p {
+        margin-bottom: 0;
+      }
+    }
+  }
+}

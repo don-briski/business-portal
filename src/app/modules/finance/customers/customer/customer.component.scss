@@ -1,0 +1,212 @@
+.add {
+  &:hover {
+    background-color: #ff015b !important;
+  }
+}
+
+.tr-border {
+  border: 3px solid #fff;
+}
+
+.nav-link {
+  &:hover {
+    color: #545454;
+  }
+}
+
+.nav-item a {
+  margin-bottom: 0;
+}
+
+.summary-sub {
+  td {
+    border-left: none;
+    border-bottom: none;
+    border-right: none;
+  }
+}
+
+#profile-section {
+  .col-md-4 {
+    margin-bottom: 20px;
+    p {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.text-black {
+  color: #000;
+}
+
+#tabs {
+  margin-bottom: 30px;
+}
+
+section {
+  border: 1px dashed gainsboro;
+  padding: 15px;
+  border-radius: 5px;
+  .icon {
+    color: gray;
+  }
+}
+
+.lnd-border {
+  border: 1px dashed gainsboro;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+.col-md-4 {
+  margin-bottom: 15px !important;
+}
+
+.single-view {
+  .left {
+    width: 25%;
+    position: fixed;
+    height: calc(100vh - 100px);
+    overflow-y: auto;
+    border-right: 2.5px solid #b3b3b3;
+    ul.inv-list {
+      padding: 0px;
+      list-style: none;
+      li {
+        cursor: pointer;
+        padding: 15px 20px;
+        margin-bottom: 2px;
+        border-left: 5px solid #fff;
+        border-radius: 5px;
+        .title {
+          font-size: 14px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+        .sub-title {
+          font-size: 11px;
+        }
+        &.selected,
+        &:not(:last-child) {
+          border-bottom: 1px solid #ccc;
+        }
+      }
+    }
+  }
+
+  .right {
+    width: 73%;
+    position: relative;
+    left: 28%;
+
+    .paper {
+      .content {
+        margin-top: 80px;
+
+        .img-container {
+          max-width: 150px;
+        }
+      }
+      .ribbon {
+        width: 150px;
+        height: 150px;
+        overflow: hidden;
+        position: absolute;
+      }
+      .ribbon::before,
+      .ribbon::after {
+        position: absolute;
+        z-index: 0;
+        content: "";
+        display: block;
+      }
+      .ribbon.posted::before,
+      .ribbon.posted::after {
+        border: 5px solid #0f7a2a;
+      }
+      .ribbon.draft::before,
+      .ribbon.draft::after {
+        border: 5px solid #5f5f5f;
+      }
+      .ribbon.overdue::before,
+      .ribbon.overdue::after {
+        border: 5px solid #942323;
+      }
+      .ribbon.sentForApproval::before,
+      .ribbon.sentForApproval::after {
+        border: 5px solid #453488;
+      }
+      .ribbon.rejected::before,
+      .ribbon.rejected::after {
+        border: 5px solid #942323;
+      }
+      .ribbon.redraft::before,
+      .ribbon.redraft::after {
+        border: 5px solid rgb(175, 86, 126);
+      }
+      .ribbon span {
+        position: absolute;
+        display: block;
+        width: 225px;
+        padding: 10px 0;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        color: #fff;
+        font: 700 18px/1 "Lato", sans-serif;
+        text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+        text-transform: uppercase;
+        text-align: center;
+        &.posted {
+          background-color: #1b941b;
+        }
+        &.draft {
+          background-color: #a8a8a8;
+        }
+        &.overdue {
+          background-color: #d13232;
+        }
+        &.sentForApproval {
+          background-color: #453488;
+          font: 700 13px/1 "Lato", sans-serif;
+          padding: 13px 16px 10px 0;
+        }
+        &.rejected {
+          background-color: #d13232;
+        }
+        &.redraft {
+          background-color: rgb(175, 86, 126);
+        }
+      }
+
+      .ribbon-top-left {
+        top: -10px;
+        left: -10px;
+      }
+      .ribbon-top-left::before,
+      .ribbon-top-left::after {
+        border-top-color: transparent;
+        border-left-color: transparent;
+      }
+      .ribbon-top-left::before {
+        top: 0;
+        right: 12px;
+      }
+      .ribbon-top-left::after {
+        bottom: 12px;
+        left: 0;
+      }
+      .ribbon-top-left span {
+        right: -25px;
+        top: 30px;
+        transform: rotate(-45deg);
+        z-index: 2;
+      }
+    }
+  }
+
+  .w-65 {
+    width: 65%;
+  }
+  .w-10 {
+    width: 10%;
+  }
+}

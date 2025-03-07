@@ -1,0 +1,72 @@
+<main>
+  <lnd-popup
+  type="filter"
+  [togglePopup]="showPopup"
+  [customTableTopPosition]="customTableTopPosition"
+  (closePopup)="closePopup.emit()"
+>
+  <header
+    class="pop-header d-flex justify-content-between align-items-center w-100"
+  >
+    <h4 class="mb-0">Filter</h4>
+    <img
+      src="assets/images/close.svg"
+      alt="close"
+      class="cursor"
+      (click)="closePopup.emit()"
+    />
+  </header>
+
+  <main class="pop-content">
+    <div *ngIf="filterTypes.includes(FILTER_TYPES.Branch)" class="mb-5">
+      <label>Select Preferred Branch(es)</label>
+      <div>
+        <slct-2
+          [data]="branches"
+          [multiple]="true"
+          [allowSelectAll]="true"
+          placeholder="Select Branch"
+          [(ngModel)]="selectedBranches"
+        ></slct-2>
+      </div>
+    </div>
+
+    <div *ngIf="filterTypes.includes(FILTER_TYPES.LoanProduct)" class="mb-5">
+      <label>Select Preferred Loan Type(s)</label>
+      <div>
+        <slct-2
+          [data]="loanProducts"
+          [multiple]="true"
+          [allowSelectAll]="true"
+          placeholder="Select Loan Type"
+          [(ngModel)]="selectedLoanProducts"
+        ></slct-2>
+      </div>
+    </div>
+
+    <div *ngIf="filterTypes.includes(FILTER_TYPES.Status)" class="mb-5">
+      <label>Select Preferred Status(es)</label>
+      <div>
+        <slct-2
+          [data]="statuses"
+          [multiple]="true"
+          [allowSelectAll]="true"
+          placeholder="Select Status"
+          [(ngModel)]="selectedStatuses"
+        ></slct-2>
+      </div>
+    </div>
+  </main>
+
+  <footer class="pop-footer">
+    <lnd-submit-btn
+      customClasses="btn-sm mt-3 btn-primary text-white"
+      text="Apply Filter"
+      [isProcessing]="isLoading"
+      [isValid]="selectedStatuses?.length > 0 || selectedBranches?.length > 0 || selectedLoanProducts?.length > 0"
+      (triggerAction)="filter()"
+    />
+  </footer>
+</lnd-popup>
+
+</main>

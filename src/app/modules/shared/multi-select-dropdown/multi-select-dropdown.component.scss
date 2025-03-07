@@ -1,0 +1,138 @@
+:host {
+  width: 100%;
+  display: block;
+}
+
+section {
+  position: relative;
+  min-width: 200px;
+
+  header {
+    border: 1px solid #ced4da;
+    border-radius: 3.2px;
+    #selected-wrapper {
+      display: flex;
+      align-items: center;
+      .selected-item {
+        border: 1px solid #ff015b;
+        color: #ff015b;
+        background-color: #fff;
+        margin-right: 4px;
+        padding: 0 5px;
+        border-radius: 10px;
+        float: left;
+        display: flex;
+        font-size: 12px;
+      }
+    }
+  }
+
+  #list {
+    position: absolute;
+    padding: 0 5px;
+    width: 100%;
+    max-height: 250px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: #fff;
+    margin-top: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    .spinner {
+      position: relative;
+      left: 90%;
+      top: -40px;
+
+      i{
+        color: var(--secondary-color);
+      }
+    }
+
+    .addItemBtn {
+      right: 4%;
+      position: absolute;
+      top: 23px;
+
+      &.text{
+        color: var(--secondary-color);
+      }
+
+      .icon-add-circle{
+        color: var(--secondary-color);
+      }
+    }
+
+    #item {
+      padding: 6px 10px;
+      position: relative;
+
+      &:hover {
+        background-color: #e4e3e3;
+      }
+
+      .checkboxField:before {
+        box-sizing: content-box;
+        content: "";
+        background-color: #fff;
+        color: #337ab7;
+        top: 50%;
+        left: 6px;
+        width: 14px;
+        height: 14px;
+        margin-top: -9px;
+        border: 2px solid #337ab7;
+        text-align: center;
+        transition: 0.4s;
+        position: absolute;
+        display: inline-block;
+      }
+
+      .checkboxField:checked:before {
+        background-color: #337ab7;
+      }
+
+      .checkboxField:after {
+        content: "";
+        transition: transform 0.2s ease-out;
+        transform: scale(0);
+        box-sizing: content-box;
+        position: absolute;
+        display: inline-block;
+        transform-origin: 50%;
+        background-color: transparent;
+        top: 50%;
+        left: 9px;
+        width: 8px;
+        height: 3px;
+        margin-top: -4px;
+        border-style: solid;
+        border-color: #fff;
+        border-width: 0 0 3px 3px;
+        -o-border-image: none;
+        border-image: none;
+      }
+
+      .checkboxField:checked:after {
+        background-color: #337ab7;
+        transition: transform 0.2s ease-out;
+        transform: rotate(-45deg) scale(1);
+      }
+    }
+  }
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.z-11 {
+  z-index: 11;
+}
+
+.bg-gray {
+  background-color: lightgray;
+}
+.text-darkgray {
+  color: darkgray;
+}

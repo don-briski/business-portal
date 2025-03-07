@@ -1,0 +1,168 @@
+app-sidebar {
+  width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+  app-sidebar {
+    width: auto;
+  }
+}
+
+.dt-content-wrapper {
+  margin-top: 74px;
+}
+
+.ui-select-choices {
+  display: block;
+}
+
+.generate-menu2 {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 6000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 8px 0;
+  margin: 8px 24px 0;
+  font-size: 22px;
+  color: #545454;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 0 solid transparent;
+  border-radius: 6px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.175);
+}
+
+.generate-menu-left {
+  // right: 210px;
+  left: auto;
+  top: 50px;
+}
+
+.generate-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 6000;
+  display: none;
+  float: left;
+  min-width: 160px;
+  padding: 8px 0;
+  margin: 8px 24px 0;
+  font-size: 6.4px;
+  color: #545454;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 0 solid transparent;
+  border-radius: 6.4px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.175);
+}
+
+.generate-menu-right {
+  right: 210px;
+  left: auto;
+  top: 50px;
+}
+
+.generate-menu {
+  width: 400px !important;
+}
+
+.generate-menu-header {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 13px;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: 19px 28px;
+}
+
+.generate-menu-header {
+  box-shadow: 0 2px 2px 0 rgba(84, 84, 84, 0.05);
+}
+
+.generate-menu-header .title {
+  font-size: 15px;
+  margin-bottom: 0;
+}
+
+.generate-menu-body {
+  padding: 24px 28px;
+}
+
+.generate-menu-footer {
+  box-shadow: 0 -2px 2px 0 rgba(84, 84, 84, 0.05);
+  justify-content: flex-end;
+}
+
+.generate-menu-header,
+.generate-menu-footer {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 13px;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: 24px 28px;
+}
+
+.center {
+  opacity: 0.8;
+  background-color: transparent;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
+}
+
+.row {
+  z-index: 3;
+  position: relative;
+}
+
+::ng-deep .myModal .modal-dialog {
+  max-width: 600px !important;
+}
+
+.switch-container {
+  margin: 50px 0 10px 0px;
+}
+
+.d-flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-nav{
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+}
+
+.dropdown-item:hover{
+  background-color: cadetblue;
+  color: #fff !important;
+}
+
+.disb-table {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .disb-table {
+    overflow-x: scroll;
+  } 
+}

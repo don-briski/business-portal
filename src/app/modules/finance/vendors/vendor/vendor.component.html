@@ -1,0 +1,959 @@
+<div class="wrapper d-flex">
+  <div class="sidebar pr-4">
+    <header
+      *ngIf="!fetchingVendor"
+      class="d-flex align-items-center justify-content-between mb-3"
+    >
+      <span><h1 class="dt-page__title mb-0">Vendor</h1></span>
+
+      <span class="float-right">
+        <button
+          *ngIf="user?.permission?.includes('Create Vendors')"
+          class="btn btn-sm py-2 btn-primary mr-2 text-white"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [routerLink]="['/finance/vendors/create']"
+          routerLinkActive="router-link-active"
+          href="javascript:void(0)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New Vendor
+        </button>
+      </span>
+    </header>
+
+    <div class="body">
+      <div class="card">
+        <div class="card-body p-0">
+          <ul class="journal-list">
+            <li
+              *ngFor="let vendor of vendors; let i = index"
+              class="d-flex justify-content-between align-items-center border-bottom"
+              (click)="showVendorInfo(vendor)"
+              [ngStyle]="{
+                'border-left':
+                  vendor?.id === selectedVendor?.vendorId
+                    ? '5px solid' + currentTheme.secondaryColor
+                    : ''
+              }"
+              (mouseover)="vendor.hover = true"
+              (mouseleave)="
+                selectedVendor?.vendorId !== vendor?.id
+                  ? (vendor.hover = false)
+                  : null
+              "
+              [ngStyle]="vendor.hover ? hoverStyle : {}"
+            >
+              <span>
+                <span class="title">{{ vendor.fullName }}</span>
+                <div class="mt-2 sub-title">
+                  <span *ngIf="vendor?.code"
+                    >{{ vendor?.code }} |</span
+                  >
+                  {{ vendor?.email }}
+                </div>
+              </span>
+              <span>
+                <span
+                  class="badge badge-sm"
+                  [ngClass]="{
+                    'badge-success': vendor?.status === 'Active',
+
+                    'badge-warning': vendor?.status === 'Inactive'
+                  }"
+                >
+                  {{ vendor?.status }}
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="main-content px-2">
+    <ng-container *ngIf="!fetchingVendor">
+      <div class="card">
+        <header
+          class="d-flex card-body justify-content-between align-items-center"
+        >
+          <div id="tabs">
+            <ul
+              id="active-div"
+              class="card-header-pills nav nav-pill justify-content-center align-items-center"
+              role="tablist"
+            >
+              <li class="nav-item">
+                <a
+                  id="nav-overview"
+                  class="nav-link pool-nav active-tab"
+                  data-toggle="tab"
+                  href="#tab-overview"
+                  role="tab"
+                  aria-controls="tab-overview"
+                  aria-selected="false"
+                  (click)="switchTabs('overview')"
+                  >Overview</a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a
+                  id="nav-transaction"
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-transaction"
+                  role="tab"
+                  aria-controls="tab-transaction"
+                  aria-selected="false"
+                  (click)="switchTabs('transaction')"
+                  >Transaction</a
+                >
+              </li>
+
+              <li class="nav-item">
+                <a
+                  id="nav-statement"
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-statement"
+                  role="tab"
+                  aria-controls="tab-statement"
+                  aria-selected="false"
+                  (click)="switchTabs('statement')"
+                  >Statement</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div class="d-flex justify-content-end align-items-center">
+            <button
+              *ngIf="user?.permission?.includes('Edit Vendors')"
+              class="btn btn-xs btn-light mx-3"
+              [routerLink]="'/finance/vendors/edit/' + selectedVendor?.vendorId"
+            >
+              Edit
+            </button>
+            <button class="btn btn-xs btn-outline-dark" (click)="closeWindow()">
+              Close
+            </button>
+          </div>
+        </header>
+      </div>
+      <div class="card card-content w-100 p-5 mt-5">
+        <div class="tab-content">
+          <div id="tab-overview" class="tab-pane active show">
+            <div>
+              <div class="d-flex justify-content-between mb-5">
+                <h3>Profile</h3>
+
+                <lnd-payables-receivables
+                  [outstandingPayables]="outstandingPayables"
+                  [unusedCredits]="unusedCredits"
+                  type="payables"
+                  [currencySymbol]="ownerInformation?.currency?.currencySymbol"
+                >
+                </lnd-payables-receivables>
+              </div>
+              <section id="profile-section">
+                <div class="row">
+                  <div class="col-md-4">
+                    <div class="d-flex align-items-center mb-2">
+                      <span><i class="icon icon-user-o icon-1x mr-1"></i></span>
+                      <span>
+                        <p class="mb-0"><b>Vendor Name</b></p>
+                        <p class="mb-0">{{ selectedVendor?.name }}</p>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    *ngIf="
+                      selectedVendor?.primaryContact?.firsName ||
+                      selectedVendor?.primaryContact?.lastName
+                    "
+                    class="col-md-4"
+                  >
+                    <div class="d-flex align-items-center mb-2">
+                      <span><i class="icon icon-user-o icon-1x mr-1"></i></span>
+                      <span>
+                        <p class="mb-0"><b>Name</b></p>
+                        <p class="mb-0">
+                          {{
+                            selectedVendor?.primaryContact?.firsName | titlecase
+                          }}
+                          {{
+                            selectedVendor?.primaryContact?.lastName | titlecase
+                          }}
+                        </p>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    *ngIf="selectedVendor?.primaryContact.phoneNumber"
+                    class="col-md-4"
+                  >
+                    <div class="d-flex align-items-center mb-2">
+                      <span><i class="icon icon-phone icon-1x mr-1"></i></span>
+                      <span>
+                        <p class="mb-0"><b>PhoneNumber</b></p>
+                        <p class="mb-0">
+                          {{ selectedVendor?.primaryContact.phoneNumber }}
+                        </p>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    *ngIf="selectedVendor?.primaryContact.email"
+                    class="col-md-4"
+                  >
+                    <div class="d-flex align-items-center mb-2">
+                      <span><i class="icon icon-email icon-1x mr-1"></i></span>
+                      <span>
+                        <p class="mb-0"><b>Email</b></p>
+                        <p class="mb-0">
+                          {{ selectedVendor?.primaryContact.email }}
+                        </p>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="selectedVendor?.taxIdNumber" class="col-md-4">
+                    <div class="d-flex align-items-center mb-2">
+                      <span><i class="icon icon-editor icon-1x mr-1"></i></span>
+                      <span>
+                        <p class="mb-0"><b>Tax Identification Number</b></p>
+                        <p class="mb-0">{{ selectedVendor?.taxIdNumber }}</p>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="selectedVendor?.paymentTermName" class="col-md-4">
+                    <div class="d-flex align-items-center mb-2">
+                      <span><i class="icon icon-editor icon-1x mr-1"></i></span>
+                      <span>
+                        <p class="mb-0"><b>Payment Term</b></p>
+                        <p class="mb-0">
+                          {{ selectedVendor?.paymentTermName }}
+                        </p>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="selectedVendor?.address" class="col-md-4">
+                    <div class="d-flex align-items-center mb-2">
+                      <span
+                        ><i class="icon icon-location icon-1x mr-1"></i
+                      ></span>
+                      <span>
+                        <p class="mb-0"><b>Address</b></p>
+                        <p class="mb-0">{{ selectedVendor?.address }}</p>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            <div class="mt-6">
+              <div id="accordion">
+                <div class="card">
+                  <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link"
+                        data-toggle="collapse"
+                        data-target="#billing"
+                        aria-expanded="true"
+                        aria-controls="billing"
+                      >
+                        Billing Address
+                      </button>
+                    </h5>
+                  </div>
+
+                  <div
+                    id="billing"
+                    class="collapse"
+                    aria-labelledby="headingOne"
+                    data-parent="#accordion"
+                  >
+                    <div class="card-body">
+                      <p
+                        *ngIf="
+                          !(selectedVendor?.billingAddress | keyvalue)?.length
+                        "
+                      >
+                        -
+                      </p>
+                      <div
+                        *ngIf="
+                          (selectedVendor?.billingAddress | keyvalue)?.length
+                        "
+                        class="row"
+                      >
+                        <div class="col-4">
+                          <div>
+                            <small>Attention</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.attention
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.attention
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>Fax</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.fax
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.fax
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>PhoneNumber</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.phoneNumber
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.phoneNumber
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        *ngIf="
+                          (selectedVendor?.billingAddress | keyvalue)?.length
+                        "
+                        class="row"
+                      >
+                        <div class="col-4">
+                          <div>
+                            <small>Country</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.country
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.country
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>State</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.state
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.state
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>City</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.city
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.city
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        *ngIf="
+                          (selectedVendor?.billingAddress | keyvalue)?.length
+                        "
+                        class="row"
+                      >
+                        <div class="col-4">
+                          <div>
+                            <small>Street 1</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.street1
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.street1
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>Street 2</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.street2
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.street2
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>Zipcode</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.zipcode
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.zipcode
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        *ngIf="
+                          (selectedVendor?.billingAddress | keyvalue)?.length
+                        "
+                        class="row"
+                      >
+                        <div class="col-12">
+                          <div>
+                            <small>Address</small>
+                            <p>
+                              {{
+                                !selectedVendor?.billingAddress.address
+                                  ? "-"
+                                  : selectedVendor?.billingAddress.address
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#shipping"
+                        aria-expanded="true"
+                        aria-controls="shipping"
+                      >
+                        Shipping Address
+                      </button>
+                    </h5>
+                  </div>
+
+                  <div
+                    id="shipping"
+                    class="collapse"
+                    aria-labelledby="headingOne"
+                    data-parent="#accordion"
+                  >
+                    <div class="card-body">
+                      <p
+                        *ngIf="
+                          !(selectedVendor?.shippingAddress | keyvalue)?.length
+                        "
+                      >
+                        -
+                      </p>
+                      <div
+                        *ngIf="
+                          (selectedVendor?.shippingAddress | keyvalue)?.length
+                        "
+                        class="row"
+                      >
+                        <div class="col-4">
+                          <div>
+                            <small>Attention</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.attention
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.attention
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>Fax</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.fax
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.fax
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>PhoneNumber</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.phoneNumber
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.phoneNumber
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        *ngIf="
+                          (selectedVendor?.shippingAddress | keyvalue)?.length
+                        "
+                        class="row"
+                      >
+                        <div class="col-4">
+                          <div>
+                            <small>Country</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.country
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.country
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>State</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.state
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.state
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>City</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.city
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.city
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        *ngIf="
+                          (selectedVendor?.shippingAddress | keyvalue)?.length
+                        "
+                        class="row"
+                      >
+                        <div class="col-4">
+                          <div>
+                            <small>Street 1</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.street1
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.street1
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>Street 2</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.street2
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.street2
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-4">
+                          <div>
+                            <small>Zipcode</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.zipcode
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.zipcode
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        *ngIf="
+                          (selectedVendor?.shippingAddress | keyvalue)?.length
+                        "
+                        class="row"
+                      >
+                        <div class="col-12">
+                          <div>
+                            <small>Address</small>
+                            <p>
+                              {{
+                                !selectedVendor?.shippingAddress.address
+                                  ? "-"
+                                  : selectedVendor?.shippingAddress.address
+                              }}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#contact"
+                        aria-expanded="true"
+                        aria-controls="contact"
+                      >
+                        Contact Details
+                      </button>
+                    </h5>
+                  </div>
+
+                  <div
+                    id="contact"
+                    class="collapse"
+                    aria-labelledby="headingOne"
+                    data-parent="#accordion"
+                  >
+                    <div class="card-body">
+                      <p *ngIf="selectedVendor?.contactDetails?.length === 0">
+                        -
+                      </p>
+
+                      <ng-container
+                        *ngFor="let contact of selectedVendor?.contactDetails"
+                      >
+                        <div class="row shadow-sm py-2 mb-5">
+                          <div class="col-6">
+                            <div>
+                              <small>FirstName</small>
+                              <p>
+                                {{ !contact.firsName ? "-" : contact.firsName }}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="col-6">
+                            <div>
+                              <small>LastName</small>
+                              <p>
+                                {{ !contact.lastName ? "-" : contact.lastName }}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="col-6">
+                            <div>
+                              <small>Email</small>
+                              <p>
+                                {{ !contact.email ? "-" : contact.email }}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="col-6">
+                            <div>
+                              <small>PhoneNumber</small>
+                              <p>
+                                {{
+                                  !contact.phoneNumber
+                                    ? "-"
+                                    : contact.phoneNumber
+                                }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="card-header" id="headingOne">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#bank"
+                        aria-expanded="true"
+                        aria-controls="bank"
+                      >
+                        Bank Details
+                      </button>
+                    </h5>
+                  </div>
+
+                  <div
+                    id="bank"
+                    class="collapse"
+                    aria-labelledby="headingOne"
+                    data-parent="#accordion"
+                  >
+                    <div class="card-body">
+                      <p *ngIf="selectedVendor?.bankDetails?.length === 0">-</p>
+
+                      <ng-container
+                        *ngFor="let bank of selectedVendor?.bankDetails"
+                      >
+                        <div class="row shadow-sm py-2 mb-5">
+                          <div class="col-4">
+                            <div>
+                              <small>Bank Name</small>
+                              <p>
+                                {{ !bank.bankName ? "-" : bank.bankName }}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="col-4">
+                            <div>
+                              <small>Account Name</small>
+                              <p>
+                                {{ !bank.accountName ? "-" : bank.accountName }}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="col-4">
+                            <div>
+                              <small>Account Number</small>
+                              <p>
+                                {{
+                                  !bank.accountNumber ? "-" : bank.accountNumber
+                                }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="tab-transaction" class="tab-pane">
+            <transactions
+              [vendorId]="selectedVendor?.vendorId"
+              [currentTheme]="currentTheme"
+            ></transactions>
+          </div>
+
+          <div id="tab-comments" class="tab-pane">
+            <div
+              *ngIf="isLoading && vendorComments.length === 0; else notLoading"
+            >
+              <p
+                [style.color]="currentTheme?.secondaryColor"
+                class="text-center"
+              >
+                Retrieving Comments <i class="icon icon-spin icon-spin2"></i>
+              </p>
+            </div>
+
+            <ng-template #notLoading>
+              <div>
+                <div
+                  *ngIf="
+                    !isLoading && vendorComments.length === 0;
+                    else comments
+                  "
+                >
+                  <no-data
+                    [currentTheme]="currentTheme"
+                    [title]="'No Comments'"
+                  ></no-data>
+                </div>
+
+                <ng-template #comments>
+                  <div class="d-flex justify-content-end">
+                    <button
+                      *ngIf="user?.permission?.includes('Add Vendor Comment')"
+                      class="btn btn-xs text-white"
+                      [style.backgroundColor]="currentTheme?.secondaryColor"
+                      (click)="openModal(commentTemplate)"
+                    >
+                      <i class="icon icon-add icon-lg"></i>
+                    </button>
+                  </div>
+
+                  <ng-container *ngFor="let comment of vendorComments">
+                    <div
+                      class="comment d-flex justify-content-between align-items-center mb-3"
+                    >
+                      <div>
+                        <p>{{ comment.comment }}</p>
+                        <small
+                          >by {{ comment.commentBy }} On
+                          <span class="mx-3">{{
+                            comment.timeStamp | customDatePipe
+                          }}</span>
+                          @ {{ comment.timeStamp | date : "shortTime" }}</small
+                        >
+                      </div>
+                      <div
+                        *ngIf="
+                          user?.permission?.includes('Delete Vendor Comment')
+                        "
+                        class="delete cursor"
+                        (click)="deleteComment(comment.id)"
+                        [style.backgroundColor]="
+                          commentIdToDelete === comment.id
+                            ? 'red'
+                            : currentTheme?.secondaryColor
+                        "
+                      >
+                        <i
+                          *ngIf="commentIdToDelete !== comment.id"
+                          class="icon icon-trash icon-lg text-white"
+                        ></i>
+                        <i
+                          *ngIf="isLoading && commentIdToDelete === comment.id"
+                          class="icon icon-spin icon-spin2 icon-lg text-white"
+                        ></i>
+                      </div>
+                    </div>
+                  </ng-container>
+                </ng-template>
+              </div>
+            </ng-template>
+          </div>
+
+          <div id="tab-statement" class="tab-pane">
+            <lnd-account-statement
+              *ngIf="selectedVendor"
+              [selectedVendor]="selectedVendor"
+              [appOwnerName]="ownerInformation?.appOwnerName"
+              [currencySymbol]="ownerInformation?.currency?.currencySymbol"
+              [currentTheme]="currentTheme"
+              type="vendor"
+            ></lnd-account-statement>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="fetchingVendor">
+      <div class="d-flex justify-content-center text-primary">
+        <p class="text-center text-primary">
+          <span>Retrieving Vendor...</span>
+          <i class="icon icon-spin icon-spin2"></i>
+        </p>
+      </div>
+    </ng-container>
+  </div>
+</div>
+
+<ng-template #commentTemplate>
+  <div class="p-3">
+    <div class="d-flex justify-content-between">
+      <p class="mb-0">Add a Comment</p>
+      <button
+        type="button"
+        class="close"
+        aria-label="Close"
+        (click)="closeModal()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="commentForm" (ngSubmit)="submitComment()">
+        <div class="form-row">
+          <textarea
+            class="form-control"
+            placeholder="Type your comment here"
+            formControlName="comment"
+          ></textarea>
+
+          <button
+            type="submit"
+            [disabled]="commentForm.invalid"
+            class="btn btn-xs mt-4"
+            [ngClass]="isLoading ? 'btn-warning' : 'btn-primary'"
+          >
+            {{ isLoading ? "Processing..." : "Submit" }}
+
+            <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #customData>
+  <form [formGroup]="filterForm">
+    <div class="card">
+      <div class="card-header">
+        <p class="mb-0">Filter Statement By Date</p>
+      </div>
+
+      <div class="card-body d-flex justify-content-between">
+        <div>
+          <label for="from">From</label>
+          <input
+          lndInvalidDateChecker
+            formControlName="fromDate"
+            type="date"
+            class="form-control"
+            id="date"
+          />
+        </div>
+        <div>
+          <label for="from">To</label>
+          <input
+          lndInvalidDateChecker
+            formControlName="toDate"
+            type="date"
+            class="form-control"
+            id="date"
+          />
+        </div>
+      </div>
+
+      <div class="card-footer d-flex justify-content-end">
+        <button
+          [disabled]="filterForm.invalid"
+          class="btn btn-xs btn-primary"
+          (click)="getVendorStatementOfAccount()"
+        >
+          {{ !isLoading ? "Filter" : "Processing..." }}
+          <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+        </button>
+        <button class="btn btn-xs btn-danger" (click)="dismiss()">Close</button>
+      </div>
+    </div>
+  </form>
+</ng-template>

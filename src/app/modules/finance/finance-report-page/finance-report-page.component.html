@@ -1,0 +1,64 @@
+<!-- Page Header -->
+<div class="dt-page__header">
+  <h1 class="dt-page__title">Reports</h1>
+</div>
+<!-- /page header -->
+
+<div *ngIf="loader" class="d-flex justify-content-center">
+  <lnd-spinner
+    text="Retrieving Report..."
+    [color]="currentTheme?.secondaryColor"
+  ></lnd-spinner>
+</div>
+
+<div *ngIf="!loader" class="dt-card">
+  <!-- Card Body -->
+  <div class="dt-card__body">
+    <div class="row">
+      <div
+        style="margin-bottom: 7rem"
+        class="col-md-3 col-md-offset-1"
+        *ngFor="let report of reportLists"
+      >
+        <h1 class="mb-4 h2">{{ report?.parent }}</h1>
+        <ul class="report_list">
+          <li *ngFor="let subReport of report?.children">
+            <a
+              href="javascript:void(0)"
+              (click)="openReportAside(subReport?.type, subReport?.isDisabled)"
+              [ngClass]="{ canceled: subReport?.isDisabled }"
+              ><i class="icon icon-star-o icon-fw icon-lg"></i>
+              <span [style.color]="currentTheme?.secondaryColor">
+                {{ subReport?.name }}</span
+              ></a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <!-- /card body -->
+</div>
+
+<!-- Customizer Sidebar -->
+<aside
+  class="dt-customizer dt-drawer position-right"
+  [ngClass]="{ open: showAside }"
+>
+  <lnd-lib-finance-report
+    *ngIf="showAside"
+    [allBranches]="branchesAccessibleArray"
+    [agingDetailPeriod]="agingDetailPeriod"
+    [agingDetailPeriodType]="agingDetailPeriodType"
+    [reportType]="openedReportTyped"
+    [userInfo]="userInfo"
+    [ownerInformation]="ownerInformation"
+    [fiscalYear]="fiscalYear"
+    [allAccounts]="allAccounts"
+    (closeModal)="toggleAside()"
+  ></lnd-lib-finance-report>
+</aside>
+
+<div *ngIf="showAside" class="dt-backdrop" (click)="toggleAside()"></div>
+
+<!-- /customizer sidebar -->

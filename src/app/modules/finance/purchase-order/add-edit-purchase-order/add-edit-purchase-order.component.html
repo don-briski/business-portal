@@ -1,0 +1,524 @@
+<div class="row m-0">
+  <header
+    class="dt-page__header d-flex justify-content-between align-items-center w-100 px-4 mb-2"
+  >
+    <h1 class="dt-page__title clearfix mb-0">
+      {{ isEditing ? "Edit" : "Add New" }} Purchase Order
+    </h1>
+
+    <span [style.color]="currentTheme.secondaryColor"
+      ><span>{{
+        (isEditing || cloning) && !purchaseOrder ? "Retrieving Purchase Order..." : ""
+      }}</span>
+      <i
+        class="icon icon-spin icon-spin2"
+        *ngIf="(isEditing || cloning) && !purchaseOrder"
+      ></i
+    ></span>
+
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <a
+          class="btn btn-primary mr-2 text-white"
+          [routerLink]="['/finance/purchase-orders']"
+          routerLinkActive="router-link-active"
+          [style.background]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          href="javascript:void(0)"
+          >Back</a
+        >
+      </div>
+    </span>
+  </header>
+  <div class="col-12 d-flex justify-content-center">
+    <div class="dt-card w-100">
+      <div
+        class="dt-card__body"
+        *ngIf="((isEditing || cloning) && purchaseOrder) || !isEditing"
+      >
+        <form [formGroup]="purchaseOrderForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-row">
+                <div class="col-md-6">
+                  <label for="vendors"
+                    >Vendor Name <b class="text-danger">*</b></label
+                  >
+                  <div class="d-flex align-items-center">
+                    <multi-select-dropdown
+                      [data]="vendors"
+                      formControlName="vendor"
+                      [currentTheme]="currentTheme"
+                      [searchService]="getSearchVendorService()"
+                      [showAddBtn]="true"
+                      placeholder="Select Vendor"
+                      (searchResult)="updateDropdown($event, 'vendor')"
+                      (addBtnClick)="openModal(vendor, 'lg', i)"
+                    ></multi-select-dropdown>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="deliver-to">Deliver To </label>
+                  <input
+                    type="text"
+                    formControlName="deliveredTo"
+                    id="deliver-to"
+                    class="form-control"
+                    placeholder="Deliver to"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col-md-6">
+                  <label for="date">Date <b class="text-danger">*</b></label>
+                  <input
+                  lndInvalidDateChecker
+                    type="date"
+                    id="date"
+                    formControlName="date"
+                    class="form-control"
+                    (change)="updateDueDate()"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="payment-terms"
+                    >Payment Terms <b class="text-danger">*</b></label
+                  >
+                  <slct-2
+                    [data]="paymentTerms"
+                    id="payment-terms"
+                    formControlName="paymentTerm"
+                    [customSearchEnabled]="true"
+                    [placeholder]="'Select Payment Terms'"
+                    [searchService]="getPaymentTermsService()"
+                    (searchResult)="updateDropdown($event, 'paymentTerms')"
+                  ></slct-2>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col-md-6">
+                  <label for="edd">Expected Delivery Date </label>
+                  <input
+                  lndInvalidDateChecker
+                    type="date"
+                    id="edd"
+                    formControlName="expectedDeliveryDate"
+                    class="form-control"
+                  />
+                </div>
+
+                <div class="col-md-6">
+                  <label for="reference">Reference#</label>
+                  <input
+                    type="text"
+                    id="reference"
+                    formControlName="reference"
+                    class="form-control"
+                    placeholder="Reference"
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <lnd-approval-comments
+                *ngIf="isEditing && purchaseOrder?.comments.length > 0"
+                [comments]="purchaseOrder.comments"
+              ></lnd-approval-comments>
+            </div>
+          </div>
+          <div class="dashed"></div>
+          <div class="mt-5">
+            <div class="form-row">
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <p class="mb-0 mr-3">Item rates are</p>
+                  <span class="w-50">
+                    <slct-2
+                      [data]="itemsRate"
+                      [active]="itemsRate"
+                      [placeholder]="'Items Rate Are'"
+                      (selected)="onSetInclusive($event)"
+                    ></slct-2>
+                  </span>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                  <p class="mb-0 mr-3">Discount Type</p>
+                  <span class="w-50">
+                    <slct-2
+                      [data]="discountTypes"
+                      [active]="discountTypes"
+                      (selected)="onSetDiscountLevel($event)"
+                    ></slct-2>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <lnd-switch
+            [value]="POForAsset"
+            text="Raising Purchase Order for Asset"
+            (emittedValue)="setPOForAsset($event)"
+          ></lnd-switch>
+
+          <div class="form-row">
+            <table
+              id="data-table"
+              class="table mt-5 table-bordered table-sm shadow-sm p-3 bg-white rounded"
+            >
+              <thead>
+                <tr>
+                  <th>{{ POForAsset ? "Asset" : "Item" }}</th>
+                  <th>Quantity</th>
+                  <th>Rate</th>
+                  <th *ngIf="discountLevel !== 'TransactionLevel'">Discount</th>
+                  <th>Tax</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+
+              <tbody formArrayName="lines">
+                <ng-container
+                  *ngFor="let itemControls of items().controls; let i = index"
+                >
+                  <tr [formGroup]="itemControls">
+                    <td>
+                      <multi-select-dropdown
+                        formControlName="item"
+                        [data]="itemsDropData"
+                        [currentTheme]="currentTheme"
+                        [searchService]="getSearchItemsService()"
+                        (searchResult)="updateDropdown($event, 'items', i)"
+                        (addBtnClick)="openModal(item, '', i)"
+                        (selected)="selectItem($event, i)"
+                        [showAddBtn]="!POForAsset"
+                      ></multi-select-dropdown>
+                    </td>
+
+                    <td class="c-width-100">
+                      <input
+                        type="number"
+                        class="form-control"
+                        min="0"
+                        placeholder="Quantity"
+                        (keyup)="linesCalculation()"
+                        (change)="linesCalculation()"
+                        formControlName="quantity"
+                      />
+                    </td>
+                    <td class="c-width-200">
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Rate"
+                        (keyup)="linesCalculation()"
+                        formControlName="unitPrice"
+                        currencyMask
+                        [options]="{
+                          prefix: currencySymbol,
+                          thousands: ',',
+                          decimal: '.'
+                        }"
+                      />
+                    </td>
+                    <td class="c-width-100" *ngIf="discountLevel !== 'TransactionLevel'">
+                      <div class="input-group">
+                        <input
+                          type="number"
+                          class="form-control"
+                          placeholder="0"
+                          formControlName="discountValueOnType"
+                          (change)="linesCalculation(i)"
+                          min="0"
+                          step="0.1"
+                        />
+                        <div class="input-group-append">
+                          <span class="input-group-text" id="basic-addon1">
+                            %
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="c-width-200">
+                      <slct-2
+                        [data]="itemControls.get('taxes').value || []"
+                        placeholder="Search Tax"
+                        (selected)="selectTax($event, i)"
+                        [customSearchEnabled]="true"
+                        formControlName="tax"
+                      ></slct-2>
+                    </td>
+                    <td class="c-width-200">
+                      <div class="d-flex align-items-center">
+                        <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Amount"
+                        readonly
+                        formControlName="amount"
+                        currencyMask
+                        [options]="{
+                          prefix: currencySymbol,
+                          thousands: ',',
+                          decimal: '.'
+                        }"
+                      />
+                      <span *ngIf="items().controls.length > 1" class="remove-btn" (click)="removeItem(i)">
+                        <i class="icon icon-trash icon-lg"></i>
+                      </span>
+                      </div>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+              <button
+                class="btn add-btn btn-xs text-white my-5 mx-1"
+                (click)="addItem()"
+              >
+                <i class="icon icon-add"></i> Add New Line
+              </button>
+            </table>
+          </div>
+
+          <div class="dashed"></div>
+
+          <div class="form-row mt-5">
+            <div class="col-md-4 mt-5"></div>
+            <div class="col-md-6 offset-md-2 mt-5">
+              <div class="shadow-sm p-5 bg-gainsboro rounded">
+                <div
+                  class="d-flex justify-content-between align-items-center my-3"
+                >
+                  <div>
+                    <p class="mb-0">Sub Total</p>
+                    <small *ngIf="taxInclusive">( Tax inclusive )</small>
+                  </div>
+                  <p class="mb-0">
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ subTotal | number : "1.2-2" }}
+                  </p>
+                </div>
+                <div
+                  *ngIf="discountLevel === 'TransactionLevel'"
+                  class="d-flex justify-content-between align-items-center my-3"
+                >
+                  <div class="mb-3">
+                    <span
+                      class="d-flex justify-content-between align-items-center"
+                    >
+                      <p class="mb-0" style="width: 120px">Discount</p>
+                      <div class="input-group w-50">
+                        <input
+                          type="number"
+                          class="form-control"
+                          placeholder="0"
+                          formControlName="transactionLevelDiscountRate"
+                          (keyup)="linesCalculation()"
+                          (change)="linesCalculation()"
+                          min="0"
+                          step="0.1"
+                        />
+                        <div class="input-group-append">
+                          <span class="input-group-text" id="basic-addon1">
+                            %
+                          </span>
+                        </div>
+                      </div>
+                    </span>
+                    <small *ngIf="taxInclusive"
+                      >( Applied on {{ subTotal | number : "1.2-2" }} )</small
+                    >
+                    <button
+                      *ngIf="discount > 0"
+                      class="btn btn-xs btn-primary"
+                      (click)="linesCalculation()"
+                    >
+                      {{
+                        purchaseOrderForm.get("discountAfterTax").value
+                          ? "Apply before tax"
+                          : "Apply after tax"
+                      }}
+                    </button>
+                  </div>
+
+                  <p class="mb-0 text-danger">
+                    - {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ discount | number : "1.2-2" }}
+                  </p>
+                </div>
+
+                <div
+                  *ngIf="showDiscountAccount"
+                  class="d-flex align-items-center"
+                >
+                  <label for="discountAccount" class="mr-1"
+                    >Discount Account <b class="text-danger">*</b></label
+                  >
+                  <account-slct
+                    [data]="accounts"
+                    (selectedAccount)="selectDiscountAccount($event, i)"
+                    [preselectedAccount]="
+                      purchaseOrder && purchaseOrder.discountAccount
+                        ? {
+                            accountId:
+                              purchaseOrder?.discountAccount?.accountId,
+                            name: purchaseOrder?.discountAccount?.name
+                          }
+                        : null
+                    "
+                  ></account-slct>
+                </div>
+
+                <div class="row py-1" *ngFor="let tax of taxesObj">
+                  <ng-container *ngIf="tax.value !== 0">
+                    <div class="col-md-5">
+                      <p>{{ tax.name }}</p>
+                    </div>
+                    <div class="col-md-7">
+                      <div class="d-flex justify-content-end">
+                        <p>
+                          {{ ownerInformation?.currency?.currencySymbol
+                          }}{{ tax.value | number : "1.2-2" }}
+                        </p>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+                <div
+                  class="d-flex justify-content-between align-items-center my-5"
+                >
+                  <p><strong>Total</strong></p>
+                  <p [ngClass]="{ 'text-danger': totalAmount < 0 }">
+                    <strong
+                      >{{ ownerInformation?.currency?.currencySymbol }}
+                      {{ totalAmount | number : "1.2-2" }}</strong
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dashed"></div>
+
+          <div class="form-row">
+            <div class="col-md-7 mt-5">
+              <div>
+                <span>
+                  <span
+                    *ngFor="
+                      let file of purchaseOrderViewFiles;
+                      let fileIndex = index
+                    "
+                    class="badge badge-pill badge-outline mr-2 px-4 mb-1"
+                    >{{ file.name || file.originalName }}
+                    <i
+                      class="icon icon-trash ml-2 cursor text-danger"
+                      (click)="removeFile(fileIndex)"
+                    ></i>
+                  </span>
+                </span>
+              </div>
+              <div>
+                <div>
+                  <small>Attach relevant files</small><br />
+                  <button
+                    class="btn btn-xs btn-secondary text-white"
+                    (click)="file.click()"
+                  >
+                    <i class="icon icon-upload"></i> Attach File
+                  </button>
+
+                  <input
+                    type="file"
+                    multiple
+                    hidden
+                    #file
+                    (change)="handleFileInput($event.target.files)"
+                  />
+                  <br />
+                </div>
+              </div>
+            </div>
+            <div class="col-md-5 mt-5">
+              <label for="t&c">Terms and Condition</label>
+              <textarea
+                class="form-control"
+                id="t&c"
+                formControlName="termsAndConditions"
+              ></textarea>
+            </div>
+          </div>
+        </form>
+
+        <footer class="d-flex justify-content-end">
+          <button
+            class="btn btn-xs btn-light mx-1"
+            *ngIf="!loader"
+            (click)="submitForm('Draft')"
+            [disabled]="purchaseOrderForm.invalid"
+          >
+            Save As Draft
+          </button>
+          <button
+            class="btn btn-xs btn-primary mx-1"
+            *ngIf="!loader"
+            (click)="submitForm('SentForApproval')"
+            [disabled]="purchaseOrderForm.invalid"
+          >
+            Send For Approval
+          </button>
+          <button
+            class="btn btn-xs btn-success mx-1"
+            *ngIf="
+              user?.permission?.includes('Approve Purchase Order') && !loader
+            "
+            (click)="openModal(approval)"
+            [disabled]="purchaseOrderForm.invalid"
+          >
+            Post
+          </button>
+          <button class="btn btn-xs btn-warning mx-1" disabled *ngIf="loader">
+            <i class="icon icon-spin icon-spin2"></i> Processing..
+          </button>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #vendor>
+  <app-add-edit-vendor
+    [showHeader]="showHeader"
+    (vendorAdded)="getVendors($event)"
+  ></app-add-edit-vendor>
+</ng-template>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [canApprove]="user?.permission?.includes('Approve Finance Payment')"
+    (sendPayload)="submitForm($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>
+
+<ng-template #item>
+  <div class="p-5">
+    <div class="item-header d-flex justify-content-between align-items-center">
+      <h1 class="mb-0">Add Item</h1>
+      <span class="cursor" (click)="closeModal()" style="font-size: 32px"
+        >&times;</span
+      >
+    </div>
+    <app-add-edit-items
+      emitNewItem="true"
+      accountType="PurchaseAccount"
+      (itemAssetAdded)="getItemsAndTaxes()"
+    ></app-add-edit-items>
+  </div>
+</ng-template>

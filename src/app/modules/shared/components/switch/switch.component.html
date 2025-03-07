@@ -1,0 +1,12 @@
+<div class="d-flex align-items-center">
+  <label class="switch">
+    <input
+      #switchRef
+      class="input-check"
+      type="checkbox"
+      (change)="checkValue($event)"
+    />
+    <span class="slider round"></span>
+  </label>
+  <span *ngIf="text" [style.color]="textColor" class="ml-2">{{ text }}</span>
+</div>

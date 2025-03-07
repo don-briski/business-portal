@@ -1,0 +1,68 @@
+<div class="dt-card overflow-hidden">
+  <div class="dt-card__body p-0">
+    <div class="table-responsive">
+      <table class="table table-striped mb-0" style="font-size: 11px">
+        <thead class="thead-light">
+          <tr>
+            <th scope="col">Application ID</th>
+            <th scope="col">Loan Code</th>
+
+            <th class="text-uppercase" scope="col">Date Disbursed</th>
+            <th class="text-uppercase amount-field" scope="col">Loan Amount</th>
+
+            <th class="text-uppercase amount-field" scope="col">
+              Amount To Be Repayed
+            </th>
+            <th class="text-uppercase amount-field" scope="col">
+              Amount Repayed
+            </th>
+            <th class="text-uppercase amount-field" scope="col">
+              Amount Outstanding
+            </th>
+            <th class="text-uppercase" scope="col">Stage</th>
+            <th class="text-uppercase" scope="col">View Info</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of loanApplications">
+            <td [style.color]="colorTheme.secondaryColor" scope="row">
+              {{ row?.applicationCode }}
+            </td>
+            <td [style.color]="colorTheme.secondaryColor" scope="row">
+              {{ row?.loanCode }}
+            </td>
+            <td>
+              <span *ngIf="row?.dateDisbursed != null">
+                {{ row.dateDisbursed | date : "mediumDate" }}</span
+              >
+            </td>
+            <td class="amount-field">
+              {{ row?.loanAmount | number : "1.2-2" }}
+            </td>
+
+            <td class="amount-field">
+              {{ row?.totalAmountToBeRepayed | number : "1.2-2" }}
+            </td>
+            <td class="amount-field">
+              {{ row?.amountRepayed | number : "1.2-2" }}
+            </td>
+            <td class="amount-field">
+              {{ row?.amountOutstanding | number : "1.2-2" }}
+            </td>
+
+            <td>{{ row?.loanStage }}</td>
+            <td>
+              <a
+                [style.color]="colorTheme.secondaryColor"
+                class="d-inline-block"
+                href="javascript:void(0)"
+                (click)="onViewLoan(row?.loanId)"
+                ><i class="icon icon-forward icon-fw mr-2"></i>View</a
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+app-sidebar {
+  width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+  app-sidebar {
+    width: auto;
+  }
+}

@@ -1,0 +1,238 @@
+<div class="card p-5">
+  <header class="d-flex justify-content-between align-items-center pb-3">
+    <h1 class="mb-0">
+      Total {{ type === "Bills" ? "Payables" : "Receivables" }}
+    </h1>
+
+    <div class="d-flex justify-content-end">
+      <div
+        *ngIf="type === 'Invoices'"
+        ngbDropdown
+        class="d-inline-block"
+        placement="bottom-left"
+      >
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          id="dropdownBasic1"
+          ngbDropdownToggle
+          style="display: none"
+          #invDropdown
+        >
+          Toggle dropdown
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+          <button
+            ngbDropdownItem
+            [routerLink]="['/finance/invoices/create']"
+            routerLinkActive="router-link-active"
+          >
+            Add Invoice
+          </button>
+          <button
+            ngbDropdownItem
+            [routerLink]="['/finance/payments-received/create']"
+            routerLinkActive="router-link-active"
+          >
+            Record Invoice Payment
+          </button>
+        </div>
+        <div
+          id="add-wrapper"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+        >
+          <i
+            class="icon icon-add icon-1x"
+            (click)="$event.stopPropagation(); invDropdown.click()"
+          ></i>
+        </div>
+      </div>
+      <div
+        *ngIf="type === 'Bills'"
+        ngbDropdown
+        class="d-inline-block"
+        placement="left"
+      >
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          id="dropdownBasic1"
+          ngbDropdownToggle
+          style="display: none"
+          #invDropdown
+        >
+          Toggle dropdown
+        </button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+          <button
+            ngbDropdownItem
+            [routerLink]="['/finance/bills/create']"
+            routerLinkActive="router-link-active"
+          >
+            Add Bill
+          </button>
+          <button
+            ngbDropdownItem
+            [routerLink]="['/finance/payments-made/create']"
+            routerLinkActive="router-link-active"
+          >
+            Record Bill Payment
+          </button>
+        </div>
+        <div
+          id="add-wrapper"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+        >
+          <i
+            class="icon icon-add icon-1x"
+            (click)="$event.stopPropagation(); invDropdown.click()"
+          ></i>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="d-flex justify-content-center py-3" *ngIf="isLoading">
+    <i
+      class="icon icon-spin icon-spin2"
+      [style.color]="currentTheme?.secondaryColor"
+    ></i>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <div class="d-flex justify-content-between align-items-center mt-5">
+      <span class="mr-2">
+        <i
+          [style.color]="currentTheme?.secondaryColor"
+          class="mr-3 icon icon-revenue-new icon-lg align-self-center"
+        ></i
+        >Total Unpaid {{ type === "Bills" ? "Bills" : "Invoices" }}
+        <div style="font-size: 24px; padding: 10px 20px">
+          {{ ownerInformation?.currency?.currencySymbol
+          }}{{
+            type === "Bills"
+              ? (totalPayables?.overdue | number : "1.2-2")
+              : (totalReceivables?.overdue | number : "1.2-2")
+          }}
+        </div></span
+      >
+    </div>
+
+    <div id="spec-cards">
+      <div class="w-50" [style.borderColor]="currentTheme?.primaryColor">
+        <h4 class="">Coming Due</h4>
+        <p>
+          {{ ownerInformation?.currency?.currencySymbol
+          }}{{
+            type === "Bills"
+              ? (totalPayables?.current | number : "1.2-2")
+              : (totalReceivables?.current | number : "1.2-2")
+          }}
+        </p>
+      </div>
+      <div class="pl-4 w-50">
+        <h4 class="text-danger">Overdue</h4>
+        <div class="d-flex align-items-center">
+          <p>
+            {{ ownerInformation?.currency?.currencySymbol
+            }}{{
+              type === "Bills"
+                ? (totalPayables?.overdue | number : "1.2-2")
+                : (totalReceivables?.overdue | number : "1.2-2")
+            }}
+          </p>
+
+          <div ngbDropdown class="d-inline-block ml-3" [placement]="placement">
+            <button
+              type="button"
+              class="btn btn-outline-primary"
+              id="dropdownBasic1"
+              ngbDropdownToggle
+              style="display: none"
+              #overdueMenuDropdown
+            ></button>
+            <div
+              ngbDropdownMenu
+              aria-labelledby="dropdownBasic1"
+              style="min-width: 230px"
+            >
+              <button ngbDropdownItem (click)="goToReport('_1to15_Days', type)">
+                <span class="d-flex justify-content-between">
+                  <span class="mr-5">1-15 Days</span>
+                  <span class="ml-5"
+                    >{{ ownerInformation?.currency?.currencySymbol
+                    }}{{
+                      type === "Bills"
+                        ? (totalPayables?._1to15_Days_Overdue
+                          | number : "1.2-2")
+                        : (totalReceivables?._1to15_Days_Overdue
+                          | number : "1.2-2")
+                    }}</span
+                  >
+                </span>
+              </button>
+              <button
+                ngbDropdownItem
+                (click)="goToReport('_16to30_Days', type)"
+              >
+                <span class="d-flex justify-content-between">
+                  <span class="mr-5">16-30 Days</span>
+                  <span class="ml-5"
+                    >{{ ownerInformation?.currency?.currencySymbol
+                    }}{{
+                      type === "Bills"
+                        ? (totalPayables?._16to30_Days_Overdue
+                          | number : "1.2-2")
+                        : (totalReceivables?._16to30_Days_Overdue
+                          | number : "1.2-2")
+                    }}</span
+                  >
+                </span>
+              </button>
+              <button
+                ngbDropdownItem
+                (click)="goToReport('_31to45_Days', type)"
+              >
+                <span class="d-flex justify-content-between">
+                  <span class="mr-5">31-45 Days</span>
+                  <span class="ml-5"
+                    >{{ ownerInformation?.currency?.currencySymbol
+                    }}{{
+                      type === "Bills"
+                        ? (totalPayables?._31to45_Days_Overdue
+                          | number : "1.2-2")
+                        : (totalReceivables?._31to45_Days_Overdue
+                          | number : "1.2-2")
+                    }}</span
+                  >
+                </span>
+              </button>
+              <button
+                ngbDropdownItem
+                (click)="goToReport('_Above45_Days', type)"
+              >
+                <span class="d-flex justify-content-between">
+                  <span class="mr-5">Above 45 Days</span>
+                  <span class="ml-5"
+                    >{{ ownerInformation?.currency?.currencySymbol
+                    }}{{
+                      type === "Bills"
+                        ? (totalPayables?._Above45_Days_Overdue
+                          | number : "1.2-2")
+                        : (totalReceivables?._Above45_Days_Overdue
+                          | number : "1.2-2")
+                    }}</span
+                  >
+                </span>
+              </button>
+            </div>
+            <i
+              class="icon icon-dropdown cursor"
+              (click)="$event.stopPropagation(); overdueMenuDropdown.click()"
+            ></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

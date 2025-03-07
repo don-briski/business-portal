@@ -1,0 +1,30 @@
+<section class="card p-3 mt-5">
+  <table *ngIf="items?.length" class="table mb-0">
+    <thead class="table-striped">
+      <tr>
+        <th class="header-text" scope="col">Item Name</th>
+        <th class="header-text" scope="col">Quantity</th>
+        <th class="header-text" scope="col">Price</th>
+        <th class="header-text" scope="col">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of items">
+        <td>{{ item?.itemName }}</td>
+        <td>
+          {{ item?.quantity }}
+        </td>
+        <td>{{ item?.amount }}</td>
+        <td>
+          {{ item?.amount * item?.quantity | number: "1.2-2" }}
+        </td>
+      </tr>
+      <tr>
+        <td class="header-text">Total</td>
+        <td></td>
+        <td></td>
+        <td>{{ itemsAmount | number: "1.2-2" }}</td>
+      </tr>
+    </tbody>
+  </table>
+</section>

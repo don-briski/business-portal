@@ -1,0 +1,250 @@
+<section class="p-2">
+  <div class="card p-5">
+    <header
+      *ngIf="
+        (!gettingCreditFile && customerCreditFile) ||
+        (!gettingCreditProfile && customerCreditProfile)
+      "
+      class="d-flex justify-content-between align-items-center pb-4"
+    >
+      <div class="d-flex justify-content-between align-items-center">
+        <img
+          src="assets/images/male-default-profile.png"
+          alt="profile-pic"
+          width="50"
+        />
+        <div class="ml-4">
+          <h3>{{ customerName }}</h3>
+          <p>
+            <i class="icon icon-link"></i>
+            {{ customerBvn }}
+          </p>
+        </div>
+      </div>
+      <button
+        class="btn btn-outline-light"
+        routerLink="/checkout-admin/customers"
+      >
+        Back
+      </button>
+    </header>
+    <div
+      *ngIf="gettingCreditFile || gettingCreditProfile"
+      class="d-flex justify-content-center mt-5"
+    >
+      <lnd-spinner text="Retrieving Details" />
+    </div>
+    <ng-container
+      *ngIf="
+        (!gettingCreditFile && customerCreditFile) ||
+        (!gettingCreditProfile && customerCreditProfile)
+      "
+    >
+      <div class="mt-5">
+        <ul class="nav nav-underline border-bottom">
+          <li
+            *ngIf="
+              user.permission.includes('View Credit File') &&
+              availableViews.includes('Credit File')
+            "
+            class="nav-item"
+            (click)="currentTabIndex = 1"
+          >
+            <a
+              [ngStyle]="
+                currentTabIndex === 1
+                  ? {
+                      color: currentTheme?.secondaryColor,
+                      borderBottom: '2px solid ' + currentTheme?.secondaryColor
+                    }
+                  : {}
+              "
+              class="nav-link"
+              data-toggle="tab"
+              href="#loans"
+              role="tab"
+              aria-controls="tab-pane1"
+              aria-selected="true"
+              >Credit File (Loans)</a
+            >
+          </li>
+          <li
+            *ngIf="
+              user.permission.includes('View Credit Profile') &&
+              availableViews.includes('Credit Profile')
+            "
+            class="nav-item"
+            (click)="currentTabIndex = 2"
+          >
+            <a
+              [ngStyle]="
+                currentTabIndex === 2
+                  ? {
+                      color: currentTheme?.secondaryColor,
+                      borderBottom: '2px solid ' + currentTheme?.secondaryColor
+                    }
+                  : {}
+              "
+              class="nav-link"
+              data-toggle="tab"
+              href="#profile"
+              role="tab"
+              aria-controls="tab-pane2"
+              aria-selected="true"
+              >Credit Profile</a
+            >
+          </li>
+        </ul>
+        <div class="tab-content pt-5">
+          <div
+            *ngIf="
+              user.permission.includes('View Credit File') &&
+              availableViews.includes('Credit File')
+            "
+            id="loans"
+            class="tab-pane active"
+          >
+            <no-data
+              *ngIf="!gettingCreditFile && !customerCreditFile"
+              title="No data available"
+            ></no-data>
+            <div *ngIf="customerCreditFile" class="mt-5">
+              <ul class="dt-list dt-list-one-second">
+                <lnd-dt-list-item
+                  title="Last Updated"
+                  [value]="customerCreditFile?.creditFile?.lastUpdated"
+                  type="date"
+                  [showDateTime]="true"
+                />
+              </ul>
+            </div>
+            <lnd-table
+              [isLoading]="isLoading"
+              [config]="tableConfig"
+              [headers]="tableHeaders"
+              [data]="tableData"
+            ></lnd-table>
+          </div>
+          <div
+            *ngIf="
+              user.permission.includes('View Credit Profile') &&
+              availableViews.includes('Credit Profile')
+            "
+            id="profile"
+            class="tab-pane"
+            [ngClass]="{ active: !customerCreditFile }"
+          >
+            <no-data
+              *ngIf="!gettingCreditProfile && !customerCreditProfile"
+              title="No data available"
+            ></no-data>
+            <div class="mt-5">
+              <ul
+                *ngIf="!gettingCreditProfile && customerCreditProfile"
+                class="dt-list dt-list-one-second"
+              >
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.dfO1"
+                  title="DF01"
+                  [value]="customerCreditProfile?.dfO1"
+                  tooltip="Decision Factor: This a decision factor score based on the customer's delinquency count level ascertained from the credit file"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.dfO2"
+                  title="DF02"
+                  [value]="customerCreditProfile?.dfO2"
+                  tooltip="Decision Factor: This is a decision factor score based on the customer's delinquency value level ascertained from the credit file."
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.ola"
+                  title="OLA"
+                  [value]="customerCreditProfile?.ola"
+                  tooltip="Open Loans in Arrears: This is the count score for all customer's loans in arrears that are open."
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.cld"
+                  title='CLD'
+                  [value]="customerCreditProfile?.cld"
+                  tooltip="Closed Loan Delinquency: This is the count score for all customer's loans in arrears that are closed."
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.olc"
+                  title="OLC"
+                  [value]="customerCreditProfile.olc"
+                  tooltip="Open Loans Count"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.maxLoanAmount !== undefined"
+                  title="Max Loan Amount"
+                  [value]="customerCreditProfile?.maxLoanAmount"
+                  type="amount"
+                  [currencySymbol]="currencySymbol"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.highestInstallmentAmount !== undefined"
+                  title="Highest Installment Amount"
+                  [value]="customerCreditProfile?.highestInstallmentAmount"
+                  type="amount"
+                  [currencySymbol]="currencySymbol"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.totalInstallmentAmount !== undefined"
+                  title="Total Installment Amount"
+                  [value]="customerCreditProfile?.totalInstallmentAmount"
+                  type="amount"
+                  [currencySymbol]="currencySymbol"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile.olaTargetLoan"
+                  title="OLA Target Loan"
+                  [value]="customerCreditProfile.olaTargetLoan"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.subCategory"
+                  title="Sub Category"
+                  [value]="customerCreditProfile?.subCategory"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.openLoanCount !== undefined"
+                  title="Open Loan Count"
+                  [value]="customerCreditProfile?.openLoanCount"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.closedLoanCount !== undefined"
+                  title="CLosed Loan Count"
+                  [value]="customerCreditProfile?.closedLoanCount"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile.cldTargetLoan"
+                  title="CLD Target Loan"
+                  [value]="customerCreditProfile.cldTargetLoan"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile.outlierLoansCount !== undefined"
+                  title="Outlier Loans Count"
+                  [value]="customerCreditProfile.outlierLoansCount"
+                />
+                <lnd-dt-list-item
+                  *ngIf="customerCreditProfile?.lastUpdatedTime"
+                  title="Last Updated Time"
+                  [value]="customerCreditProfile?.lastUpdatedTime"
+                  type="date"
+                  [showDateTime]="true"
+                />
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <no-data
+      *ngIf="
+        !gettingCreditFile &&
+        !customerCreditFile &&
+        !gettingCreditProfile &&
+        !customerCreditProfile
+      "
+      title="No data available"
+    ></no-data>
+  </div>
+</section>

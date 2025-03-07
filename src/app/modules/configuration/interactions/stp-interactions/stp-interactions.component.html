@@ -1,0 +1,285 @@
+<div class="inner-collapse p-6">
+  <div class="d-flex justify-content-between align-items-center">
+    <header>
+      <h3 class="mb-0">New Short Term Placements
+        <lnd-tooltip placement="right" [useProjection]="true">
+          <div class="tooltip-container">
+            <span class="text-left"
+              >When active, the creation of a new short term placement record in the investment module triggers the generation of corresponding journal transaction entries, which are then sent to the finance module.</span
+            >
+          </div>
+        </lnd-tooltip>
+      </h3>
+      <span>
+        <lnd-switch
+          [value]="
+            stpInteractionForm?.value?.stp?.stpInitialIsActive
+              ? true
+              : false
+          "
+          (emittedValue)="toggleSwitch($event, 'stp.stpInitialIsActiveObj','initialInv')"
+        ></lnd-switch>
+        <i *ngIf="isLoading && activeElement === 'initialInv'" class="icon icon-spin icon-spin2"></i>
+      </span>
+    </header>
+    <input
+      name="initialInv"
+      type="radio"
+      [checked]="formName === 'initialInv'"
+      (change)="checkInnerValue('initialInv')"
+    />
+  </div>
+  <div *ngIf="formName === 'initialInv'" class="mt-5">
+    <form [formGroup]="stpInteractionForm" (ngSubmit)="save()">
+      <div formGroupName="stp">
+        <div class="form-row mb-5">
+          <div class="col-md-4">
+            <label>Posting Type <b class="text-danger">*</b>
+              <lnd-tooltip placement="right" [useProjection]="true">
+                <div class="tooltip-container">
+                  <b>Automatic:</b><br />
+                  <span class="text-left"
+                    >Journal entries for New short term placements will be generated and directly posted to the corresponding ledger account.</span
+                  >
+                </div>
+
+                <div class="tooltip-container">
+                  <b>Manual:</b><br />
+                  <span class="text-left"
+                    >Journal entries for New short term placements will be initially created under transactions in the finance module. However, approval is necessary for them to be officially recorded under ledger accounts.</span
+                  >
+                </div>
+              </lnd-tooltip>
+            </label>
+
+            <slct-2
+              [data]="modes"
+              formControlName="stpInitialModeObj"
+              [customSearchEnabled]="true"
+              [placeholder]="'Select Type'"
+            ></slct-2>
+          </div>
+          <div class="col-md-8">
+            <label>Accounts
+              <lnd-tooltip placement="right" [useProjection]="true">
+                <div class="tooltip-container">
+                  <span class="text-left"
+                    >These ledger accounts, whether designated as cash or bank, function as representations of the bank accounts utilized when creating New short term placement records within the investment module. During the short term placement creation process, multiple options are presented for selection. The user is then prompted to choose the specific account through which a short term placement was received, ensuring precision and accuracy in the operation.</span
+                  >
+                </div>
+              </lnd-tooltip>
+            </label>
+            <slct-2
+              [data]="accounts"
+              formControlName="stpIntialAccountIdsObj"
+              [multiple]="true"
+              [allowSelectAll]="true"
+              [customSearchEnabled]="true"
+              [placeholder]="'Select Account'"
+            ></slct-2>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="user?.permission?.includes('Update Finance Interactions')">
+        <button
+          *ngIf="!isLoading"
+          class="btn text-white"
+          type="submit"
+          [disabled]="stpInteractionForm.invalid"
+          style="background-color: #f26135; border-color: #f26135"
+        >
+          Save
+        </button>
+
+        <button class="btn btn-secondary" [disabled]="true" *ngIf="isLoading">
+          <i class="icon icon-spin icon-spin2"></i> Processing.....
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="inner-collapse p-6">
+  <div class="d-flex justify-content-between align-items-center">
+    <header>
+      <h3 class="mb-0">Short Term Placement Interest Payout
+        <lnd-tooltip placement="right" [useProjection]="true">
+          <div class="tooltip-container">
+            <span class="text-left"
+              >When activated, recording a short term placement payout in the investment module triggers the generation of corresponding journal transaction entries, which are then sent to the finance module.</span
+            >
+          </div>
+        </lnd-tooltip>
+      </h3>
+      <span>
+        <lnd-switch
+          [value]="
+            stpInteractionForm?.value?.stp?.stpAccruedIsActive
+              ? true
+              : false
+          "
+          (emittedValue)="toggleSwitch($event, 'stp.stpAccruedIsActiveObj','accrued-interest')"
+        ></lnd-switch>
+        <i *ngIf="isLoading && activeElement === 'accrued-interest'" class="icon icon-spin icon-spin2"></i>
+      </span>
+    </header>
+    <input
+      name="accrued-interest"
+      type="radio"
+      [checked]="formName === 'accrued-interest'"
+      (change)="checkInnerValue('accrued-interest')"
+    />
+  </div>
+
+  <div *ngIf="formName === 'accrued-interest'" class="mt-5">
+    <form [formGroup]="stpInteractionForm" (ngSubmit)="save()">
+      <div formGroupName="stp">
+        <div class="form-row mb-5">
+          <div class="col-md-8">
+            <label>Accounts
+              <lnd-tooltip placement="right" [useProjection]="true">
+                <div class="tooltip-container">
+                  <span class="text-left mb-3"
+                    >These are the accounts that will be available when a short term placement interest payout is recorded in the investment module. Multiple accounts can be selected.
+                    </span
+                  >
+                  <span class="text-left">
+                    These ledger accounts, whether designated as cash or bank, function as representations of the bank accounts utilized when making short term placement payout on the investment module. During the interest payout process, multiple options are presented for selection. The user is then prompted to choose the specific account through which a short term placement interest was sent to the investor, ensuring precision and accuracy in the operation.
+                  </span>
+                </div>
+              </lnd-tooltip>
+            </label>
+            <slct-2
+              [data]="accounts"
+              formControlName="stpAccruedAccountIdsObj"
+              [multiple]="true"
+              [allowSelectAll]="true"
+              [customSearchEnabled]="true"
+              [placeholder]="'Select Account'"
+            ></slct-2>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="user?.permission?.includes('Update Finance Interactions')">
+        <button
+          *ngIf="!isLoading"
+          class="btn text-white"
+          type="submit"
+          [disabled]="stpInteractionForm.invalid"
+          style="background-color: #f26135; border-color: #f26135"
+        >
+          Save
+        </button>
+
+        <button class="btn btn-secondary" [disabled]="true" *ngIf="isLoading">
+          <i class="icon icon-spin icon-spin2"></i> Processing.....
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="inner-collapse p-6">
+  <div class="d-flex justify-content-between align-items-center">
+    <header>
+      <h3 class="mb-0">Short Term Placement Liquidation
+        <lnd-tooltip placement="right" [useProjection]="true">
+          <div class="tooltip-container">
+            <span class="text-left mb-3"
+              >When activated, recording a short term placement liquidation in the investment module triggers the generation of corresponding journal transaction entries, which are then sent to the finance module.
+              </span
+            >
+          </div>
+        </lnd-tooltip>
+      </h3>
+      <span>
+        <lnd-switch
+          [value]="
+            stpInteractionForm?.value?.stp?.stpInitialAndAccruedIsActive
+              ? true
+              : false
+          "
+          (emittedValue)="toggleSwitch($event, 'stp.stpInitialAndAccruedIsActiveObj','investmentInitialAndAccrued')"
+        ></lnd-switch>
+        <i *ngIf="isLoading && activeElement === 'investmentInitialAndAccrued'" class="icon icon-spin icon-spin2"></i>
+      </span>
+    </header>
+    <input
+      name="investmentInitialAndAccrued"
+      type="radio"
+      [checked]="formName === 'investmentInitialAndAccrued'"
+      (change)="checkInnerValue('investmentInitialAndAccrued')"
+    />
+  </div>
+  <div *ngIf="formName === 'investmentInitialAndAccrued'" class="mt-5">
+    <form [formGroup]="stpInteractionForm" (ngSubmit)="save()">
+      <div formGroupName="stp">
+        <div class="form-row mb-5">
+          <div class="col-md-4">
+            <label>Posting Type <b class="text-danger">*</b>
+              <lnd-tooltip placement="right" [useProjection]="true">
+                <div class="tooltip-container">
+                  <b>Automatic:</b><br />
+                  <span class="text-left"
+                    >Journal entries for Liquidations registered on the investment module will be generated and directly posted to the corresponding ledger account on the finance module.</span
+                  >
+                </div>
+
+                <div class="tooltip-container">
+                  <b>Manual:</b><br />
+                  <span class="text-left"
+                    >Journal entries for Liquidations registered on the investment module will be generated but will necessitate approval before being posted to the relevant ledger accounts on the finance module.</span
+                  >
+                </div>
+              </lnd-tooltip>
+            </label>
+
+            <slct-2
+              [data]="modes"
+              formControlName="stpInitialAndAccruedModeObj"
+              [customSearchEnabled]="true"
+              [placeholder]="'Select Type'"
+            ></slct-2>
+          </div>
+
+          <div class="col-md-8">
+            <label>Accounts
+              <lnd-tooltip placement="right" [useProjection]="true">
+                <div class="tooltip-container">
+                  <span class="text-left mb-3"
+                    >These ledger accounts, whether designated as cash or bank, function as representations of the bank accounts utilized when liquidating an investor’s short term placement. During the liquidation process, multiple options are presented for selection. The user is then prompted to choose the specific account through which the short term placement balance was sent to the investor, ensuring precision and accuracy in the operation.
+                    </span
+                  >
+                </div>
+              </lnd-tooltip>
+            </label>
+            <slct-2
+              [data]="accounts"
+              formControlName="stpInitialAndAccruedAccountIdsObj"
+              [multiple]="true"
+              [allowSelectAll]="true"
+              [customSearchEnabled]="true"
+              [placeholder]="'Select Account'"
+            ></slct-2>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="user?.permission?.includes('Update Finance Interactions')">
+        <button
+          *ngIf="!isLoading"
+          class="btn text-white"
+          type="submit"
+          [disabled]="stpInteractionForm.invalid"
+          style="background-color: #f26135; border-color: #f26135"
+        >
+          Save
+        </button>
+
+        <button class="btn btn-secondary" [disabled]="true" *ngIf="isLoading">
+          <i class="icon icon-spin icon-spin2"></i> Processing.....
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,22 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2018", "dom"],
+    "types": ["jquery"],
+    "paths": {
+      "exceljs": ["node_modules/exceljs/dist/exceljs.min"]
+    },
+    "useDefineForClassFields": false,
+    "skipLibCheck": true,
+  }
+}

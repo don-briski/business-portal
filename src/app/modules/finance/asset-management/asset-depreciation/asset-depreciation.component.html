@@ -1,0 +1,176 @@
+<div class="p-3">
+  <button
+    type="button"
+    class="close float-right"
+    aria-label="Close"
+    (click)="closeModal()"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <header class="d-flex flex-column align-items-center">
+    <h1>Posting Schedule</h1>
+    <p>Running assets ready for depreciation posting</p>
+  </header>
+
+  <div class="px-3">
+    <ul
+      id="active-div"
+      class="nav nav-underline flex-row border-bottom nav-card-tabs mt-5"
+      role="tablist"
+    >
+      <li class="nav-item">
+        <a
+          id="nav-month"
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#tab-month"
+          role="tab"
+          aria-controls="tab-month"
+          aria-selected="false"
+          (click)="switchTabs('month')"
+          >This Month
+          <span class="badge badge-primary">{{
+            assetsDueForPosting.length
+          }}</span></a
+        >
+      </li>
+    </ul>
+
+    <div class="tab-content pb-5">
+      <div id="tab-month" class="tab-pane active show">
+        <header class="my-4">
+          <div class="form-row">
+            <div class="col-md-4"></div>
+
+            <div
+              [ngClass]="{ hidden: !isLoading, visible: isLoading }"
+              class="col-md-5"
+            >
+              <div
+                *ngIf="isLoading"
+                class="table-loader"
+                style="text-align: center; color: indianred"
+              >
+                <span>
+                  <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                >
+              </div>
+            </div>
+
+            <div
+              class="col-md-4"
+              [ngClass]="{ hidden: isLoading, visible: !isLoading }"
+            >
+              <div class="d-flex justify-content-center date-fixtures">
+                <div *ngIf="fromDate" class="mr-5">
+                  <strong><p>From</p></strong>
+                  <select class="form-control" disabled="true">
+                    <option [value]="fromDate">
+                      {{ fromDate }}
+                    </option>
+                  </select>
+                </div>
+                <div class="ml-5">
+                  <strong><p>To</p></strong>
+                  <div class="form-group">
+                    <select
+                      class="form-control"
+                      (change)="updateToDate($event.target.value)"
+                    >
+                      <option
+                        *ngFor="let date of depreciationDates"
+                        [value]="date"
+                      >
+                        {{ date }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+        <table
+          *ngIf="assetsDueForPosting.length > 0 && !isLoading"
+          class="table table-striped"
+        >
+          <thead>
+            <tr>
+              <th>Asset Name</th>
+              <th>Asset Code</th>
+              <th class="text-right">
+                Total Cost ({{ ownerInformation?.currency?.currencySymbol }})
+              </th>
+              <th class="text-right">
+                Accum Depreciation ({{
+                  ownerInformation?.currency?.currencySymbol
+                }})
+              </th>
+              <th class="text-right">
+                NBV ({{ ownerInformation?.currency?.currencySymbol }})
+              </th>
+              <th class="text-right">
+                Dep Amount (in Period) ({{
+                  ownerInformation?.currency?.currencySymbol
+                }})
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let asset of assetsDueForPosting; let i = index">
+              <td>{{ asset?.assetName }}</td>
+              <td [style.color]="currentTheme?.secondaryColor">
+                {{ asset?.assetCode }}
+              </td>
+              <td class="text-right">
+                {{ asset?.totalCost | number : "1.2-2" }}
+              </td>
+              <td class="text-right">
+                {{ asset?.totalDepreciation | number : "1.2-2" }}
+              </td>
+              <td class="text-right">
+                {{ asset?.netBookValue | number : "1.2-2" }}
+              </td>
+              <td class="text-right">{{ asset?.amount | number : "1.2-2" }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="mt-5 d-flex justify-content-end">
+          <button
+            [disabled]="isLoading"
+            *ngIf="
+              user?.permission?.includes('Post Asset Depreciation') &&
+              assetsDueForPosting.length > 0
+            "
+            class="btn btn-xs btn-primary"
+            (click)="postSchedule()"
+          >
+            {{
+              isLoading && assetsDueForPosting.length > 0
+                ? "Posting..."
+                : "Post Entry"
+            }}
+            <i
+              *ngIf="isLoading && assetsDueForPosting.length > 0"
+              class="icon icon-spin icon-spin2"
+            ></i>
+          </button>
+        </div>
+
+        <div
+          *ngIf="assetsDueForPosting.length === 0 && !isLoading"
+          class="d-flex flex-column align-items-center w-100 py-3"
+        >
+          <p class="display-4 text-center font-weight-light mb-0">No Logs</p>
+          <img
+            src="assets/images/no data.svg"
+            alt="no-data-svg"
+            width="200px"
+            class="py-5"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

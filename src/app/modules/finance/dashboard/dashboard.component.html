@@ -1,0 +1,57 @@
+<section *ngIf="ownerInformation && financeMetricsFetchModel" id="dashboard">
+  <div class="row">
+    <div
+      *ngIf="currentuser?.permission?.includes('View Invoice')"
+      class="col-md-6"
+    >
+      <lnd-dash-card
+        [financeMetricsFetchModel]="financeMetricsFetchModel"
+        [ownerInformation]="ownerInformation"
+        [currentTheme]="currentTheme"
+        placement="bottom-left"
+        type="Invoices"
+      ></lnd-dash-card>
+    </div>
+
+    <div
+      *ngIf="currentuser?.permission?.includes('View Bills')"
+      class="col-md-6"
+    >
+      <lnd-dash-card
+        [financeMetricsFetchModel]="financeMetricsFetchModel"
+        [ownerInformation]="ownerInformation"
+        [currentTheme]="currentTheme"
+        placement="bottom-right"
+        type="Bills"
+      ></lnd-dash-card>
+    </div>
+  </div>
+
+  <div class="row">
+    <div
+      *ngIf="
+        currentuser?.permission?.includes('View Invoice') &&
+        currentuser?.permission?.includes('View Bills')
+      "
+      class="col-md-6"
+    >
+      <lnd-dash-inc-exp
+        [financeMetricsFetchModel]="financeMetricsFetchModel"
+        [ownerInformation]="ownerInformation"
+      ></lnd-dash-inc-exp>
+    </div>
+    <div
+      *ngIf="
+        currentuser?.permission?.includes('View Expense') &&
+        currentuser?.permission?.includes('View Bills') &&
+        currentTheme
+      "
+      class="col-md-6"
+    >
+      <lnd-dash-top-expenses
+        [currentTheme]="currentTheme"
+        [financeMetricsFetchModel]="financeMetricsFetchModel"
+      ></lnd-dash-top-expenses>
+    </div>
+  </div>
+</section>

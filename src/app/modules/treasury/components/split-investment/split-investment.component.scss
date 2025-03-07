@@ -1,0 +1,53 @@
+#newInvestmentForm {
+  position: relative;
+  left: 0;
+}
+
+.form-icon {
+  cursor: pointer;
+  color: red;
+}
+
+.form-inline {
+  .m-1 {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    min-height: 100px;
+
+    label {
+      margin-bottom: 7px;
+      padding: 0 3px;
+    }
+  }
+}
+
+span {
+  max-width: 200px;
+}
+
+.custom-success {
+  background-color: #558e90;
+}
+
+.col-3{
+  border-left: 1px solid var(--lenda-grey);
+
+  header {
+    position: sticky;
+    top: 5px;
+    padding: 0 25px;
+  }
+}
+
+
+.border-error {
+  border: 2px solid red;
+}
+.hide-tx {
+  color: #fff;
+}
+
+.inv-row{
+  border-bottom: 1px solid var(--lenda-grey);
+}

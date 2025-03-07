@@ -1,0 +1,23 @@
+.top-bar {
+  height: 2px;
+}
+
+.status-text {
+  font-size: 11px;
+}
+
+.pending-bg {
+  background: var(--yellow);
+}
+
+.approved-bg {
+  background: var(--lenda-green);
+}
+
+.pending-color {
+  color: var(--yellow);
+}
+
+.approved-color {
+  color: var(--lenda-green);
+}

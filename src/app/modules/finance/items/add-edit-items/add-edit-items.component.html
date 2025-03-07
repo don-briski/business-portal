@@ -1,0 +1,410 @@
+<div *ngIf="!emitNewItem" class="row m-0">
+  <header
+    class="dt-page__header d-flex justify-content-between align-items-center w-100 my-3"
+  >
+    <h1 class="dt-page__title clearfix mb-0">
+      {{ isEditing ? "Edit Item  " : "Add New Item  " }}
+    </h1>
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <a
+          class="btn btn-primary mr-2 text-white"
+          [routerLink]="['/finance/items']"
+          routerLinkActive="router-link-active"
+          [style.background]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          href="javascript:void(0)"
+          >Back</a
+        >
+      </div>
+    </span>
+  </header>
+  <div *ngIf="isEditing && !item" style="margin: auto">
+    <p class="text-primary">
+      <i class="icon icon-spin icon-spin2"></i> Retrieving Items...
+    </p>
+  </div>
+  <div class="w-100" *ngIf="(isEditing && item) || !isEditing">
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <form [formGroup]="itemForm" (ngSubmit)="submitForm()">
+          <div class="form-row mb-6">
+            <div>
+              <label for="goods">Type <b class="text-danger">*</b></label>
+              <div class="d-flex w-100 mt-3 px-3">
+                <div class="d-flex w-50 align-items-center mr-4">
+                  <input
+                    type="radio"
+                    formControlName="itemType"
+                    value="{{ ItemType_Goods }}"
+                    class="form-control check mr-2"
+                  />
+                  <span>Goods</span>
+                </div>
+
+                <div class="d-flex w-50 align-items-center ml-4">
+                  <input
+                    type="radio"
+                    formControlName="itemType"
+                    value="{{ ItemType_Service }}"
+                    class="form-control check mr-2"
+                  />
+                  <span>Services</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row mb-6">
+            <div class="col-md-3">
+              <label for="name">Item Name <b class="text-danger">*</b></label>
+              <input
+                type="text"
+                formControlName="itemName"
+                class="form-control"
+                placeholder="Enter Name"
+              />
+            </div>
+
+            <div class="col-md-3">
+              <label for="name">SKU </label>
+              <input
+                type="text"
+                formControlName="sku"
+                class="form-control"
+                placeholder="Sku"
+              />
+            </div>
+
+            <div class="col-md-3">
+              <label for="units">Unit </label>
+              <slct-2
+                [data]="units"
+                formControlName="unit"
+                [customSearchEnabled]="true"
+                [placeholder]="'Search Unit'"
+              ></slct-2>
+            </div>
+          </div>
+
+          <div class="form-row mb-6 px-3">
+            <div class="mr-5">
+              <ng-template #tipContentSales>
+                Only items with sales information will be available on invoices
+              </ng-template>
+              <label>
+                <input type="checkbox" formControlName="hasSalesInformation" />
+                Sales Information
+                <i
+                  class="icon icon-question-circle ml-1"
+                  placement="top"
+                  [ngbTooltip]="tipContentSales"
+                >
+                </i>
+              </label>
+            </div>
+
+            <div>
+              <ng-template #tipContentPurchase>
+                Only items with purchase information will be available on bills
+              </ng-template>
+              <label>
+                <input
+                  type="checkbox"
+                  formControlName="hasPurchaseInformation"
+                />
+                Purchases Information
+                <i
+                  class="icon icon-question-circle ml-1"
+                  placement="top"
+                  [ngbTooltip]="tipContentPurchase"
+                >
+                </i>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row mb-6">
+            <div
+              *ngIf="itemForm.get('hasSalesInformation').value == true"
+              class="col-md-6"
+            >
+              <div class="dashed">
+                <h3 class="font-weight-light">Sales Information</h3>
+                <div class="form-row">
+                  <div class="col-md-12">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <label for="selling-price"
+                          >Selling Price <b class="text-danger">*</b></label
+                        >
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">{{
+                              ownerInformation?.currency?.currencySymbol
+                            }}</span>
+                          </div>
+                          <input
+                            type="text"
+                            formControlName="sellingPrice"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                            class="form-control"
+                            placeholder="Enter a Selling Price"
+                          />
+                        </div>
+                      </div>
+
+                      <div class="col-md-6">
+                        <label for="tax">Sales Tax </label>
+                        <slct-2
+                          [data]="salesTaxes"
+                          formControlName="salesTax"
+                          [customSearchEnabled]="true"
+                          [placeholder]="'Search Tax'"
+                        ></slct-2>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row mb-6">
+                  <div class="col-md-12">
+                    <label for="description">Description</label>
+                    <textarea
+                      formControlName="salesDescription"
+                      class="form-control w-100"
+                      rows="5"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="col-md-12">
+                    <label for="account"
+                      >Sales Account <b class="text-danger">*</b></label
+                    >
+
+                    <account-slct
+                      [data]="accounts"
+                      (selectedAccount)="selected('SalesAccount', $event)"
+                      [preselectedAccount]="
+                        isEditing && item.salesAccount
+                          ? {
+                              accountId: item.salesAccount.accountId,
+                              name: item.salesAccount.name
+                            }
+                          : null
+                      "
+                    ></account-slct>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              *ngIf="itemForm.get('hasPurchaseInformation').value == true"
+              class="col-md-6"
+            >
+              <div class="dashed">
+                <h3 class="font-weight-light">Purchases Information</h3>
+                <div class="form-row">
+                  <div class="col-md-12">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <label for="cost-price"
+                          >Cost Price <b class="text-danger">*</b></label
+                        >
+                        <div class="input-group mb-3">
+                          <div class="input-group-prepend">
+                            <span class="input-group-text">{{
+                              ownerInformation?.currency?.currencySymbol
+                            }}</span>
+                          </div>
+                          <input
+                            type="text"
+                            formControlName="costPrice"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                            class="form-control"
+                            placeholder="Enter a Selling Price"
+                          />
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <label for="tax">Purchase Tax </label>
+                        <slct-2
+                          [data]="purchaseTaxes"
+                          formControlName="purchaseTax"
+                          [customSearchEnabled]="true"
+                          [placeholder]="'Search Tax'"
+                        ></slct-2>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-row mb-6">
+                  <div class="col-md-12">
+                    <label for="description">Description</label>
+                    <textarea
+                      formControlName="purchaseDescription"
+                      class="form-control w-100"
+                      rows="5"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="col-md-12">
+                    <label for="account"
+                      >Purchase Account <b class="text-danger">*</b></label
+                    >
+                    <account-slct
+                      [data]="accounts"
+                      (selectedAccount)="selected('PurchaseAccount', $event)"
+                      [preselectedAccount]="
+                        isEditing && item.purchaseAccount
+                          ? {
+                              accountId: item.purchaseAccount.accountId,
+                              name: item.purchaseAccount.name
+                            }
+                          : null
+                      "
+                    ></account-slct>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row mb-6">
+            <div>
+              <div class="custom-file input-group" data-provides="fileinput">
+                <span class="input-group-addon btn btn-default btn-file">
+                  <input
+                    #file
+                    class="form-control"
+                    type="file"
+                    multiple
+                    (change)="handleFileInput($event.target.files)"
+                    hidden
+                  />
+                </span>
+              </div>
+              <div class="d-flex flex-wrap">
+                <span
+                  *ngFor="let file of itemViewFiles; let fileIndex = index"
+                  class="badge badge-pill badge-outline mr-2 mt-2 px-4"
+                  >{{ file.name || file.originalName }}
+                  <i
+                    class="icon icon-trash ml-2 cursor text-danger"
+                    (click)="removeFile(fileIndex)"
+                  ></i>
+                </span>
+              </div>
+              <div class="mt-3">
+                <small>Attach relevant files</small>
+              </div>
+              <button
+                class="btn btn-xs btn-secondary text-white"
+                type="button"
+                (click)="file.click()"
+              >
+                <i class="icon icon-upload"></i>
+                Attach File(s)
+              </button>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end mb-6">
+            <div *ngIf="!loader">
+              <button
+                type="submit"
+                class="btn btn-primary btn-xs text-white"
+                [disabled]="itemForm.invalid"
+              >
+                {{ isEditing ? "Update" : "Save" }} Item
+              </button>
+            </div>
+            <div *ngIf="loader">
+              <button
+                type="button"
+                class="btn btn-xs btn-warning"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Processing...
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="emitNewItem">
+  <form [formGroup]="itemForm">
+    <div class="form-row mb-6">
+      <div class="col-md-12">
+        <label for="name">Item Name <b class="text-danger">*</b></label>
+        <input
+          type="text"
+          formControlName="itemName"
+          class="form-control"
+          placeholder="Enter Name"
+        />
+      </div>
+
+      <div class="col-md-12 mt-4">
+        <label for="account"
+          >{{
+            accountType === "PurchaseAccount"
+              ? "Purchase Account"
+              : "Sales Account"
+          }}
+          <b class="text-danger">*</b></label
+        >
+        <account-slct
+          [data]="accounts"
+          (selectedAccount)="selected(accountType, $event)"
+          [preselectedAccount]="
+            isEditing && item.purchaseAccount
+              ? {
+                  accountId: item.purchaseAccount.accountId,
+                  name: item.purchaseAccount.name
+                }
+              : null
+          "
+        ></account-slct>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-end">
+      <button
+        *ngIf="!loader"
+        class="btn btn-primary btn-sm"
+        (click)="addBillItem()"
+        [disabled]="itemForm.invalid"
+      >
+        Add Item
+      </button>
+
+      <button
+        *ngIf="loader"
+        type="button"
+        class="btn btn-xs btn-warning"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-container>

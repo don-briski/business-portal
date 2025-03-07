@@ -1,0 +1,12 @@
+.pop-content{
+  .detail{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    .code{
+      color: var(--secondary-color);
+    }
+  }
+}

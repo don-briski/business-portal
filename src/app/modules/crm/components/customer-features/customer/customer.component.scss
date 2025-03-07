@@ -1,0 +1,51 @@
+main {
+  padding: 15px 30px;
+  header {
+    button {
+      padding: 7px 10px;
+      font-size: 14px;
+      line-height: 1.2;
+      border-color: var(--lenda-grey);
+      color: var(--lenda-grey);
+      &:hover {
+        background-color: inherit;
+      }
+    }
+  }
+  .tabs {
+    section {
+      border-bottom: 1px solid var(--border-grey);
+      ul {
+        list-style: none;
+        margin-top: 50px;
+        padding-left: 0;
+        display: flex;
+        flex-wrap: wrap;
+
+        lnd-dt-list-item {
+          width: calc(100% / 5);
+
+          &.address {
+            width: 100% !important;
+          }
+        }
+      }
+    }
+  }
+
+  footer {
+    color: var(--lenda-grey);
+    margin-top: 30px;
+    margin-bottom: 20px;
+
+    div {
+      border: 1px solid var(--lenda-grey);
+      padding: 10px;
+      border-radius: 4px;
+      p {
+        color: var(--lenda-text-dark);
+        margin-bottom: 0;
+      }
+    }
+  }
+}

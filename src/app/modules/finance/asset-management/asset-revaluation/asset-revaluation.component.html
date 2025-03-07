@@ -1,0 +1,449 @@
+<div class="p-3">
+  <button
+    type="button"
+    class="close float-right"
+    aria-label="Close"
+    (click)="closeModal()"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <header class="d-flex flex-column align-items-center">
+    <h1>Revaluation</h1>
+    <p>Revaluate Your Assets Here</p>
+  </header>
+
+  <div class="px-3">
+    <ul
+      id="active-div"
+      class="nav nav-underline flex-row border-bottom nav-card-tabs mt-5"
+      role="tablist"
+    >
+      <li class="nav-item">
+        <a
+          id="nav-revalueable"
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#tab-revalueable"
+          role="tab"
+          aria-controls="tab-revalueable"
+          aria-selected="false"
+          (click)="switchTabs('revalueable')"
+          >Revaluable
+          <span class="badge badge-primary">{{ assets.length }}</span></a
+        >
+      </li>
+
+      <li class="nav-item">
+        <a
+          id="nav-toberevalued"
+          class="nav-link"
+          data-toggle="tab"
+          href="#tab-toberevalued"
+          role="tab"
+          aria-controls="tab-toberevalued"
+          aria-selected="false"
+          (click)="switchTabs('toberevalued')"
+          >To Be Revalued
+          <span class="badge badge-warning">{{
+            assetsToBeRevalued.length
+          }}</span></a
+        >
+      </li>
+    </ul>
+
+    <div class="tab-content pb-5">
+      <div id="tab-revalueable" class="tab-pane active show">
+        <header class="my-4">
+          <div class="form-row">
+            <div class="col-md-4">
+              <label style="display: inline-flex"
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [(ngModel)]="pagination.pageSize"
+                  aria-controls="data-table"
+                  class="custom-select custom-select-xl form-control form-control-xl height mx-2"
+                  (change)="fetchAssets()"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+
+            <div class="col-md-4">
+              <div
+                *ngIf="isLoading"
+                class="table-loader"
+                style="text-align: center; color: indianred"
+              >
+                <span>
+                  <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                >
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label style="display: inline-flex; float: right">
+                <input
+                  type="search"
+                  class="form-control form-control-sm mr-3"
+                  placeholder="Asset Tag or Name"
+                  (keydown.enter)="fetchAssets(searchInput.value)"
+                  aria-controls="data-table"
+                  #searchInput
+                />
+
+                <button
+                  class="btn btn-xs text-white"
+                  [style.background]="currentTheme?.secondaryColor"
+                  type="button"
+                  (click)="fetchAssets(searchInput.value)"
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </label>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between mt-4">
+            <div aria-live="polite">
+              Showing
+              {{
+                (pagination.pageNumber - 1) * pagination.pageSize + 1
+                  | number : "1.0-0"
+              }}
+              -
+              {{
+                (pagination.pageNumber - 1) * pagination.pageSize +
+                  pagination.count | number : "1.0-0"
+              }}
+              of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+            </div>
+            <div></div>
+          </div>
+        </header>
+        <table
+          *ngIf="assets.length > 0 && !isLoading"
+          class="table table-striped"
+        >
+          <thead>
+            <tr>
+              <th *ngIf="tabState === 'revalueable'"></th>
+              <th>Asset Tag</th>
+              <th>Asset Name</th>
+              <th class="text-right">
+                Asset Cost ({{ ownerInformation?.currency?.currencySymbol }})
+              </th>
+              <th class="text-right">
+                Total Cost ({{ ownerInformation?.currency?.currencySymbol }})
+              </th>
+              <th class="text-right">
+                Accum Dep ({{ ownerInformation?.currency?.currencySymbol }})
+              </th>
+              <th class="text-right">
+                NBV ({{ ownerInformation?.currency?.currencySymbol }})
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let asset of assets; let i = index">
+              <td *ngIf="tabState === 'revalueable'">
+                <i
+                  [style.color]="currentTheme?.secondaryColor"
+                  class="icon icon-add-circle icon-fw cursor"
+                  (click)="addAsset(asset, i)"
+                ></i>
+              </td>
+              <td [style.color]="currentTheme?.secondaryColor">
+                {{ asset?.assetCode }}
+              </td>
+              <td>{{ asset?.assetName }}</td>
+              <td class="text-right">
+                {{ asset?.purchasePrice | number : "1.2-2" }}
+              </td>
+              <td class="text-right">
+                {{ asset?.totalCost | number : "1.2-2" }}
+              </td>
+              <td class="text-right">
+                {{ asset?.totalDepreciation | number : "1.2-2" }}
+              </td>
+              <td class="text-right">
+                {{ asset?.netBookValue | number : "1.2-2" }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <footer class="py-3 d-flex justify-content-between">
+          <nav>
+            <ul class="pagination pagination-sm justify-content-end">
+              <li class="page-item" *ngIf="pagination.hasPreviousPage">
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="
+                    pagination.pageNumber = pagination.pageNumber - 1;
+                    fetchAssets()
+                  "
+                  tabindex="-1"
+                  >Previous</a
+                >
+              </li>
+              <li class="page-item pagination-menu-wrapper">
+                <a
+                  class="page-link page-target"
+                  href="javascript:void(0)"
+                  (click)="itemPaginatedJumpModal()"
+                >
+                  {{ pagination.pageNumber }} of
+                  {{ pagination.totalPages }} page{{
+                    pagination.pageNumber > 1 ? "s" : ""
+                  }}
+                  <span class="sr-only">(current)</span>
+                </a>
+                <div
+                  class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                >
+                  <div class="pagination-menu-body">
+                    <div class="h-auto">
+                      <span>Jump to Page</span>
+                      <select
+                        aria-controls="data-table"
+                        [(ngModel)]="pagination.pageNumber"
+                        class="custom-select custom-select-xl form-control form-control-xl height"
+                        (change)="fetchAssets()"
+                      >
+                        <option
+                          *ngFor="let line of pagination.jumpArray"
+                          (click)="pagination.pageNumber = line"
+                        >
+                          {{ line }}
+                        </option>
+                      </select>
+                      <div class="text-center mt-3">
+                        <button
+                          (click)="itemPaginatedJumpModal()"
+                          type="button"
+                          class="btn btn-danger btn-xs"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+              <li class="page-item" *ngIf="pagination.hasNextPage">
+                <a
+                  class="page-link"
+                  href="javascript:void(0)"
+                  (click)="
+                    pagination.pageNumber = pagination.pageNumber + 1;
+                    fetchAssets()
+                  "
+                >
+                  Next
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </footer>
+      </div>
+
+      <div id="tab-toberevalued" class="tab-pane">
+        <div *ngIf="assetsToBeRevalued.length > 0">
+          <div class="d-flex align-items-center">
+            <h1 class="mt-5 mr-3">Selected Items For Revaluation</h1>
+            <i class="icon icon-question-circle mr-2"></i
+            ><span
+              >Last Posted Depreciation Date :
+              {{
+                (assets[0]?.lastPostedDepreciationDate | customDatePipe) ||
+                  "No depreciation yet"
+              }}</span
+            >
+          </div>
+          <form [formGroup]="revaluationForm" (ngSubmit)="submit()">
+            <div class="form-row">
+              <div class="col-md-4">
+                <label for="reference">Reference </label>
+                <input
+                  type="text"
+                  id="reference"
+                  class="form-control"
+                  placeholder="Enter Reference"
+                  formControlName="reference"
+                />
+              </div>
+
+              <div class="col-md-4">
+                <label
+                  >Revaluation Date <b class="text-danger required">*</b></label
+                >
+                <input
+                lndInvalidDateChecker
+                  type="date"
+                  class="form-control"
+                  formControlName="transactionDate"
+                />
+              </div>
+            </div>
+
+            <table
+              *ngIf="assetsToBeRevalued.length > 0"
+              class="table table-striped"
+            >
+              <thead>
+                <tr>
+                  <th *ngIf="tabState === 'toberevalued'"></th>
+                  <th>Asset Tag</th>
+                  <th>Asset Name</th>
+                  <th>Revaluation Account</th>
+                  <th class="text-right">
+                    NBV ({{ ownerInformation?.currency?.currencySymbol }})
+                  </th>
+                  <th class="text-right">
+                    New Value ({{ ownerInformation?.currency?.currencySymbol }})
+                  </th>
+                  <th class="text-right">
+                    S/D ({{ ownerInformation?.currency?.currencySymbol }})
+                    <i
+                      class="icon icon-question-circle icon-fw"
+                      placement="top"
+                      ngbTooltip="Surplus or Deficit"
+                    ></i>
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody formArrayName="lines">
+                <ng-container
+                  *ngFor="
+                    let assetLineControl of lines().controls;
+                    let i = index
+                  "
+                >
+                  <tr [formGroup]="assetLineControl">
+                    <td *ngIf="tabState === 'toberevalued'">
+                      <i
+                        class="icon icon-trash icon-fw text-danger cursor"
+                        (click)="
+                          removeAsset(assetLineControl.get('asset').value, i)
+                        "
+                      ></i>
+                    </td>
+                    <td [style.color]="currentTheme?.secondaryColor">
+                      {{ assetLineControl.get("assetTag").value }}
+                    </td>
+                    <td>
+                      {{ assetLineControl.get("assetName").value }}
+                    </td>
+                    <td>
+                      <input
+                        class="form-control"
+                        readonly
+                        type="text"
+                        [value]="
+                          assetLineControl.get('assetSubClassAccount')?.value
+                        "
+                      />
+                    </td>
+                    <td class="text-right">
+                      {{
+                        assetLineControl.get("netBookValue")?.value
+                          | number : "1.2-2"
+                      }}
+                    </td>
+                    <td class="form-row justify-content-end">
+                      <div class="col-md-8">
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="new value"
+                          formControlName="newValue"
+                          currencyMask
+                          [options]="{
+                            prefix: '',
+                            thousands: ',',
+                            decimal: '.'
+                          }"
+                        />
+                      </div>
+                    </td>
+                    <td
+                      class="text-right"
+                      [ngClass]="
+                        assetLineControl.value.diff < 0
+                          ? 'text-danger'
+                          : 'text-success'
+                      "
+                    >
+                      {{ assetLineControl.value.diff | number : "1.2-2" }}
+                    </td>
+                  </tr>
+                </ng-container>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td class="text-right">Total:</td>
+                  <td class="text-right">
+                    {{ totalAssetsAmount | number : "1.2-2" }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="mx-1 my-3">
+              <div class="d-flex">
+                <small>Attach relevant files </small>
+                <span
+                  *ngFor="let file of assetFiles; let fileIndex = index"
+                  class="badge badge-pill badge-outline ml-2 px-4"
+                  >{{ file.name || file.originalName }}
+                  <i
+                    class="icon icon-trash ml-2 cursor text-danger"
+                    (click)="removeFile(fileIndex)"
+                  ></i>
+                </span>
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-xs btn-secondary text-white"
+                (click)="files.click()"
+              >
+                <i class="icon icon-upload"></i>
+                Attach File(s)
+                <!-- <i *ngIf="fileDelete" class="icon icon-spin icon-spin2"></i> -->
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              class="btn btn-xs btn-primary float-right"
+              [disabled]="revaluationForm.invalid"
+            >
+              {{ isLoading ? "Posting..." : "Post Revaluation" }}
+              <i *ngIf="isLoading" class="icon icon-spin icon-spin2"></i>
+            </button>
+          </form>
+          <input
+            #files
+            type="file"
+            multiple
+            (change)="handleFileInput($event.target.files)"
+            style="display: none"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

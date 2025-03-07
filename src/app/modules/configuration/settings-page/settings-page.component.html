@@ -1,0 +1,4150 @@
+<!-- Profile Banner -->
+<div
+  class="profile__banner"
+  [style.background]="
+    currentTheme?.theme === 'dark'
+      ? currentTheme?.dark?.primaryColor
+      : currentTheme?.primaryColor
+  "
+  [ngClass]="{ profile__banner__light: currentTheme.theme === 'Light Mode' }"
+>
+  <!-- Profile Banner Top -->
+  <div class="profile__banner-top">
+    <!-- Avatar Wrapper -->
+    <div class="dt-avatar-wrapper">
+      <!-- Avatar -->
+
+      <img
+        *ngIf="profilePicture"
+        class="dt-avatar dt-avatar__shadow size-90 mr-sm-4"
+        [src]="profilePicture"
+        [alt]="user?.person?.displayName"
+      />
+      <span
+        [style.background]="
+          currentTheme?.theme === 'Green'
+            ? currentTheme?.primaryColor
+            : currentTheme.secondaryColor
+        "
+        [ngClass]="{ 'bg-white': currentTheme?.theme === 'Light Mode' }"
+        *ngIf="!profilePicture"
+        class="mr-4 dt-avatar size-35 rounded-circle"
+        >{{ user?.person?.initials }}</span
+      >
+      <div class="dt-avatar-info">
+        <span class="mb-2 dt-avatar-name display-4 font-weight-light">{{
+          user?.person?.displayName
+        }}</span>
+        <span class="f-16">{{ user?.person?.emailAddress }}</span>
+      </div>
+      <!-- /info -->
+    </div>
+    <!-- /avatar wrapper -->
+  </div>
+  <!-- /profile banner top -->
+
+  <!-- Profile Banner Bottom -->
+  <div class="profile__banner-bottom">
+    <!-- Navbar -->
+    <ul class="card-header-pills nav nav-pills w-100" role="tablist">
+      <!-- Nav Item -->
+      <li
+        *ngIf="specificView === 'profile'"
+        (click)="switchView('profile')"
+        class="nav-item active"
+      >
+        <a
+          [style.background]="
+            specificView === 'profile' ? currentTheme.primaryColor : ''
+          "
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' && specificView === 'profile'
+          }"
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#tab-pane-4"
+          role="tab"
+          aria-controls="tab-pane-4"
+          aria-selected="true"
+          >Profile</a
+        >
+      </li>
+      <li
+        *ngIf="specificView !== 'profile'"
+        (click)="switchView('profile')"
+        class="nav-item"
+      >
+        <a
+          [style.background]="
+            specificView === 'profile' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link"
+          data-toggle="tab"
+          href="#tab-pane-4"
+          role="tab"
+          aria-controls="tab-pane-4"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' && specificView === 'profile'
+          }"
+          >Profile</a
+        >
+      </li>
+
+      <!-- Nav Item -->
+      <li
+        *ngIf="specificView === 'security'"
+        (click)="switchView('security')"
+        class="nav-item active"
+      >
+        <a
+          [style.background]="
+            specificView === 'security' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#tab-pane-7"
+          role="tab"
+          aria-controls="tab-pane-7"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'security'
+          }"
+          >Security
+        </a>
+      </li>
+      <li
+        *ngIf="specificView !== 'security'"
+        (click)="switchView('security')"
+        class="nav-item"
+      >
+        <a
+          [style.background]="
+            specificView === 'security' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link"
+          data-toggle="tab"
+          href="#tab-pane-7"
+          role="tab"
+          aria-controls="tab-pane-7"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'security'
+          }"
+          >Security
+        </a>
+      </li>
+
+      <!-- /nav item -->
+
+      <!-- Nav Item -->
+      <li
+        *ngIf="
+          specificView === 'integrations' &&
+          user?.permission?.includes('Manage Business Information')
+        "
+        (click)="switchView('integrations')"
+        class="nav-item"
+      >
+        <a
+          [style.background]="
+            specificView === 'integrations' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#tab-pane-8"
+          role="tab"
+          aria-controls="tab-pane-8"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'integrations'
+          }"
+          >Integrations</a
+        >
+      </li>
+      <li
+        *ngIf="
+          user?.permission?.includes('Manage Business Information') &&
+          specificView !== 'integrations'
+        "
+        (click)="switchView('integrations')"
+        class="nav-item"
+      >
+        <a
+          [style.background]="
+            specificView === 'integrations' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link"
+          data-toggle="tab"
+          href="#tab-pane-8"
+          role="tab"
+          aria-controls="tab-pane-8"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'integrations'
+          }"
+          >Integrations</a
+        >
+      </li>
+
+      <!-- /nav item -->
+      <!-- Nav Item -->
+      <li
+        *ngIf="
+          specificView === 'businessinfo' &&
+          user?.permission?.includes('Manage Business Information')
+        "
+        (click)="
+          user?.permission?.includes('Manage Business Information') &&
+            switchView('businessinfo')
+        "
+        class="nav-item active"
+      >
+        <a
+          [style.background]="
+            specificView === 'businessinfo' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#tab-pane-9"
+          role="tab"
+          aria-controls="tab-pane-9"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'businessinfo'
+          }"
+          >Business Info</a
+        >
+      </li>
+      <li
+        *ngIf="
+          specificView !== 'businessinfo' &&
+          user?.permission?.includes('Manage Business Information')
+        "
+        (click)="
+          user?.permission?.includes('Manage Business Information') &&
+            switchView('businessinfo')
+        "
+        class="nav-item"
+      >
+        <a
+          [style.background]="
+            specificView === 'businessinfo' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link"
+          data-toggle="tab"
+          href="#tab-pane-9"
+          role="tab"
+          aria-controls="tab-pane-9"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'businessinfo'
+          }"
+          >Business Info</a
+        >
+      </li>
+
+      <li
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+        (click)="switchView('sms')"
+        class="nav-item"
+      >
+        <a
+          [style.background]="
+            specificView === 'sms' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link"
+          data-toggle="tab"
+          href="#sms-settings"
+          role="tab"
+          aria-controls="sms-settings"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' && specificView === 'sms',
+            'active show': specificView === 'sms'
+          }"
+          >SMS</a
+        >
+      </li>
+
+      <!-- /nav item -->
+      <!-- Nav Item -->
+
+      <li
+        class="nav-item"
+        *ngIf="
+          specificView !== 'apiAccessManagement' &&
+          user?.permission?.includes('Manage Business Information')
+        "
+        (click)="
+          user?.permission?.includes('Manage Business Information') &&
+            switchView('apiAccessManagement')
+        "
+      >
+        <a
+          [style.background]="
+            specificView === 'apiAccessManagement'
+              ? currentTheme.primaryColor
+              : ''
+          "
+          class="nav-link"
+          data-toggle="tab"
+          href="#tab-pane-21"
+          role="tab"
+          aria-controls="tab-pane-21"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'apiAccessManagement'
+          }"
+          >Api Access Management</a
+        >
+      </li>
+      <!-- /nav item -->
+      <li
+        class="nav-item active"
+        *ngIf="
+          specificView === 'apiAccessManagement' &&
+          user?.permission?.includes('Manage Business Information')
+        "
+        (click)="
+          user?.permission?.includes('Manage Business Information') &&
+            switchView('apiAccessManagement')
+        "
+      >
+        <a
+          [style.background]="
+            specificView === 'apiAccessManagement'
+              ? currentTheme.primaryColor
+              : ''
+          "
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#tab-pane-21"
+          role="tab"
+          aria-controls="tab-pane-21"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'apiAccessManagement'
+          }"
+          >Api Access Management</a
+        >
+      </li>
+      <!-- /nav item -->
+
+      <!-- Nav Item -->
+
+      <li
+        class="nav-item"
+        [ngClass]="{ active: specificView === 'customTheme' }"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+        (click)="
+          user?.permission?.includes('Manage Business Information') &&
+            switchView('customTheme')
+        "
+      >
+        <a
+          [style.background]="
+            specificView === 'customTheme' ? currentTheme.primaryColor : ''
+          "
+          class="nav-link"
+          [ngClass]="{ 'active show': specificView === 'customTheme' }"
+          data-toggle="tab"
+          href="#tab-pane-18"
+          role="tab"
+          aria-controls="tab-pane-18"
+          aria-selected="true"
+          [ngClass]="{
+            'text-dark':
+              currentTheme?.theme === 'Light Mode' &&
+              specificView === 'customTheme'
+          }"
+          >Appearance</a
+        >
+      </li>
+      <!-- /nav item -->
+      <!-- Nav Item -->
+    </ul>
+    <!-- /navbar -->
+
+    <!-- Dropdown -->
+    <div class="pl-3 mt-2 ml-auto dropdown"></div>
+    <!-- /dropdown -->
+  </div>
+  <!-- /profile banner bottom -->
+</div>
+<!-- /profile banner -->
+
+<!-- tab content -->
+<div class="tab-content">
+  <!-- Tab panel -->
+  <div
+    id="tab-pane-4"
+    class="tab-pane active"
+  >
+    <div class="profile-content">
+      <!-- Grid -->
+      <div class="row">
+        <!-- Grid Item -->
+        <div class="col-xl-8">
+          <!-- Card -->
+          <div *ngIf="specificView === 'profile'" class="card">
+            <!-- Card Header -->
+            <div
+              class="bg-transparent card-header card-nav d-flex justify-content-between"
+            >
+              <h2 class="mb--20">Profile</h2>
+              <span
+                *ngIf="requestLoader"
+                class="table-loader"
+                style="text-align: center; color: indianred"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Loading...</span
+              >
+            </div>
+            <!-- /card header -->
+
+            <!-- Card Body -->
+            <div class="pb-2 card-body" *ngIf="user != null">
+              <!-- <h4 class="text-center orange">Edit your profile</h4>                           -->
+              <!-- Form -->
+              <form
+                [formGroup]="profileForm"
+                action="?"
+                method="post"
+                enctype="multipart/form-data"
+                (ngSubmit)="saveProfileForm(profileForm.value)"
+              >
+                <div class="form-row">
+                  <div class="mb-3 col-md-4">
+                    <label for="validationDefault01"
+                      >First name <sup class="text-danger">*</sup></label
+                    >
+                    <input
+                      type="text"
+                      formControlName="FirstName"
+                      class="form-control"
+                      id="validationDefault01"
+                      placeholder="First name"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-4">
+                    <label for="middlename">Middle name </label>
+                    <input
+                      type="text"
+                      formControlName="MiddleName"
+                      class="form-control"
+                      id="middlename"
+                      placeholder="Last name"
+                    />
+                  </div>
+                  <div class="mb-3 col-md-4">
+                    <label for="validationDefault02"
+                      >Last name <sup class="text-danger">*</sup></label
+                    >
+                    <input
+                      type="text"
+                      formControlName="LastName"
+                      class="form-control"
+                      id="validationDefault02"
+                      placeholder="Last name"
+                    />
+                  </div>
+                  <div class="mb-3 col-sm-6">
+                    <label for="validationDefaultUsername"
+                      >Email Address <sup class="text-danger">*</sup></label
+                    >
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroupPrepend2"
+                          ><i class="mr-2 icon icon-email icon-fw mr-sm-1"></i
+                        ></span>
+                      </div>
+                      <input
+                        type="email"
+                        class="form-control"
+                        readonly
+                        id="validationDefaultUsername"
+                        formControlName="EmailAddress"
+                        placeholder="Email"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-3 col-sm-6">
+                    <label for="validationDefaultUsername"
+                      >Phone <sup class="text-danger">*</sup></label
+                    >
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroupPrepend2"
+                          ><i class="mr-2 icon icon-phone icon-fw mr-sm-1"></i
+                        ></span>
+                      </div>
+                      <input
+                        type="text"
+                        [dropSpecialCharacters]="false"
+                        mask="9*"
+                        formControlName="PhoneNumber"
+                        class="form-control"
+                        id="validationDefaultUsername"
+                        placeholder="Phone"
+                      />
+                    </div>
+                  </div>
+                  <div class="mb-3 col-sm-6">
+                    <label for="validationDefaultdob"
+                      >Date Of Birth <sup class="text-danger">*</sup></label
+                    >
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroupPrepend2">
+                          <i
+                            class="mr-2 icon icon-calendar icon-fw mr-sm-1"
+                          ></i>
+                        </span>
+                      </div>
+                      <input
+                        lndInvalidDateChecker
+                        type="date"
+                        formControlName="DateOfBirth"
+                        class="form-control"
+                        id="validationDefaultdob"
+                        placeholder="Date Of Birth"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  [style.backgroundColor]="currentTheme?.secondaryColor"
+                  [style.borderColor]="currentTheme?.secondaryColor"
+                  class="mt-3 mb-3 btn btn-primary orange-bg"
+                  type="submit"
+                  *ngIf="!loader"
+                  [disabled]="profileForm.invalid"
+                >
+                  Update Profile
+                </button>
+                <button
+                  class="mt-3 mb-3 btn btn-primary orange-bg"
+                  type="button"
+                  *ngIf="loader"
+                  [disabled]="true"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Updating ...
+                </button>
+              </form>
+              <!-- /form -->
+            </div>
+            <!-- /card body -->
+          </div>
+          <!-- /card -->
+        </div>
+        <div class="col-xl-4">
+          <!-- Card -->
+          <div
+          *ngIf="specificView === 'profile'"
+          class="dt-card dt-card__full-height"
+        >
+          <!-- Card Header -->
+          <div class="dt-card__header">
+            <!-- Card Heading -->
+            <div class="dt-card__heading">
+              <h3 class="dt-card__title">
+                Profile Picture
+                <span class="float-right">
+                  <i
+                    class="icon icon-trash pointer text-danger"
+                    *ngIf="profileImageSelected"
+                    (click)="cancelProfilePicture()"
+                  ></i>
+                </span>
+              </h3>
+            </div>
+            <!-- /card heading -->
+          </div>
+          <!-- /card header -->
+          <!-- Card Body -->
+          <div class="dt-card__body">
+            <img class="mx-auto img-fluid d-block maxWidth-150" [src]="profilePicturePreview" />
+
+            <hr />
+            <input
+              type="file"
+              (change)="fileUploader($event.target.files)"
+              accept="image/*"
+              class="d-none"
+              #profileUpload
+            />
+            <button
+              class="mr-2 btn btn-success btn-sm text-uppercase"
+              (click)="profileUpload.click()"
+            >
+              <i class="mr-1 icon icon-add"></i> Select Image
+            </button>
+
+            <button
+              class="btn btn-primary orange-bg btn-sm text-uppercase"
+              *ngIf="profileImageSelected && !loader"
+              (click)="saveProfileForm(profileForm.value)"
+              [disabled]="profileForm.invalid"
+            >
+              Upload
+            </button>
+            <button
+              class="text-sm btn btn-primary orange-bg btn-sm text-uppercase"
+              type="button"
+              *ngIf="loader && profileImageSelected"
+              [disabled]="true"
+            >
+              <i class="icon icon-spin icon-spin2"></i> Uploading ...
+            </button>
+            <br />
+            <br />
+            <small class="text-muted"
+              >The supported image types are .jpg and .png</small
+            >
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+        </div>
+      </div>
+      <!-- /grid -->
+    </div>
+  </div>
+  <div id="tab-pane-7" class="tab-pane">
+    <div class="row">
+
+      <!-- Grid Item -->
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+          >
+            <h2 class="mb--20">Security</h2>
+          </div>
+          <!-- /card header -->
+
+          <!-- Card Body -->
+          <div class="dt-card__body tabs-container tabs-vertical">
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs flex-column" role="tablist">
+              <li class="nav-item">
+                <a
+                  class="nav-link active pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-1"
+                  role="tab"
+                  aria-controls="tab-pane-3"
+                  aria-selected="true"
+                  >Change Password
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-2"
+                  role="tab"
+                  aria-controls="tab-pane-2"
+                  aria-selected="true"
+                  >Transaction Pin
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-3"
+                  role="tab"
+                  aria-controls="tab-pane-5"
+                  aria-selected="true"
+                  >Two-Factor Auth
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#timeout_settings"
+                  role="tab"
+                  aria-controls="timeout_settings"
+                  aria-selected="true"
+                  >Timeout Settings
+                </a>
+              </li>
+            </ul>
+            <!-- /tab navigation -->
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+              <!-- Tab Pane -->
+              <div id="tab-pane-1" class="tab-pane active">
+                <div class="card-body">
+                  <h3
+                    [style.color]="currentTheme?.secondaryColor"
+                    class="mb-2 orange"
+                  >
+                    Reset Password
+                  </h3>
+                  <p class="mb-5">Enter a new password for your account</p>
+                  <!-- Form -->
+                  <form
+                    [formGroup]="passwordForm"
+                    (ngSubmit)="checkPwValidity()"
+                  >
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label for="password-current">Current Password</label>
+                      <input
+                        type="password"
+                        formControlName="currentPassword"
+                        class="form-control"
+                        id="password-current"
+                        aria-describedby="password-current"
+                        placeholder="Current Password"
+                        autocomplete="off"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="password-1">New Password</label>
+                      <input
+                        type="password"
+                        formControlName="Password"
+                        class="form-control"
+                        id="password-1"
+                        aria-describedby="password-1"
+                        placeholder="New Password"
+                        autocomplete="off"
+                        placement="top"
+                        [ngbPopover]="newPwRequiredParams"
+                        [popoverTitle]="pwParamsTitle"
+                      />
+
+                      <ng-template #newPwRequiredParams>
+                        <lnd-required-pw-params
+                          [enteredPw]="passwordForm.get('Password').value"
+                        ></lnd-required-pw-params>
+                      </ng-template>
+                      <span
+                        class="help-text text-danger"
+                        *ngIf="
+                          passwordForm.get('Password').value !=
+                          passwordForm.get('ConfirmPassword').value
+                        "
+                      >
+                        Password does not match
+                      </span>
+                    </div>
+                    <ng-template #pwParamsTitle>
+                      <h4 class="m-0">
+                        Password should meet the following requirements:
+                      </h4>
+                    </ng-template>
+                    <div class="form-group">
+                      <label for="password-2">Retype New Password</label>
+                      <input
+                        type="password"
+                        formControlName="ConfirmPassword"
+                        class="form-control"
+                        id="password-2"
+                        aria-describedby="password-2"
+                        placeholder="Retype New Password"
+                        autocomplete="off"
+                        placement="top"
+                        [ngbPopover]="confirmPwRequiredParams"
+                        [popoverTitle]="pwParamsTitle"
+                      />
+                      <ng-template #confirmPwRequiredParams>
+                        <lnd-required-pw-params
+                          [enteredPw]="
+                            passwordForm.get('ConfirmPassword').value
+                          "
+                        ></lnd-required-pw-params>
+                      </ng-template>
+                      <span
+                        class="help-text text-danger"
+                        *ngIf="
+                          passwordForm.get('Password')?.value !=
+                          passwordForm.get('ConfirmPassword')?.value
+                        "
+                      >
+                        Password does not match
+                      </span>
+                    </div>
+                    <!-- /form group -->
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <button
+                        type="submit"
+                        class="btn btn-primary btn-sm orange-bg"
+                        *ngIf="!passwordLoader && !validatingPw"
+                        [disabled]="
+                          passwordForm.invalid ||
+                          passwordForm.get('Password')?.value !=
+                            passwordForm.get('ConfirmPassword')?.value
+                        "
+                      >
+                        Reset
+                      </button>
+                      <button
+                        class="btn btn-xs btn-warning mx-1 text-white"
+                        disabled
+                        *ngIf="validatingPw"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Validating
+                        Password...
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-warning btn-xs text-white mx-1"
+                        *ngIf="passwordLoader"
+                        disabled
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Updating...
+                      </button>
+                    </div>
+                    <!-- /form group -->
+                  </form>
+                  <!-- /form -->
+                </div>
+              </div>
+              <!-- /tab pane-->
+
+              <!-- Tab Pane -->
+              <div id="tab-pane-2" class="tab-pane">
+                <div class="card-body">
+                  <h3
+                    [style.color]="currentTheme?.secondaryColor"
+                    class="mb-2 orange"
+                  >
+                    Transaction Pin
+                  </h3>
+                  <h4 class="mb-5">Change Your Transaction Pin</h4>
+                  <div class="">
+                    <div class="form-grop mb-3 w-25">
+                      <label for="pin">Password</label>
+                      <input
+                        type="password"
+                        class="form-control"
+                        [(ngModel)]="password"
+                        placeholder="Enter your password"
+                      />
+                    </div>
+                    <div class="form-group mb-3">
+                      <label>New Pin</label>
+                      <lnd-transaction-pin
+                        (valueChange)="updateTrasactionKeyValue($event, 'new')"
+                        #newPin
+                      />
+                    </div>
+                    <div class="form-group mb-5">
+                      <label>Confirm Pin</label>
+                      <lnd-transaction-pin
+                        (valueChange)="
+                          updateTrasactionKeyValue($event, 'confirm')
+                        "
+                        #confirmPin
+                      />
+                    </div>
+                    <p
+                      class="error-message text-danger"
+                      *ngIf="
+                        newTransactionKey !== confirmTransactionKey &&
+                        newTransactionKey &&
+                        confirmTransactionKey
+                      "
+                    >
+                      Your new pin does not match
+                    </p>
+                    <div class="">
+                      <button
+                        *ngIf="!keyLoader"
+                        class="btn btn-primary"
+                        type="button"
+                        [disabled]="
+                          !password ||
+                          !newTransactionKey ||
+                          newTransactionKey !== confirmTransactionKey
+                        "
+                        (click)="updateTransactionKey()"
+                      >
+                        <i class="icon icon-forgot-password"></i>&nbsp;Update
+                      </button>
+                      <button
+                        *ngIf="keyLoader"
+                        class="btn btn-primary"
+                        type="button"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- <button type="submit" class="btn btn-primary orange-bg">Backup Key</button> -->
+                  <!-- <button type="button" class="mb-2 mr-2 btn btn-outline-primary orange-outline">Backup Key</button> -->
+                </div>
+              </div>
+              <!-- /tab pane-->
+
+              <!-- Tab Pane -->
+              <div id="tab-pane-3" class="tab-pane">
+                <div class="card-body">
+                  <div class="smsActive">
+                    <div class="setup" *ngIf="is2FaSetutup">
+                      <form [formGroup]="twoFacForm">
+                        <div class="step1 d-flex">
+                          <div class="step">
+                            <span
+                              class="p-4 rounded-circle text-white"
+                              [style.background]="currentTheme?.secondaryColor"
+                            >
+                              <span class="p-1 num">1</span>
+                            </span>
+                            <div class="line"></div>
+                          </div>
+                          <h3 class="my-0 ml-5 pt-4" *ngIf="!twoFacStep1">
+                            Two Factor Authentication (2FA)
+                          </h3>
+                          <div
+                            class="card border w-75 ml-5"
+                            *ngIf="twoFacStep1"
+                          >
+                            <div class="card-header text-center">
+                              <i
+                                class="icon icon-forgot-password f-40"
+                                [style.color]="currentTheme?.secondaryColor"
+                              ></i>
+                            </div>
+                            <div class="card-body">
+                              <h3
+                                class="mb-2 orange"
+                                [style.color]="currentTheme?.secondaryColor"
+                                class="mb-2 orange"
+                              >
+                                Two Factor Authentication (2FA)
+                              </h3>
+                              <hr class="mb-5" />
+                              <p class="card-text">
+                                Two factor authentication (2FA) adds an
+                                aditional layer of security to your account by
+                                requiring more than just a password to sign in.
+                              </p>
+                              <div class="form-check pb-5">
+                                <input
+                                  class="form-check-input"
+                                  type="checkbox"
+                                  disabled
+                                  formControlName="isEmail"
+                                  id="exampleRadios1"
+                                />
+                                <label
+                                  class="form-check-label"
+                                  for="exampleRadios1"
+                                >
+                                  <span
+                                    class="icon-wrap p-4 rounded-circle"
+                                    [style.background]="
+                                      currentTheme?.secondaryColor
+                                    "
+                                  >
+                                    <i
+                                      class="icon icon-email text-white mb-1"
+                                    ></i>
+                                  </span>
+                                  Setup Using Email
+                                </label>
+                                <p class="mt-4">
+                                  We will use the email provided in the
+                                  onboarding process. This is setup by default.
+                                </p>
+                              </div>
+                              <div
+                                class="form-check pt-5"
+                                [ngClass]="{
+                                  'sms-disabled':
+                                    !appOwner?.smsSetupInfo?.IsActive
+                                }"
+                              >
+                                <input
+                                  class="form-check-input"
+                                  type="checkbox"
+                                  formControlName="isSms"
+                                  id="exampleRadios2"
+                                  *ngIf="appOwner?.smsSetupInfo?.IsActive"
+                                />
+                                <label
+                                  class="form-check-label"
+                                  for="exampleRadios2"
+                                >
+                                  <span
+                                    class="icon-wrap p-4 rounded-circle"
+                                    [style.background]="
+                                      currentTheme?.secondaryColor
+                                    "
+                                  >
+                                    <i
+                                      class="icon icon-chat text-white mb-1"
+                                    ></i>
+                                  </span>
+                                  Setup using SMS
+                                </label>
+                                <p class="mt-4">
+                                  The Application will send you a SMS with an
+                                  authentication code when prompted.
+                                  <br />
+                                  <span
+                                    class="text-danger"
+                                    *ngIf="!appOwner?.smsSetupInfo?.IsActive"
+                                    >You will not be able to use the SMS option
+                                    for 2FA as SMS is not active for your
+                                    business.</span
+                                  >
+                                </p>
+                              </div>
+                              <div
+                                class="actions mt-5 d-flex ml-auto justify-content-end"
+                              >
+                                <a
+                                  href="javascript:void(0)"
+                                  type="buton"
+                                  class="btn btn-outline-dark mr-3"
+                                  (click)="is2FaSetutup = false"
+                                  >Cancel</a
+                                >
+                                <a
+                                  href="javascript:void(0)"
+                                  class="btn"
+                                  [style.background]="
+                                    currentTheme?.secondaryColor
+                                  "
+                                  [style.borderColor]="
+                                    currentTheme?.secondaryColor
+                                  "
+                                  (click)="toggle2FAStep(2)"
+                                  type="button"
+                                  *ngIf="
+                                    twoFacForm.get('isSms').value &&
+                                    appOwner?.smsSetupInfo?.IsActive
+                                  "
+                                  >Next</a
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="step2 d-flex">
+                          <div class="step">
+                            <span
+                              class="p-4 rounded-circle text-white"
+                              [style.background]="currentTheme?.secondaryColor"
+                            >
+                              <span class="p-1 num">2</span>
+                            </span>
+                            <div class="line"></div>
+                          </div>
+                          <h3 class="my-0 ml-5 pt-4" *ngIf="!twoFacStep2">
+                            Authentication Verification
+                          </h3>
+                          <div
+                            class="card border w-75 ml-5"
+                            *ngIf="twoFacStep2"
+                          >
+                            <div class="card-body">
+                              <h3
+                                class="mb-2 orange"
+                                [style.color]="currentTheme?.secondaryColor"
+                                class="mb-2 orange"
+                              >
+                                Authentication Verification
+                              </h3>
+                              <hr class="mb-5" />
+                              <p class="card-text">
+                                We will send the One-Time Passowrd (OTP) to your
+                                phone/email each time you are attemptng to
+                                login.
+                              </p>
+
+                              <div class="form-group mb-3">
+                                <label>Phone Number</label>
+                                <input
+                                  type="tel"
+                                  *ngIf="twoFacForm.get('isSms').value"
+                                  class="form-control w-50"
+                                  placeholder="Enter your phone number"
+                                  formControlName="phoneNumber"
+                                  [disabled]="sentOTP"
+                                />
+                              </div>
+                              <button
+                                type=""
+                                button
+                                class="btn"
+                                [style.background]="
+                                  currentTheme?.secondaryColor
+                                "
+                                [style.borderColor]="
+                                  currentTheme?.secondaryColor
+                                "
+                                type="button"
+                                [disabled]="sendingOTP || sentOTP"
+                                (click)="requestOTP()"
+                              >
+                                <i
+                                  class="icon icon-spin icon-spin2"
+                                  *ngIf="sendingOTP"
+                                ></i>
+                                {{
+                                  sendingOTP
+                                    ? "Sending..."
+                                    : "Request Activation OTP"
+                                }}
+                              </button>
+                              <p class="text-success mt-3" *ngIf="sentOTP">
+                                We have sent the OTP to your phone number/email.
+                                You will be able to retry in
+                                {{ twoFactorResendTimer | number }} seconds.
+                              </p>
+
+                              <hr />
+
+                              <div class="form-group mb-3">
+                                <label>Enter the OTP sent to you.</label>
+                                <input
+                                  type="text"
+                                  class="form-control w-50"
+                                  formControlName="otp"
+                                  placeholder="Enter OTP"
+                                />
+                              </div>
+
+                              <a
+                                href="javascript:void(0)"
+                                class="btn"
+                                [style.background]="
+                                  currentTheme?.secondaryColor
+                                "
+                                [style.borderColor]="
+                                  currentTheme?.secondaryColor
+                                "
+                                type="button"
+                                [disabled]="activatingOTP"
+                                (click)="activateOTP()"
+                              >
+                                <i
+                                  class="icon icon-spin icon-spin2"
+                                  *ngIf="activatingOTP"
+                                ></i>
+                                {{
+                                  activatingOTP
+                                    ? "Activating..."
+                                    : "Activate 2FA"
+                                }}
+                              </a>
+
+                              <div
+                                class="actions mt-5 d-flex ml-auto justify-content-end"
+                              >
+                                <a
+                                  href="javascript:void(0)"
+                                  type="buton"
+                                  class="btn btn-outline-dark mr-3"
+                                  (click)="toggle2FAStep(1)"
+                                  >Back</a
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div
+                          class="step3 d-flex"
+                          [ngClass]="{ 'align-items-center': !twoFacStep3 }"
+                        >
+                          <div class="step">
+                            <span
+                              class="p-4 rounded-circle text-white"
+                              [style.background]="currentTheme?.secondaryColor"
+                            >
+                              <span class="p-1 num">3</span>
+                            </span>
+                          </div>
+                          <h3 class="my-0 ml-5 pt-4" *ngIf="!twoFacStep3">
+                            Final setup
+                          </h3>
+                          <div
+                            class="card border w-75 ml-5"
+                            *ngIf="twoFacStep3"
+                          >
+                            <div class="card-body">
+                              <div class="text-center text-success p-5">
+                                <i class="icon icon-circle-check-o f-40"></i>
+                                <h3 class="h4 text-success mt-4">
+                                  You have succesfully setup your two factor
+                                  authentication. Next time you login, a
+                                  one-time password (OTP) will be sent to your
+                                  email and phone number.
+                                </h3>
+                              </div>
+                              <div
+                                class="actions mt-5 d-flex ml-auto justify-content-end"
+                              >
+                                <!-- <a href="javascript:void(0)" type="buton" class="btn btn-outline-dark mr-3" (click)="toggle2FAStep(2)">Back</a> -->
+                                <a
+                                  href="javascript:void(0)"
+                                  class="btn"
+                                  [style.background]="
+                                    currentTheme?.secondaryColor
+                                  "
+                                  [style.borderColor]="
+                                    currentTheme?.secondaryColor
+                                  "
+                                  (click)="is2FaSetutup = false"
+                                  type="button"
+                                  >Finish</a
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                    <div class="non-setup text-center" *ngIf="!is2FaSetutup">
+                      <div class="text-center">
+                        <h3
+                          class="mb-2 orange"
+                          [style.color]="currentTheme?.secondaryColor"
+                          class="mb-2 orange"
+                        >
+                          Two Factor Authentication (2FA)
+                        </h3>
+                        <hr class="mb-5" />
+                        <i
+                          class="icon icon-forgot-password f-40"
+                          [ngClass]="
+                            user?._user2FASettings?.isEnabled
+                              ? 'text-success'
+                              : 'text-danger'
+                          "
+                        ></i>
+                        <h4 class="mb-3" *ngIf="appOwner2FASetup?.isActive">
+                          Two factor authentication is
+                          {{ user?._user2FASettings?.isEnabled ? "" : "not" }}
+                          enabled.
+                        </h4>
+                        <h4
+                          class="mt-5 mb-3 text-danger w-50 mx-auto"
+                          *ngIf="!appOwner2FASetup?.isActive"
+                        >
+                          Two factor authentication has been deactivated. Please
+                          contact your admin for more enquiries.
+                        </h4>
+                        <p class="card-text">
+                          Two factor authentication (2FA) adds an aditional
+                          layer of security to your account by requiring more
+                          than just a password to sign in.
+                        </p>
+                        <a
+                          href="javascript:void(0)"
+                          *ngIf="appOwner2FASetup?.isActive"
+                          class="btn"
+                          [style.background]="currentTheme?.secondaryColor"
+                          [style.borderColor]="currentTheme?.secondaryColor"
+                          (click)="is2FaSetutup = true"
+                          >{{
+                            user?._user2FASettings?.isEnabled
+                              ? "Reconfigure"
+                              : "Setup"
+                          }}
+                          2FA</a
+                        >
+                      </div>
+
+                      <div
+                        class="business-setup mt-5 pt-5"
+                        *ngIf="
+                          user?.permission?.includes(
+                            'Manage Two Factor Authentication'
+                          )
+                        "
+                      >
+                        <h3
+                          class="mb-2 orange"
+                          [style.color]="currentTheme?.secondaryColor"
+                          class="mb-2 orange"
+                        >
+                          Two Factor Authentication (2FA) Settings
+                        </h3>
+                        <hr class="mb-5" />
+                        <div class="w-50">
+                          <div
+                            class="d-flex justify-content-between align-items-center mb-3"
+                          >
+                            <p class="m-0">Enable 2FA</p>
+                            <label class="switch">
+                              <input
+                                type="checkbox"
+                                [(ngModel)]="appOwner2FASetup.isActive"
+                              />
+                              <span class="slider2 round"></span>
+                            </label>
+                          </div>
+                          <div
+                            class="d-flex justify-content-between align-items-center mb-3"
+                          >
+                            <p class="m-0">Enable 2FA for staffs</p>
+                            <label class="switch">
+                              <input
+                                type="checkbox"
+                                [(ngModel)]="appOwner2FASetup.isActiveForStaff"
+                              />
+                              <span class="slider2 round"></span>
+                            </label>
+                          </div>
+                          <div
+                            class="d-flex justify-content-between align-items-center mb-3"
+                          >
+                            <p class="m-0">Enable 2FA for customers</p>
+                            <label class="switch">
+                              <input
+                                type="checkbox"
+                                [(ngModel)]="
+                                  appOwner2FASetup.isActiveForCustomer
+                                "
+                              />
+                              <span class="slider2 round"></span>
+                            </label>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn float-left my-5"
+                          [style.background]="currentTheme?.secondaryColor"
+                          [style.borderColor]="currentTheme?.secondaryColor"
+                          [disabled]="updating2faConfig"
+                          (click)="update2faConfig()"
+                        >
+                          <i
+                            class="icon icon-spin icon-spin2"
+                            *ngIf="updating2faConfig"
+                          ></i>
+                          {{
+                            updating2faConfig
+                              ? "Updating..."
+                              : "Update Configuration"
+                          }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="timeout_settings" class="tab-pane">
+                <div class="card-header">
+                  <h3
+                    class="mb-2"
+                    [style.color]="currentTheme?.secondaryColor"
+                    class="mb-2"
+                  >
+                    Timeout Settings
+                  </h3>
+
+                  <p>
+                    Your Session would be terminated after
+                    <span [style.color]="currentTheme?.secondaryColor"
+                      >{{ appInactivityTimeoutSeconds }} secs of In
+                      Activity</span
+                    >, after which you would be required to Re-Authenticate
+                  </p>
+                  <small [style.color]="currentTheme?.secondaryColor"
+                    >you can customise the settings below ( Minimum : 60 -
+                    Maximum : 600 ) secs</small
+                  >
+                </div>
+                <div class="card-body">
+                  <div class="form-row">
+                    <div class="col-md-6">
+                      <div class="input-group mb-2">
+                        <input
+                          type="number"
+                          [(ngModel)]="appInactivityTimeoutSeconds"
+                          class="form-control"
+                          placeholder="Enter Timeout in Secs"
+                          min="60"
+                          max="600"
+                          (keyup)="checkRange($event.target.value)"
+                        />
+
+                        <div class="input-group-append">
+                          <button
+                            *ngIf="!timeoutLoader"
+                            class="btn btn-primary"
+                            type="button"
+                            [disabled]="
+                              appInactivityTimeoutSeconds == null ||
+                              appInactivityTimeoutSeconds < 60 ||
+                              appInactivityTimeoutSeconds > 600
+                            "
+                            (click)="updateTimeoutSettings()"
+                          >
+                            Update
+                          </button>
+                          <button
+                            *ngIf="timeoutLoader"
+                            class="btn btn-primary"
+                            type="button"
+                            [disabled]="true"
+                          >
+                            <i class="icon icon-spin icon-spin2"></i>
+                          </button>
+                        </div>
+                      </div>
+                      <p class="text-danger">{{ timeoutRangeError }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /tab pane-->
+          </div>
+          <!-- /tab content -->
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+      <!-- Card -->
+      <!-- <div class="card"> -->
+
+      <!-- Card Body -->
+      <!-- <div class="card-body">
+                      <h2 class="card-title">Another Card</h2>
+                  </div> -->
+      <!-- /card body -->
+
+      <!-- </div> -->
+      <!-- /card -->
+    </div>
+    <!-- /grid item -->
+  </div>
+
+  <div id="tab-pane-8" class="tab-pane">
+    <div class="row">
+      <!-- Grid Item -->
+
+      <!-- /grid item -->
+      <!-- Grid Item -->
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div *ngIf="specificView === 'integrations'" class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+          >
+            <h2 class="mb--20">Integrations</h2>
+          </div>
+
+          <div *ngIf="loadingState.isLoading" class="py-4 mx-auto">
+            <span [style.color]="currentTheme.secondaryColor"
+              ><i class="icon icon-spin icon-spin2"></i>
+              {{ loadingState?.text }}</span
+            >
+          </div>
+          <!-- /card header -->
+
+          <!-- Card Body -->
+          <div
+            *ngIf="!loadingState.isLoading"
+            class="dt-card__body tabs-container tabs-vertical"
+          >
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs flex-column" role="tablist">
+              <li class="nav-item">
+                <a
+                  class="nav-link active pool-nav"
+                  data-toggle="tab"
+                  href="#mono-tab-pane"
+                  role="tab"
+                  aria-controls="mono-tab-pane"
+                  aria-selected="true"
+                  >Mono
+                </a>
+              </li>
+              <li
+                *ngIf="user?.permission?.includes('Update Decide Settings')"
+                class="nav-item"
+              >
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#decide"
+                  role="tab"
+                  aria-controls="tab-pane-3"
+                  aria-selected="true"
+                  >Indicina
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-11"
+                  role="tab"
+                  aria-controls="tab-pane-3"
+                  aria-selected="true"
+                  >Paystack Keys
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#monnify"
+                  role="tab"
+                  aria-controls="youverify-tab-pane"
+                  aria-selected="true"
+                  >Monnify
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#youverify-tab-pane"
+                  role="tab"
+                  aria-controls="youverify-tab-pane"
+                  aria-selected="true"
+                  >YouVerify
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-12"
+                  role="tab"
+                  aria-selected="true"
+                  >Remita
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-13"
+                  role="tab"
+                  aria-controls="tab-pane-5"
+                  aria-selected="true"
+                  >First Central
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-14"
+                  role="tab"
+                  aria-controls="tab-pane-6"
+                  aria-selected="true"
+                  >Credit Registry
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-okra"
+                  role="tab"
+                  aria-controls="tab-pane-6"
+                  aria-selected="true"
+                  >Okra
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-calendly"
+                  role="tab"
+                  aria-controls="tab-pane-calendly"
+                  aria-selected="true"
+                  >Calendly
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#africasTalking-tab-pane"
+                  role="tab"
+                  aria-controls="africaIsTalking-tab-pane"
+                  aria-selected="true"
+                  >Africa's talking
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#multitexter-tab-pane"
+                  role="tab"
+                  aria-controls="multitexter-tab-pane"
+                  aria-selected="true"
+                  >Multi Texter
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#kuda-tab-pane"
+                  role="tab"
+                  aria-controls="kuda-tab-pane"
+                  aria-selected="true"
+                  >Kuda
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#seerbit-tab-pane"
+                  role="tab"
+                  aria-controls="seerbit-tab-pane"
+                  aria-selected="true"
+                  >Seerbit
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#dojah-tab-pane"
+                  role="tab"
+                  aria-controls="dojah-tab-pane"
+                  aria-selected="true"
+                  >Dojah
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#termii-tab-pane"
+                  role="tab"
+                  aria-controls="termii-tab-pane"
+                  aria-selected="true"
+                  >Termii
+                </a>
+              </li>
+            </ul>
+            <!-- /tab navigation -->
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+              <!-- Tab Pane -->
+              <div id="decide" class="tab-pane">
+                <div class="card-body">
+                  <app-decide-setup
+                    [currentTheme]="currentTheme"
+                    [decideInfo]="decideInfo"
+                    [currencySymbol]="appOwner.currency.currencySymbol"
+                  ></app-decide-setup>
+                </div>
+              </div>
+              <!-- /tab pane-->
+
+              <!-- Tab Pane -->
+              <div id="tab-pane-11" class="tab-pane">
+                <div class="card-body">
+                  <p *ngIf="payStackInfo !== null">
+                    Paystack payment method is currently
+
+                    <span
+                      *ngIf="paystackInfo"
+                      class="badge badge-pill"
+                      [ngClass]="
+                        paystackInfo?.isActive
+                          ? 'badge-success'
+                          : 'badge-danger'
+                      "
+                      >{{
+                        paystackInfo?.isActive ? "Active" : "Inactive"
+                      }}</span
+                    >
+                  </p>
+                  <!-- <h3 class="mb-2 orange">Change Paystack Keys</h3> -->
+                  <small class="mb-5 text-link"
+                    >Kindly COPY and PASTE your keys from your Paystack
+                    dashboard. DO NOT TYPE!!!
+                    <a
+                      [style.color]="currentTheme?.secondaryColor"
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="text-link"
+                      href="https://dashboard.paystack.com/#/settings/developer"
+                      target="_blank"
+                      >Get your keys here.</a
+                    ></small
+                  >
+                  <!-- Form -->
+                  <br />
+                  <br />
+                  <form [formGroup]="paystackForm">
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label class="sr-only">Secret Key</label>
+                      <input
+                        type="text"
+                        formControlName="secretKey"
+                        class="form-control"
+                        placeholder="Secret Key"
+                      />
+                    </div>
+                    <!-- /form group -->
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label class="sr-only">Public Key</label>
+                      <input
+                        type="text"
+                        formControlName="publicKey"
+                        class="form-control"
+                        placeholder="Public Key"
+                      />
+                    </div>
+                    <!-- /form group -->
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <button
+                        [style.backgroundColor]="currentTheme?.secondaryColor"
+                        [style.borderColor]="currentTheme?.secondaryColor"
+                        (click)="updatePaystackInfo()"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="!passwordLoader"
+                        [disabled]="paystackForm.invalid"
+                      >
+                        Update
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="passwordLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Updating ...
+                      </button>
+                      <button
+                        class="btn btn-sm text-uppercase"
+                        [ngClass]="
+                          paystackInfo.isActive ? 'btn-danger' : 'btn-success'
+                        "
+                        *ngIf="!statusLoader && paystackInfo"
+                        (click)="updatePaystackStatus()"
+                      >
+                        {{ paystackInfo?.isActive ? "Deactivate" : "Activate" }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="statusLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Processing ...
+                      </button>
+                    </div>
+                    <!-- /form group -->
+                  </form>
+                  <!-- /form -->
+                </div>
+              </div>
+              <!-- /tab pane-->
+
+              <!-- Tab Pane -->
+              <div id="monnify" class="tab-pane">
+                <div class="card-body">
+                  <app-monnify-setup
+                    [currentTheme]="currentTheme"
+                    [monnifyInfo]="appOwner?.appOwnerMonnifyInfo"
+                    (retriveAppownerInfo)="getAppOwnerDetails()"
+                  ></app-monnify-setup>
+                </div>
+              </div>
+              <div id="youverify-tab-pane" class="tab-pane">
+                <div class="card-body">
+                  <p *ngIf="youVerifyConfig">
+                    YouVerify payment method is currently
+                    <span
+                      class="badge badge-pill"
+                      [ngClass]="{
+                        'badge-success': youVerifyForm.controls.isActive.value,
+                        'badge-danger': !youVerifyForm.controls.isActive.value
+                      }"
+                      >{{youVerifyForm.controls.isActive.value ? 'Active' : 'Inactive'}}</span
+                    >
+                  </p>
+                  <small class="mb-5 text-link"
+                    >Kindly COPY and PASTE your keys from your YouVerify
+                    dashboard. DO NOT TYPE!!!
+                    <a
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="text-link"
+                      href="https://dashboard.paystack.com/#/settings/developer"
+                      target="_blank"
+                      >Get your keys here.</a
+                    ></small
+                  >
+                  <br />
+                  <br />
+                  <form [formGroup]="youVerifyForm">
+                    <div class="form-group">
+                      <label class="sr-only">Api Key</label>
+                      <input
+                        type="text"
+                        formControlName="apiSecretKey"
+                        class="form-control"
+                        placeholder="Api Key"
+                      />
+                    </div>
+                    <div class="form-group">
+                      <button
+                        [style.backgroundColor]="currentTheme?.secondaryColor"
+                        [style.borderColor]="currentTheme?.secondaryColor"
+                        (click)="updateYouVerifyInfo()"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="!passwordLoader"
+                        [disabled]="youVerifyForm.invalid"
+                      >
+                        Update
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="passwordLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Updating ...
+                      </button>
+                      <button
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="!youVerifyForm.controls.isActive.value && !statusLoader"
+                        (click)="updateYouVerifyStatus(true)"
+                      >
+                        Activate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="!youVerifyForm.controls.isActive.value && statusLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Activating ...
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger text-uppercase"
+                        *ngIf="youVerifyForm.controls.isActive.value && !statusLoader
+                        "
+                        (click)="updateYouVerifyStatus(false)"
+                      >
+                        Deactivate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger text-uppercase"
+                        *ngIf="youVerifyForm.controls.isActive.value && statusLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Deactivating
+                        ...
+                      </button>
+                      <button
+                        class="btn btn-sm btn-primary text-uppercase"
+                        *ngIf="youVerifyForm.controls.isActive.value &&
+                          !defaultBvnLoader &&
+                          appOwner.defaultBvnValidationPartner !==
+                            bvnIntegrationPartners.youVerify
+                        "
+                        (click)="setDefaultBvnValidationPartner(bvnIntegrationPartners.youVerify)"
+                      >
+                        Set As Default Bvn Partner
+                      </button>
+                      <button
+                        class="btn btn-sm btn-primary text-uppercase"
+                        *ngIf="defaultBvnLoader"
+                        disabled
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Processing...
+                      </button>
+                    </div>
+                    <!-- /form group -->
+                  </form>
+                  <!-- /form -->
+                  <div style="display: none">
+                    <div class="form-group">
+                      <input
+                        type="text"
+                        [(ngModel)]="bvnInput"
+                        class="form-control"
+                      />
+                      <br />
+                      <button
+                        (click)="checkBVN()"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                      >
+                        CheckBVN
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div id="tab-pane-12" class="tab-pane">
+                <div class="card-body">
+                  <lnd-tab-bar
+                    [tabs]="tabs"
+                    [currentTabId]="remitaCurrentTabId"
+                  ></lnd-tab-bar>
+                  <ng-container
+                    *ngIf="remitaCurrentTabId === 'inflight-collections-remita'"
+                  >
+                    <form [formGroup]="remitaInflightForm">
+                      <h3
+                        [style.color]="currentTheme?.secondaryColor"
+                        class="mb-2 orange"
+                      >
+                        Update Details
+                      </h3>
+                      <ng-container formGroupName="remitaInfo">
+                        <p>
+                          Inflight collections - remita is currently
+                          <span
+                            class="badge badge-pill"
+                            [ngClass]="
+                              remitaInflightForm.get('remitaInfo.isActive')
+                                .value
+                                ? 'badge-success'
+                                : 'badge-danger'
+                            "
+                            >{{
+                              remitaInflightForm.get("remitaInfo.isActive")
+                                .value
+                                ? "Active"
+                                : "Inactive"
+                            }}</span
+                          >
+                        </p>
+                        <div class="form-group">
+                          <label>Username</label>
+                          <input
+                            type="text"
+                            formControlName="userName"
+                            class="form-control"
+                            placeholder="Username"
+                          />
+                          <lnd-input-errors
+                            label="Username"
+                            [control]="
+                              remitaInflightForm.get('remitaInfo.userName')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                        <div class="form-group">
+                          <label>merchant ID</label>
+                          <input
+                            type="text"
+                            formControlName="merchantID"
+                            class="form-control"
+                            placeholder="Merchant ID"
+                          />
+                          <lnd-input-errors
+                            label="Merchant ID"
+                            [control]="
+                              remitaInflightForm.get('remitaInfo.merchantID')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                        <div class="form-group">
+                          <label>Service Type ID</label>
+                          <input
+                            type="text"
+                            formControlName="serviceTypeID"
+                            class="form-control"
+                            placeholder="Service Type ID"
+                          />
+                          <lnd-input-errors
+                            label="Service Type ID"
+                            [control]="
+                              remitaInflightForm.get('remitaInfo.serviceTypeID')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                        <div class="form-group">
+                          <label>API Key</label>
+                          <input
+                            type="text"
+                            formControlName="apiKey"
+                            class="form-control"
+                            placeholder="API Key"
+                          />
+                          <lnd-input-errors
+                            label="API Key"
+                            [control]="
+                              remitaInflightForm.get('remitaInfo.apiKey')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                        <div class="form-group">
+                          <label>API Token</label>
+                          <input
+                            type="text"
+                            formControlName="apiToken"
+                            class="form-control"
+                            placeholder="API Token"
+                          />
+                          <lnd-input-errors
+                            label="API Token"
+                            [control]="
+                              remitaInflightForm.get('remitaInfo.apiToken')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                      </ng-container>
+                      <div class="dotted-divider"></div>
+                      <ng-container formGroupName="bankDetails">
+                        <h4>Bank Details</h4>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label>Bank</label>
+                              <slct-2
+                                *ngIf="
+                                  !isFetchingRemitaBanks &&
+                                  !isGettingRemitaInflightInfo
+                                "
+                                [data]="remitaBanks"
+                                [active]="
+                                  activeRemitaInflightBank?.id
+                                    ? [activeRemitaInflightBank]
+                                    : null
+                                "
+                                [customSearchEnabled]="true"
+                                placeholder="Select Bank"
+                                (selected)="
+                                  onSelectRemitaBank($event, 'remita-inflight')
+                                "
+                                (removed)="
+                                  onDeselectRemitaBank('remita-inflight')
+                                "
+                              ></slct-2>
+                              <lnd-spinner
+                                *ngIf="
+                                  isFetchingRemitaBanks ||
+                                  isGettingRemitaInflightInfo
+                                "
+                                class="d-block"
+                              ></lnd-spinner>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="acc-name-rem-inflight"
+                                >Account Name</label
+                              >
+                              <input
+                                id="acc-name-rem-inflight"
+                                type="text"
+                                formControlName="accountName"
+                                class="form-control"
+                                placeholder="Enter account name"
+                              />
+                              <lnd-input-errors
+                                label="Account Name"
+                                [control]="
+                                  remitaInflightForm.get(
+                                    'bankDetails.accountName'
+                                  )
+                                "
+                              ></lnd-input-errors>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="acc-number-rem-inflight"
+                                >Account Number</label
+                              >
+                              <input
+                                id="acc-number-rem-inflight"
+                                type="text"
+                                formControlName="accountNumber"
+                                class="form-control"
+                                placeholder="Enter account number"
+                              />
+                              <lnd-input-errors
+                                label="Account Number"
+                                [control]="
+                                  remitaInflightForm.get(
+                                    'bankDetails.accountNumber'
+                                  )
+                                "
+                              ></lnd-input-errors>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                      <div class="dotted-divider"></div>
+                      <div class="form-group">
+                        <button
+                          [style.backgroundColor]="currentTheme?.secondaryColor"
+                          [style.borderColor]="currentTheme?.secondaryColor"
+                          (click)="updateRemitaInflightInfo()"
+                          class="btn btn-primary btn-sm text-uppercase orange-bg"
+                          *ngIf="!isUpdatingRemitaInflightInfo"
+                          [disabled]="remitaInflightForm.invalid"
+                        >
+                          Update
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-sm text-uppercase orange-bg"
+                          *ngIf="isUpdatingRemitaInflightInfo"
+                          [disabled]="true"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i> Updating ...
+                        </button>
+
+                        <button
+                          class="btn btn-sm btn-success text-uppercase"
+                          *ngIf="
+                            !remitaInflightForm.get('remitaInfo.isActive')
+                              .value && !isUpdatingRemitaInflightStatus
+                          "
+                          (click)="updateRemitaInflightStatus(true)"
+                        >
+                          Activate
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-success text-uppercase"
+                          *ngIf="
+                            !remitaInflightForm.get('remitaInfo.isActive')
+                              .value && isUpdatingRemitaInflightStatus
+                          "
+                          [disabled]="true"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i> Activating
+                          ...
+                        </button>
+                        <button
+                          class="btn btn-sm btn-danger text-uppercase"
+                          *ngIf="
+                            remitaInflightForm.get('remitaInfo.isActive')
+                              .value && !isUpdatingRemitaInflightStatus
+                          "
+                          (click)="updateRemitaInflightStatus(false)"
+                        >
+                          Deactivate
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-danger text-uppercase"
+                          *ngIf="
+                            remitaInflightForm.get('remitaInfo.isActive')
+                              .value && isUpdatingRemitaInflightStatus
+                          "
+                          [disabled]="true"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i> Deactivating
+                          ...
+                        </button>
+                      </div>
+                    </form>
+                  </ng-container>
+                  <ng-container
+                    *ngIf="
+                      remitaCurrentTabId === 'automatic-direct-debit-remita'
+                    "
+                  >
+                    <form [formGroup]="remitaDirectDebitForm">
+                      <h3
+                        [style.color]="currentTheme?.secondaryColor"
+                        class="mb-2 orange"
+                      >
+                        Update Details
+                      </h3>
+                      <ng-container formGroupName="remitaInfo">
+                        <p>
+                          Inflight collections - remita is currently
+                          <span
+                            class="badge badge-pill"
+                            [ngClass]="
+                              remitaDirectDebitForm.get('remitaInfo.isActive')
+                                .value
+                                ? 'badge-success'
+                                : 'badge-danger'
+                            "
+                            >{{
+                              remitaDirectDebitForm.get("remitaInfo.isActive")
+                                .value
+                                ? "Active"
+                                : "Inactive"
+                            }}</span
+                          >
+                        </p>
+                        <div class="form-group">
+                          <label>Username</label>
+                          <input
+                            type="text"
+                            formControlName="userName"
+                            class="form-control"
+                            placeholder="Username"
+                          />
+                          <lnd-input-errors
+                            label="Username"
+                            [control]="
+                              remitaDirectDebitForm.get('remitaInfo.userName')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                        <div class="form-group">
+                          <label>merchant ID</label>
+                          <input
+                            type="text"
+                            formControlName="merchantID"
+                            class="form-control"
+                            placeholder="Merchant ID"
+                          />
+                          <lnd-input-errors
+                            label="Merchant ID"
+                            [control]="
+                              remitaDirectDebitForm.get('remitaInfo.merchantID')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                        <div class="form-group">
+                          <label>Service Type ID</label>
+                          <input
+                            type="text"
+                            formControlName="serviceTypeID"
+                            class="form-control"
+                            placeholder="Service Type ID"
+                          />
+                          <lnd-input-errors
+                            label="Service Type ID"
+                            [control]="
+                              remitaDirectDebitForm.get(
+                                'remitaInfo.serviceTypeID'
+                              )
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                        <div class="form-group">
+                          <label>API Key</label>
+                          <input
+                            type="text"
+                            formControlName="apiKey"
+                            class="form-control"
+                            placeholder="API Key"
+                          />
+                          <lnd-input-errors
+                            label="API Key"
+                            [control]="
+                              remitaDirectDebitForm.get('remitaInfo.apiKey')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                        <div class="form-group">
+                          <label>API Token</label>
+                          <input
+                            type="text"
+                            formControlName="apiToken"
+                            class="form-control"
+                            placeholder="API Token"
+                          />
+                          <lnd-input-errors
+                            label="API Token"
+                            [control]="
+                              remitaDirectDebitForm.get('remitaInfo.apiToken')
+                            "
+                          ></lnd-input-errors>
+                        </div>
+                      </ng-container>
+                      <div class="dotted-divider"></div>
+                      <ng-container formGroupName="bankDetails">
+                        <h4>Bank Details</h4>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label>Bank</label>
+                              <slct-2
+                                *ngIf="
+                                  !isFetchingRemitaBanks &&
+                                  !isGettingRemitaDirectDebitInfo
+                                "
+                                [data]="remitaBanks"
+                                [active]="
+                                  activeRemitaDirectDebitBank?.id
+                                    ? [activeRemitaDirectDebitBank]
+                                    : null
+                                "
+                                [customSearchEnabled]="true"
+                                placeholder="Select Bank"
+                                (selected)="
+                                  onSelectRemitaBank(
+                                    $event,
+                                    'remita-direct-debit'
+                                  )
+                                "
+                                (removed)="
+                                  onDeselectRemitaBank('remita-direct-debit')
+                                "
+                              ></slct-2>
+                              <lnd-spinner
+                                *ngIf="
+                                  isFetchingRemitaBanks ||
+                                  isGettingRemitaDirectDebitInfo
+                                "
+                                class="d-block"
+                              ></lnd-spinner>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="acc-name-direct-debit"
+                                >Account Name</label
+                              >
+                              <input
+                                id="acc-name-direct-debit"
+                                type="text"
+                                formControlName="accountName"
+                                class="form-control"
+                                placeholder="Enter account name"
+                              />
+                              <lnd-input-errors
+                                label="Account Name"
+                                [control]="
+                                  remitaDirectDebitForm.get(
+                                    'bankDetails.accountName'
+                                  )
+                                "
+                              ></lnd-input-errors>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="acc-number-direct-debit"
+                                >Account Number</label
+                              >
+                              <input
+                                id="acc-number-direct-debit"
+                                type="text"
+                                formControlName="accountNumber"
+                                class="form-control"
+                                placeholder="Enter account number"
+                              />
+                              <lnd-input-errors
+                                label="Account Number"
+                                [control]="
+                                  remitaDirectDebitForm.get(
+                                    'bankDetails.accountNumber'
+                                  )
+                                "
+                              ></lnd-input-errors>
+                            </div>
+                          </div>
+                        </div>
+                      </ng-container>
+                      <div class="dotted-divider"></div>
+                      <div class="form-group">
+                        <button
+                          [style.backgroundColor]="currentTheme?.secondaryColor"
+                          [style.borderColor]="currentTheme?.secondaryColor"
+                          (click)="updateRemitaDirectDebitInfo()"
+                          class="btn btn-primary btn-sm text-uppercase orange-bg"
+                          *ngIf="!isUpdatingRemitaDirectDebitInfo"
+                          [disabled]="remitaDirectDebitForm.invalid"
+                        >
+                          Update
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-sm text-uppercase orange-bg"
+                          *ngIf="isUpdatingRemitaDirectDebitInfo"
+                          [disabled]="true"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i> Updating ...
+                        </button>
+
+                        <button
+                          class="btn btn-sm btn-success text-uppercase"
+                          *ngIf="
+                            !remitaDirectDebitForm.get('remitaInfo.isActive')
+                              .value && !isUpdatingRemitaDirectDebitStatus
+                          "
+                          (click)="updateRemitaDirectDebitStatus(true)"
+                        >
+                          Activate
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-success text-uppercase"
+                          *ngIf="
+                            !remitaDirectDebitForm.get('remitaInfo.isActive')
+                              .value && isUpdatingRemitaDirectDebitStatus
+                          "
+                          [disabled]="true"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i> Activating
+                          ...
+                        </button>
+                        <button
+                          class="btn btn-sm btn-danger text-uppercase"
+                          *ngIf="
+                            remitaDirectDebitForm.get('remitaInfo.isActive')
+                              .value && !isUpdatingRemitaDirectDebitStatus
+                          "
+                          (click)="updateRemitaDirectDebitStatus(false)"
+                        >
+                          Deactivate
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-danger text-uppercase"
+                          *ngIf="
+                            remitaDirectDebitForm.get('remitaInfo.isActive')
+                              .value && isUpdatingRemitaDirectDebitStatus
+                          "
+                          [disabled]="true"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i> Deactivating
+                          ...
+                        </button>
+                      </div>
+                    </form>
+                  </ng-container>
+                </div>
+              </div>
+              <div id="tab-pane-13" class="tab-pane">
+                <div class="card-body">
+                  <h3
+                    [style.color]="currentTheme?.secondaryColor"
+                    class="mb-2 orange"
+                  >
+                    Update First Central Details
+                  </h3>
+                  <p *ngIf="appOwner?.firstCentralInfo !== null">
+                    First Central payment method is currently
+                    <span
+                      class="badge badge-pill badge-success"
+                      *ngIf="appOwner?.firstCentralInfo?.IsActive === true"
+                      >Active</span
+                    >
+                    <span
+                      class="badge badge-pill badge-danger"
+                      *ngIf="appOwner?.firstCentralInfo?.IsActive === false"
+                      >Inactive</span
+                    >
+                  </p>
+                  <!-- <h4 class="mb-5">Change your remita details</h4> -->
+                  <!-- <p class="card-text">
+                    Your Transaction Key is not, so we cannot recover it for you.
+                    For reliable access to your account we recommend that you download
+                                  and save your Recovery Key in a secure place.
+                  </p> -->
+                  <!-- Form -->
+                  <form [formGroup]="firstCentralForm">
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label class="sr-only">Username</label>
+                      <input
+                        type="search"
+                        formControlName="userName"
+                        class="form-control"
+                        placeholder="Username"
+                      />
+                    </div>
+                    <!-- /form group -->
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label class="sr-only">Password</label>
+                      <input
+                        type="password"
+                        formControlName="password"
+                        class="form-control"
+                        placeholder="Password"
+                        autocomplete="off"
+                      />
+                    </div>
+                    <!-- /form group -->
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <button
+                        [style.backgroundColor]="currentTheme?.secondaryColor"
+                        [style.borderColor]="currentTheme?.secondaryColor"
+                        (click)="updateFirstCentralInfo()"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="!passwordLoader"
+                        [disabled]="firstCentralForm.invalid"
+                      >
+                        Update
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="passwordLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Updating ...
+                      </button>
+
+                      <button
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="
+                          appOwner?.firstCentralInfo?.IsActive === false &&
+                          !statusLoader
+                        "
+                        (click)="updateFirstCentralStatus(true)"
+                      >
+                        Activate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="
+                          appOwner?.firstCentralInfo?.IsActive === false &&
+                          statusLoader
+                        "
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Activating ...
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger text-uppercase"
+                        *ngIf="
+                          appOwner?.firstCentralInfo?.IsActive === true &&
+                          !statusLoader
+                        "
+                        (click)="updateFirstCentralStatus(false)"
+                      >
+                        Deactivate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger text-uppercase"
+                        *ngIf="
+                          appOwner?.firstCentralInfo?.IsActive === true &&
+                          statusLoader
+                        "
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Deactivating
+                        ...
+                      </button>
+                      <!-- <button class="btn btn-white btn-sm text-uppercase orange-outline" (click)="openModal(walletModal, 'firstCentral')"
+                      >
+                        View Wallet
+                      </button> -->
+                    </div>
+                    <!-- /form group -->
+                  </form>
+                  <!-- /form -->
+                </div>
+              </div>
+              <!--Tab pane-->
+
+              <!-- Tab Pane -->
+              <div id="tab-pane-14" class="tab-pane">
+                <div class="card-body">
+                  <h3
+                    [style.color]="currentTheme?.secondaryColor"
+                    class="mb-2 orange"
+                  >
+                    Update Credit Registry Details
+                  </h3>
+                  <p *ngIf="appOwner?.creditRegistryInfo !== null">
+                    Credit Registry payment method is currently
+                    <span
+                      class="badge badge-pill badge-success"
+                      *ngIf="appOwner?.creditRegistryInfo?.IsActive === true"
+                      >Active</span
+                    >
+                    <span
+                      class="badge badge-pill badge-danger"
+                      *ngIf="appOwner?.creditRegistryInfo?.IsActive === false"
+                      >Inactive</span
+                    >
+                  </p>
+                  <!-- <h4 class="mb-5">Change your remita details</h4> -->
+                  <!-- <p class="card-text">
+                    Your Transaction Key is not, so we cannot recover it for you.
+                    For reliable access to your account we recommend that you download
+                                  and save your Recovery Key in a secure place.
+                  </p> -->
+                  <!-- Form -->
+                  <form [formGroup]="creditRegistryForm">
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label class="sr-only">Email Address</label>
+                      <input
+                        type="text"
+                        formControlName="emailAddress"
+                        class="form-control"
+                        placeholder="Email Address"
+                      />
+                    </div>
+                    <!-- /form group -->
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label class="sr-only">Password</label>
+                      <input
+                        type="text"
+                        formControlName="password"
+                        class="form-control"
+                        placeholder="Password"
+                      />
+                    </div>
+                    <!-- /form group -->
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label class="sr-only">Subscriber ID</label>
+                      <input
+                        type="text"
+                        formControlName="subscriberId"
+                        class="form-control"
+                        placeholder="Subscriber ID"
+                      />
+                    </div>
+                    <!-- /form group -->
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <button
+                        [style.backgroundColor]="currentTheme?.secondaryColor"
+                        [style.borderColor]="currentTheme?.secondaryColor"
+                        (click)="updateCreditRegistryInfo()"
+                        class="btn btn-sm text-uppercase"
+                        *ngIf="!passwordLoader"
+                        [disabled]="creditRegistryForm.invalid"
+                      >
+                        Update
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="passwordLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Updating ...
+                      </button>
+
+                      <button
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="
+                          appOwner?.creditRegistryInfo?.IsActive === false &&
+                          !statusLoader
+                        "
+                        (click)="updateCreditRegStatus(true)"
+                      >
+                        Activate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="
+                          appOwner?.creditRegistryInfo?.IsActive === false &&
+                          statusLoader
+                        "
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Activating ...
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger text-uppercase"
+                        *ngIf="
+                          appOwner?.creditRegistryInfo?.IsActive === true &&
+                          !statusLoader
+                        "
+                        (click)="updateCreditRegStatus(false)"
+                      >
+                        Deactivate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger text-uppercase"
+                        *ngIf="
+                          appOwner?.creditRegistryInfo?.IsActive === true &&
+                          statusLoader
+                        "
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Deactivating
+                        ...
+                      </button>
+                      <!-- <button class="btn btn-white btn-sm text-uppercase orange-outline" (click)="openModal(walletModal, 'creditRegistry')"
+                      >
+                        View Wallet
+                      </button> -->
+                    </div>
+                    <!-- /form group -->
+                  </form>
+                  <!-- /form -->
+                </div>
+              </div>
+              <!--Tab pane-->
+
+              <!-- Tab Pane -->
+              <div id="tab-pane-okra" class="tab-pane">
+                <div class="card-body">
+                  <p *ngIf="okraData !== null">
+                    Okra integration is currently
+                    <span
+                      class="badge badge-pill badge-success"
+                      *ngIf="okraData?.isActive == true"
+                      >Active</span
+                    >
+                    <span
+                      class="badge badge-pill badge-danger"
+                      *ngIf="okraData?.isActive == false"
+                      >Inactive</span
+                    >
+                  </p>
+                  <p *ngIf="okraData == null">
+                    <small class="mb-5 text-link"
+                      >Kindly fill the form and activate okra
+                    </small>
+                  </p>
+                  <!-- <h3 class="mb-2 orange">Change Paystack Keys</h3> -->
+                  <!-- <small class="mb-5 text-link"
+                    >Kindly COPY and PASTE your keys from your Okra dashboard.
+                    DO NOT TYPE!!!
+                    <a
+                      class="text-link"
+                      href="https://dashboard.paystack.com/#/settings/developer"
+                      target="_blank"
+                      >Get your keys here.</a
+                    ></small
+                  > -->
+                  <!-- Form -->
+                  <br />
+                  <form [formGroup]="okraForm">
+                    <!-- Form Group -->
+
+                    <!-- /form group -->
+
+                    <div class="form-group">
+                      <label class="">Bank statement length in months</label>
+                      <select
+                        formControlName="StatementLimitInMonths"
+                        class="form-control"
+                      >
+                        <option value="3">3 months</option>
+                        <option value="6">6 months</option>
+                        <option value="12">12 months</option>
+                        <option value="18">18 months</option>
+                        <option value="24">24 months</option>
+                      </select>
+                    </div>
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <button
+                        [style.backgroundColor]="currentTheme?.secondaryColor"
+                        [style.borderColor]="currentTheme?.secondaryColor"
+                        (click)="updateOkraInfo()"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="okraData != null && !passwordLoader"
+                        [disabled]="paystackForm.invalid"
+                      >
+                        Update
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="passwordLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Updating ...
+                      </button>
+                      <button
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="
+                          okraData == null ||
+                          (okraData?.isActive === false && !statusLoader)
+                        "
+                        (click)="updateOkraStatus(true)"
+                      >
+                        Activate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-success text-uppercase"
+                        *ngIf="okraData?.isActive === false && statusLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Activating ...
+                      </button>
+                      <button
+                        class="btn btn-sm btn-danger text-uppercase"
+                        *ngIf="okraData?.isActive === true && !statusLoader"
+                        (click)="updateOkraStatus(false)"
+                      >
+                        Deactivate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-danger text-uppercase"
+                        *ngIf="okraData?.isActive === true && statusLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Deactivating
+                        ...
+                      </button>
+                      <!-- <button class="btn btn-white btn-sm text-uppercase orange-outline" (click)="openModal(walletModal, 'okra')"
+                      >
+                        View Wallet
+                      </button> -->
+                    </div>
+                    <!-- /form group -->
+                  </form>
+                  <!-- /form -->
+                </div>
+              </div>
+              <!-- /tab pane-->
+
+              <!-- Tab Pane -->
+              <div id="tab-pane-calendly" class="tab-pane">
+                <div class="card-body">
+                  <p>
+                    <small class="mb-5 text-link">
+                      Kindly fill the form below
+                    </small>
+                  </p>
+                  <!-- Form -->
+                  <br />
+                  <form
+                    [formGroup]="calendlyForm"
+                    (ngSubmit)="saveCalendlyForm()"
+                  >
+                    <!-- Form Group -->
+
+                    <!-- /form group -->
+
+                    <div class="form-group">
+                      <label class="">Calendly Link</label>
+                      <input
+                        type="text"
+                        formControlName="Url"
+                        class="form-control"
+                      />
+                    </div>
+
+                    <div class="form-group">
+                      <label class="">Calendly Email Message</label>
+                      <textarea
+                        cols="5"
+                        rows="5"
+                        formControlName="EmailMessage"
+                        class="form-control"
+                      ></textarea>
+                    </div>
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <button
+                        type="submit"
+                        class="btn btn-sm btn-danger text-uppercase"
+                        [disabled]="calendlyLoader"
+                      >
+                        Save
+                        <i
+                          *ngIf="calendlyLoader"
+                          class="icon icon-spin icon-spin2"
+                        ></i>
+                      </button>
+                      <!-- <button class="btn btn-white btn-sm text-uppercase orange-outline" (click)="openModal(walletModal, 'okra')"
+                      >
+                        View Wallet
+                      </button> -->
+                    </div>
+                    <!-- /form group -->
+                  </form>
+                  <!-- /form -->
+                </div>
+              </div>
+              <!-- /tab pane -->
+
+              <!-- Tab Pane -->
+              <div id="africasTalking-tab-pane" class="tab-pane">
+                <div class="card-body">
+                  <lnd-africa-talking
+                    [currentTheme]="currentTheme"
+                    [config]="africaTalkingConfig"
+                    (getAllIntegrations)="getAllIntegrations()"
+                  >
+                  </lnd-africa-talking>
+                </div>
+              </div>
+              <!-- /tab pane-->
+              <!-- Tab Pane -->
+              <div id="multitexter-tab-pane" class="tab-pane">
+                <div class="card-body">
+                  <lnd-multi-texter
+                    [currentTheme]="currentTheme"
+                    [config]="multiTexterConfig"
+                    (getAllIntegrations)="getAllIntegrations()"
+                  ></lnd-multi-texter>
+                </div>
+              </div>
+              <!-- /tab pane-->
+              <!-- Tab Pane -->
+              <div id="kuda-tab-pane" class="tab-pane">
+                <div class="card-body">
+                  <lnd-kuda-setup
+                    [currentTheme]="currentTheme"
+                    [kudaInfo]="kudaInfo"
+                    (getAllIntegrations)="getAllIntegrations()"
+                  ></lnd-kuda-setup>
+                </div>
+              </div>
+              <div id="dojah-tab-pane" class="tab-pane">
+                <div class="card-body">
+                  <lnd-dojah-setup
+                    [currentTheme]="currentTheme"
+                    [dojahSetup]="dojahSetup"
+                    (getAllIntegrations)="getAllIntegrations()"
+                  ></lnd-dojah-setup>
+                </div>
+              </div>
+              <div id="seerbit-tab-pane" class="tab-pane">
+                <div class="card-body">
+                  <lnd-seerbit-setup
+                    [currentTheme]="currentTheme"
+                    [seerbitSetup]="seerbitSetup"
+                    (getAllIntegrations)="getAllIntegrations()"
+                  ></lnd-seerbit-setup>
+                </div>
+              </div>
+              <div id="termii-tab-pane" class="tab-pane">
+                <div class="card-body">
+                  <lnd-termii
+                    [currentTheme]="currentTheme"
+                    [config]="termiiConfig"
+                    (getAllIntegrations)="getAllIntegrations()"
+                  ></lnd-termii>
+                </div>
+              </div>
+
+              <div id="mono-tab-pane" class="tab-pane active">
+                <div class="card-body">
+                  <lnd-mono
+                    [currentTheme]="currentTheme"
+                    [config]="monoConfig"
+                    (getAllIntegrations)="getAllIntegrations()"
+                  ></lnd-mono>
+                </div>
+              </div>
+              <!-- /tab pane-->
+            </div>
+            <!-- /tab content -->
+          </div>
+          <!-- /card body -->
+        </div>
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+  <div id="tab-pane-9" class="tab-pane">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-4 order-xl-2">
+        <!-- Grid -->
+        <div class="row">
+          <!-- Grid Item -->
+          <div class="col-xl-12 col-md-6 col-12 order-xl-1">
+            <!-- Card -->
+            <div
+              *ngIf="specificView === 'businessinfo'"
+              class="dt-card dt-card__full-height"
+            >
+              <!-- Card Header -->
+              <div class="dt-card__header">
+                <!-- Card Heading -->
+                <div class="dt-card__heading">
+                  <h3 class="dt-card__title">
+                    Business Logo
+                    <span class="float-right">
+                      <i
+                        class="icon icon-trash pointer text-danger"
+                        *ngIf="fileSelected"
+                        (click)="cancelFile()"
+                      ></i>
+                    </span>
+                  </h3>
+                </div>
+                <!-- /card heading -->
+              </div>
+              <!-- /card header -->
+              <!-- Card Body -->
+              <div class="dt-card__body">
+                <img class="mx-auto img-fluid d-block" [src]="businessLogo" />
+
+                <hr />
+                <input
+                  type="file"
+                  (change)="fileProgress($event)"
+                  accept="image/*"
+                  class="d-none"
+                  #logoUpload
+                />
+                <button
+                  class="mr-2 btn btn-success btn-sm text-uppercase"
+                  (click)="logoUpload.click()"
+                >
+                  <i class="mr-1 icon icon-add"></i> Select Logo
+                </button>
+
+                <button
+                  class="btn btn-primary orange-bg btn-sm text-uppercase"
+                  *ngIf="fileSelected && !loader"
+                  (click)="updateBusinessInfo()"
+                  [disabled]="businessInfoForm.invalid"
+                >
+                  Upload
+                </button>
+                <button
+                  class="text-sm btn btn-primary orange-bg btn-sm text-uppercase"
+                  type="button"
+                  *ngIf="loader && fileSelected"
+                  [disabled]="true"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Uploading ...
+                </button>
+                <br />
+                <br />
+                <small class="text-muted"
+                  >The supported logo types are .jpg and .png</small
+                >
+              </div>
+              <!-- /card body -->
+            </div>
+            <!-- /card -->
+          </div>
+          <!-- /grid item -->
+        </div>
+        <!-- /grid -->
+      </div>
+      <!-- /grid item -->
+      <!-- Grid Item -->
+      <div class="col-xl-8 order-xl-1">
+        <!-- Card -->
+        <!-- Card -->
+        <div *ngIf="specificView === 'businessinfo'" class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+            style="position: relative"
+          >
+            <h2 class="pr-2 mb--20">Business Information</h2>
+            <label
+              for="duration"
+              title="Click here to copy link to clipboard"
+              class="clickable"
+              (click)="
+                copyToClipboard(appOwner?.businessPortalUrlViaBusinessAlias)
+              "
+            >
+              <span
+                *ngIf="appOwner?.businessPortalUrlViaBusinessAlias !== null"
+                class="mb-2 mr-3"
+                style="position: absolute; right: 0; bottom: 0"
+              >
+                {{ appOwner?.businessPortalUrlViaBusinessAlias }}
+              </span></label
+            >
+            <label
+              for="duration"
+              title="Click here to copy link to clipboard"
+              class="clickable"
+              (click)="copyToClipboard(appOwner?.businessPortalUrl)"
+              ><span
+                *ngIf="appOwner?.businessPortalUrlViaBusinessAlias == null"
+                class="mb-2 mr-3"
+                style="position: absolute; right: 0; bottom: 0"
+              >
+                {{ appOwner?.businessPortalUrl }}
+              </span></label
+            >
+          </div>
+          <!-- /card header -->
+
+          <!-- Card Body -->
+          <div
+            class="pb-2 card-body tabs-container tabs-vertical"
+            *ngIf="appOwner != null"
+          >
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs flex-column" role="tablist">
+              <li class="nav-item">
+                <a
+                  class="nav-link active pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-15"
+                  role="tab"
+                  aria-controls="tab-pane-25"
+                  aria-selected="true"
+                  >Basic Info
+                </a>
+              </li>
+              <li class="nav-item">
+                <a
+                  (click)="getBankDetailsTabData()"
+                  class="nav-link pool-nav"
+                  data-toggle="tab"
+                  href="#tab-pane-16"
+                  role="tab"
+                  aria-controls="tab-pane-16"
+                  aria-selected="true"
+                  >Bank Details
+                </a>
+              </li>
+            </ul>
+            <!-- /tab navigation -->
+            <form [formGroup]="businessInfoForm" enctype="multipart/form-data">
+              <!-- Tab Content -->
+              <div class="tab-content">
+                <!-- Tab Pane -->
+                <div id="tab-pane-15" class="tab-pane active">
+                  <div class="card-body">
+                    <h3
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="mb-2 orange"
+                    >
+                      Update Basic Info
+                    </h3>
+                    <!-- Form -->
+                    <div class="form-row">
+                      <div class="mb-3 col-md-8">
+                        <label for="validationDefault01"
+                          >Business name <sup class="text-danger">*</sup></label
+                        >
+                        <input
+                          type="text"
+                          formControlName="appOwnerName"
+                          class="form-control"
+                          id="validationDefault01"
+                          placeholder="Business name"
+                        />
+                      </div>
+                      <div class="mb-3 col-md-4">
+                        <label for="validationDefault02"
+                          >Business Code <sup class="text-danger">*</sup></label
+                        >
+                        <input
+                          type="text"
+                          formControlName="appOwnerPersonCode"
+                          class="form-control"
+                          id="validationDefault02"
+                          placeholder="Business code"
+                        />
+                      </div>
+
+                      <div class="mb-3 col-sm-6">
+                        <label for="validationDefaultUsername"
+                          >Email Address <sup class="text-danger">*</sup></label
+                        >
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <span
+                              class="input-group-text"
+                              id="inputGroupPrepend2"
+                              ><i
+                                class="mr-2 icon icon-email icon-fw mr-sm-1"
+                              ></i
+                            ></span>
+                          </div>
+                          <input
+                            type="email"
+                            class="form-control"
+                            id="validationDefaultUsername"
+                            formControlName="appOwnerEmail"
+                            placeholder="Business Email"
+                          />
+                        </div>
+                      </div>
+                      <div class="mb-3 col-sm-6">
+                        <label for="validationDefaultUsername"
+                          >Phone <sup class="text-danger">*</sup></label
+                        >
+                        <div class="input-group">
+                          <div class="input-group-prepend">
+                            <span
+                              class="input-group-text"
+                              id="inputGroupPrepend2"
+                              ><i
+                                class="mr-2 icon icon-phone icon-fw mr-sm-1"
+                              ></i
+                            ></span>
+                          </div>
+                          <input
+                            type="text"
+                            [dropSpecialCharacters]="false"
+                            mask="9*"
+                            formControlName="appOwnerPhone"
+                            class="form-control"
+                            id="validationDefaultUsername"
+                            placeholder="Phone"
+                          />
+                        </div>
+                      </div>
+                      <div class="mb-3 col-sm-12">
+                        <label for="validationDefaultdob"
+                          >Billing Address
+                          <sup class="text-danger">*</sup></label
+                        >
+                        <textarea
+                          type="text"
+                          formControlName="appOwnerBillingAddress"
+                          class="form-control"
+                          id="validationDefault02"
+                          placeholder="Billing Address"
+                        ></textarea>
+                      </div>
+
+                      <div class="mb-3 col-md-7">
+                        <label for="validationDefault01"
+                          >Business Alias <sup class="text-danger"></sup>
+                          <span
+                            ><i
+                              class="icon icon-question-circle icon-fw icon-xl"
+                              placement="top"
+                              ngbTooltip="Setup a custom name for accessing your accounts"
+                            ></i></span
+                        ></label>
+                        <input
+                          type="text"
+                          formControlName="appOwnerAlias"
+                          class="form-control"
+                          id="validationDefault01alias"
+                          placeholder="Alias"
+                          (keyup)="onchangeAlias($event.target.value)"
+                        />
+                        <br />
+                        <span *ngIf="aliasError" class="text-danger">
+                          Invalid alias: Avoid spaces and special characters
+                          like brackets, spaces, ?, +, !, etc
+                        </span>
+                      </div>
+
+                      <div class="mb-3 col-sm-5">
+                        <label for="validationDefaultdob"
+                          >Ofi Code
+                          <span
+                            ><i
+                              class="icon icon-question-circle icon-fw icon-xl"
+                              placement="top"
+                              ngbTooltip="Other financial institution (OFI) code: Used to generate NUBAN per loan."
+                            ></i></span
+                        ></label>
+                        <input
+                          type="text"
+                          formControlName="ofiCode"
+                          class="form-control"
+                          placeholder="Unique Ofi code (e.g. 9xxxxx)"
+                        />
+                        <span
+                          *ngIf="
+                            businessInfoForm.get('ofiCode').invalid &&
+                            (businessInfoForm.get('ofiCode').dirty ||
+                              businessInfoForm.get('ofiCode').touched)
+                          "
+                          class="text-sm text-danger"
+                        >
+                          <small
+                            >The Ofi code can only be a 6 digit number which
+                            must start with 9.</small
+                          >
+                        </span>
+                      </div>
+                      <!-- <div class="mb-3 col-sm-6">
+                      <label for="validationDefault02" class="left-aligned">Shipping Address</label>
+                      <textarea type="text" formControlName="appOwnerShippingAddress" class="form-control" id="validationDefault02"
+                        placeholder="Shipping Address"></textarea>
+                    </div> -->
+                    </div>
+                  </div>
+                </div>
+                <!--Tab pane-->
+
+                <!-- Tab Pane -->
+                <div id="tab-pane-16" class="tab-pane">
+                  <div class="card-body">
+                    <h3
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="mb-2 orange"
+                    >
+                      Bank Details
+                    </h3>
+                    <!-- Form Row -->
+                    <div class="form-row">
+                      <div class="col-md-6">
+                        <!-- Form Group -->
+                        <div class="form-group">
+                          <label class="sr-only">Bank</label>
+                          <select
+                            #bankSelect
+                            formControlName="appOwnerBankCode"
+                            class="form-control"
+                            (change)="selectBank(bankSelect.value)"
+                          >
+                            <option value="" selected disabled>
+                              -Select Bank-
+                            </option>
+                            <option
+                              value="{{ bank.sortCode }}"
+                              *ngFor="let bank of bankDetailsTabBanks"
+                            >
+                              {{ bank.bankName }}
+                            </option>
+                          </select>
+                        </div>
+                        <!-- /form group -->
+                      </div>
+                      <div class="col-md-6">
+                        <!-- Form Group -->
+                        <div class="form-group">
+                          <label class="sr-only">Account Number</label>
+                          <input
+                            type="text"
+                            formControlName="appOwnerAccountNumber"
+                            class="form-control"
+                            placeholder="Account Number"
+                          />
+                        </div>
+                        <!-- /form group -->
+                      </div>
+                    </div>
+                    <!-- /Form Row -->
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <label class="sr-only">Account Name</label>
+                      <input
+                        type="text"
+                        disabled
+                        formControlName="appOwnerAccountName"
+                        class="form-control"
+                        placeholder="Business Account Name"
+                      />
+                    </div>
+                    <!-- /form group -->
+
+                    <!-- Form Group -->
+                    <div class="form-group">
+                      <button
+                        [style.backgroundColor]="currentTheme?.secondaryColor"
+                        [style.borderColor]="currentTheme?.secondaryColor"
+                        (click)="validateAccountName()"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="!passwordLoader"
+                      >
+                        Validate
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm text-uppercase orange-bg"
+                        *ngIf="passwordLoader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Validating ...
+                      </button>
+                    </div>
+                    <!-- /form group -->
+                  </div>
+                </div>
+                <!--Tab pane-->
+              </div>
+              <button
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                [style.borderColor]="currentTheme?.secondaryColor"
+                class="float-right mt-3 mb-3 btn btn-primary orange-bg"
+                (click)="updateBusinessInfo()"
+                *ngIf="!loader"
+                [disabled]="businessInfoForm.invalid || aliasError"
+              >
+                Update Profile
+              </button>
+              <button
+                class="float-right mt-3 mb-3 btn btn-primary orange-bg"
+                type="button"
+                *ngIf="loader"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Updating ...
+              </button>
+            </form>
+            <!-- /form -->
+          </div>
+
+          <!-- /tab content -->
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+  <div
+    id="sms-settings"
+    class="tab-pane"
+    [ngClass]="{ 'active show': specificView === 'sms' }"
+  >
+    <lnd-sms-settings
+      *ngIf="appOwner && smsTemplateSyntaxStrings.length > 0"
+      [smsEvents]="appOwner?.smsSetupInfo?.SendSmsEvents"
+      [smsTemplateSyntaxStrings]="smsTemplateSyntaxStrings"
+    ></lnd-sms-settings>
+  </div>
+
+  <div
+    id="tab-pane-21"
+    *ngIf="specificView === 'apiAccessManagement'"
+    class="tab-pane mt--20"
+  >
+    <div class="row">
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div class="card mb--20">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+          >
+            <div
+              style="display: flex; justify-content: space-between; width: 100%"
+            >
+              <h2 class="mb--20">Generate your API Keys</h2>
+              <!-- <button class="orange-btn">Switch</button> -->
+            </div>
+          </div>
+          <!-- /card header -->
+
+          <!-- Card Body -->
+          <div class="pb-2 card-body" *ngIf="appOwner != null">
+            <button
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              class="mt-3 mb-3 btn btn-primary orange-bg"
+              (click)="openModal(apiKeyModal, 'md')"
+            >
+              Generate New Api Keys
+            </button>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+
+        <!-- Card -->
+        <div *ngIf="apiLists.length > 0">
+          <!-- Card Body -->
+          <div class="pb-2" *ngIf="appOwner != null">
+            <div class="dt-card">
+              <div class="dt-card__body">
+                <div class="table-responsive">
+                  <table class="table table-striped table-hover">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Public Key</th>
+                        <th>Secret Key</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody *ngIf="apiLists?.length > 0">
+                      <tr *ngFor="let item of apiLists">
+                        <td>
+                          <div
+                            style="display: flex; justify-content: space-even"
+                          >
+                            <span>
+                              {{ item?.name }}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <div
+                            style="display: flex; justify-content: space-even"
+                          >
+                            <span>
+                              {{ item?.apiPublicKey | slice : 0 : 20 }} ...
+                            </span>
+                            <i
+                              class="ml-5 icon icon-editor icon-fw clickable"
+                              title="Click to copy to clipboard"
+                              (click)="
+                                copyToClipboard(
+                                  item?.apiPublicKey,
+                                  'Copied API public key to clip board'
+                                )
+                              "
+                            ></i>
+                          </div>
+                        </td>
+                        <td>
+                          <div
+                            style="display: flex; justify-content: space-even"
+                          >
+                            <span>
+                              {{ item?.apiSecretKey | slice : 0 : 20 }} ...
+                            </span>
+                            <i
+                              class="ml-5 icon icon-editor icon-fw clickable"
+                              title="Click to copy to clipboard"
+                              (click)="
+                                copyToClipboard(
+                                  item?.apiSecretKey,
+                                  'Copied API secret key to clip board'
+                                )
+                              "
+                            ></i>
+                          </div>
+                        </td>
+
+                        <td>
+                          <span
+                            *ngIf="item.isActive"
+                            class="mb-1 mr-1 badge badge-success btn-xs"
+                            style="color: white"
+                            >Active</span
+                          >
+                          <span
+                            *ngIf="!item.isActive"
+                            class="mb-1 mr-1 badge badge-warning btn-xs"
+                            style="color: white"
+                            >InActive</span
+                          >
+                        </td>
+                        <td>
+                          <!-- <div class="btn-group btn-xs dropleft" role="group">
+                             Dropdown Button
+                            <button type="button" class="btn btn-xs btn-primary dropdown-toggle dropdown-toggle-split"
+                              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                              Action
+                            </button>
+
+                            <div class="dropdown-menu" x-placement="left-start"
+                              style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-5px, 0px, 0px);">
+                              <a class="dropdown-item" href="javascript:void(0)" (click)="openEditModal(editApiKeyModal, item)"
+                                *ngIf="user?.permission?.includes('Update Role')"><i class="icon icon-edit"></i> Edit</a>
+                              <a class="dropdown-item" href="javascript:void(0)" (click)="deleteKey(item)"
+                                *ngIf="user?.permission?.includes('Delete Role')"><i class="icon icon-trash"></i> Delete</a>
+                            </div>
+
+                          </div> -->
+
+                          <div class="mb-2 mr-2 dropdown d-inline-block">
+                            <button
+                              class="btn btn-warning btn-xs dropdown-toggle"
+                              type="button"
+                              data-toggle="dropdown"
+                              aria-haspopup="true"
+                              aria-expanded="false"
+                            ></button>
+
+                            <div class="dropdown-menu">
+                              <a
+                                class="dropdown-item"
+                                href="javascript:void(0)"
+                                *ngIf="
+                                  user?.permission?.includes('Update Role')
+                                "
+                                (click)="openEditModal(editApiKeyModal, item)"
+                                skipLocationChange
+                                ><i class="mr-2 icon icon-edit icon-fw"></i
+                                >Edit</a
+                              >
+
+                              <!-- onClick="viewLoan()" -->
+                              <a
+                                class="dropdown-item"
+                                href="javascript:void(0)"
+                                (click)="deleteKey(item)"
+                                *ngIf="
+                                  user?.permission?.includes('Delete Role')
+                                "
+                                ><i class="mr-2 icon icon-forward icon-fw"></i
+                                >Delete</a
+                              >
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                    <tbody *ngIf="apiLists?.length == 0">
+                      <tr>
+                        <td colspan="3" class="text-center">
+                          No api key created yet!
+                        </td>
+                      </tr>
+                    </tbody>
+
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+
+  <div
+    id="tab-pane-18"
+    class="tab-pane"
+    [ngClass]="{ active: specificView === 'customTheme' }"
+  >
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-4">
+        <!-- Card -->
+        <div class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+          >
+            <h2 class="mb--20">Appearance</h2>
+          </div>
+          <div class="dt-card__body color-theme">
+            <!-- <div class="color-mode mb-5">
+              <h4 class="mb-3">Overall Appearance</h4>
+              <div class="mode d-flex align-items-center">
+                <div class="color-box" (click)="setBaseTheme('lite')">
+                  <div class="color light" [ngClass]="{'selected': isThemeBaseSelected() === 'lite'}"></div>
+                  <p class="mb-0 mt-1">Light</p>
+                </div>
+                <div class="color-box" (click)="setBaseTheme('dark')">
+                  <div class="color dark" [ngClass]="{'selected': isThemeBaseSelected() === 'dark'}" style="opacity: 0.8"></div>
+                  <p class="mb-0 mt-1">
+                    Dark
+                  </p>
+                </div>
+              </div>
+            </div> -->
+            <div class="theme-mode">
+              <h4 class="mb-3">Themes</h4>
+              <h5 class="mb-2">Presets</h5>
+              <div class="theme d-flex align-items-center">
+                <div class="color-box" *ngFor="let theme of presetThemes">
+                  <div
+                    class="color"
+                    *ngIf="appOwner"
+                    [ngClass]="
+                      appOwner.appOwnerCustomColors.primaryColor ==
+                        theme.primaryColor &&
+                      appOwner.appOwnerCustomColors.secondaryColor ==
+                        theme.secondaryColor &&
+                      !themeSelected
+                        ? 'selected'
+                        : ''
+                    "
+                    [ngStyle]="theme.style"
+                    (click)="setPresetTheme(theme.name)"
+                  ></div>
+                  <p class="mb-0 mt-1">{{ theme.name }}</p>
+                </div>
+              </div>
+
+              <div class="w-25">
+                <hr />
+              </div>
+
+              <h5 class="mb-2">Custom</h5>
+              <p>Set your own colors manually.</p>
+              <div class="theme d-flex align-items-center">
+                <div class="color-box">
+                  <div
+                    class="color"
+                    [style.background]="customPriColor"
+                    [cpPositionRelativeToArrow]="true"
+                    (colorPickerChange)="changeColor($event, 'primary')"
+                    [(colorPicker)]="customPriColor"
+                    [cpCancelButtonClass]="
+                      'btn btn-primary btn-xs mr-2 orange-bg text-white'
+                    "
+                  ></div>
+                  <p class="mb-0 mt-1">Primary Color</p>
+                </div>
+
+                <div class="color-box">
+                  <div
+                    class="color"
+                    [style.background]="customSecColor"
+                    [cpPositionRelativeToArrow]="true"
+                    (colorPickerChange)="changeColor($event, 'secondary')"
+                    [(colorPicker)]="customSecColor"
+                    [cpCancelButtonClass]="
+                      'btn btn-primary btn-xs mr-2 orange-bg text-white'
+                    "
+                  ></div>
+                  <p class="mb-0 mt-1">Secondary Color</p>
+                </div>
+              </div>
+              <div class="mt-4" *ngIf="showButtons">
+                <button
+                  class="btn btn-primary btn-sm mr-2 orange-bg text-white"
+                  (click)="saveTheme()"
+                >
+                  <i
+                    *ngIf="savingThemeStatus"
+                    class="icon icon-spin icon-spin2"
+                  ></i>
+                  {{ savingThemeStatus ? "Saving " : "Save" }}
+                </button>
+                <button
+                  class="btn btn-primary btn-sm mr-2 btn-danger"
+                  (click)="resetTheme()"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /card body -->
+      </div>
+      <!-- /card -->
+      <!-- Card -->
+      <!-- <div class="card"> -->
+
+      <!-- Card Body -->
+      <!-- <div class="card-body">
+                      <h2 class="card-title">Another Card</h2>
+                  </div> -->
+      <!-- /card body -->
+
+      <!-- </div> -->
+      <!-- /card -->
+    </div>
+    <!-- /grid item -->
+  </div>
+
+  <!-- <div id="tab-pane-8" class="tab-pane"></div> -->
+</div>
+<!-- /profile content -->
+
+<!-- Wallet Modals -->
+<ng-template #walletModal let-modal>
+  <div class="modal-header">
+    <button
+      type="button"
+      class="close"
+      (click)="modal.dismiss()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3 row">
+      <div class="col-md-4">
+        <div class="card purple-bg">
+          <div class="card-body">
+            <p class="mb-3 text-light">Your available balance</p>
+            <p class="h4 titles">
+              {{ appOwner?.currency?.currencySymbol }}750,000
+            </p>
+            <button class="bg-white btn btn-block text-orange text-uppercase">
+              Topup Wallet
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8">
+        <div class="shadow card">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-3 offset-md-9">
+                <div class="select">
+                  <select class="form-control">
+                    <option>Today</option>
+                    <option>Yesterday</option>
+                    <option>Last 7 days</option>
+                    <option>Last 30 days</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 row">
+              <div class="col-md-4">
+                <p class="mb-1 h5">Transactions</p>
+                <p class="h3">0</p>
+              </div>
+              <div class="col-md-4">
+                <p class="mb-1 h5">Incoming</p>
+                <p class="h3">
+                  {{ appOwner?.currency?.currencySymbol }}596,536.67
+                </p>
+              </div>
+              <div class="col-md-4">
+                <p class="mb-1 h5">Outgoing</p>
+                <p class="h3">
+                  {{ appOwner?.currency?.currencySymbol }}295,631.85
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="shadow card">
+      <div class="card-body">
+        <div class="mb-3 row align-items-center">
+          <div class="col-md-9">
+            <p class="mb-0 h5 text-purple">Recent Transactions</p>
+          </div>
+          <div class="col-md-3">
+            <div class="float-right dropdown">
+              <button
+                class="btn text-light purple-bg dropdown-toggle"
+                type="button"
+                id="dropdownMenuButton"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Export
+              </button>
+              <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="#">To Excel</a>
+                <a class="dropdown-item" href="#">To CSV</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3 row">
+          <div class="col-md-3">
+            <div class="form-group">
+              <input type="text" placeholder="Search" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <input
+                lndInvalidDateChecker
+                type="date"
+                placeholder="Start Date"
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <input lndInvalidDateChecker  type="date" placeholder="End Date" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="form-group">
+              <select class="form-control">
+                <option>All</option>
+                <option>Successful</option>
+                <option>Failed</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <table class="table table-hover">
+          <thead class="font-weight-bold">
+            <tr>
+              <th scope="col">
+                <i class="icon icon-circle icon-sm text-muted"></i>
+              </th>
+              <th scope="col">
+                Amount ({{ appOwner?.currency?.currencySymbol }})
+              </th>
+              <th scope="col">Customer</th>
+              <th scope="col">Reference</th>
+              <th scope="col">Channel</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <i
+                  class="icon icon-circle icon-sm text-success"
+                  title="Successful"
+                ></i>
+              </td>
+              <td>10,000.00</td>
+              <td>Paul Pogba</td>
+              <td>T93JKDF41556885</td>
+              <td><span class="badge badge-pill badge-light">Card</span></td>
+              <td>Tuesday Nov 3, 2020 12:30 PM</td>
+            </tr>
+            <tr>
+              <td>
+                <i
+                  class="icon icon-circle icon-sm text-success"
+                  title="Successful"
+                ></i>
+              </td>
+              <td>10,000.00</td>
+              <td>Morgan Freeman</td>
+              <td>T93JKDF41556885</td>
+              <td><span class="badge badge-pill badge-light">Card</span></td>
+              <td>Tuesday Nov 3, 2020 12:30 PM</td>
+            </tr>
+            <tr>
+              <td>
+                <i
+                  class="icon icon-circle icon-sm text-danger"
+                  title="Failed"
+                ></i>
+              </td>
+              <td>25,000.00</td>
+              <td>Harry Potter</td>
+              <td>T93JKDF41556885</td>
+              <td><span class="badge badge-pill badge-light">Card</span></td>
+              <td>Tuesday Nov 3, 2020 12:30 PM</td>
+            </tr>
+            <tr>
+              <td>
+                <i
+                  class="icon icon-circle icon-sm text-success"
+                  title="Successful"
+                ></i>
+              </td>
+              <td>10,000.00</td>
+              <td>Edwin Van der Sar</td>
+              <td>T93JKDF41556885</td>
+              <td><span class="badge badge-pill badge-light">Card</span></td>
+              <td>Tuesday Nov 3, 2020 12:30 PM</td>
+            </tr>
+            <tr>
+              <td>
+                <i
+                  class="icon icon-circle icon-sm text-danger"
+                  title="Failed"
+                ></i>
+              </td>
+              <td>50,010.00</td>
+              <td>Ed Woodward</td>
+              <td>T93JKDF41556885</td>
+              <td><span class="badge badge-pill badge-light">Card</span></td>
+              <td>Tuesday Nov 3, 2020 12:30 PM</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- APi key Modals -->
+<ng-template #apiKeyModal let-modal>
+  <div class="modal-header">
+    <div class="modal-title">Generate Api Keys</div>
+    <button
+      type="button"
+      class="close"
+      (click)="modal.dismiss()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3 row">
+      <div class="col-md-12">
+        <form [formGroup]="ApiAccessForm" (ngSubmit)="saveApiAccessKey()">
+          <div class="form-row">
+            <div class="mb-3 col-md-12">
+              <label for="apiKeyName"
+                >Name of Api key <sup class="text-danger">*</sup></label
+              >
+              <input
+                type="text"
+                formControlName="Name"
+                class="form-control"
+                id="apiKeyName"
+                placeholder="Name of Api key"
+              />
+            </div>
+            <div class="mb-3 col-md-12">
+              <label for="apiKeyDescription"
+                >Description of Api key <sup class="text-danger">*</sup></label
+              >
+              <textarea
+                rows="3"
+                cols="3"
+                formControlName="Description"
+                class="form-control"
+                id="apiKeyDescription"
+                placeholder="Description of Api key"
+              ></textarea>
+            </div>
+            <div class="mb-3 col-md-12">
+              <!-- <label for="apiKeyScopeData">Scope of Api key <sup class="text-danger">*</sup></label>
+              <select formControlName="Name" class="form-control" id="apiKeyScopeData">
+
+              </select> -->
+              <label for="permission">Scope of Api key </label>
+              <angular2-multiselect
+                [data]="apiKeyScope"
+                [settings]="dropdownSettings"
+                formControlName="ScopeData"
+                placeholder="No Permission Selected"
+              >
+              </angular2-multiselect>
+            </div>
+            <div class="mb-3 col-md-12">
+              <label for="apiKeyStatus"
+                >Status <sup class="text-danger">*</sup></label
+              >
+              <select
+                formControlName="IsActive"
+                class="form-control"
+                id="apiKeyStatus"
+              >
+                <option value="false">Inactive</option>
+                <option value="true">Active</option>
+              </select>
+            </div>
+            <div class="mb-3 col-md-12">
+              <button
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                [style.borderColor]="currentTheme?.secondaryColor"
+                class="mt-3 mb-3 btn btn-primary orange-bg"
+                type="submit"
+                [disabled]="ApiAccessForm.invalid || apiLoader"
+              >
+                Proceed
+                <span *ngIf="apiLoader"
+                  ><i class="ml-4 icon icon-spin icon-spin2"></i
+                ></span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #editApiKeyModal let-modal>
+  <div class="modal-header">
+    <div class="modal-title">Edit Api Access Key</div>
+    <button
+      type="button"
+      class="close"
+      (click)="modal.dismiss()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="mb-3 row">
+      <div class="col-md-12" *ngIf="EditApiAccessForm">
+        <form
+          [formGroup]="EditApiAccessForm"
+          (ngSubmit)="saveEditApiAccessKey()"
+        >
+          <div class="form-row">
+            <div class="mb-3 col-md-12">
+              <label for="apiKeyName"
+                >Name of Api key <sup class="text-danger">*</sup></label
+              >
+              <input
+                type="text"
+                formControlName="Name"
+                class="form-control"
+                id="apiKeyName"
+                placeholder="Name of Api key"
+              />
+            </div>
+            <div class="mb-3 col-md-12">
+              <label for="apiKeyDescription"
+                >Description of Api key <sup class="text-danger">*</sup></label
+              >
+              <textarea
+                rows="3"
+                cols="3"
+                formControlName="Description"
+                class="form-control"
+                id="apiKeyDescription"
+                placeholder="Description of Api key"
+              ></textarea>
+            </div>
+            <div class="mb-3 col-md-12">
+              <!-- <label for="apiKeyScopeData">Scope of Api key <sup class="text-danger">*</sup></label>
+              <select formControlName="Name" class="form-control" id="apiKeyScopeData">
+
+              </select> -->
+              <label for="permission">Scope of Api key </label>
+              <angular2-multiselect
+                [data]="apiKeyScope"
+                [settings]="dropdownSettings"
+                formControlName="ScopeData"
+                placeholder="No Permission Selected"
+              >
+              </angular2-multiselect>
+            </div>
+            <div class="mb-3 col-md-12">
+              <label for="apiKeyStatus"
+                >Status <sup class="text-danger">*</sup></label
+              >
+              <select
+                formControlName="IsActive"
+                class="form-control"
+                id="apiKeyStatus"
+              >
+                <option value="false">Inactive</option>
+                <option value="true">Active</option>
+              </select>
+            </div>
+            <div class="mb-3 col-md-12">
+              <button
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                [style.borderColor]="currentTheme?.secondaryColor"
+                class="mt-3 mb-3 btn btn-primary orange-bg"
+                type="submit"
+                [disabled]="EditApiAccessForm.invalid || apiLoader"
+              >
+                Proceed
+                <span *ngIf="apiLoader"
+                  ><i class="ml-4 icon icon-spin icon-spin2"></i
+                ></span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</ng-template>

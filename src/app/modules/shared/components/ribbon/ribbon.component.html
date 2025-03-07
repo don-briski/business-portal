@@ -1,0 +1,35 @@
+<span
+  class="ribbon ribbon-top-left"
+  [ngClass]="{
+    draft: status === 'Draft',
+    sentForApproval: status === 'SentForApproval',
+    posted: status === 'Posted',
+    rejected: status === 'Rejected',
+    redraft: status === 'ReDraft' || status === 'Redraft',
+    overdue: status === 'Overdue',
+    notPaid: status === 'Posted' && paymentStatus === 'Not Paid',
+    partiallyPaid: status === 'Posted' && paymentStatus === 'Partially Paid'
+  }"
+>
+  <span
+    [ngClass]="{
+      'draft def-text-color': status === 'Draft',
+      sentForApproval:
+        status === 'SentForApproval' || status === 'Sent For Approval',
+      posted: status === 'Posted',
+      rejected: status === 'Rejected',
+      redraft: status === 'ReDraft' || status === 'Redraft',
+      overdue: status === 'Overdue',
+      notPaid: status === 'Posted' && paymentStatus === 'Not Paid',
+      partiallyPaid: status === 'Posted' && paymentStatus === 'Partially Paid'
+    }"
+  >
+    {{
+      status !== "Posted"
+        ? status === "SentForApproval" || status === "Sent For Approval"
+          ? "Awaiting Approval"
+          : status
+        : paymentStatus || status
+    }}
+  </span>
+</span>

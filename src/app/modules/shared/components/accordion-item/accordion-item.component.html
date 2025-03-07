@@ -1,0 +1,38 @@
+<section
+  [ngClass]="{ tc_50: title === 'Terms & Conditions' }"
+  [ngStyle]="containerStyle"
+>
+  <p class="mb-1" *ngIf="title">
+    {{ useTitleCasePipe ? (title | humanify | titlecase) : (title | humanify) }}
+    <lnd-tooltip *ngIf="tooltip" [text]="tooltip"></lnd-tooltip>
+    <span *ngIf="trailing" [class]="trailingClass">{{ trailing }}</span>
+  </p>
+  <div [ngSwitch]="type">
+    <div *ngSwitchCase="'currency'">
+      {{ value | number : "1.2-2" }}
+    </div>
+    <div *ngSwitchCase="'percentage'">{{ value }}%</div>
+    <div *ngSwitchCase="'list'">
+      <span class="d-flex align-items-center flex-wrap">
+        <span
+          *ngFor="let item of value"
+          [style.backgroundColor]="bgColor"
+          [style.color]="primaryColor"
+          class="badge badge-pill my-1 mr-1"
+          >{{ item }}</span
+        >
+      </span>
+    </div>
+    <div *ngSwitchCase="'number'">
+      {{ value }}
+    </div>
+    <div
+      *ngSwitchDefault
+      [ngClass]="{ 'badge badge-pill': showValueAsPill && value }"
+      [style.backgroundColor]="showValueAsPill && value ? bgColor : ''"
+      [style.color]="showValueAsPill && value ? primaryColor : ''"
+    >
+      {{ value || "-" | humanify }}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,202 @@
+<div class="row">
+  <div class="col-xl-4 col-md-4">
+    <div class="mb-4">
+      <div class="dt-card dt-card__full-height">
+        <div class="dt-card__header">
+          <div class="dt-card__heading">
+            <h3
+              class="dt-card__title orange"
+              [style.color]="currentTheme?.primaryColor"
+            >
+              <i class="icon icon-tasks mr-2"></i>
+              My Requests
+            </h3>
+          </div>
+
+          <div class="dt-card__tools">
+            <div
+              class="btn-group btn-group-xs mb-2 tabs-container"
+              role="group"
+              aria-label="Basic example"
+            >
+              <ul class="nav" role="tablist">
+                <li class="nav-item">
+                  <button
+                    *ngIf="currentUser?.permission.includes('View Request')"
+                    type="button"
+                    class="btn btn-xs gray-outline nav-link active f-9"
+                    aria-selected="true"
+                    [routerLink]="['/workflow/requests']"
+                    routerLinkActive="active"
+                  >
+                    View Requests
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="dt-card__body pt-5 mt-2">
+          <div class="row no-gutters">
+            <div class="col">
+              <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                {{ workflowMetricsData?.MyRequests?.Count?.pending | number }}
+              </h2>
+              <h3 class="dt-card__title mb-2 text-light-gray f-12">Pending</h3>
+            </div>
+            <div class="col">
+              <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                {{ workflowMetricsData?.MyRequests?.Count?.approved | number }}
+              </h2>
+              <h3 class="dt-card__title mb-2 text-light-gray f-12">Approved</h3>
+            </div>
+            <div class="col">
+              <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                {{ workflowMetricsData?.MyRequests?.Count?.redrafted | number }}
+              </h2>
+              <h3 class="dt-card__title mb-2 text-light-gray f-12">
+                Redrafted
+              </h3>
+            </div>
+            <div class="col">
+              <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                {{ workflowMetricsData?.MyRequests?.Count?.declined | number }}
+              </h2>
+              <h3 class="dt-card__title mb-2 text-light-gray f-12">Declined</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mb-4">
+      <div class="dt-card dt-card__full-height">
+        <div class="dt-card__header">
+          <div class="dt-card__heading">
+            <h3
+              class="dt-card__title orange"
+              [style.color]="currentTheme?.primaryColor"
+            >
+              <i class="icon icon-tasks mr-2"></i>
+              My Approvals
+            </h3>
+          </div>
+          <div class="dt-card__tools">
+            <div
+              class="btn-group btn-group-xs mb-2 tabs-container"
+              role="group"
+              aria-label="Basic example"
+            >
+              <ul class="nav" role="tablist">
+                <li class="nav-item">
+                  <button
+                    *ngIf="currentUser?.permission.includes('Approve Request')"
+                    type="button"
+                    class="btn btn-xs gray-outline nav-link active f-9"
+                    aria-selected="true"
+                    [routerLink]="['/workflow/approval/roles']"
+                    routerLinkActive="active"
+                  >
+                    View Approvals
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="dt-card__body pt-5 mt-4">
+          <div class="row no-gutters">
+            <div class="col">
+              <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                {{ workflowMetricsData?.MyApprovals?.Count?.pending | number }}
+              </h2>
+              <h3 class="dt-card__title mb-2 text-light-gray f-12">Pending</h3>
+            </div>
+            <div class="col">
+              <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                {{ workflowMetricsData?.MyApprovals?.Count?.approved | number }}
+              </h2>
+              <h3 class="dt-card__title mb-2 text-light-gray f-12">Approved</h3>
+            </div>
+            <div class="col">
+              <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                {{
+                  workflowMetricsData?.MyApprovals?.Count?.redrafted | number
+                }}
+              </h2>
+              <h3 class="dt-card__title mb-2 text-light-gray f-12">
+                Redrafted
+              </h3>
+            </div>
+            <div class="col">
+              <h2 class="display-2 f-24 font-weight-medium mb-3 f-18">
+                {{ workflowMetricsData?.MyApprovals?.Count?.declined | number }}
+              </h2>
+              <h3 class="dt-card__title mb-2 text-light-gray f-12">Declined</h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-8">
+    <div class="dt-card dt-card__full-height">
+      <div class="dt-card__header">
+        <div class="dt-card__heading">
+          <h3
+            class="dt-card__title orange"
+            [style.color]="currentTheme?.primaryColor"
+          >
+            <i class="icon icon-tasks mr-2"></i>
+            Requests awaiting attention
+          </h3>
+        </div>
+        <div class="dt-card__tools">
+          <div
+            class="btn-group btn-group-xs mb-2 tabs-container"
+            role="group"
+            aria-label="Basic example"
+          >
+            <ul class="nav" role="tablist">
+              <li class="nav-item">
+                <button
+                  *ngIf="currentUser?.permission.includes('View Request')"
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link active f-9"
+                  aria-selected="true"
+                  [routerLink]="['/workflow/approval/roles']"
+                  routerLinkActive="active"
+                >
+                  View All
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="dt-card__body pt-5 mt-2">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <th class="px-4">Code</th>
+              <th class="px-4">Request Name</th>
+              <th class="px-4">Date Created</th>
+              <th class="px-4">Request Type</th>
+              <th class="px-4">
+                ({{ ownerInformation?.currency?.currencySymbol }}) Total Amount
+              </th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of pendingApprovals">
+                <td class="code">{{ item?.requestCode }}</td>
+                <td>{{ item?.requestName }}</td>
+                <td>{{ item?.createdAt | customDatePipe }}</td>
+                <td>{{ item?.requestType }}</td>
+                <td>{{ item?.totalAmount | number : "1.2-2" }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

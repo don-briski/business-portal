@@ -1,0 +1,211 @@
+<ng-template #loader>
+  <div class="d-flex justify-content-center">
+    <lnd-spinner text="Retrieving details..."></lnd-spinner>
+  </div>
+</ng-template>
+<section class="setup card p-5" *ngIf="!initializing; else loader">
+  <header class="d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center">
+      <i class="icon icon-setting icon-2x mr-2 text-warning"></i>
+      <h3 class="m-0">Loan Approval Workflow</h3>
+    </div>
+    <a
+      class="btn btn-primary mr-2 text-white"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      routerLink="/configurations/parameterssetup"
+      >Back</a
+    >
+  </header>
+  <div class="dashed my-3"></div>
+  <div>
+    <p>Set up an approval flow for your loan type.</p>
+    <p>
+      Approvals begin at the lowest level and move up to the highest approver.
+    </p>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="row">
+        <div class="col-md-4">
+          <label for="customName"
+            >Custom Name
+            <span>
+              <i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="Enter a unique name for this loan approval workflow."
+              ></i>
+            </span>
+          </label>
+          <input
+            id="customName"
+            type="text"
+            formControlName="name"
+            class="form-control"
+            placeholder="Enter custom name"
+          />
+          <lnd-input-errors
+            label="Custom name"
+            [control]="form.get('name')"
+            [custom]="{
+              message:
+                'Only letters and numbers are allowed. Special characters are not allowed.'
+            }"
+          />
+          <span
+            *ngIf="workflowNameDuplicate"
+            class="text-danger error-text d-block mt-1"
+            >There is another workflow with this name. Please choose another
+            name.</span
+          >
+        </div>
+      </div>
+      <div class="dashed my-5"></div>
+      <div>
+        <h4 class="m-0">Approval Workflow</h4>
+        <p>
+          Approvals follow a hierarchy from top to bottom. With the top level
+          being the highest approver
+        </p>
+      </div>
+      <ng-container
+        *ngFor="let level of approvalLevels.controls; let levelIndex = index"
+      >
+        <div class="mb-5" [formGroup]="level">
+          <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5>Level {{ levelIndex + 1 }}</h5>
+              <button
+                *ngIf="approvalLevels.controls.length > 1"
+                type="button"
+                class="btn btn-xs remove-btn"
+                (click)="onRemoveApprovalLevel(levelIndex)"
+              >
+                Remove <i class="icon icon-trash"></i>
+              </button>
+            </div>
+            <div class="row">
+              <div class="col-md-4">
+                <label for="apprLevelName"
+                  >Approval Level Name
+                  <span>
+                    <i
+                      class="icon icon-question-circle icon-fw icon-xl"
+                      placement="top"
+                      ngbTooltip="Assign a name for this approval level. Such as 'Underwriter' or 'Loan Manager'"
+                    ></i>
+                  </span>
+                </label>
+                <input
+                  id="apprLevelName"
+                  type="text"
+                  formControlName="approvalLevelName"
+                  class="form-control"
+                  placeholder="Enter approval level name"
+                />
+                <lnd-input-errors
+                  label="Approval level name"
+                  [control]="level.get('approvalLevelName')"
+                  [custom]="{
+                    message:
+                      'Only letters and numbers are allowed. Special characters are not allowed.'
+                  }"
+                />
+                <span
+                  *ngIf="level.get('approvalLevelNameDuplicate').value"
+                  class="text-danger error-text d-block mt-1"
+                  >There is another approval level with this name. Please choose
+                  another name.</span
+                >
+              </div>
+            </div>
+          </div>
+          <div class="row mb-5">
+            <div class="col-sm-12">
+              <label
+                >Approving Roles
+                <span>
+                  <i
+                    class="icon icon-question-circle icon-fw icon-xl"
+                    placement="top"
+                    ngbTooltip="Select the roles responsible for approving at this level."
+                  ></i>
+                </span>
+              </label>
+              <slct-2
+                [multiple]="true"
+                [active]="level.get('selectedApprovingRoles').value"
+                [data]="availableRoles"
+                [customSearchEnabled]="true"
+                (selected)="
+                  onSelect({ type: 'approvingRole', levelIndex, value: $event })
+                "
+                (removed)="
+                  onRemove({ type: 'approvingRole', levelIndex, value: $event })
+                "
+                placeholder="Select approving roles"
+              ></slct-2>
+            </div>
+          </div>
+          <div class="shadow-sm p-5 bg-gainsboro rounded">
+            <div class="d-flex align-items-center">
+              <input
+                type="checkbox"
+                (change)="
+                  onParentChange(
+                    level.get('levelId').value,
+                    $event.target.checked
+                  )
+                "
+                [checked]="level.get('allPermissionsChecked').value"
+              />
+              <span class="ml-3">Select All</span>
+            </div>
+            <div class="dashed my-5"></div>
+            <div class="row">
+              <div
+                class="col-md-4 form-group"
+                *ngFor="let perm of level.get('permissions').controls"
+              >
+                <div class="d-flex align-items-center" [formGroup]="perm">
+                  <input
+                    type="checkbox"
+                    (change)="
+                      onChildChange({
+                        permId: perm.get('id').value,
+                        levelId: level.get('levelId').value,
+                        checked: $event.target.checked
+                      })
+                    "
+                    [checked]="perm.get('permissionChecked').value"
+                  />
+                  <span class="ml-3">{{ perm.get("name").value }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <button
+        *ngIf="approvalLevels.controls.length < 5"
+        type="button"
+        class="btn add-btn btn-xs text-white mb-5"
+        (click)="onAddApprovalLevel()"
+      >
+        <i class="icon icon-add"></i> Add New
+      </button>
+      <div>
+        <button
+          [disabled]="submitting || form.invalid || workflowNameDuplicate"
+          type="button"
+          class="btn default"
+          (click)="onSubmit()"
+        >
+          <span *ngIf="submitting"
+            ><i class="icon icon-spin icon-spin2"></i
+          ></span>
+          {{ submitting ? "Saving..." : "Save" }}
+        </button>
+      </div>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,403 @@
+<!-- Page Header -->
+<div class="d-flex justify-content-between align-items-center mb-5">
+  <div class="dt-page__header">
+    <h1 class="dt-page__title clearfix m-0">Transactions Entries</h1>
+  </div>
+  <div
+    class="btn-group"
+    role="group"
+    aria-label="Button group with nested dropdown"
+  >
+    <div class="btn-group" role="group">
+      <button
+        id="btnGroupDrop1"
+        type="button"
+        class="btn dropdown-toggle text-white"
+        data-toggle="dropdown"
+        aria-expanded="false"
+        [style.background]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+      >
+        End of Period
+      </button>
+      <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+        <a
+          class="dropdown-item cursor"
+          (click)="onSetEndOfPeriod(setEndOfPeriodView, 'LoanInterestIncome')"
+          >Loan Interest Income</a
+        >
+        <a
+          class="dropdown-item cursor"
+          (click)="
+            onSetEndOfPeriod(setEndOfPeriodView, 'PlacementInterestIncome')
+          "
+          >Placement Interest Income</a
+        >
+        <a
+          class="dropdown-item cursor"
+          (click)="onSetEndOfPeriod(setEndOfPeriodView, 'InterestExpense')"
+          >Investment Interest Expense</a
+        >
+        <a
+          class="dropdown-item cursor"
+          routerLink="/finance/transactions/backlog"
+          routerLinkActive="active"
+          >Backlog</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xl-12">
+    <div class="tab-content">
+      <div id="tab-created" class="tab-pane active show">
+        <div class="dt-card">
+          <div class="dt-card__body">
+            <div class="table-responsive">
+              <lnd-table
+                [isLoading]="transactionLoader"
+                [pagination]="transactionPagination"
+                [headers]="headers"
+                [config]="config"
+                [data]="tableData"
+                [searchColumns]="transactionPagination?.searchColumns"
+                [useComplexFilters]="true"
+                [complexFilters]="filters"
+                [selectedFilters]="selectedFilters"
+                [useFilterModel]="true"
+                (paginationChange)="onPaginationChange($event)"
+                (searchParams)="onSearchParams($event)"
+                (retrieveRowDetails)="retrieveRowDetails($event)"
+                (complexFiltersChange)="onComplexFiltersChange($event)"
+                (initialized)="onSelectedFiltersInit($event)"
+              />
+            </div>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- # region -->
+<!-- Modals -->
+<!-- /Modals -->
+<!-- # endregion -->
+
+<!-- Customizer Sidebar -->
+<aside
+  class="dt-customizer dt-drawer position-right"
+  [ngClass]="{ open: openAside }"
+>
+  <div class="dt-customizer__inner">
+    <!-- Customizer Header -->
+    <div class="dt-customizer__header">
+      <!-- Avatar Wrapper -->
+      <div class="dt-avatar-wrapper">
+        <!-- Avatar -->
+        <!-- /avatar -->
+
+        <!-- Info -->
+        <div class="dt-avatar-info">
+          <span class="display-5 mb-2 font-weight-light">
+            <i class="icon icon-editor icon-xl mr-3"></i>Transaction Code -
+            <span [style.color]="currentTheme?.secondaryColor">{{
+              transaction?.code
+            }}</span>
+          </span>
+          <span class="mb-2 display-5 font-weight-light">
+            &nbsp;
+
+            <span class="mb-1 mr-1 badge badge-warning btn-xs"> </span>
+          </span>
+        </div>
+        <!-- /info -->
+      </div>
+      <!-- /avatar wrapper -->
+
+      <!-- Close Button -->
+      <button type="button" class="close" (click)="toggleAside('close')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <!-- /close button -->
+    </div>
+    <!-- /customizer header -->
+
+    <!-- Customizer Body -->
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <div *ngIf="transaction != null" class="row">
+        <div class="col-md-12" style="padding: 20px">
+          <!-- List -->
+          <ul class="dt-list dt-list-one-second padded-left">
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Reference</span
+                  >
+                  <h5 class="mb-0">{{ transaction?.reference }}</h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-datepicker icon-2x align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Posting Date</span
+                  >
+                  <h5 class="mb-0">
+                    {{
+                      transaction.createdAt | customDatePipe : "MMM DD, YYYY"
+                    }}
+                    <span>
+                      <i class="icon icon-timepicker ml-3"></i>
+                      {{ transaction?.createdAt | customDatePipe : "h:mm A" }}
+                    </span>
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Created By</span
+                  >
+                  <h5 class="mb-0">{{ transaction.createdBy }}</h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Total Debit</span
+                  >
+                  <h5 class="mb-0">
+                    {{ currencySymbol
+                    }}{{ transaction?.debitAmount | number : "1.2-2" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="mr-3 icon icon-revenue-new icon-3x align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="mb-1 d-block text-light-gray f-12"
+                    >Total Credit</span
+                  >
+                  <h5 class="mb-0">
+                    {{ currencySymbol
+                    }}{{ transaction?.creditAmount | number : "1.2-2" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+          </ul>
+          <!-- /list -->
+        </div>
+      </div>
+      <!-- Customizer Body Inner  -->
+      <div class="">
+        <br />
+        <!-- Section -->
+        <div class="dt-card__body">
+          <ul
+            class="flex-row nav nav-underline border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                data-toggle="tab"
+                href="#tab-pane1"
+                role="tab"
+                aria-controls="tab-pane1"
+                aria-selected="true"
+                >Lines
+              </a>
+            </li>
+          </ul>
+
+          <div class="tab-content mt-4">
+            <div id="tab-pane1" class="tab-pane active">
+              <div class="d-flex">
+                <div
+                  *ngIf="transaction?.status === 'AwaitingApproval'"
+                  class="d-flex justify-content-center my-3"
+                >
+                  <button
+                    *ngIf="
+                      user?.permission?.includes('Reject Finance Transactions')
+                    "
+                    class="btn btn-xs btn-danger mr-2"
+                    (click)="
+                      rejectTransaction(transaction?.groupedTransactionId)
+                    "
+                    [disabled]="isLoading || transactionLoader"
+                  >
+                    {{ isLoading ? "Processing..." : "Reject" }}
+                    <i
+                      *ngIf="transactionLoader"
+                      class="icon icon-spin icon-spin2"
+                    ></i>
+                  </button>
+                  <button
+                    *ngIf="
+                      user?.permission?.includes('Post Finance Transactions')
+                    "
+                    class="btn btn-xs btn-success"
+                    (click)="
+                      postTransaction(
+                        transaction?.groupedTransactionId,
+                        transaction?.modifiedAt
+                      )
+                    "
+                    [disabled]="isLoading || transactionLoader"
+                  >
+                    {{ transactionLoader ? "Posting..." : "Post Transaction" }}
+                    <i
+                      *ngIf="transactionLoader"
+                      class="icon icon-spin icon-spin2"
+                    ></i>
+                  </button>
+                </div>
+                <button
+                  *ngIf="transaction?.reportsUploadUrl"
+                  class="mb-2 mr-2 btn btn-outline-primary btn-xs"
+                  type="button"
+                  (click)="downloadFile(transaction?.reportsUploadUrl)"
+                  aria-expanded="false"
+                  aria-controls="doc1"
+                >
+                  <i class="mr-3 icon icon-folder-o icon-xl"></i>Download report
+                </button>
+              </div>
+
+              <table
+                id="data-table"
+                class="table table-striped table-hover"
+                *ngIf="
+                  !fetchingLedgerTransactions && ledgerTransactions?.length
+                "
+              >
+                <thead>
+                  <tr>
+                    <th>Account</th>
+                    <th>Label/Reference</th>
+                    <th>Narration</th>
+                    <th>Transaction Date</th>
+                    <th class="text-right">Debit({{ currencySymbol }})</th>
+                    <th class="text-right">Credit({{ currencySymbol }})</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <ng-container>
+                    <tr class="gradeX" *ngFor="let item of ledgerTransactions">
+                      <td [style.color]="currentTheme?.secondaryColor">
+                        <span> {{ item.account }}</span>
+                      </td>
+                      <td [style.color]="currentTheme?.secondaryColor">
+                        <span>{{ item.label }}/{{ item.reference }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item?.description }}</span>
+                      </td>
+                      <td>
+                        <span>{{ item.transactionDate | date }}</span>
+                      </td>
+                      <td class="text-right">
+                        <span *ngIf="item.debitAmount > 0">{{
+                          item.debitAmount | number : "1.2-2"
+                        }}</span>
+                        <span *ngIf="item.debitAmount <= 0"> - </span>
+                      </td>
+                      <td class="text-right">
+                        <span *ngIf="item.creditAmount > 0">{{
+                          item.creditAmount | number : "1.2-2"
+                        }}</span>
+                        <span *ngIf="item.creditAmount <= 0"> - </span>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+              <p
+                *ngIf="
+                  !fetchingLedgerTransactions && !ledgerTransactions?.length
+                "
+              >
+                No entries
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div
+        *ngIf="fetchingLedgerTransactions"
+        class="table-loader"
+        style="text-align: center; color: indianred"
+      >
+        <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div *ngIf="openAside" class="dt-backdrop" (click)="toggleAside('close')"></div>
+<!-- /customizer sidebar -->
+<ng-template #setEndOfPeriodView>
+  <lnd-set-end-of-period [type]="selectedEndOfPeriod"></lnd-set-end-of-period>
+</ng-template>

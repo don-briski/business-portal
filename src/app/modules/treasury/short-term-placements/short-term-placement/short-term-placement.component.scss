@@ -1,0 +1,145 @@
+.badge {
+  color: #fff;
+}
+
+.dt-list__item {
+  padding: 10px 13px;
+}
+
+.liquidate {
+  position: absolute;
+  // bottom: -35%;
+  top: 170px;
+  left: 0;
+  z-index: 6000;
+  display: none;
+  float: left;
+  min-width: 80px;
+  padding: 8px 0;
+  margin: 8px 0 0;
+
+  color: #545454;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 0 solid transparent;
+  border-radius: 6.4px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.175);
+}
+.liquidate-right {
+  right: 0;
+  left: auto;
+}
+
+.liquidate {
+  width: 400px !important;
+}
+
+.liquidate-header {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 13px;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: 19.2px 28.8px;
+}
+
+.liquidate-header {
+  box-shadow: 0 2px 2px 0 rgba(84, 84, 84, 0.05);
+}
+
+.liquidate-header .title {
+  font-size: 15px;
+  margin-bottom: 0;
+}
+.liquidate-body {
+  padding: 24px 28.8px;
+}
+
+.liquidate-footer {
+  box-shadow: 0 -2px 2px 0 rgba(84, 84, 84, 0.05);
+  justify-content: flex-end;
+}
+
+.liquidate-header,
+.liquidate-footer {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 13px;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: 24px 28.8px;
+}
+
+.terminate-modal {
+  position: absolute;
+  top: -90px;
+  right: 0;
+  z-index: 6000;
+  display: none;
+  float: left;
+  min-width: 80px;
+  padding: 8px 0;
+  margin: 8px 0 0;
+  color: #545454;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 0 solid transparent;
+  border-radius: 6.4px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.175);
+}
+
+.terminate-modal {
+  width: 400px !important;
+}
+
+.terminate-modal-header {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 13px;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: 19.2px 28.8px;
+}
+
+.terminate-modal-header {
+  box-shadow: 0 2px 2px 0 rgba(84, 84, 84, 0.05);
+}
+
+.terminate-modal-header .title {
+  font-size: 15px;
+  margin-bottom: 0;
+}
+.terminate-modal-body {
+  padding: 24px 28.8px;
+}
+
+.terminate-modal-footer {
+  box-shadow: 0 -2px 2px 0 rgba(84, 84, 84, 0.05);
+  justify-content: flex-end;
+}
+
+.terminate-modal-header,
+.terminate-modal-footer {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  font-size: 13px;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: 24px 28.8px;
+}
+
+.mb-50 {
+  margin-bottom: 50px;
+}

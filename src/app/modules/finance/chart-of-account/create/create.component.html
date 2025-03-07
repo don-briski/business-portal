@@ -1,0 +1,231 @@
+<div class="row m-0">
+  <div class="col-md-6 offset-md-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="dt-page__title clearfix mb-0">
+        {{ isEditing ? "Edit" : "Create a" }} Ledger Account
+      </h1>
+
+      <a
+        class="btn btn-primary btn-sm mr-2 text-white"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        [routerLink]="['/finance/coa/all']"
+        routerLinkActive="router-link-active"
+        href="javascript:void(0)"
+        >Cancel</a
+      >
+    </div>
+    <div class="dt-card">
+      <div class="dt-card__body">
+        <form [formGroup]="accountForm" (ngSubmit)="submitForm()">
+          <div class="form-group" *ngIf="!isEditing">
+            <lnd-switch
+              [value]="accountForm.get('isPostingAccount').value"
+              text="I'm creating a posting account"
+              (emittedValue)="setPostingAcctOpt($event)"
+            ></lnd-switch>
+          </div>
+
+          <div class="form-group">
+            <label>Parent Account</label>
+            <slct-2
+              [data]="dropdownAccount"
+              (selected)="selectParent($event)"
+              (deselect)="delectParent()"
+              [customSearchEnabled]="true"
+              formControlName="parentAccount"
+              [placeholder]="'Select parent account'"
+            ></slct-2>
+            <small
+              *ngIf="accountForm.get('parentAccountId').value"
+              class="d-flex justify-content-between p-2"
+            >
+              Lower Boundary ({{ minRange }}) - ({{ maxRange }}) Upper Boundary
+            </small>
+            <small
+              *ngIf="cannotCreateSubHeader"
+              class="d-flex justify-content-between p-2 text-danger"
+            >
+              {{ SubHeaderErrorMsg }}
+            </small>
+          </div>
+
+          <div class="form-row">
+            <div class="col-md-8">
+              <div class="form-group">
+                <label>Account name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="name"
+                  placeholder="Type name"
+                />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label
+                  >Transaction type
+                  <ng-template #tipContent
+                    >What type of transaction occurs on this account ?<br /> </ng-template
+                  ><i
+                    class="icon icon-question-circle mx-1"
+                    placement="top"
+                    [ngbTooltip]="tipContent"
+                  ></i
+                ></label>
+
+                <slct-2
+                  [data]="transactionTypeOpts"
+                  formControlName="transactionTypeOpt"
+                  [placeholder]="'Search Transaction Type'"
+                ></slct-2>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="!isPostingAccount">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label
+                  >Account Number Range Start
+                  <ng-template #tipContent
+                    >Reference code upper boundary<br /> </ng-template
+                  ><i
+                    class="icon icon-question-circle mx-1"
+                    placement="top"
+                    [ngbTooltip]="tipContent"
+                  ></i
+                ></label>
+                <input
+                  type="number"
+                  class="form-control"
+                  placeholder="Type a range start ID"
+                  formControlName="referenceLowerBoundary"
+                />
+                <small
+                  *ngIf="outOfRange"
+                  class="d-flex justify-content-between p-2 text-danger"
+                >
+                  {{
+                    accountForm.get("referenceLowerBoundary").value < minRange
+                      ? "Value is LESS than Mininum allowed"
+                      : null
+                  }}
+                </small>
+                <small *ngIf="minRange > 0">(Min: {{ minRange }})</small>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label
+                  >Account Number Range End
+                  <ng-template #tipContent
+                    >Reference code lower boundary<br /> </ng-template
+                  ><i
+                    class="icon icon-question-circle mx-1"
+                    placement="top"
+                    [ngbTooltip]="tipContent"
+                  ></i
+                ></label>
+                <input
+                  type="number"
+                  class="form-control"
+                  placeholder="Type a range end ID"
+                  formControlName="referenceUpperBoundary"
+                />
+                <small
+                  *ngIf="outOfRange"
+                  class="d-flex justify-content-between p-2 text-danger"
+                >
+                  {{
+                    accountForm.get("referenceUpperBoundary").value > maxRange
+                      ? "Value is GREATER than Mininum allowed"
+                      : null
+                  }}
+                </small>
+                <small *ngIf="maxRange > 0">(Max: {{ maxRange }})</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="isPostingAccount">
+            <div class="col-md-8">
+              <div class="form-group">
+                <label>Reference Code</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  placeholder="Enter Reference Code"
+                  formControlName="reference"
+                />
+                <small
+                  *ngIf="outOfRange"
+                  class="d-flex justify-content-between p-2 text-danger"
+                >
+                  Value is Out Of Range!
+                </small>
+                <small
+                  *ngIf="accountForm.get('parentAccountId').value"
+                  class="d-flex justify-content-between p-2"
+                >
+                  Min ({{ minRange }}) - ({{ maxRange }}) Max
+                </small>
+              </div>
+            </div>
+          </div>
+          <div class="row" *ngIf="selectedAccountChildReferences?.length > 0">
+            <div class="col-md-12">
+              <label
+                >Unavailable account numbers for selected account
+                <ng-template #tipContent
+                  >These are the accounts created under the selected parent
+                  accounts. The ranges and references here cannot be selected
+                  for a new account<br />
+                </ng-template>
+                <i
+                  class="icon icon-question-circle mx-1"
+                  placement="top"
+                  [ngbTooltip]="tipContent"
+                ></i
+              ></label>
+              <div class="mb-3">
+                <span
+                  class="badge badge-pill badge-light mr-2 mb-2"
+                  *ngFor="let item of selectedAccountChildReferences"
+                >
+                  <span *ngIf="item?.isPostingAccount">
+                    {{ item?.name }} ({{ item?.reference }})</span
+                  >
+                  <span *ngIf="!item?.isPostingAccount"
+                    >{{ item?.name }} ({{ item?.lowerBoundary }} -
+                    {{ item?.upperBoundary }})</span
+                  >
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group d-flex">
+            <button
+              type="submit"
+              class="btn btn-xs btn-success ml-auto"
+              [disabled]="accountForm?.invalid || cannotCreateSubHeader"
+              *ngIf="!loader"
+            >
+              {{ isEditing ? "Update" : "Create" }} Account
+            </button>
+            <button
+              type="button"
+              class="btn btn-xs btn-success ml-auto"
+              *ngIf="loader"
+              [disabled]="true"
+            >
+              <i class="icon icon-spin icon-spin2"></i> Processing...
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

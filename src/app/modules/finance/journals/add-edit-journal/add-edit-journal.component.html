@@ -1,0 +1,426 @@
+<div class="row m-0">
+  <div class="col-12">
+    <header
+      class="dt-page__header d-flex justify-content-between align-items-center w-100"
+    >
+      <h1 class="dt-page__title clearfix">
+        {{ isEditing ? "Edit Journal  " : "Add New Journal  " }}
+      </h1>
+
+      <span [style.color]="currentTheme?.secondaryColor"
+        ><span>{{ isEditing && !journal ? "Retrieving Journal..." : "" }}</span>
+        <i class="icon icon-spin icon-spin2" *ngIf="(isEditing || cloning) && !journal"></i
+      ></span>
+
+      <span class="float-right role-add">
+        <div style="position: relative; right: -5px; bottom: 5px; float: right">
+          <a
+            class="btn btn-primary mr-2 text-white"
+            [routerLink]="['/finance/journals']"
+            routerLinkActive="router-link-active"
+            [style.background]="currentTheme?.secondaryColor"
+            [style.borderColor]="currentTheme?.secondaryColor"
+            href="javascript:void(0)"
+            >Back</a
+          >
+        </div>
+      </span>
+    </header>
+
+    <div class="dt-card w-100" *ngIf="accounts.length > 0">
+      <div class="dt-card__body" *ngIf="(isEditing || cloning && journal) || !isEditing && !cloning">
+        <form [formGroup]="journalForm">
+          <div class="form-row mb-5">
+            <div class="col-md-6">
+              <div class="form-row mb-5">
+                <div class="col-md-6">
+                  <label for="date">Date <b class="text-danger">*</b></label>
+                  <input
+                  lndInvalidDateChecker
+                    formControlName="date"
+                    type="date"
+                    class="form-control"
+                    id="date"
+                  />
+
+                  <span
+                    class="help-block f-12"
+                    *ngIf="
+                      journalForm.get('date').errors &&
+                      journalForm.get('date').touched
+                    "
+                  >
+                    <span *ngIf="journalForm.get('date').getError('required')"
+                      >This field is required</span
+                    >
+                  </span>
+                </div>
+                <div class="col-md-6">
+                  <label for="reference">Reference</label>
+                  <input
+                    formControlName="reference"
+                    id="reference"
+                    type="text"
+                    class="form-control"
+                    placeholder="Enter Reference"
+                  />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="col-md-12">
+                  <label for="notes">Notes <b class="text-danger">*</b></label>
+                  <textarea
+                    formControlName="notes"
+                    id="notes"
+                    rows="5"
+                    class="form-control"
+                    placeholder="Enter Note"
+                  ></textarea>
+
+                  <span
+                    class="help-block f-12"
+                    *ngIf="
+                      journalForm.get('notes').errors &&
+                      journalForm.get('notes').touched
+                    "
+                  >
+                    <span *ngIf="journalForm.get('notes').getError('required')"
+                      >This field is required</span
+                    >
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              *ngIf="isEditing && journal?.comments?.length > 0"
+              class="col-md-6"
+            >
+              <lnd-approval-comments
+                [comments]="journal?.comments"
+              ></lnd-approval-comments>
+            </div>
+            <div *ngIf="items?.requestItems?.length > 0" class="col-md-6 mt-4">
+              <div class="itemsCard p-5">
+                <header class="d-flex justify-content-end">
+                  <p>Ref: {{ items.requestCode }}</p>
+                </header>
+                <table class="table table-striped">
+                  <thead>
+                    <th>REF</th>
+                    <th>ITEM</th>
+                    <th>QUANTITY</th>
+                    <th>
+                      {{ ownerInformation?.currency?.currencySymbol }}AMOUNT
+                    </th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of items?.requestItems">
+                      <td>{{ item.itemCode }}</td>
+                      <td>{{ item.itemName }}</td>
+                      <td class="text-center">{{ item.quantity }}</td>
+                      <td>{{ item.amount | number : "1.2-2" }}</td>
+                    </tr>
+
+                    <tr>
+                      <td></td>
+                      <td></td>
+                      <td class="text-center" style="color: #000">Total:</td>
+                      <td style="color: #000">
+                        {{ ownerInformation?.currency?.currencySymbol
+                        }}{{ itemsTotal | number : "1.2-2" }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="dashed mb-5"></div>
+          <div>
+            <table id="data-table" class="table mt-5 table-bordered table-sm">
+              <thead>
+                <tr>
+                  <th class="slct-2">Account</th>
+                  <th>Description</th>
+                  <th class="slct-2">Contacts</th>
+                  <th class="text-right">Debits</th>
+                  <th class="text-right">Credits</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container formArrayName="journalLines">
+                  <ng-container
+                    *ngFor="
+                      let journalControl of journals().controls;
+                      let i = index
+                    "
+                  >
+                    <tr
+                      [formGroup]="journalControl"
+                      class="gradeX"
+                      *ngIf="(!isEditing || cloning) || journalSet"
+                    >
+                      <td class="slct-2">
+                        <account-slct
+                          [data]="accounts"
+                          (selectedAccount)="selectAccount($event, i)"
+                          [preselectedAccount]="
+                            (isEditing || cloning) && journal.journalLines[i]?.account
+                              ? {
+                                  accountId: journal.journalLines[i]?.account?.accountId,
+                                  name: journal.journalLines[i]?.account?.name
+                                }
+                              : null
+                          "
+                        ></account-slct>
+                      </td>
+
+                      <td>
+                        <textarea
+                          formControlName="description"
+                          class="form-control"
+                          placeholder="Description"
+                          (focus)="onPrefillDescription(i)"
+                          rows="3"
+                        ></textarea>
+                      </td>
+
+                      <td class="slct-2">
+                        <slct-2
+                          [searchService]="getSearchCustomerOrVendorService()"
+                          (searchResult)="
+                            updateDropdown($event, 'CustomersAndVendors')
+                          "
+                          (selected)="setContact($event, i)"
+                          [id]="i + 'slct'"
+                          [data]="contacts"
+                          [active]="
+                            (isEditing || cloning) && journal.journalLines[i]?.contact
+                              ? [
+                                  {
+                                    id: journal.journalLines[i]?.contactId,
+                                    text: journal.journalLines[i]?.contact.name
+                                  }
+                                ]
+                              : null
+                          "
+                          [customSearchEnabled]="true"
+                          [placeholder]="'Search Contact'"
+                        ></slct-2>
+                      </td>
+
+                      <td>
+                        <input
+                          type="text"
+                          formControlName="debitAmount"
+                          class="form-control"
+                          placeholder="Debit Amount"
+                          (keyup)="debitValidator($event, i)"
+                          currencyMask
+                          [options]="{
+                            prefix: '',
+                            thousands: ',',
+                            decimal: '.'
+                          }"
+                        />
+
+                        <span
+                          class="help-block f-12"
+                          *ngIf="
+                            journalControl.get('debitAmount').errors &&
+                            journalControl.get('debitAmount').touched
+                          "
+                        >
+                          <span
+                            *ngIf="
+                              journalControl
+                                .get('debitAmount')
+                                .getError('required')
+                            "
+                            >This field is required</span
+                          >
+                        </span>
+                      </td>
+
+                      <td>
+                        <div class="d-flex">
+                          <input
+                            type="text"
+                            formControlName="creditAmount"
+                            class="form-control"
+                            placeholder="Credit Amount"
+                            (keyup)="creditValidator($event, i)"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                          />
+                        </div>
+
+                        <span
+                          class="help-block f-12"
+                          *ngIf="
+                            journalControl.get('creditAmount').errors &&
+                            journalControl.get('creditAmount').touched
+                          "
+                        >
+                          <span
+                            *ngIf="
+                              journalControl
+                                .get('creditAmount')
+                                .getError('required')
+                            "
+                            >This field is required</span
+                          >
+                        </span>
+                      </td>
+                      <div
+                        *ngIf="journals().length > 1"
+                        class="remove-btn"
+                        (click)="removeJournal(i)"
+                      >
+                        <i class="icon icon-trash text-danger icon-lg"></i>
+                      </div>
+                    </tr>
+                  </ng-container>
+                </ng-container>
+              </tbody>
+              <button
+                class="btn add-btn btn-xs text-white my-5 mx-1"
+                (click)="addJournal()"
+                [disabled]="
+                  this.items?.requestItems?.length > 0 &&
+                  totalCredit > itemsTotal
+                "
+              >
+                <i class="icon icon-add"></i>Add new line
+              </button>
+            </table>
+          </div>
+
+          <div id="summary">
+            <div class="row justify-content-end">
+              <div class="col-md-4 bg-custom p-5">
+                <div class="row py-1" *ngFor="let tax of taxesObj">
+                  <div class="col-md-4">
+                    <p>{{ tax.name }}</p>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="d-flex justify-content-end">
+                      <p class="mr-4">{{ tax.debit | number : "1.2-2" }}</p>
+                      <p>{{ currency }}{{ tax.credit | number : "1.2-2" }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row py-4">
+                  <div class="col-md-4">
+                    <p class="font-weight-bold">
+                      Total ({{ ownerInformation?.currency?.currencySymbol }})
+                    </p>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="d-flex justify-content-between text-right">
+                      <div>
+                        <p class="font-weight-bold mr-4">Total Debit</p>
+                        <p class="font-weight-bold mr-4">
+                          {{ totalDebit | number : "1.2-2" }}
+                        </p>
+                      </div>
+                      <div>
+                        <p class="font-weight-bold">Total Credit</p>
+                        <p class="font-weight-bold">
+                          {{ totalCredit | number : "1.2-2" }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <input
+            #files
+            type="file"
+            multiple
+            (change)="handleFileInput($event.target.files)"
+            style="display: none"
+          />
+        </form>
+
+        <div class="dashed mb-5"></div>
+
+        <div class="mx-1 my-3">
+          <div class="d-flex">
+            <small>Attach relevant files </small>
+            <span
+              *ngFor="let file of journalViewFiles; let fileIndex = index"
+              class="badge badge-pill badge-outline ml-2 px-4"
+              >{{ file.name || file.originalName }}
+              <i
+                class="icon icon-trash ml-2 cursor text-danger"
+                (click)="removeFile(fileIndex)"
+              ></i>
+            </span>
+          </div>
+
+          <button
+            class="btn btn-xs btn-secondary text-white"
+            (click)="files.click()"
+          >
+            <i class="icon icon-upload"></i>
+            {{ !fileDelete ? "Attach File" : "Deleting file..." }}
+            <i *ngIf="fileDelete" class="icon icon-spin icon-spin2"></i>
+          </button>
+        </div>
+
+        <footer class="d-flex justify-content-end">
+          <div *ngIf="!loading; else processing">
+            <button
+              [disabled]="
+                journalForm.invalid || !creditsAndDebitsEqual || fileDelete
+              "
+              class="btn btn-xs btn-light mx-1"
+              (click)="submit('Draft')"
+            >
+              Save As Draft
+            </button>
+            <button
+              [disabled]="
+                journalForm.invalid || !creditsAndDebitsEqual || fileDelete
+              "
+              class="btn btn-xs btn-primary mx-1"
+              (click)="submit('SentForApproval')"
+            >
+              Send For Approval
+            </button>
+            <button
+              [disabled]="
+                journalForm.invalid || !creditsAndDebitsEqual || fileDelete
+              "
+              class="btn btn-xs btn-success mx-1"
+              (click)="openModal(approval)"
+            >
+              Post
+            </button>
+          </div>
+          <ng-template #processing>
+            <button class="btn btn-xs btn-warning mx-1" disabled>
+              <i class="icon icon-spin icon-spin2"></i> Processing...
+            </button>
+          </ng-template>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [canApprove]="user?.permission?.includes('Approve Journal')"
+    (sendPayload)="submit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>

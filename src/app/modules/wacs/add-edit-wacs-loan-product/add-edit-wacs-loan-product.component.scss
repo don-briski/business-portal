@@ -1,0 +1,98 @@
+a:hover{
+  background-color: var(--secondary-color) !important;
+}
+
+.text-light{
+  color: var(--lenda-text-light) !important;
+}
+
+main{
+  margin-top: 30px;
+  padding: 30px 20px;
+
+  header{
+    border-bottom: 1px solid gainsboro;
+    p{
+      color: var(--lenda-text-light);
+    }
+    padding-bottom: 10px;
+  }
+
+  section{
+    &.top-section{
+      div{
+        width: 40%;
+        margin-bottom: 20px;
+
+        &.product-desc{
+          width: 60%;
+        }
+      }
+    }
+    &.space-bottom{
+      padding-bottom: 30px;
+    }
+    border-bottom: 1px solid gainsboro;
+    padding-top: 20px;
+    .wrapper{
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      .badge{
+        position: relative;
+        left: 86%;
+        top: 14px;
+      }
+
+      lnd-dt-list-item{
+        width: calc(100% / 4);
+      }
+      .inner-wrapper{
+        border: 1px solid gainsboro;
+        width: 100%;
+        display: flex;
+        border-radius: 10px;
+        padding-top: 22px;
+        margin-bottom: 15px;
+        &.not-available{
+          // background-color: #EBEBE4;
+        }
+        &:last-child{
+          margin-bottom: 50px !important;
+        }
+      }
+    }
+
+    &#fees{
+      tbody{
+        slct-2{
+          &:first-child{
+            min-width: 200px;
+            display: block;
+          }
+        }
+        tr{
+          border: none;
+          &:last-child{
+            td{
+              border-bottom: 1px solid #fff;
+            }
+          }
+        }
+      }
+
+      .feeType{
+        width: 30%;
+        margin-top: 30px;
+      }
+    }
+  }
+
+  .lnd-row{
+    gap: 15px;
+    margin-bottom: 20px;
+    div{
+      width: calc(100% / 3);
+    }
+  }
+}

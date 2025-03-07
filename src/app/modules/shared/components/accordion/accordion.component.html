@@ -1,0 +1,31 @@
+<section class="accordion" [ngClass]="accordionClass">
+  <div id="headingOne">
+    <header
+      (click)="onToggle()"
+      class="d-flex align-items-center cursor pt-6 pb-4"
+      data-toggle="collapse"
+      [attr.data-target]="'#' + accordionId"
+      aria-expanded="true"
+      aria-controls="collapseOne"
+    >
+      <img class="mr-3" [src]="caret" alt="caret-down-logo" />
+      <h3 class="mb-0">
+        {{ title }}
+        <span [class]="trailingClass" *ngIf="trailing">{{ trailing }}</span>
+      </h3>
+    </header>
+    <p *ngIf="subTitle" class="subtitle">{{ subTitle }}</p>
+    <p *ngIf="subtitleMeta && opened" class="subtitle-meta">{{ subtitleMeta }}</p>
+  </div>
+
+  <div
+    [id]="accordionId"
+    class="collapse"
+    [ngClass]="{ show: open }"
+    aria-labelledby="headingOne"
+  >
+    <div class="content accordion-content-border-top">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</section>

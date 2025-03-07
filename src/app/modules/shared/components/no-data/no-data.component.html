@@ -1,0 +1,17 @@
+<div [class]="'mt-5 d-flex flex-column flex-column align-items-center ' + containerClasses">
+  <img src="assets/images/search-files.svg" [width]="imageWidth" alt="search svg" />
+  <p
+    [style]="{ 'font-size': titleSize }"
+    class="display-3 lenda-text-dark text-center mt-3"
+  >
+    {{ title }}
+  </p>
+  <p
+    *ngIf="desc"
+    class="lenda-text-light text-center"
+    [style]="{ 'font-size': descSize }"
+  >
+    {{ desc }}
+  </p>
+  <button *ngIf="createLinkInfo?.type === 'url'" class="btn btn-sm text-white" [style.backgroundColor]="currentTheme?.secondaryColor" [routerLink]="createLinkInfo?.url">{{createLinkInfo.text}}</button>
+</div>

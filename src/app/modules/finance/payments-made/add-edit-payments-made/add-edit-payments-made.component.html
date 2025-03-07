@@ -1,0 +1,383 @@
+<div class="row m-0">
+  <div
+    class="dt-page__header d-flex justify-content-between align-items-center w-100 px-4"
+  >
+    <h1 class="dt-page__title clearfix">
+      {{ !isEditing ? "Add New" : "Edit" }} Payment
+      <small class="text-primary"
+        ><small>{{
+          isEditing && !paymentMade ? "Retrieving Payment..." : ""
+        }}</small>
+        <i
+          class="icon icon-spin icon-spin2"
+          *ngIf="isEditing && !paymentMade"
+        ></i
+      ></small>
+    </h1>
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <a
+          class="btn btn-primary mr-2 text-white"
+          [routerLink]="['/finance/payments-made']"
+          routerLinkActive="router-link-active"
+          [style.background]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          href="javascript:void(0)"
+          >Back</a
+        >
+      </div>
+    </span>
+  </div>
+  <div class="col-12 d-flex justify-content-center">
+    <div class="dt-card w-100" *ngIf="!isEditing || (isEditing && paymentMade)">
+      <div class="dt-card__body">
+        <form [formGroup]="paymentForm">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-row">
+                <div class="col-md-6">
+                  <label for="vendors"
+                    >Vendor Name <b class="text-danger">*</b></label
+                  >
+                  <slct-2
+                    [data]="vendors"
+                    id="vendors"
+                    (selected)="selectVendor($event)"
+                    [customSearchEnabled]="true"
+                    [placeholder]="'Select Vendor'"
+                    [active]="
+                      isEditing && paymentMade
+                        ? [
+                            {
+                              id: paymentMade.personId,
+                              text: paymentMade.personName
+                            }
+                          ]
+                        : null
+                    "
+                    [searchService]="getSearchVendorService()"
+                    (searchResult)="updateDropdown($event, 'vendor')"
+                  ></slct-2>
+                </div>
+                <div class="col-md-6">
+                  <label for="amount"
+                    >Amount <b class="text-danger">*</b></label
+                  >
+                  <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text" id="basic-addon1">{{
+                        ownerInformation?.currency?.currencySymbol
+                      }}</span>
+                    </div>
+                    <input
+                      type="text"
+                      formControlName="paymentAmount"
+                      class="form-control"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      placeholder="Amount"
+                      [disabled]="loadingVendor"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-md-6">
+                  <label for="date"
+                    >Payment Date <b class="text-danger">*</b></label
+                  >
+                  <input
+                  lndInvalidDateChecker
+                    type="date"
+                    formControlName="paymentMadeDate"
+                    class="form-control"
+                    [disabled]="loadingVendor"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="payment-mode"
+                    >Payment Mode <b class="text-danger">*</b></label
+                  >
+                  <slct-2
+                    [data]="paymentModes"
+                    (selected)="selectPaymentMode($event)"
+                    id="payment-mode"
+                    [customSearchEnabled]="true"
+                    [placeholder]="'Search Mode'"
+                    formControlName="paymentMode"
+                    [searchService]="getPaymentModeService()"
+                    (searchResult)="updateDropdown($event, 'paymentMode')"
+                  ></slct-2>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-md-6">
+                  <label for="paid-through"
+                    >Paid Through <b class="text-danger">*</b></label
+                  >
+                  <span
+                    *ngIf="accounts.length === 0; else account"
+                    class="text-primary"
+                  >
+                    <i class="icon icon-spin icon-spin2"></i> Loading
+                    accounts...
+                  </span>
+                  <ng-template #account>
+                    <slct-2
+                      [data]="bankAccounts"
+                      (selected)="selectAccount($event)"
+                      [customSearchEnabled]="true"
+                      placeholder="Select an account"
+                      [active]="
+                        isEditing && paymentMade
+                          ? [
+                              {
+                                id: paymentMade.paidThroughAccountId,
+                                text: paymentMade.paidThroughAccountName
+                              }
+                            ]
+                          : null
+                      "
+                      [searchService]="getPaidThroughService()"
+                      (searchResult)="updateDropdown($event, 'paidThrough')"
+                    ></slct-2>
+                  </ng-template>
+                </div>
+                <div class="col-md-6">
+                  <label for="reference">Reference#</label>
+                  <input
+                    type="text"
+                    formControlName="paymentReference"
+                    class="form-control"
+                    placeholder="Reference"
+                    [disabled]="loadingVendor"
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="col-md-6">
+                  <label for="paid-through">Tax Account </label>
+                  <span
+                    *ngIf="accounts.length === 0; else taxAccount"
+                    class="text-primary"
+                  >
+                    <i class="icon icon-spin icon-spin2"></i> Loading
+                    accounts...
+                  </span>
+                  <ng-template #taxAccount>
+                    <account-slct
+                      [data]="accounts"
+                      (selectedAccount)="selectTaxAccount($event)"
+                      [preselectedAccount]="{
+                        accountId: paymentMade?.taxAccountId,
+                        name: paymentMade?.taxAccountName
+                      }"
+                    ></account-slct>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <lnd-approval-comments
+                *ngIf="
+                  isEditing &&
+                  paymentMade?.financePaymentStatusCommentData?.length > 0
+                "
+                [comments]="paymentMade?.financePaymentStatusCommentData"
+              ></lnd-approval-comments>
+            </div>
+          </div>
+
+          <table
+            id="data-table"
+            class="table mt-5 table-striped shadow-sm p-3 mb-5 bg-white rounded"
+          >
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Bill#</th>
+                <th class="text-right">Bill Amount</th>
+                <th class="text-right">Amount Due</th>
+                <th class="text-right">Withholding Tax</th>
+                <th class="text-right">Payment</th>
+              </tr>
+            </thead>
+
+            <tbody
+              formArrayName=""
+              *ngIf="
+                selectedVendor?.bills?.length > 0 && !loadingVendor;
+                else noData
+              "
+            >
+              <ng-container
+                *ngFor="let item of lineItems().controls; let i = index"
+              >
+                <tr
+                  *ngIf="selectedVendor?.bills[i]?.balanceDue > 0"
+                  [formGroup]="item"
+                >
+                  <td>
+                    {{
+                      selectedVendor?.bills[i]?.billDate
+                        | customDatePipe : "DD-MMM-YYYY"
+                    }}
+                    <br />
+                    <small class="text-muted"
+                      >Due date:
+                      {{
+                        selectedVendor.bills[i]?.billDueDate
+                          | customDatePipe : "DD-MMM-YYYY"
+                      }}</small
+                    >
+                  </td>
+                  <td>{{ selectedVendor.bills[i]?.billCode }}</td>
+                  <td class="amount-field w-amount pr-5">
+                    {{
+                      selectedVendor.bills[i]?.totalAmount | number : "1.2-2"
+                    }}
+                  </td>
+                  <td class="amount-field w-amount">
+                    {{ selectedVendor.bills[i]?.balanceDue | number : "1.2-2" }}
+                  </td>
+                  <td class="c-width">
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="whtAmount"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      class="form-control"
+                      type="text"
+                      formControlName="paymentAmount"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                    />
+                  </td>
+                </tr>
+              </ng-container>
+            </tbody>
+            <ng-template #noData>
+              <h1 class="display-4 text-center font-weight-light p-5">
+                {{
+                  allBills.length === 0 && loadingVendor
+                    ? "Retrieving Vendor Bills"
+                    : "There are no bills for this vendor"
+                }}
+                <i
+                  *ngIf="allBills.length === 0 && loadingVendor"
+                  class="icon text-primary icon-spin icon-spin2"
+                ></i>
+              </h1>
+            </ng-template>
+          </table>
+
+          <div class="form-row mt-5">
+            <div class="col-md-4 offset-md-8 mt-5">
+              <div class="shadow-sm p-5 bg-gainsboro rounded">
+                <div
+                  class="d-flex justify-content-between align-items-center my-3"
+                >
+                  <div>
+                    <p class="mb-0">Amount Paid:</p>
+                  </div>
+                  <p class="mb-0">
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{
+                      paymentForm.get("paymentAmount").value | number : "1.2-2"
+                    }}
+                  </p>
+                </div>
+                <div
+                  class="d-flex justify-content-between align-items-center my-3"
+                >
+                  <div>
+                    <p class="mb-0">Amount used for payment:</p>
+                  </div>
+                  <p class="mb-0">
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ amountUsed | number : "1.2-2" }}
+                  </p>
+                </div>
+                <div
+                  class="d-flex justify-content-between align-items-center my-3"
+                >
+                  <div>
+                    <p class="mb-0">Amount in excess:</p>
+                  </div>
+                  <p class="mb-0">
+                    {{ ownerInformation?.currency?.currencySymbol }}
+                    {{ amountExcess | number : "1.2-2" }}
+                  </p>
+                </div>
+                <div
+                  class="d-flex justify-content-between align-items-center my-3"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="col-md-8">
+              <div class="form-grou">
+                <label
+                  >Notes
+                  <small>(Internal use: not visible to vendors)</small></label
+                >
+                <textarea
+                  class="form-control"
+                  formControlName="internalNote"
+                  cols="10"
+                  rows="5"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+        </form>
+        <footer>
+          <div class="d-flex justify-content-end">
+            <button
+              [disabled]="paymentForm.invalid || amountUsed === 0"
+              class="btn btn-xs btn-light mx-1"
+              *ngIf="!loader"
+              (click)="submitForm('Draft')"
+            >
+              Save As Draft
+            </button>
+            <button
+              [disabled]="paymentForm.invalid || amountUsed === 0"
+              class="btn btn-xs btn-primary mx-1"
+              *ngIf="!loader"
+              (click)="submitForm('SentForApproval')"
+            >
+              Send For Approval
+            </button>
+            <button
+              [disabled]="paymentForm.invalid || amountUsed === 0"
+              class="btn btn-xs btn-success mx-1"
+              *ngIf="!loader"
+              (click)="openModal(approval)"
+            >
+              Post Payment
+            </button>
+            <button class="btn btn-xs btn-warning mx-1" disabled *ngIf="loader">
+              <i class="icon icon-spin icon-spin2"></i> Processing..
+            </button>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [canApprove]="user?.permission?.includes('Approve Finance Payment')"
+    (sendPayload)="submitForm($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>

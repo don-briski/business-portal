@@ -1,0 +1,373 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-9">
+      <form [formGroup]="splitForm" (ngSubmit)="submit()">
+        <ng-container formArrayName="newInvestments">
+          <ng-container
+            *ngFor="
+              let newInvestment of newInvestments().controls;
+              let i = index
+            "
+            id="cust-cont"
+          >
+            <div
+              id="newInvestmentForm"
+              [formGroup]="newInvestment"
+              class="inv-row mb-5 px-4 py-3"
+            >
+              <div class="d-flex flex-column">
+                <div
+                  *ngIf="newInvestments().length > 2"
+                  class="p-2 d-flex justify-content-end"
+                >
+                  <i
+                    class="icon icon-trash icontext-white form-icon shadow"
+                    (click)="removeControl(i)"
+                  ></i>
+                </div>
+                <div class="form-inline">
+                  <div class="m-1">
+                    <label
+                      for="investmentTypeId"
+                      [ngStyle]="{
+                        'margin-bottom': newInvestment.get('investmentTypeId')
+                          .value
+                          ? '20px'
+                          : ''
+                      }"
+                      >Type of Investment <b class="text-danger">*</b></label
+                    >
+                    <select
+                      (change)="onSelect($event.target.value, i)"
+                      formControlName="investmentTypeId"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                      id="investmentTypeId"
+                    >
+                      <option value="">Select Investment</option>
+                      <option
+                        *ngFor="let item of investmentTypeList"
+                        value="{{ item?.investmentTypeId }}"
+                      >
+                        {{ item?.investmentName }}
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="m-1">
+                    <label for="amount"
+                      >Investment Amount <b class="text-danger">*</b></label
+                    >
+                    <small>{{
+                      newInvestment.get("amountTextInfo").value
+                    }}</small>
+                    <input
+                      type="text"
+                      currencyMask
+                      [ngClass]="
+                        newInvestment?.value.balanceOver ? 'border-error' : ''
+                      "
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      formControlName="investmentAmount"
+                      class="form-control"
+                      id="amount"
+                      placeholder="Enter investment amount"
+                    />
+
+                    <span
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="help-block f-12"
+                      [style.color]="currentTheme?.secondaryColor"
+                      *ngIf="
+                        (newInvestment.get('investmentAmount').errors &&
+                          newInvestment.get('investmentAmount').touched) ||
+                        formSubmitted
+                      "
+                    >
+                      <span
+                        [style.color]="currentTheme?.secondaryColor"
+                        *ngIf="
+                          newInvestment
+                            .get('investmentAmount')
+                            .getError('required')
+                        "
+                        >This field is required</span
+                      >
+
+                      <span
+                        [style.color]="currentTheme?.secondaryColor"
+                        *ngIf="
+                          newInvestment
+                            .get('investmentAmount')
+                            .getError('OutOfRange')
+                        "
+                        >{{
+                          newInvestment
+                            .get("investmentAmount")
+                            .getError("OutOfRange")
+                        }}</span
+                      >
+                    </span>
+                  </div>
+
+                  <div class="m-1">
+                    <label
+                      for="investmentRate"
+                      [ngStyle]="{
+                        'margin-bottom': newInvestment.get('investmentTypeId')
+                          .value
+                          ? '20px'
+                          : ''
+                      }"
+                      >Investment Rate <b class="text-danger">*</b></label
+                    >
+                    <input
+                      type="number"
+                      formControlName="investmentRate"
+                      class="form-control"
+                      id="investmentRate"
+                      placeholder="Investment Rate"
+                    />
+
+                    <span
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="help-block f-12"
+                      [style.color]="currentTheme?.secondaryColor"
+                      *ngIf="
+                        (newInvestment.get('investmentRate').errors &&
+                          newInvestment.get('investmentRate').touched) ||
+                        formSubmitted
+                      "
+                    >
+                      <span
+                        [style.color]="currentTheme?.secondaryColor"
+                        *ngIf="
+                          newInvestment
+                            .get('investmentRate')
+                            .getError('required')
+                        "
+                        >This field is required</span
+                      >
+
+                      <span
+                        [style.color]="currentTheme?.secondaryColor"
+                        *ngIf="
+                          newInvestment
+                            .get('investmentRate')
+                            .getError('OutOfRange') &&
+                          !newInvestment
+                            .get('investmentRate')
+                            .getError('required')
+                        "
+                        >{{
+                          newInvestment
+                            .get("investmentRate")
+                            .getError("OutOfRange")
+                        }}</span
+                      >
+                    </span>
+                  </div>
+
+                  <div class="m-1">
+                    <label
+                      for="investmentTenor"
+                      [ngStyle]="{
+                        'margin-bottom': newInvestment.get('investmentTypeId')
+                          .value
+                          ? '20px'
+                          : ''
+                      }"
+                      >Investment Tenor <b class="text-danger">*</b></label
+                    >
+                    <input
+                      (blur)="onTenorChange(i)"
+                      type="number"
+                      formControlName="investmentTenor"
+                      class="form-control"
+                      id="investmentTenor"
+                      placeholder="Investment Tenor"
+                    />
+
+                    <span
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="help-block f-12"
+                      [style.color]="currentTheme?.secondaryColor"
+                      *ngIf="
+                        (newInvestment.get('investmentTenor').errors &&
+                          newInvestment.get('investmentTenor').touched) ||
+                        formSubmitted
+                      "
+                    >
+                      <span
+                        [style.color]="currentTheme?.secondaryColor"
+                        *ngIf="
+                          newInvestment
+                            .get('investmentTenor')
+                            .getError('required')
+                        "
+                        >This field is required</span
+                      >
+
+                      <span
+                        [style.color]="currentTheme?.secondaryColor"
+                        *ngIf="
+                          newInvestment
+                            .get('investmentTenor')
+                            .getError('OutOfRange') &&
+                          !newInvestment
+                            .get('investmentTenor')
+                            .getError('required')
+                        "
+                        >{{
+                          newInvestment
+                            .get("investmentTenor")
+                            .getError("OutOfRange")
+                        }}</span
+                      >
+                    </span>
+                  </div>
+
+                  <div class="m-1">
+                    <ng-template #tipContent
+                      >How Often You Want To Collect Your Earnings ?<br />
+                      Monthly : Enter (30) To Collect Your Earnings Every Month
+                      <br />
+                      Quarterly : Enter (90) To Collect Your Earnings Every
+                      Quarter <br />
+                      Annually : Enter (365) To Collect Your Earnings Every Year
+                      <br />
+                      Bi-Anually : Enter (730) To Collect Your Earnings Two
+                      Years <br />
+                    </ng-template>
+
+                    <label
+                      for="collectionPeriod"
+                      [ngStyle]="{
+                        'margin-bottom': newInvestment.get('investmentTypeId')
+                          .value
+                          ? '20px'
+                          : ''
+                      }"
+                      >Collection Period (In Days)
+                      <b class="text-danger">* </b>
+                      <span>
+                        <i
+                          class="icon icon-question-circle"
+                          placement="top"
+                          [ngbTooltip]="tipContent"
+                        >
+                        </i> </span
+                    ></label>
+
+                    <input
+                      id="collectionPeriod"
+                      formControlName="collectionPeriod"
+                      class="form-control"
+                      type="number"
+                      placeholder="Collection Period"
+                    />
+
+                    <span
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="help-block f-12"
+                      [style.color]="currentTheme?.secondaryColor"
+                      *ngIf="
+                        (newInvestment.get('collectionPeriod').errors &&
+                          newInvestment.get('collectionPeriod').touched) ||
+                        formSubmitted
+                      "
+                    >
+                      <span
+                        [style.color]="currentTheme?.secondaryColor"
+                        *ngIf="
+                          newInvestment
+                            .get('collectionPeriod')
+                            .getError('required')
+                        "
+                        >This field is required</span
+                      >
+
+                      <span
+                        [style.color]="currentTheme?.secondaryColor"
+                        *ngIf="
+                          newInvestment
+                            .get('collectionPeriod')
+                            .getError('OutOfRange') &&
+                          !newInvestment
+                            .get('collectionPeriod')
+                            .getError('required')
+                        "
+                        >{{
+                          newInvestment
+                            .get("collectionPeriod")
+                            .getError("OutOfRange")
+                        }}</span
+                      >
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+
+        <div class="d-flex justify-content-end p-5">
+          <input
+            type="password"
+            formControlName="transactionPin"
+            class="form-control w-25"
+            placeholder="********"
+          />
+          <button
+            [disabled]="
+              splitForm.invalid ||
+              remainingBalance > 0 ||
+              !allSplitInvestmentStartDate
+            "
+            class="btn btn-xs custom-success btn-primary ml-3 text-white"
+            type="submit"
+          >
+            {{ loading ? "Splitting Investment..." : "Split Investment"
+            }}<i *ngIf="loading" class="icon icon-spin icon-spin2"></i>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-3">
+      <header>
+        <p class="py-2" style="margin-bottom: 0"><em>Remaining Balance</em></p>
+        <h2
+          class="mb-3 font-weight-medium"
+          [ngClass]="{ greaterThanError: 'text-danger' }"
+        >
+          {{ ownerInformation?.currency?.currencySymbol }}
+          {{ remainingBalance | number : "1.2-2" }}
+        </h2>
+
+        <button
+          [disabled]="remainingBalance < 1"
+          class="btn btn-xs mt-4 text-white"
+          (click)="addNewInvestmentControls()"
+          [style.backgroundColor]="currentTheme?.primaryColor"
+        >
+          Add new
+        </button>
+
+        <div class="mt-6">
+          <label
+            >Start Date
+            <b class="text-danger">* </b>
+            <i class="icon icon-question-circle" placement="top" ngbTooltip="All investments here would have the same start date">
+            </i>
+          </label>
+          <input
+          lndInvalidDateChecker
+            type="date"
+            class="form-control"
+            (change)="setAllInvStartDate($event.target.value)"
+          />
+        </div>
+      </header>
+    </div>
+  </div>
+</div>

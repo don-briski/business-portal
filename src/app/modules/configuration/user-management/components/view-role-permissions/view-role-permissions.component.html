@@ -1,0 +1,130 @@
+<main class="card">
+  <div
+    *ngIf="isLoading && loadingState === 'role'"
+    class="d-flex justify-content-center"
+  >
+    <lnd-spinner />
+  </div>
+
+  <ng-container *ngIf="!isLoading && loadingState === 'role'">
+    <header>
+      <div class="d-flex align-items-center">
+        <img
+          src="assets/images/male-default-profile.png"
+          width="75"
+          height="75"
+          alt="profile"
+        />
+
+        <div class="ml-5">
+          <h3>{{ role.name }}</h3>
+
+          <p class="role-desc">{{ role.description }}</p>
+        </div>
+      </div>
+
+      <div class="btns">
+        <button
+          type="button"
+          class="btn cancel-btn"
+          routerLink="/configurations/roles-and-permissions"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn"
+          [routerLink]="'/configurations/roles-and-permissions/edit/' + role.id"
+        >
+          Edit
+        </button>
+      </div>
+    </header>
+
+    <section class="mt-5">
+      <lnd-tab-bar [tabs]="tabs" [currentTabId]="currentTab" />
+      <h3>Accessible Modules</h3>
+
+      <p>Modules selected for this role above will be displayed here</p>
+      <div
+        *ngFor="let module of accessibleModules"
+        class="module-card pointer"
+        (click)="openAside(module)"
+      >
+        <h3>{{ module.text }} Module</h3>
+
+        <p>Click to view permissions for this module</p>
+      </div>
+    </section>
+  </ng-container>
+</main>
+
+<lnd-aside
+  [isOpen]="showAside"
+  (closeAside)="closeAside()"
+  [useCustomHeader]="true"
+>
+  <header customHeader class="view-permission-header">
+    <h3 class="mb-0">{{ selectedModule?.text }} Permissions</h3>
+
+    <div class="btns">
+      <button type="button" class="btn cancel-btn" (click)="closeAside()">
+        Close
+      </button>
+      <button
+        type="button"
+        class="btn"
+        [routerLink]="'/configurations/roles-and-permissions/edit/' + role?.id"
+      >
+        Edit
+      </button>
+    </div>
+  </header>
+
+  <section class="p-5">
+    <lnd-search-permissions
+      [isViewPerm]="true"
+      [searchCount]="searchCount"
+      (searchPermissions)="searchPermissions($event)"
+    />
+    <div class="modules p-0">
+      <div
+        *ngIf="isLoading && loadingState === 'permissions'"
+        class="d-flex justify-content-center"
+      >
+        <lnd-spinner />
+      </div>
+
+      <div class="permission-group">
+        <ng-container *ngIf="!isLoading && loadingState === 'permissions'">
+          <lnd-accordion
+            *ngFor="let permissionGroup of permissionGroups; let i = index"
+            [accordionId]="permissionGroup?.tag"
+            [title]="permissionGroup?.classification"
+            [open]="true"
+            accordionClass="header-bg"
+          >
+            <div class="permissions">
+              <ng-container
+                *ngFor="
+                  let permissionCol of permissionGroup?.displayPermissions
+                "
+              >
+                <div class="col-md-4">
+                  <ng-container *ngFor="let permission of permissionCol">
+                    <span
+                      class="mb-5 d-block"
+                      [ngClass]="{ active: permission?.active }"
+                    >
+                      {{ permission?.name }}
+                    </span>
+                  </ng-container>
+                </div>
+              </ng-container>
+            </div>
+          </lnd-accordion>
+        </ng-container>
+      </div>
+    </div>
+  </section>
+</lnd-aside>

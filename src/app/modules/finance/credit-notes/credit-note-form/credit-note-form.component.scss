@@ -1,0 +1,28 @@
+.c-width {
+  width: 164px;
+}
+
+.dashed {
+  border-bottom: 1px dashed gainsboro;
+  width: 100%;
+  height: 5px;
+  margin: 2.5rem 0;
+}
+
+.add-btn {
+  border-radius: 16px;
+  background-color: #558e80;
+  min-width: 120px;
+}
+
+.remove-btn {
+  margin: 5px 4px 5px 12px;
+  color: red;
+  padding: 5px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.bg-gainsboro {
+  background-color: #fbfafa;
+}

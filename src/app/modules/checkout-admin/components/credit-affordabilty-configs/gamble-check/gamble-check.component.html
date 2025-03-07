@@ -1,0 +1,84 @@
+<section >
+  <div class="card-header">
+    <h3>Gamble Check Configuration</h3>
+  </div>
+
+  <div class="card-body">
+    <p>
+      The gambling check verifies if the customer's gambling rate surpasses a
+      set threshold. Update the parameters for gamble check configuration.
+    </p>
+
+    <div id="tips">
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="cursor text-underline"
+        (click)="hideHints = !hideHints"
+      >
+        {{ hideHints ? "Show" : "Hide" }} Hints
+      </p>
+
+      <ul *ngIf="!hideHints">
+        <li>
+          <b>Gamble Check:</b> This indicates if the narration service should be
+          applied or not.
+        </li>
+        <li>
+          <b>Gambling Check Application:</b> These are the words in the search
+          criteria that if found results in a FAIL of the NarrationCipher
+          service.
+        </li>
+        <li>
+          <b>Gambling Rate:</b> These are the words in the search criteria that
+          if found results in a FAIL of the NarrationCipher service.
+        </li>
+      </ul>
+    </div>
+
+    <lnd-switch
+      [value]="form.value.checkGamblingRate"
+      text="Gamble Check"
+      (emittedValue)="toggleSwitch($event, 'checkGamblingRate')"
+    ></lnd-switch>
+
+    <form class="w-100 mt-6" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="form-row">
+        <div class="col-md-6">
+          <label>Gambling Check Application</label>
+
+          <slct-2 [data]="gamblingCheckApplications" [customSearchEnabled]="true" formControlName="gamblingRateCheckApplication" placeholder="Select Application"></slct-2>
+
+          <lnd-input-errors
+          label="Gambling Rate Check Application"
+          [control]="form.get('gamblingRateCheckApplication')"
+        ></lnd-input-errors>
+        </div>
+
+        <div class="col-md-6">
+          <label>Gambling Rate</label>
+
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Set rate"
+            formControlName="gamblingRate"
+          />
+          <lnd-input-errors
+          label="Gambling Rate"
+          [control]="form.get('gamblingRate')"
+        ></lnd-input-errors>
+        </div>
+      </div>
+
+      <button
+        class="btn"
+        type="submit"
+        [disabled]="form.invalid"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+      >
+      {{isLoading ? "Processing..." : "Update"}}
+      <i *ngIf="isLoading" class="icon icon-spin2 icon-spin"></i>
+      </button>
+    </form>
+  </div>
+</section>

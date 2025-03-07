@@ -1,0 +1,2947 @@
+<div *ngIf="requestLoader" class="table-loader text-center indian_red">
+  <span><i class="icon icon-spin icon-spin2"></i> Loading parameters...</span>
+</div>
+<br />
+<section
+  class="row"
+  *ngIf="
+    user?.permission?.includes('Create Loan Application') &&
+    loanApplicationForm &&
+    !requestLoader
+  "
+>
+  <div class="col-md-8 offset-md-2 mb-15">
+    <div
+      class="dt-card"
+      [style.background]="
+        colorTheme?.theme === 'Dark' ? colorTheme?.dark?.cardColor : ''
+      "
+    >
+      <div class="dt-card__body">
+        <form
+          id="msform"
+          [formGroup]="loanApplicationForm"
+          enctype="multipart/form-data"
+          (ngSubmit)="submitLoanApplicationForm(loanApplicationForm.value)"
+        >
+          <ul id="progressbar">
+            <li
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+              [ngClass]="{ active: accountShow }"
+            >
+              Account & BVN
+            </li>
+            <li
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+              [ngClass]="{ active: employmentShow }"
+            >
+              Employment Info.
+            </li>
+            <li
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+              [ngClass]="{ active: residenceShow }"
+            >
+              Bank & Personal Info.
+            </li>
+          </ul>
+          <div [ngClass]="{ active: accountShow }" *ngIf="accountShow">
+            <h2
+              class="fs-title"
+              *ngIf="
+                paystackInfo?.isActive &&
+                (appOwnerDetails['appOwnerLoanOriginationId'] == 'UNIQUE_ID' ||
+                  appOwnerDetails['appOwnerLoanOriginationId'] ==
+                    'UNIQUE_ID_OR_EMAIL_ADDRESS')
+              "
+            >
+              Verify BVN
+            </h2>
+            <h2 class="fs-title" *ngIf="!paystackInfo?.isActive">
+              Customer Information
+            </h2>
+            <p
+              class="text-light-blue"
+              *ngIf="
+                paystackInfo?.isActive &&
+                appOwnerDetails['appOwnerLoanOriginationId'] ==
+                  'UNIQUE_ID_OR_EMAIL_ADDRESS'
+              "
+            >
+              Search / Add Customer
+              <a
+                href="javascript:;"
+                class="my-1 btn-link font-weight-bold"
+                (click)="openModal(alternativeCustomer)"
+                style="text-decoration: underline"
+                >Here</a
+              >
+            </p>
+            <div class="mt-3 row">
+              <div
+                class="col-sm-12"
+                *ngIf="loanApplicationForm.get('PersonId').errors"
+              >
+                <button
+                  type="button"
+                  class="btn btn-xs btn-claim"
+                  *ngIf="
+                    !paystackInfo?.isActive &&
+                    (appOwnerDetails['appOwnerLoanOriginationId'] ==
+                      'EMAIL_ADDRESS' ||
+                      appOwnerDetails['appOwnerLoanOriginationId'] ==
+                        'UNIQUE_ID_OR_EMAIL_ADDRESS')
+                  "
+                  (click)="openModal(alternativeCustomer)"
+                >
+                  Enter Customer Information
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  *ngIf="
+                    loader &&
+                    appOwnerDetails['appOwnerLoanOriginationId'] ==
+                      'EMAIL_ADDRESS'
+                  "
+                  [disabled]="true"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Validating...
+                </button>
+              </div>
+              <ng-container
+                *ngIf="
+                  paystackInfo?.isActive &&
+                  (appOwnerDetails['appOwnerLoanOriginationId'] ==
+                    'UNIQUE_ID' ||
+                    appOwnerDetails['appOwnerLoanOriginationId'] ==
+                      'UNIQUE_ID_OR_EMAIL_ADDRESS')
+                "
+              >
+                <div class="mb-3 col-sm-6">
+                  <div class="form-group">
+                    <label class="left-aligned" for="bvn"
+                      >Bank Verification Number
+                      <span class="red">* </span>
+                    </label>
+                    <input
+                      [style.background]="
+                        colorTheme?.theme === 'Dark'
+                          ? colorTheme?.dark?.primaryColor
+                          : ''
+                      "
+                      [style.color]="
+                        colorTheme?.theme === 'Dark'
+                          ? colorTheme?.dark?.textColor
+                          : ''
+                      "
+                      type="text"
+                      [dropSpecialCharacters]="false"
+                      mask="9*"
+                      max="11"
+                      formControlName="BVN"
+                      id="bvn"
+                      class="form-control"
+                      placeholder="Enter BVN"
+                    />
+                    <span
+                      class="left-aligned text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('BVN').errors &&
+                        loanApplicationForm.get('BVN').touched
+                      "
+                    >
+                      Provide a valid 11 digit Bank Verification Number
+                    </span>
+                  </div>
+                </div>
+                <div class="mb-3 col-sm-6">
+                  <div class="form-group">
+                    <label for="emailaddress" class="left-aligned"
+                      >Email Address <span class="red">*</span></label
+                    >
+                    <input
+                      [style.background]="
+                        colorTheme?.theme === 'Dark'
+                          ? colorTheme?.dark?.primaryColor
+                          : ''
+                      "
+                      [style.color]="
+                        colorTheme?.theme === 'Dark'
+                          ? colorTheme?.dark?.textColor
+                          : ''
+                      "
+                      type="email"
+                      id="emailaddress"
+                      formControlName="EmailAddress"
+                      class="form-control"
+                      placeholder="Enter E-Mail Address"
+                    />
+                    <span
+                      class="left-aligned text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('EmailAddress').errors &&
+                        loanApplicationForm.get('EmailAddress').touched
+                      "
+                    >
+                      Provide a valid Email Address
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  *ngIf="
+                    !loanApplicationForm.get('PersonId').errors &&
+                    appOwnerDetails?.defaultBvnValidationPartner ===
+                      'YouVerify' &&
+                    profile
+                  "
+                  class="col-12"
+                >
+                  <lnd-profile-upload
+                    [profile]="profile"
+                    (savedImg)="setCustomerImage($event)"
+                  />
+                </div>
+
+                <div
+                  class="col-sm-12"
+                  *ngIf="loanApplicationForm.get('PersonId').errors"
+                >
+                  <button
+                    type="button"
+                    class="btn btn-success"
+                    *ngIf="!loader"
+                    [disabled]="
+                      loanApplicationForm.get('EmailAddress').invalid ||
+                      loanApplicationForm.get('BVN').invalid
+                    "
+                    (click)="validateBVN()"
+                  >
+                    Next
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-success"
+                    *ngIf="loader"
+                    [disabled]="true"
+                  >
+                    <i class="icon icon-spin icon-spin2"></i> Validating ...
+                  </button>
+                </div>
+              </ng-container>
+            </div>
+
+            <ng-container *ngIf="!loanApplicationForm.get('PersonId').errors">
+              <div div class="mt-3 form-row">
+                <div
+                  class="col-sm-6"
+                  *ngIf="!loanApplicationForm.get('IsBvnValidated').value"
+                >
+                  <div class="form-group">
+                    <label class="left-aligned"
+                      >First Name <span class="red">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="FirstName"
+                    />
+
+                    <span
+                      class="help-block mb-2 text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('FirstName').errors &&
+                        loanApplicationForm.get('FirstName').touched
+                      "
+                    >
+                      Please provide a valid First Name
+                    </span>
+                  </div>
+                </div>
+                <div
+                  class="col-sm-6"
+                  *ngIf="!loanApplicationForm.get('IsBvnValidated').value"
+                >
+                  <div class="form-group">
+                    <label class="left-aligned"
+                      >Last Name <span class="red">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="LastName"
+                    />
+
+                    <span
+                      class="help-block mb-2 text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('LastName').errors &&
+                        loanApplicationForm.get('LastName').touched
+                      "
+                    >
+                      Please provide a valid Last Name
+                    </span>
+                  </div>
+                </div>
+                <div
+                  class="mb-3 col-sm-12"
+                  *ngIf="loanApplicationForm.get('IsBvnValidated').value"
+                >
+                  <div class="form-group">
+                    <label for="customerName" class="left-aligned"
+                      >Customer Name</label
+                    >
+                    <input
+                      type="text"
+                      id="customerName"
+                      formControlName="CustomerName"
+                      class="form-control"
+                    />
+
+                    <span
+                      class="help-block mb-2 text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('CustomerName').errors &&
+                        loanApplicationForm.get('CustomerName').touched
+                      "
+                    >
+                      Please provide a valid Customer Name
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-5">
+                <div class="col-md-6">
+                  <label class="text-left d-block">
+                    Loan Type <span class="red">*</span>
+                  </label>
+                  <div class="form-group">
+                    <slct-2
+                      [data]="modifiedLoanTypes"
+                      [customSearchEnabled]="true"
+                      formControlName="Loan"
+                      (selected)="verifyMultiLoanRequirements($event)"
+                      (removed)="onDeselectLoanType()"
+                      placeholder="Select Loan Type"
+                    >
+                    </slct-2>
+                  </div>
+
+                  <div>
+                    <span
+                      *ngIf="this.selectedLoanType == null"
+                      class="left-aligned help-block mb-2 text-danger f-12"
+                    >
+                      Please select a Loan Type
+                    </span>
+                    <span
+                      class="help-text"
+                      *ngIf="this.selectedLoanType != null"
+                    >
+                      {{
+                        appOwnerDetails?.currency?.currencySymbol +
+                          (this.selectedLoanType?.minAmount).toLocaleString()
+                      }}
+                      -
+                      {{
+                        appOwnerDetails?.currency?.currencySymbol +
+                          (this.selectedLoanType?.maxAmount).toLocaleString()
+                      }}
+                    </span>
+                  </div>
+                </div>
+                <div
+                  class="col-md-6"
+                  *ngIf="
+                    user?.permission?.includes(
+                      'Override Loan Product Interest Rate'
+                    )
+                  "
+                >
+                  <div>
+                    <label for="loan-interest" class="left-aligned"
+                      >Loan Interest<span
+                        ><i
+                          class="icon icon-question-circle icon-fw icon-xl"
+                          placement="top"
+                          ngbTooltip="Leave empty to use loan product's configured interest rate."
+                        ></i></span
+                    ></label>
+                    <input
+                      type="text"
+                      formControlName="LoanInterest"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                      class="form-control"
+                      id="loan-interest"
+                      placeholder="Enter loan interest"
+                      (blur)="checkIfLoanTypeSelected($event)"
+                    />
+                  </div>
+                  <div>
+                    <span
+                      class="help-block left-aligned mb-2 text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('LoanInterest').errors &&
+                        loanApplicationForm.get('LoanInterest').touched
+                      "
+                    >
+                      Please provide a valid Loan Interest
+                    </span>
+
+                    <span
+                      class="help-block text-danger f-12"
+                      *ngIf="LoanTypeSelected != null"
+                    >
+                      Maximum interest: {{ LoanTypeSelected?.interestRate }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div div class="row mb-5">
+                <div class="col-sm-6 col-md-4 mb-5">
+                  <label for="validationDefault02" class="left-aligned"
+                    >Monthly Net Income <span class="red">*</span></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="NetIncome"
+                    currencyMask
+                    [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                    class="form-control"
+                    id="validationDefault02"
+                    placeholder="Monthly net income"
+                    required
+                  />
+
+                  <span
+                    class="help-block mb-2 text-danger f-12"
+                    *ngIf="
+                      loanApplicationForm.get('NetIncome').errors &&
+                      loanApplicationForm.get('NetIncome').touched
+                    "
+                  >
+                    Please provide a valid Net Income
+                  </span>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                  <label for="validationDefault02" class="left-aligned"
+                    >Loan Amount <span class="red">*</span></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="LoanAmount"
+                    currencyMask
+                    [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                    class="form-control"
+                    id="validationDefault02"
+                    placeholder="Enter loan amount"
+                    required
+                    (blur)="checkIfLoanTypeSelected($event)"
+                  />
+
+                  <span
+                    class="help-block mb-2 text-danger f-12"
+                    *ngIf="
+                      loanApplicationForm.get('LoanAmount').errors &&
+                      loanApplicationForm.get('LoanAmount').touched
+                    "
+                  >
+                    Please provide a valid Loan Amount
+                  </span>
+                </div>
+
+                <div class="col-sm-12 col-md-4" style="position: relative">
+                  <label for="validationDefault02" class="left-aligned"
+                    >Loan Duration <span class="red">*</span></label
+                  >
+                  <select
+                    formControlName="LoanDuration"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                    id="LoanDurationSelect"
+                  >
+                    <option *ngFor="let item of tenorList" value="{{ item }}">
+                      {{ item }}
+                    </option>
+                  </select>
+
+                  <div class="durationloader" *ngIf="durationLoader">
+                    <div class="lds-css ng-scope">
+                      <div
+                        class="lds-spinner"
+                        style="width: 100%; height: 100%"
+                      >
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <lnd-loan-deposit
+                  [isDepositRequired]="selectedLoanType?.isDepositRequired"
+                  [depositAmount]="loanApplicationForm?.value?.depositAmount"
+                  [depositType]="
+                    selectedLoanType?.loanDepositSettings?.depositType
+                  "
+                  [currencySymbol]="appOwnerDetails?.currency?.currencySymbol"
+                  [depositValue]="
+                    selectedLoanType?.loanDepositSettings?.depositValue
+                  "
+                  [LoanAmount]="loanApplicationForm?.value?.LoanAmount"
+                ></lnd-loan-deposit>
+
+                <div
+                  *ngIf="
+                    loanApplicationForm.value?.depositAmount &&
+                    loanApplicationForm.value?.LoanAmount > 0
+                  "
+                  class="w-100 mb-5"
+                >
+                  <div class="mt-3 ml-5 d-flex align-items-center">
+                    <input
+                      class="markAsRecieved mb-0 mr-2"
+                      type="checkbox"
+                      (change)="markAsRecieved($event.target.checked)"
+                    />
+                    <span class="mb-0">Mark as Received</span>
+                    <span
+                      ><i
+                        class="icon icon-question-circle icon-fw icon-xl"
+                        placement="top"
+                        ngbTooltip="Indicates if the required deposit has been received"
+                      ></i
+                    ></span>
+                  </div>
+                </div>
+
+                <div
+                  class="col-sm-6 col-sm12 col-md-12"
+                  *ngIf="this.selectedLoanType != null"
+                >
+                  <div class="text-center" *ngIf="this.feeModified == true">
+                    <i class="icon icon-alert icon-fw icon-xl"></i>
+                    You have modified
+                    <b>{{ this.selectedLoanType.loanName }}'s</b> fee default
+                    setting. This loan application will created with the
+                    modified fee changes.
+                  </div>
+                  <table
+                    class="table table-striped text-center"
+                    *ngIf="this.feelines.length > 0"
+                    id="table"
+                  >
+                    <thead>
+                      <tr>
+                        <th class="important-field text-center">
+                          <b> Fee </b>
+                        </th>
+                        <th class="text-center">
+                          <b> Fee Calculation&nbsp;</b>
+                          <span
+                            ><i
+                              class="icon icon-question-circle icon-fw icon-xl"
+                              placement="top"
+                              ngbTooltip="1.DEDUCTED UPFRONT: Deducted from the approved principal amount at disbursement, meaning the client receives less money as actual disbursement, but still has to repay full loan amount by the end of the loan term.  2.CAPITALIZED: Added to the approved principal amount at disbursement, meaning the client receives the approved amount as actual disbursement, but has to repay a higher amount, including the loan fees, by the end of the loan term"
+                            ></i
+                          ></span>
+                        </th>
+                        <th class="important-field text-center">
+                          <b> Application &nbsp;</b>
+                          <span
+                            ><i
+                              class="icon icon-question-circle icon-fw icon-xl"
+                              placement="top"
+                              ngbTooltip="Percentage: % of Loan amount."
+                            ></i
+                          ></span>
+                        </th>
+
+                        <th class="text-center">
+                          <b>Amount&nbsp; </b>
+                        </th>
+                        <th><b>Apply to application </b></th>
+                      </tr>
+                    </thead>
+                    <tbody id="tbody">
+                      <tr *ngFor="let line of feelines; let i = index">
+                        <td>
+                          <label for="validationDefault02" class=""
+                            >{{ line.FeeName }}
+                          </label>
+                        </td>
+                        <td>
+                          <label for="validationDefault02" class=""
+                            >{{ line.FeeApplication }}
+                          </label>
+                        </td>
+                        <td>
+                          <label for="validationDefault02" class=""
+                            >{{ line.FeeType }}
+                          </label>
+                        </td>
+
+                        <td>
+                          <input
+                            type="text"
+                            class="form-control"
+                            currencyMask
+                            [options]="{
+                              prefix: '',
+                              thousands: ',',
+                              decimal: '.'
+                            }"
+                            [(ngModel)]="line.FeeAmount"
+                            [ngModelOptions]="{ standalone: true }"
+                            placeholder="Value"
+                            [readOnly]="true"
+                          />
+                        </td>
+                        <td>
+                          <button
+                            *ngIf="line.FeeIsMandatory == 'No'"
+                            type="button"
+                            class="remove_btn btn btn-floating btn-warning btn-xs"
+                            (click)="removeFeeRow(i)"
+                          >
+                            Remove Fee <i class="icon icon-close icon-lg"></i>
+                          </button>
+
+                          <span
+                            *ngIf="line.FeeIsMandatory == 'Yes'"
+                            class="badge text-white badge-primary badge-xs"
+                          >
+                            Fee is Mandatory
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div
+                  class="col-md-6 mb-5"
+                  *ngIf="
+                    user?.permission?.includes(
+                      'Set Loan Application Start Date'
+                    )
+                  "
+                >
+                  <label class="left-aligned"
+                    >Loan Start Date<span
+                      ><i
+                        class="icon icon-question-circle icon-fw icon-xl"
+                        placement="top"
+                        ngbTooltip="Please note that the loan start date will be used to determine the first repayment date. Leave this field empty to allow loan start from current date"
+                      ></i></span
+                  ></label>
+                  <div
+                    class="input-group date"
+                    id="date-time-picker-2"
+                    data-target-input="nearest"
+                  >
+                    <input
+                      lndInvalidDateChecker
+                      type="date"
+                      [(ngModel)]="loanStartDate"
+                      [ngModelOptions]="{ standalone: true }"
+                      class="form-control"
+                      (change)="onLoanDateChange($event.target.value)"
+                      formControlName="LoanStartDate"
+                    />
+                  </div>
+                  <small
+                    *ngIf="loanDateError && loanStartDate"
+                    class="text-center indian_red"
+                    >Invalid date</small
+                  >
+                </div>
+
+                <div class="col-sm-12 col-md-6">
+                  <label for="validationDefault05" class="left-aligned"
+                    >Gender
+                    <span class="red">{{
+                      formField?.Gender ? "*" : ""
+                    }}</span></label
+                  >
+                  <select
+                    formControlName="Gender"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                    id="validationDefault05"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                  </select>
+                </div>
+                <div class="mb-3 col-sm12 col-md-6">
+                  <label for="validationDefault02" class="left-aligned"
+                    >Date of Birth</label
+                  >
+                  <div
+                    class="input-group date"
+                    id="date-time-picker-1"
+                    data-target-input="nearest"
+                  >
+                    <input
+                      lndInvalidDateChecker
+                      type="date"
+                      [readonly]="isDOBFromBVN"
+                      [(ngModel)]="dateOfBirth"
+                      [ngModelOptions]="{ standalone: true }"
+                      class="form-control"
+                      (change)="onDateChange($event.target.value)"
+                      formControlName="BvnDateOfBirth"
+                      [max]="today"
+                    />
+
+                    <span
+                      class="help-block mb-2 text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('BvnDateOfBirth').errors &&
+                        loanApplicationForm.get('BvnDateOfBirth').touched
+                      "
+                    >
+                      Please provide a valid Bvn Date Of Birth
+                    </span>
+                  </div>
+                  <small *ngIf="dateError" class="text-center indian_red"
+                    >Invalid date</small
+                  >
+                </div>
+
+                <div
+                  class="mb-3 col-sm-12 col-md-6"
+                  *ngIf="user?.permission?.includes('Edit Sold By')"
+                >
+                  <label class="d-block text-left"
+                    >Sold By
+                    <span class="red">{{
+                      formField?.SoldBy ? "*" : ""
+                    }}</span></label
+                  >
+                  <slct-2
+                    [data]="userListForSelect"
+                    [active]="selectedSoldByArray"
+                    [customSearchEnabled]="true"
+                    (selected)="selectedSoldBy($event)"
+                    (removed)="removedSoldBy($event)"
+                    placeholder="Select Sale Agent"
+                  >
+                  </slct-2>
+                </div>
+                <div class="mb-3 col-sm-12 col-md-6">
+                  <label for="validationDefault05" class="left-aligned"
+                    >Loan Reason
+                    <span class="text-danger">{{
+                      formField?.LoanReasonId ? "*" : ""
+                    }}</span></label
+                  >
+                  <div>
+                    <input
+                      type="text"
+                      formControlName="LoanReason"
+                      placeholder="Search for loan reason"
+                      class="form-control"
+                      (blur)="loanReasonCheck()"
+                    />
+                    <span
+                      class="left-aligned help-block d-block mb-2 text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('LoanReason').errors &&
+                        loanApplicationForm.get('LoanReason').touched
+                      "
+                    >
+                      Please provide a valid Loan Reason
+                    </span>
+
+                    <div class="input-group-append">
+                      <button
+                        #buttonEl
+                        *ngIf="!loanReasonSearch"
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        (click)="searchLoanReason(loanSearch)"
+                        [disabled]="
+                          loanApplicationForm.get('LoanReason').invalid
+                        "
+                      >
+                        <i class="icon icon-search"></i>
+                      </button>
+                      <button
+                        #buttonEl
+                        class="btn btn-outline-secondary"
+                        type="button"
+                        *ngIf="loanReasonSearch"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-8 text-center col-sm-12">
+                  <ng-container
+                    *ngIf="
+                      loanApplicationForm.get('LoanAmount').valid &&
+                      loanApplicationForm.get('LoanAmount').value > 0 &&
+                      loanApplicationForm.get('NetIncome').valid &&
+                      loanApplicationForm.get('NetIncome').value > 0 &&
+                      loanApplicationForm.get('LoanDuration').valid &&
+                      loanApplicationForm.get('LoanDuration').value != ''
+                    "
+                  >
+                    <button
+                      *ngIf="!repaymentLoader"
+                      type="button"
+                      class="btn btn-xs btn-outline-secondary"
+                      (click)="viewRepaymentSchedule(repaymentSchedule)"
+                    >
+                      View Repayment Schedule
+                    </button>
+                    <button
+                      *ngIf="repaymentLoader"
+                      type="button"
+                      class="btn btn-xs btn-outline-secondary"
+                      [disabled]="true"
+                    >
+                      <i class="icon icon-spin icon-spin2"></i> Processing ...
+                    </button>
+                  </ng-container>
+                </div>
+                <div class="col-md-12">
+                  <div class="row">
+                    <div
+                      *ngIf="haveInflightCollectionsRemita"
+                      [ngClass]="
+                        showCreateLoanWithoutRemitaBtn
+                          ? 'col-md-6 text-right'
+                          : 'col-md-12'
+                      "
+                    >
+                      <button
+                        type="button"
+                        class="btn btn-success"
+                        (click)="onContinueWithRemita()"
+                        [disabled]="
+                          loanApplicationForm.get('LoanReasonId').invalid ||
+                          loanApplicationForm.get('SoldBy').invalid ||
+                          loanApplicationForm.get('Gender').invalid ||
+                          loanApplicationForm.get('LoanDuration').invalid ||
+                          loanApplicationForm.get('NetIncome').invalid ||
+                          loanApplicationForm.get('LoanAmount').invalid ||
+                          !customerBVNDetails?.bvn
+                        "
+                      >
+                        Continue With Remita
+                      </button>
+                    </div>
+                    <div
+                      [ngClass]="
+                        haveInflightCollectionsRemita
+                          ? 'col-md-6 text-left'
+                          : 'col-md-12'
+                      "
+                      *ngIf="showCreateLoanWithoutRemitaBtn"
+                    >
+                      <button
+                        type="button"
+                        class="btn"
+                        [ngClass]="
+                          haveInflightCollectionsRemita
+                            ? 'btn-warning'
+                            : 'btn-success'
+                        "
+                        *ngIf="!loader"
+                        [disabled]="
+                          loanApplicationForm.get('LoanReasonId').invalid ||
+                          loanApplicationForm.get('SoldBy').invalid ||
+                          loanApplicationForm.get('Gender').invalid ||
+                          loanApplicationForm.get('LoanDuration').invalid ||
+                          loanApplicationForm.get('NetIncome').invalid ||
+                          loanApplicationForm.get('LoanAmount').invalid
+                        "
+                        (click)="nextStep(2)"
+                      >
+                        {{
+                          haveInflightCollectionsRemita
+                            ? "Continue Without Remita"
+                            : "Next"
+                        }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-success"
+                        *ngIf="loader"
+                        [disabled]="true"
+                      >
+                        <i class="icon icon-spin icon-spin2"></i> Validating ...
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <div [ngClass]="{ active: employmentShow }" *ngIf="employmentShow">
+            <h2 class="fs-title">Employment Information</h2>
+            <h3 class="fs-subtitle">Provide Customer Employment Info</h3>
+            <div class="mt-3 form-row">
+              <div class="mb-3 col-sm-12">
+                <label for="validationDefault03" class="left-aligned"
+                  >Employment Status <span class="red">*</span></label
+                >
+                <div class="form-group">
+                  <select
+                    formControlName="EmploymentStatus"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                    (change)="switchValidity($event.target.value)"
+                  >
+                    <option value="">Employment Status</option>
+                    <option value="EMPLOYED">Employed</option>
+                    <option value="SELF EMPLOYED">Self-Employed</option>
+                  </select>
+
+                  <span
+                    class="help-block left-aligned d-block text-left mt-1"
+                    *ngIf="
+                      loanApplicationForm.get('EmploymentStatus').errors &&
+                      loanApplicationForm.get('EmploymentStatus').touched
+                    "
+                  >
+                    Please select a valid Employment Status
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              class="mt-3 form-row"
+              *ngIf="
+                loanApplicationForm.get('EmploymentStatus').value == 'EMPLOYED'
+              "
+            >
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault02" class="left-aligned"
+                  >Employer <span class="red">*</span></label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    formControlName="EmployerName"
+                    placeholder="Type to search for your employer"
+                    class="form-control"
+                  />
+
+                  <div class="input-group-append">
+                    <button
+                      #buttonEl
+                      *ngIf="!employerSearchBool"
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      (click)="searchEmployer(employerSearch)"
+                      [disabled]="
+                        loanApplicationForm.get('EmployerName').invalid
+                      "
+                    >
+                      <i class="icon icon-search"></i>
+                    </button>
+                    <button
+                      #buttonEl
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      *ngIf="employerSearchBool"
+                      [disabled]="true"
+                    >
+                      <i class="icon icon-spin icon-spin2"></i>
+                    </button>
+                  </div>
+                </div>
+                <span
+                  class="help-block left-aligned text-left mt-1"
+                  *ngIf="
+                    loanApplicationForm.get('EmployerName').errors &&
+                    loanApplicationForm.get('EmployerName').touched
+                  "
+                >
+                  Please provide a valid Employer Name
+                </span>
+                <div *ngIf="typeaheadLoading">Loading Employers</div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault03" class="left-aligned"
+                  >Date Started Employment
+                  <span class="red">{{
+                    formField?.DateOfEmployment ? "*" : ""
+                  }}</span></label
+                >
+                <div class="form-group">
+                  <input
+                    lndInvalidDateChecker
+                    type="date"
+                    formControlName="DateOfEmployment"
+                    class="form-control"
+                    id="simple-select"
+                  />
+                  <span
+                    class="help-block left-aligned text-left mt-1"
+                    *ngIf="
+                      loanApplicationForm.get('DateOfEmployment').errors &&
+                      loanApplicationForm.get('DateOfEmployment').touched
+                    "
+                  >
+                    Please provide a valid Date Of Employment
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault03" class="left-aligned"
+                  >Employee ID
+                  <span class="red">{{
+                    formField?.EmploymentCode ? "*" : ""
+                  }}</span>
+                </label>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    formControlName="EmploymentCode"
+                    class="form-control"
+                  />
+                  <span
+                    class="help-block text-left mt-1"
+                    *ngIf="
+                      loanApplicationForm.get('EmploymentCode').errors &&
+                      loanApplicationForm.get('EmploymentCode').touched
+                    "
+                  >
+                    Please provide a valid Employment ID
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault03" class="left-aligned"
+                  >Grade level
+                  <span class="red">{{
+                    formField?.GradeLevel ? "*" : ""
+                  }}</span></label
+                >
+                <div class="form-group">
+                  <input
+                    type="text"
+                    formControlName="GradeLevel"
+                    class="form-control"
+                  />
+                  <span
+                    class="help-block text-left mt-1"
+                    *ngIf="
+                      loanApplicationForm.get('GradeLevel').errors &&
+                      loanApplicationForm.get('GradeLevel').touched
+                    "
+                  >
+                    Please provide a valid Grade Level
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault03" class="left-aligned"
+                  >Employer Email Address
+                  <span class="red">{{
+                    formField?.EmployerEmailAddress ? "*" : ""
+                  }}</span></label
+                >
+                <div class="form-group">
+                  <input
+                    type="email"
+                    formControlName="EmployerEmailAddress"
+                    class="form-control"
+                  />
+                  <span
+                    class="help-block text-left mt-1"
+                    *ngIf="
+                      loanApplicationForm.get('EmployerEmailAddress').errors &&
+                      loanApplicationForm.get('EmployerEmailAddress').touched
+                    "
+                  >
+                    Please provide a valid Employer Email Address
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault03" class="left-aligned"
+                  >Employer Phone Number
+                  <span class="red">{{
+                    formField?.EmployerPhone ? "*" : ""
+                  }}</span></label
+                >
+                <div class="form-group">
+                  <input
+                    type="text"
+                    [dropSpecialCharacters]="false"
+                    mask="9*"
+                    formControlName="EmployerPhone"
+                    class="form-control"
+                  />
+                  <span
+                    class="help-block text-left mt-1"
+                    *ngIf="
+                      loanApplicationForm.get('EmployerPhone').errors &&
+                      loanApplicationForm.get('EmployerPhone').touched
+                    "
+                  >
+                    Please provide a valid Employer Phone
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div
+              *ngIf="!appOwnerDetails.decideInfo.isActive"
+              class="mt-3 form-row"
+            >
+              <div class="mb-3 col-sm-12">
+                <label for="validationDefault02" class="left-aligned"
+                  >Upload 6 months salary acc. statement
+                  <span class="red">{{
+                    formField?.BankStatement ? "*" : ""
+                  }}</span></label
+                >
+                <div class="form-group">
+                  <input
+                    type="file"
+                    (change)="
+                      fileUploader($event.target.files, 'BankStatement')
+                    "
+                    accept="application/pdf"
+                    class="dropify mb-1"
+                    data-max-file-size="5M"
+                  />
+                  <small class="text-muted"
+                    >Only PDF files are allowed and must not be larger than 5MB
+                    in size.</small
+                  >
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              class="mr-2 btn btn-warning"
+              (click)="previousStep(1)"
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              class="ml-2 btn btn-success"
+              (click)="nextStep(3)"
+              [disabled]="
+                loanApplicationForm.get('BankStatement').invalid ||
+                loanApplicationForm.get('EmployerPhone').invalid ||
+                loanApplicationForm.get('EmployerEmailAddress').invalid ||
+                loanApplicationForm.get('EmployerAddress').invalid ||
+                loanApplicationForm.get('EmployerPayDate').invalid ||
+                loanApplicationForm.get('GradeLevel').invalid ||
+                loanApplicationForm.get('DateOfEmployment').invalid ||
+                loanApplicationForm.get('EmployerName').invalid ||
+                loanApplicationForm.get('EmploymentIndustry').invalid ||
+                loanApplicationForm.get('EmploymentStatus').invalid
+              "
+            >
+              Next
+            </button>
+          </div>
+          <div [ngClass]="{ active: residenceShow }" *ngIf="residenceShow">
+            <h2 class="fs-title">Bank & Personal Info.</h2>
+            <h3 class="fs-subtitle">Provide bank and personal info</h3>
+            <div class="mt-3 form-row">
+              <div class="mb-3 col-sm-12">
+                <label for="validationDefault02" class="left-aligned"
+                  >Residential Address <span class="red">*</span></label
+                >
+                <textarea
+                  formControlName="ResidentialAddress"
+                  placeholder="Customer's Residential Address"
+                ></textarea>
+                <span
+                  class="help-block d-block text-left"
+                  *ngIf="
+                    loanApplicationForm.get('ResidentialAddress').errors &&
+                    loanApplicationForm.get('ResidentialAddress').touched
+                  "
+                >
+                  Please provide a valid Residential Address
+                </span>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label class="left-aligned"
+                  >Customer Phone Number
+                  <span class="red">{{
+                    formField?.CustomerPhoneNumber ? "*" : ""
+                  }}</span></label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    [dropSpecialCharacters]="false"
+                    mask="9*"
+                    formControlName="CustomerPhoneNumber"
+                    class="form-control"
+                    placeholder="Enter customer's phone number"
+                  />
+                  <span
+                    class="help-block d-block text-left"
+                    *ngIf="
+                      loanApplicationForm.get('CustomerPhoneNumber').errors &&
+                      loanApplicationForm.get('CustomerPhoneNumber').touched
+                    "
+                  >
+                    Please provide a valid Customer PhoneNumber
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label class="left-aligned"
+                  >Customer Alternative Phone Number
+                  <span class="red">{{
+                    formField?.CustomerAltPhoneNumber ? "*" : ""
+                  }}</span></label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    [dropSpecialCharacters]="false"
+                    mask="9*"
+                    formControlName="CustomerAltPhoneNumber"
+                    class="form-control"
+                    placeholder="Enter customer's alternative phone number"
+                  />
+                  <span
+                    class="help-block d-block text-left"
+                    *ngIf="
+                      loanApplicationForm.get('CustomerAltPhoneNumber')
+                        .errors &&
+                      loanApplicationForm.get('CustomerAltPhoneNumber').touched
+                    "
+                  >
+                    Please provide a valid Customer Alternative Phone Number
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label class="left-aligned"
+                  >Next Of Kin Name
+                  <span class="red">{{
+                    formField?.NextOfKinName ? "*" : ""
+                  }}</span></label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    formControlName="NextOfKinName"
+                    class="form-control"
+                    placeholder="Enter customer's next of kin"
+                  />
+                  <span
+                    class="help-block d-block text-left"
+                    *ngIf="
+                      loanApplicationForm.get('NextOfKinName').errors &&
+                      loanApplicationForm.get('NextOfKinName').touched
+                    "
+                  >
+                    Please provide a valid Next Of Kin Name
+                  </span>
+                  <small
+                    class="text-danger"
+                    *ngIf="
+                      loanApplicationForm
+                        .get('NextOfKinName')
+                        .getError('pattern')
+                    "
+                  >
+                    This is not a valid name
+                  </small>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label class="left-aligned"
+                  >Next Of Kin Phone Number
+                  <span class="red">{{
+                    formField?.NextOfKinPhoneNumber ? "*" : ""
+                  }}</span></label
+                >
+                <div class="input-group">
+                  <input
+                    type="text"
+                    [dropSpecialCharacters]="false"
+                    mask="9*"
+                    formControlName="NextOfKinPhoneNumber"
+                    class="form-control"
+                    placeholder="Enter next of kin phone number"
+                  />
+                  <span
+                    class="help-block d-block text-left"
+                    *ngIf="
+                      loanApplicationForm.get('NextOfKinPhoneNumber').errors &&
+                      loanApplicationForm.get('NextOfKinPhoneNumber').touched
+                    "
+                  >
+                    Please provide a valid Next Of Kin Phone Number
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault02" class="left-aligned"
+                  >Next of kin Address
+                  <span class="red">{{
+                    formField?.NextOfKinAddress ? "*" : ""
+                  }}</span></label
+                >
+                <textarea
+                  formControlName="NextOfKinAddress"
+                  placeholder="Next of kin Address"
+                ></textarea>
+                <span
+                  class="help-block d-block text-left"
+                  *ngIf="
+                    loanApplicationForm.get('NextOfKinAddress').errors &&
+                    loanApplicationForm.get('NextOfKinAddress').touched
+                  "
+                >
+                  Please provide a valid Next Of Kin Address
+                </span>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault02" class="left-aligned"
+                  >Utililty Bill
+                  <span class="red">{{
+                    formField?.UtilityBill ? "*" : ""
+                  }}</span></label
+                >
+                <div class="form-group">
+                  <input
+                    (change)="fileUploader($event.target.files, 'UtilityBill')"
+                    type="file"
+                    class="dropify mb-1"
+                    data-max-file-size="5M"
+                    accept="image/jpeg, image/png, image/jpg, .pdf"
+                  />
+                  <small class="text-muted"
+                    >Files allowed are PNG, JPEG, JPG and PDF and must not be
+                    larger than 5MB in size.</small
+                  >
+                </div>
+              </div>
+              <div class="mb-3 col-sm-12">
+                <label for="validationDefault02" class="left-aligned"
+                  >Other Supporting Document
+                  <small class="text-primary">can upload multiple files</small>
+                  <span class="red">{{
+                    formField?.UtilityBill ? "*" : ""
+                  }}</span></label
+                >
+                <div
+                  (click)="supportingDocs.click()"
+                  style="
+                    border: 1px solid #ced4da;
+                    border-radius: 0.4rem;
+                    height: 38px;
+                    padding: 8px;
+                  "
+                  class="w-100 cursor d-flex justify-content-start mb-5"
+                >
+                  <i class="icon icon-upload icon-lg"></i>
+                  <small class="pl-2 text-primary">{{
+                    supportingDocuments.length === 0
+                      ? "No Files Uploaded"
+                      : supportingDocuments.length + " Files Uploaded"
+                  }}</small>
+                </div>
+
+                <span
+                  class="help-block d-block text-left"
+                  *ngIf="
+                    loanApplicationForm.get('SupportingDocuments').errors &&
+                    loanApplicationForm.get('SupportingDocuments').touched
+                  "
+                >
+                  Please provide valid Supporting Documents
+                </span>
+
+                <div class="d-flex flex-wrap">
+                  <span
+                    *ngFor="
+                      let file of supportingDocumentsView;
+                      let fileIndex = index
+                    "
+                    class="badge badge-pill badge-outline ml-2 px-4 mb-2"
+                    >{{ file.name || file.originalName }}
+                    <i
+                      class="icon icon-trash ml-2 cursor text-danger"
+                      (click)="removeFile(fileIndex)"
+                    ></i>
+                  </span>
+                  <input
+                    (change)="handleFileInput($event.target.files)"
+                    type="file"
+                    class="dropify"
+                    data-max-file-size="5M"
+                    accept="image/jpeg, image/png, image/jpg, .pdf"
+                    multiple
+                    hidden
+                    #supportingDocs
+                  />
+                </div>
+                <small class="text-muted"
+                  >Files allowed are PNG, JPEG, JPG and PDF and must not be
+                  larger than 5MB in size.</small
+                >
+              </div>
+              <div
+                class="mb-3 col-sm-6"
+                *ngIf="user?.permission?.includes('Set Branch On Loan')"
+              >
+                <label for="validationDefault03" class="left-aligned"
+                  >Branch<span class="red">*</span></label
+                >
+                <div>
+                  <select
+                    formControlName="BranchId"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option
+                      *ngFor="let item of branches"
+                      value="{{ item.branchId }}"
+                    >
+                      {{ item.branchName }}
+                    </option>
+                  </select>
+
+                  <span
+                    class="help-block d-block text-left"
+                    *ngIf="
+                      loanApplicationForm.get('BranchId').errors &&
+                      loanApplicationForm.get('BranchId').touched
+                    "
+                  >
+                    Please select a valid Branch
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-12">
+                <label for="validationDefault02" class="left-aligned"
+                  >Additional Comment</label
+                >
+                <textarea
+                  formControlName="AdditionalComment"
+                  placeholder="Additional comment for reviewer"
+                ></textarea>
+              </div>
+              <div class="col-md-12 bank-delimeter">
+                <div class="dotted-divider"></div>
+                <h5>Disbursement Bank Information</h5>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label for="validationDefault03" class="left-aligned"
+                  >Select Bank <span class="red">*</span></label
+                >
+                <div>
+                  <select
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                    formControlName="BankList"
+                    id="simple-select"
+                    (change)="getBankSelected($event)"
+                  >
+                    <option
+                      *ngFor="let item of bankList"
+                      value="{{ item.code }}"
+                    >
+                      {{ item.name }}
+                    </option>
+                  </select>
+
+                  <span
+                    class="help-block d-block text-left"
+                    *ngIf="
+                      loanApplicationForm.get('BankList').errors &&
+                      loanApplicationForm.get('BankList').touched
+                    "
+                  >
+                    Please select a valid Bank
+                  </span>
+                </div>
+              </div>
+              <div class="mb-3 col-sm-6">
+                <label class="left-aligned"
+                  >Bank Account Number <span class="red">*</span>
+                  <span
+                    ><i
+                      class="icon icon-question-circle icon-fw icon-xl"
+                      placement="top"
+                      ngbTooltip="Bank account number must 10 digits"
+                    ></i
+                  ></span>
+                </label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    [dropSpecialCharacters]="false"
+                    mask="9*"
+                    formControlName="BankAccountNumber"
+                    class="form-control"
+                    placeholder="Type your account number"
+                  />
+
+                  <span
+                    class="help-block d-block text-left"
+                    *ngIf="
+                      loanApplicationForm.get('BankAccountNumber').errors &&
+                      loanApplicationForm.get('BankAccountNumber').touched
+                    "
+                  >
+                    Please provide a valid Bank Account Number
+                  </span>
+
+                  <div
+                    class="input-group-append"
+                    *ngIf="
+                      loanApplicationForm.get('BankAccountNumber').valid &&
+                      loanApplicationForm.get('BankSortCode').valid
+                    "
+                  >
+                    <button
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      id="button-addon2"
+                      *ngIf="!verifyloader"
+                      (click)="validateAccount()"
+                    >
+                      Validate
+                    </button>
+                    <button
+                      class="btn btn-outline-secondary"
+                      type="button"
+                      id="button-addon2"
+                      *ngIf="verifyloader"
+                      [disabled]="true"
+                    >
+                      <i class="icon icon-spin icon-spin2"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3 text-center col-sm-12">
+                <div
+                  *ngIf="
+                    loanApplicationForm.get('AccountVerification').value &&
+                    loanApplicationForm.get('BankAccountNumber').valid &&
+                    loanApplicationForm.get('BankSortCode').valid
+                  "
+                >
+                  <br />
+                  <p>
+                    Account Name:
+                    <span class="text-light-gray">{{
+                      bankInfo?.accountName
+                    }}</span>
+                  </p>
+                  <p>
+                    Account Number:
+                    <span class="text-light-gray">{{
+                      bankInfo?.accountNumber
+                    }}</span>
+                  </p>
+                  <p>
+                    Bank:
+                    <span class="text-light-gray">{{
+                      loanApplicationForm.get("BankName").value
+                    }}</span>
+                  </p>
+                </div>
+              </div>
+              <ng-container *ngIf="appOwnerDetails.decideInfo.isActive">
+                <div class="col-md-12 bank-delimeter">
+                  <div class="dotted-divider"></div>
+                  <h5>Bank Statement Analysis (Decide)</h5>
+                  <span>Powered by Indicina</span>
+                </div>
+                <div class="mb-3 col-sm-6">
+                  <label for="validationDefault03" class="left-aligned"
+                    >Select Bank Associated With Statement
+                  </label>
+                  <div>
+                    <select
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                      formControlName="BankList"
+                      id="simple-select"
+                      (change)="getBankSelected($event, 'bankStatement')"
+                    >
+                      <option
+                        *ngFor="let item of bankList"
+                        value="{{ item.code }}"
+                      >
+                        {{ item.name }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3 col-sm-6">
+                  <label for="validationDefault03" class="left-aligned"
+                    >Upload Bank Statement
+                    <span
+                      ><i
+                        class="icon icon-question-circle icon-fw icon-xl"
+                        placement="top"
+                        ngbTooltip="This would be used to check for credit worthiness"
+                      ></i
+                    ></span>
+                  </label>
+                  <br />
+                  <input
+                    #file
+                    style="display: none"
+                    type="file"
+                    (change)="
+                      fileUploader($event.target.files, 'BankStatement')
+                    "
+                    accept="application/pdf"
+                    class="dropify"
+                    data-max-file-size="5M"
+                  />
+                  <div
+                    (click)="file.click()"
+                    style="
+                      border: 1px solid #ced4da;
+                      border-radius: 0.4rem;
+                      height: 38px;
+                      padding: 8px;
+                    "
+                    class="w-100 cursor d-flex justify-content-start"
+                  >
+                    <i class="icon icon-upload icon-lg"></i>
+                    <small
+                      *ngIf="loanApplicationForm.get('BankStatement').value"
+                      class="pl-2 text-primary"
+                      >{{
+                        loanApplicationForm.get("BankStatement").value.name
+                      }}</small
+                    >
+                  </div>
+                  <small class="text-muted"
+                    >Only PDF files are allowed and must not be larger than 5MB
+                    in size.</small
+                  >
+                </div>
+                <div
+                  *ngIf="loanApplicationForm.get('BankStatement').value"
+                  class="mb-3 col-sm-12"
+                >
+                  <label class="left-aligned"
+                    >Bank Statement Password
+                    <span
+                      ><i
+                        class="icon icon-question-circle icon-fw icon-xl"
+                        placement="top"
+                        ngbTooltip="If your bank statment requires a password, enter it here"
+                      ></i
+                    ></span>
+                  </label>
+                  <div>
+                    <input
+                      formControlName="BankStatementPassword"
+                      type="text"
+                      class="form-control"
+                      placeholder="Bank Statement Password"
+                    />
+                  </div>
+                </div>
+              </ng-container>
+              <div class="col-md-12">
+                <div class="dotted-divider"></div>
+              </div>
+              <div class="mb-3 col-sm-12">
+                <label class="left-aligned" for="validationDefault03"
+                  >Repayment Method <span class="red">*</span>
+                </label>
+                <div>
+                  <select
+                    formControlName="RepaymentMethod"
+                    class="custom-select custom-select-xl form-control form-control-xl height"
+                    (change)="onSelectRepaymentMethod()"
+                  >
+                    <option
+                      *ngFor="let item of repaymentMethods"
+                      value="{{ item }}"
+                    >
+                      {{ item }}
+                    </option>
+                  </select>
+
+                  <span
+                    class="help-block d-block text-left"
+                    *ngIf="
+                      loanApplicationForm.get('RepaymentMethod').errors &&
+                      loanApplicationForm.get('RepaymentMethod').touched
+                    "
+                  >
+                    Please select a valid Repayment Method
+                  </span>
+                </div>
+              </div>
+              <ng-container
+                *ngIf="
+                  showBuyOver &&
+                  user?.permission?.includes('Create Loan Buy Over Loan')
+                "
+              >
+                <div class="mb-3 col-sm-12">
+                  <input
+                    class="input-group left-aligned"
+                    id="isBuyOver"
+                    style="width: 5% !important"
+                    type="checkbox"
+                    formControlName="IsBuyOver"
+                    (change)="isBuyOver()"
+                  />
+                  <label id="isBuyOver" class="left-aligned">
+                    Click here if this is a buyover
+                  </label>
+                </div>
+                <div
+                  class="m-0 row"
+                  *ngIf="loanApplicationForm.get('IsBuyOver').value"
+                >
+                  <div class="mb-3 col-sm-6">
+                    <label class="left-aligned"
+                      >Select Lending Institution
+                      <span class="red">*</span></label
+                    >
+                    <select
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                      formControlName="LendingInstitutionId"
+                    >
+                      <option
+                        *ngFor="let item of setUp?.lendingInstitution"
+                        value="{{ item?.lendingInstitutionId }}"
+                      >
+                        {{ item?.lendingInstitutionName }}
+                      </option>
+                    </select>
+                    <span
+                      class="left-aligned help-block text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('LendingInstitutionId')
+                          .errors ||
+                        loanApplicationForm.get('LendingInstitutionId').touched
+                      "
+                    >
+                      <span
+                        *ngIf="
+                          loanApplicationForm
+                            .get('LendingInstitutionId')
+                            .getError('required')
+                        "
+                        >Select lending institution.</span
+                      >
+                    </span>
+                  </div>
+                  <div class="mb-3 col-sm-6">
+                    <label class="left-aligned"
+                      >Buy Over Amount <span class="red">*</span></label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="BuyOverAmount"
+                      currencyMask
+                      [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+                    />
+                    <span
+                      class="left-aligned help-block text-danger f-12"
+                      *ngIf="
+                        loanApplicationForm.get('BuyOverAmount').errors ||
+                        loanApplicationForm.get('BuyOverAmount').touched
+                      "
+                    >
+                      <span
+                        *ngIf="
+                          loanApplicationForm
+                            .get('BuyOverAmount')
+                            .getError('required')
+                        "
+                        >Provide a buyover amount.</span
+                      >
+                      {{
+                        loanApplicationForm
+                          .get("BuyOverAmount")
+                          .getError("BuyOverAmountGreaterThanLoanAmount")
+                      }}
+                    </span>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <div class="d-flex justify-content-between">
+              <button
+                type="button"
+                class="btn btn-sm btn-warning flex-1"
+                *ngIf="!loader"
+                (click)="previousStep(2)"
+              >
+                Previous
+              </button>
+              <button
+                type="submit"
+                class="mx-2 btn btn-sm btn-warning flex-2"
+                (click)="statusCheck('17sehj')"
+                *ngIf="!loader"
+                [disabled]="
+                  loanApplicationForm.get('ResidentialAddress').invalid ||
+                  loanApplicationForm.get('UtilityBill').invalid ||
+                  loanApplicationForm.get('BankSortCode').invalid ||
+                  loanApplicationForm.get('BankName').invalid ||
+                  loanApplicationForm.get('BankAccountNumber').invalid ||
+                  loanApplicationForm.get('RepaymentMethod').invalid ||
+                  loanApplicationForm.get('CardPrime').invalid ||
+                  loanApplicationForm.get('CustomerPhoneNumber').invalid ||
+                  loanApplicationForm.get('NextOfKinName').invalid ||
+                  loanApplicationForm.get('NextOfKinPhoneNumber').invalid ||
+                  loanApplicationForm.get('NextOfKinAddress').invalid ||
+                  loanApplicationForm.get('TransactionRef').invalid ||
+                  loanApplicationForm.get('LendingInstitutionId').invalid ||
+                  loanApplicationForm.get('BuyOverAmount').invalid ||
+                  loanApplicationForm.get('BankStatement').invalid ||
+                  loanApplicationForm.get('bankStatementBankSortCode').invalid
+                "
+              >
+                Save Application as Draft
+              </button>
+              <button
+                type="submit"
+                class="btn btn-sm btn-success flex-2"
+                (click)="statusCheck('13km87')"
+                *ngIf="!loader"
+                [disabled]="
+                  loanApplicationForm.get('ResidentialAddress').invalid ||
+                  loanApplicationForm.get('UtilityBill').invalid ||
+                  loanApplicationForm.get('BankSortCode').invalid ||
+                  loanApplicationForm.get('BankName').invalid ||
+                  loanApplicationForm.get('BankAccountNumber').invalid ||
+                  loanApplicationForm.get('RepaymentMethod').invalid ||
+                  loanApplicationForm.get('CardPrime').invalid ||
+                  loanApplicationForm.get('CustomerPhoneNumber').invalid ||
+                  loanApplicationForm.get('NextOfKinName').invalid ||
+                  loanApplicationForm.get('NextOfKinPhoneNumber').invalid ||
+                  loanApplicationForm.get('NextOfKinAddress').invalid ||
+                  loanApplicationForm.get('TransactionRef').invalid ||
+                  loanApplicationForm.get('LendingInstitutionId').invalid ||
+                  loanApplicationForm.get('BuyOverAmount').invalid ||
+                  loanApplicationForm.get('BankStatement').invalid ||
+                  loanApplicationForm.get('bankStatementBankSortCode').invalid
+                "
+              >
+                Submit Application
+              </button>
+              <button
+                *ngIf="
+                  !loader &&
+                  user?.permission?.includes('Submit Application to Pool')
+                "
+                type="submit"
+                class="ml-2 btn btn-sm btn-success flex-2"
+                (click)="statusCheck('1sy87')"
+                [disabled]="
+                  loanApplicationForm.get('ResidentialAddress').invalid ||
+                  loanApplicationForm.get('UtilityBill').invalid ||
+                  loanApplicationForm.get('BankSortCode').invalid ||
+                  loanApplicationForm.get('BankName').invalid ||
+                  loanApplicationForm.get('BankAccountNumber').invalid ||
+                  loanApplicationForm.get('RepaymentMethod').invalid ||
+                  loanApplicationForm.get('CardPrime').invalid ||
+                  loanApplicationForm.get('CustomerPhoneNumber').invalid ||
+                  loanApplicationForm.get('NextOfKinName').invalid ||
+                  loanApplicationForm.get('NextOfKinPhoneNumber').invalid ||
+                  loanApplicationForm.get('NextOfKinAddress').invalid ||
+                  loanApplicationForm.get('TransactionRef').invalid ||
+                  loanApplicationForm.get('LendingInstitutionId').invalid ||
+                  loanApplicationForm.get('BuyOverAmount').invalid ||
+                  loanApplicationForm.get('BankStatement').invalid ||
+                  loanApplicationForm.get('bankStatementBankSortCode').invalid
+                "
+              >
+                Submit Application To Pool
+              </button>
+              <button
+                type="button"
+                class="btn btn-success"
+                *ngIf="loader"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Creating Loan
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<ng-template #repaymentSchedule>
+  <!-- Modal Content -->
+  <div class="modal-content">
+    <!-- Modal Header -->
+    <div class="border-0 modal-header">
+      <h3 class="modal-title orange" id="model-1">Repayment Schedule</h3>
+      <button
+        type="button"
+        class="close"
+        data-dismiss="modal"
+        aria-label="Close"
+        (click)="closeModal()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <!-- /modal header -->
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="row mt-1 mb-6">
+        <div class="col-md-12 mt-3">
+          <div class="shadow-sm p-5 bg-gainsboro rounded">
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>Loan amount:</p>
+              <p>
+                {{
+                  loanApplicationForm.get("LoanAmount").value | number : "1.2-2"
+                }}
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>
+                Fees upfront
+                <span
+                  ><i
+                    class="icon icon-question-circle icon-fw icon-xl"
+                    placement="top"
+                    ngbTooltip="Deducted before disbursement"
+                  ></i></span
+                >:
+              </p>
+              <p>
+                {{
+                  this.scheduleInformation.feesInfo.totalUpFrontFees
+                    | number : "1.2-2"
+                }}
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>
+                Fees capitalized<span
+                  ><i
+                    class="icon icon-question-circle icon-fw icon-xl"
+                    ngbTooltip="Spread accross the lifespan of the schedule"
+                  ></i></span
+                >:
+              </p>
+              <p>
+                {{
+                  this.scheduleInformation.feesInfo.totalPostDisbursementFees
+                    | number : "1.2-2"
+                }}
+              </p>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>Total fees:</p>
+              <p>
+                {{
+                  this.scheduleInformation.feesInfo.totalPostDisbursementFees +
+                    this.scheduleInformation.feesInfo.totalUpFrontFees
+                    | number : "1.2-2"
+                }}
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p><b>Amount to be disbursed to customer:</b></p>
+              <p>
+                <b>
+                  {{
+                    this.scheduleInformation.feesInfo.amountToBeDisbursed
+                      | number : "1.2-2"
+                  }}</b
+                >
+              </p>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <p>Amount used to generate schedule:</p>
+              <p>
+                {{
+                  this.scheduleInformation.feesInfo.amountUsedForSchedule
+                    | number : "1.2-2"
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="my-2 row">
+        <div class="col">
+          <a href="javascript:;" (click)="toggleRepaymentStartDate()"
+            >To choose a repayment start date, click here</a
+          >
+        </div>
+        <div class="col" *ngIf="showRepaymentInputBox">
+          <div class="form-group">
+            <input
+              lndInvalidDateChecker
+              type="date"
+              class="form-control"
+              [(ngModel)]="repaymentDate"
+              placeholder="Select custom repayment date"
+              (change)="customRepaymentDate()"
+            />
+          </div>
+        </div>
+      </div>
+      <!-- Tables -->
+      <div class="table-responsive">
+        <table class="table mb-0 table-striped">
+          <thead class="thead-light">
+            <tr>
+              <th scope="col">Period</th>
+              <th class="text-uppercase text-center" scope="col">Date</th>
+              <th class="text-uppercase text-right" scope="col">
+                Installment Amount
+              </th>
+            </tr>
+          </thead>
+          <tbody *ngIf="repaymentScheduleArray.length > 0">
+            <tr *ngFor="let item of repaymentScheduleArray; let i = index">
+              <th scope="row">{{ item?.paymentNumber }}</th>
+              <td class="text-center">
+                {{ item?.paymentDueDate | date : "mediumDate" }}
+              </td>
+              <td class="text-right">
+                {{ item?.paymentAmount | number : "1.2-2" }}
+              </td>
+            </tr>
+          </tbody>
+          <tbody *ngIf="repaymentLoader">
+            <tr>
+              <td colspan="3" class="text-center">Loading ...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- tables -->
+    </div>
+    <!-- modal body -->
+
+    <!-- Modal Footer -->
+    <div class="border-0 modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm white"
+        (click)="closeModal()"
+      >
+        Close
+      </button>
+      <!-- <button type="button" class="btn btn-primary btn-sm" data-dismiss="modal">Save changes</button> -->
+    </div>
+    <!-- /modal footer -->
+  </div>
+  <!-- /modal content -->
+</ng-template>
+
+<ng-template #addEmployerModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="mr-2 icon icon-setting icon-2x align-self-center text-warning"
+      ></i>
+      Add Employer
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form
+    [formGroup]="AddEmployerForm"
+    (ngSubmit)="submitEmployerForm(AddEmployerForm.value)"
+  >
+    <div class="modal-body">
+      <div class="mt-3 form-row">
+        <div
+          class="mb-3 col-sm-12 form-group"
+          [ngClass]="{
+            'has-error':
+              AddEmployerForm.get('EmployerName').errors &&
+              AddEmployerForm.get('EmployerName').touched
+          }"
+        >
+          <label>Employer Name </label><b class="help-block">*</b>
+          <input
+            type="text"
+            placeholder="Business Name"
+            class="form-control"
+            formControlName="EmployerName"
+            id="EmployerName"
+          />
+          <span
+            class="help-block"
+            *ngIf="
+              AddEmployerForm.get('EmployerName').errors &&
+              AddEmployerForm.get('EmployerName').touched
+            "
+          >
+            What is name of the Business?
+          </span>
+        </div>
+        <div
+          class="mb-3 col-sm-6 form-group"
+          [ngClass]="{
+            'has-error':
+              AddEmployerForm.get('EmploymentIndustryId').errors &&
+              AddEmployerForm.get('EmploymentIndustryId').touched
+          }"
+        >
+          <label for="validationDefault03" class="left-aligned"
+            >Employer Industry <span class="red">*</span></label
+          >
+          <select
+            formControlName="EmploymentIndustryId"
+            class="custom-select custom-select-xl form-control form-control-xl height employmentIndustry"
+          >
+            <option
+              *ngFor="let item of setUp?.employmentIndustry"
+              value="{{ item?.employmentIndustryId }}"
+            >
+              {{ item?.employmentIndustryName }}
+            </option>
+          </select>
+          <span
+            class="help-block"
+            *ngIf="
+              AddEmployerForm.get('EmploymentIndustryId').errors &&
+              AddEmployerForm.get('EmploymentIndustryId').touched
+            "
+          >
+            What is your employer industry?
+          </span>
+        </div>
+        <div
+          class="mb-3 col-sm-6 form-group"
+          [ngClass]="{
+            'has-error':
+              AddEmployerForm.get('EmployerPayDate').errors &&
+              AddEmployerForm.get('EmployerPayDate').touched
+          }"
+        >
+          <label
+            >Pay Date <small><b class="help-block">*</b></small>
+          </label>
+          <input
+            type="number"
+            min="1"
+            max="31"
+            placeholder="e.g 24"
+            class="form-control"
+            formControlName="EmployerPayDate"
+            id="EmployerName"
+          />
+          <span
+            class="help-block"
+            *ngIf="
+              AddEmployerForm.get('EmployerPayDate').errors &&
+              AddEmployerForm.get('EmployerPayDate').touched
+            "
+          >
+            What is day are salaries typically paid?
+          </span>
+        </div>
+        <div
+          class="mb-3 col-sm-12 form-group"
+          [ngClass]="{
+            'has-error':
+              AddEmployerForm.get('EmployerAddress').errors &&
+              AddEmployerForm.get('EmployerAddress').touched
+          }"
+        >
+          <label>Business Address <b class="help-block">*</b></label>
+          <textarea
+            class="form-control"
+            formControlName="EmployerAddress"
+            id="text-area-1"
+            rows="3"
+            placeholder="Textarea"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+      >
+        Close
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="AddEmployerForm.invalid"
+      >
+        Save
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #employerSearch>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="mr-2 icon icon-setting icon-2x align-self-center text-warning"
+      ></i
+      >Employer Search Result
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="table-responsive" *ngIf="employerList?.length > 0">
+      <table class="table table-hover">
+        <thead>
+          <th>Employer Name</th>
+          <th>Address</th>
+          <th>Pay Date</th>
+          <th>Action</th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of employerList">
+            <td>
+              <span
+                ngxTextHighlight
+                [content]="item?.name"
+                [searchTerm]="employerSearchTerm"
+              ></span>
+            </td>
+            <td>{{ item?.address }}</td>
+            <td>{{ item?.payDate }}</td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-xs btn-warning"
+                (click)="selectEmployer(item)"
+              >
+                Select
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-center" *ngIf="employerList.length == 0">
+      <h6>
+        The employer "{{ loanApplicationForm.get("EmployerName").value }}" was
+        not found consider adding it instead.
+      </h6>
+      <br />
+      <a href="javascript:;" (click)="AddEmployerFormInit(addEmployerModal)"
+        >Add Employer</a
+      >
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      (click)="closeModal()"
+      style="color: #fff"
+    >
+      Close
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #loanSearch>
+  <div
+    class="modal-header"
+    [style.background]="
+      colorTheme?.theme === 'Dark' ? colorTheme?.dark?.primaryColor : ''
+    "
+  >
+    <h4
+      class="modal-title"
+      id="modal-basic-title"
+      [style.color]="
+        colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+      "
+    >
+      <i
+        class="mr-2 icon icon-setting icon-2x align-self-center text-warning"
+      ></i
+      >Loan Reason Search Result
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span
+        aria-hidden="true"
+        [style.color]="
+          colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+        "
+        >&times;</span
+      >
+    </button>
+  </div>
+  <div
+    class="modal-body"
+    [style.background]="
+      colorTheme?.theme === 'Dark' ? colorTheme?.dark?.cardColor : ''
+    "
+  >
+    <div class="table-responsive" *ngIf="loanReasonList?.length > 0">
+      <table
+        [class]="colorTheme?.theme === 'Dark' ? 'table' : 'table table-hover'"
+      >
+        <thead>
+          <th
+            [style.color]="
+              colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+            "
+          >
+            Loan Reason Name
+          </th>
+          <th
+            [style.color]="
+              colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+            "
+          >
+            Loan Reason Code
+          </th>
+          <th
+            [style.color]="
+              colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+            "
+          >
+            Action
+          </th>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of loanReasonList">
+            <td
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              <span
+                ngxTextHighlight
+                [content]="item?.loanReasonName"
+                [searchTerm]="loanReasonSearchTerm"
+              ></span>
+            </td>
+            <td
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              <span
+                ngxTextHighlight
+                [content]="item?.loanReasonCode"
+                [searchTerm]="loanReasonSearchTerm"
+              ></span>
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn btn-xs btn-warning"
+                (click)="selectLoanReason(item)"
+              >
+                Select
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-center" *ngIf="loanReasonList?.length == 0">
+      <h6
+        [style.color]="
+          colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+        "
+      >
+        The loan reason "{{ loanApplicationForm.get("LoanReason").value }}" was
+        not found consider adding it instead.
+      </h6>
+    </div>
+  </div>
+  <div
+    class="modal-footer"
+    [style.background]="
+      colorTheme?.theme === 'Dark' ? colorTheme?.dark?.primaryColor : ''
+    "
+  >
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      (click)="closeModal()"
+      style="color: #fff"
+    >
+      Close
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #addCustomerInfo>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      <i
+        class="mr-2 icon icon-setting icon-2x align-self-center text-warning"
+      ></i>
+      Add Customer Info
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ng-container *ngIf="AlternativeCustomerForm">
+      <form
+        [formGroup]="AlternativeCustomerForm"
+        (submit)="saveAlternativeCustomerForm(AlternativeCustomerForm.value)"
+      >
+        <div class="form-row form-group">
+          <div class="col-md-6">
+            <label class="left-aligned"
+              >First Name <span class="red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="FirstName"
+            />
+            <small
+              class="help-block text-danger f-12"
+              *ngIf="
+                AlternativeCustomerForm.get('FirstName').errors &&
+                AlternativeCustomerForm.get('FirstName').touched
+              "
+            >
+              Provide a valid First Name
+            </small>
+          </div>
+          <div class="col-md-6">
+            <label class="left-aligned"
+              >Last Name <span class="red">*</span></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              formControlName="LastName"
+            />
+            <small
+              class="help-block text-danger f-12"
+              *ngIf="
+                AlternativeCustomerForm.get('LastName').errors &&
+                AlternativeCustomerForm.get('LastName').touched
+              "
+            >
+              Provide a valid Last Name
+            </small>
+          </div>
+        </div>
+        <div class="form-row form-group">
+          <div class="col-md-6">
+            <label
+              >Email Address
+              <sup class="text-span">{{
+                this.altRequiredBox.includes("Email") ? "*" : ""
+              }}</sup></label
+            >
+            <input
+              type="email"
+              class="form-control"
+              formControlName="EmailAddress"
+            />
+
+            <small
+              class="text-danger"
+              *ngIf="
+                AlternativeCustomerForm.get('EmailAddress').errors &&
+                AlternativeCustomerForm.get('EmailAddress').touched
+              "
+              >Provide a valid email address</small
+            >
+          </div>
+          <div class="col-md-6">
+            <label
+              >BVN
+              <sup class="text-span">{{
+                this.altRequiredBox.includes("UniqueId") ? "*" : ""
+              }}</sup></label
+            >
+            <input type="text" class="form-control" formControlName="Bvn" />
+            <small
+              class="text-danger"
+              *ngIf="
+                AlternativeCustomerForm.get('Bvn').errors &&
+                AlternativeCustomerForm.get('Bvn').touched
+              "
+              >Provide a valid BVN</small
+            >
+          </div>
+        </div>
+        <div class="form-row form-group">
+          <div class="col-md-6">
+            <label>Date Of Birth (M/D/Y) <sup class="text-span">*</sup></label>
+            <input
+              lndInvalidDateChecker
+              type="date"
+              class="form-control"
+              formControlName="DateOfBirth"
+            />
+            <small
+              class="text-danger"
+              *ngIf="
+                AlternativeCustomerForm.get('DateOfBirth').errors &&
+                AlternativeCustomerForm.get('DateOfBirth').touched
+              "
+              >Provide a valid Date of Birth</small
+            >
+          </div>
+          <div class="col-md-6">
+            <label
+              >Phone Number
+              <sup class="text-span">{{
+                this.altRequiredBox.includes("Phone") ? "*" : ""
+              }}</sup></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              [dropSpecialCharacters]="false"
+              mask="9*"
+              formControlName="PhoneNumber"
+            />
+            <lnd-input-errors
+              label="Phone number"
+              [control]="AlternativeCustomerForm.get('PhoneNumber')"
+            ></lnd-input-errors>
+          </div>
+        </div>
+        <div class="form-group" *ngIf="CustomerInfoError != ''">
+          <div class="alert alert-danger">{{ CustomerInfoError }}</div>
+        </div>
+        <div class="mt-2 form-group">
+          <button
+            class="btn btn-block btn-warning"
+            *ngIf="!loader"
+            [disabled]="AlternativeCustomerForm.invalid"
+            type="submit"
+          >
+            Start Application
+          </button>
+          <button
+            type="button"
+            class="btn btn-warning btn-sm"
+            *ngIf="loader"
+            [disabled]="true"
+          >
+            <i class="icon icon-spin icon-spin2"></i> Processing...
+          </button>
+        </div>
+      </form>
+    </ng-container>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      (click)="closeModal()"
+      style="color: #fff"
+    >
+      Close
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #alternativeCustomer>
+  <div
+    class="modal-header"
+    [style.background]="
+      colorTheme?.theme === 'Dark' ? colorTheme?.dark?.primaryColor : ''
+    "
+  >
+    <h4
+      class="modal-title"
+      id="modal-basic-title"
+      [style.color]="
+        colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+      "
+    >
+      <i
+        class="mr-2 icon icon-setting icon-2x align-self-center text-warning"
+      ></i>
+      Search Customer
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span
+        aria-hidden="true"
+        [style.color]="
+          colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+        "
+        >&times;</span
+      >
+    </button>
+  </div>
+  <div
+    class="modal-body"
+    [style.background]="
+      colorTheme?.theme === 'Dark' ? colorTheme?.dark?.cardColor : ''
+    "
+  >
+    <div
+      class="my-4 card"
+      [style.background]="
+        colorTheme?.theme === 'Dark' ? colorTheme?.dark?.secondaryColor : ''
+      "
+    >
+      <div class="card-body">
+        <form
+          [formGroup]="uniqueIdForm"
+          action=""
+          (ngSubmit)="submitUniqueIdForm()"
+        >
+          <div class="form-group">
+            <input
+              [style.background]="
+                colorTheme?.theme === 'Dark'
+                  ? colorTheme?.dark?.primaryColor
+                  : ''
+              "
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+              type="text"
+              formControlName="parameter"
+              [placeholder]="placeholder"
+              class="form-control"
+            />
+          </div>
+          <div class="form-row form-group">
+            <div class="col-md-4">
+              <label for="UniqueId" style="cursor: pointer"
+                ><input
+                  id="UniqueId"
+                  type="radio"
+                  formControlName="searchType"
+                  value="UniqueId"
+                />
+                Unique Id
+              </label>
+            </div>
+            <div class="col-md-4">
+              <label for="Phone" style="cursor: pointer"
+                ><input
+                  id="Phone"
+                  type="radio"
+                  formControlName="searchType"
+                  value="Phone"
+                />
+                Phone
+              </label>
+            </div>
+            <div class="col-md-4">
+              <label for="Email" style="cursor: pointer"
+                ><input
+                  id="Email"
+                  type="radio"
+                  formControlName="searchType"
+                  value="Email"
+                />
+                Email
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <button
+              type="submit"
+              class="btn btn-secondary btn-md"
+              [disabled]="searchLoader || uniqueIdForm.invalid"
+              style="color: #fff"
+            >
+              Search
+              <i
+                class="ml-2 icon icon-spin icon-spin2"
+                *ngIf="searchLoader"
+              ></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- tab content -->
+    <div
+      class="card"
+      *ngIf="uniqueCustomerList?.item2?.length > 0"
+      [style.background]="
+        colorTheme?.theme === 'Dark' ? colorTheme?.dark?.secondaryColor : ''
+      "
+    >
+      <div class="table-responsive card-body">
+        <h5
+          [style.color]="
+            colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+          "
+        >
+          Result List
+        </h5>
+        <table
+          [class]="colorTheme?.theme === 'Dark' ? 'table' : 'table table-hover'"
+        >
+          <thead>
+            <th
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              Customer Code
+            </th>
+            <th
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              FullName
+            </th>
+            <th
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              Date of Birth
+            </th>
+            <th
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              Phone Number
+            </th>
+            <th
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              UniqueId
+            </th>
+            <th
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              Email Address
+            </th>
+            <th
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              Date Created
+            </th>
+            <th
+              [style.color]="
+                colorTheme?.theme === 'Dark' ? colorTheme?.dark?.textColor : ''
+              "
+            >
+              Action
+            </th>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let item of uniqueCustomerList?.item2; let i = index"
+              [hidden]="!showMore && i > 5"
+            >
+              <td [style.color]="colorTheme?.secondaryColor">
+                {{ item?.personCode }}
+              </td>
+              <td
+                [style.color]="
+                  colorTheme?.theme === 'Dark'
+                    ? colorTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ item?.firstName + " " + item?.lastName }}
+              </td>
+              <td
+                [style.color]="
+                  colorTheme?.theme === 'Dark'
+                    ? colorTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ item?.dateOfBirth | date : "dd/MM/yyyy" }}
+              </td>
+              <td
+                [style.color]="
+                  colorTheme?.theme === 'Dark'
+                    ? colorTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ item?.phoneNumber }}
+              </td>
+              <td
+                [style.color]="
+                  colorTheme?.theme === 'Dark'
+                    ? colorTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ item?.bvn }}
+              </td>
+              <td
+                [style.color]="
+                  colorTheme?.theme === 'Dark'
+                    ? colorTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ item?.emailAddress }}
+              </td>
+              <td
+                [style.color]="
+                  colorTheme?.theme === 'Dark'
+                    ? colorTheme?.dark?.textColor
+                    : ''
+                "
+              >
+                {{ item?.createdAt | date : "dd/MM/yyyy" }}
+              </td>
+
+              <td>
+                <button
+                  type="button"
+                  class="btn btn-xs btn-warning"
+                  (click)="selectCustomer(item)"
+                >
+                  Select
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="text-center" *ngIf="uniqueCustomerList?.item2?.length > 5">
+          <button class="btn btn-xs btn-default" (click)="showMore = !showMore">
+            More/less
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div
+        class="text-center card-body"
+        *ngIf="uniqueCustomerList?.item2?.length == 0"
+      >
+        <div *ngIf="!searchLoader">
+          <h6>No customer found.</h6>
+          <button
+            class="btn btn-success btn-md"
+            (click)="openModalCustomer(addCustomerInfo)"
+          >
+            Add New Customer
+          </button>
+        </div>
+        <div
+          *ngIf="searchLoader"
+          class="table-loader"
+          class="text-center indian_red"
+        >
+          <span>
+            <i class="icon icon-spin icon-spin2"></i> Loading customers...</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="modal-footer"
+    [style.background]="
+      colorTheme?.theme === 'Dark' ? colorTheme?.dark?.primaryColor : ''
+    "
+  >
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      (click)="closeModal()"
+      style="color: #fff"
+    >
+      Close
+    </button>
+  </div>
+</ng-template>
+<ng-template #createLoanWithRemita>
+  <lnd-create-loan-with-remita
+    [colorTheme]="colorTheme"
+    [customerBVNDetails]="customerBVNDetails"
+    [partLoanApplicationDetails]="loanApplicationForm.value"
+    [loanTypeId]="selectedLoanTypeId"
+    [loanInterest]="loanApplicationForm.get('LoanInterest').value"
+    [customerEmailAddress]="customerEmailAddress"
+  ></lnd-create-loan-with-remita>
+</ng-template>

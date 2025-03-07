@@ -1,0 +1,27 @@
+app-sidebar {
+    width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+    app-sidebar {
+        width: auto;
+    }
+}
+
+.dt-content-wrapper {
+    margin-top: 74px;
+}
+
+sup {
+    font-size: 14px;
+}
+
+.inv_type{
+  padding: 25px 40px;
+}
+
+.sub_title{
+  color: #979797;
+  font-size: 18px;
+  font-weight: 300;;
+}

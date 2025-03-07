@@ -1,0 +1,346 @@
+<ng-container
+  *ngIf="
+    !isSingleView && user?.permission?.includes('View Finance Payments');
+    else singleView
+  "
+>
+  <header class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Payments Received</h1>
+
+    <a
+      *ngIf="user?.permission?.includes('Create Finance Payment')"
+      class="btn btn-primary mr-2 text-white"
+      [style.borderColor]="currentTheme?.secondaryColor"
+      [style.backgroundColor]="currentTheme?.secondaryColor"
+      [routerLink]="['/finance/payments-received/create']"
+      routerLinkActive="router-link-active"
+      href="javascript:void(0)"
+    >
+      <i class="icon icon-add-circle mr-2"></i>Add New</a
+    >
+  </header>
+
+  <ul
+    id="active-div"
+    class="card-header-pills nav nav-pill justify-content-center mb-2"
+    role="tablist"
+  >
+    <li class="nav-item">
+      <a
+        id="nav-open"
+        class="nav-link pool-nav active-tab"
+        href="javascript:void(0)"
+        (click)="switchviews('open', ['Draft', 'ReDraft', 'SentForApproval'])"
+      >
+        Open
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a
+        id="nav-closed"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="switchviews('closed', ['Posted', 'Rejected'])"
+      >
+        Closed
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        id="nav-all"
+        class="nav-link pool-nav"
+        href="javascript:void(0)"
+        (click)="switchviews('all', [])"
+      >
+        All
+      </a>
+    </li>
+  </ul>
+
+  <div class="dt-card w-100">
+    <div class="dt-card__body">
+      <div class="row">
+        <div class="col-md-4 mb-4">
+          <label style="display: inline-flex"
+            ><span style="padding: 8px 2px; font-size: 12px">Show </span
+            ><select
+              [(ngModel)]="pagination.pageSize"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height"
+              (change)="getPayments()"
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+            <span style="padding: 8px 2px; font-size: 12px"
+              >entries</span
+            ></label
+          >
+        </div>
+
+        <div class="col-md-4">
+          <div
+            *ngIf="isLoading"
+            class="table-loader"
+            style="text-align: center; color: indianred"
+          >
+            <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+          </div>
+        </div>
+
+        <div class="form-group col-md-4 mb-4 legacy-search-imp">
+          <lnd-search-dropdown [searchColumns]="searchColumns" [currentTheme]="currentTheme" (searchParams)="getPayments(null,$event)"></lnd-search-dropdown>
+        </div>
+
+        <div class="col-md-12">
+          <lnd-selected-filters
+            (initialized)="onSelectedFiltersInit($event)"
+          ></lnd-selected-filters>
+        </div>
+        <div
+          class="d-flex justify-content-between w-100 align-items-center"
+          style="padding: 0 18px"
+        >
+          <div
+            class=""
+            aria-live="polite"
+            style="font-size: 13px; margin-top: -8px"
+          >
+            Showing
+            {{
+              (pagination.pageNumber - 1) * pagination.pageSize + 1
+                | number : "1.0-0"
+            }}
+            -
+            {{
+              (pagination.pageNumber - 1) * pagination.pageSize +
+                pagination.count | number : "1.0-0"
+            }}
+            of {{ pagination.totalCount | number : "1.0-0" }} record(s)
+          </div>
+          <div>
+            <lnd-filter-btn (filterModalOpen)="filterModalOpen()"></lnd-filter-btn>
+            <lnd-filter
+              *ngIf="!isLoading"
+              [filterOptions]="filterStatuses"
+              (optionSelected)="getPayments($event)"
+            ></lnd-filter>
+          </div>
+        </div>
+      </div>
+      <div class="table-responsive" *ngIf="!isLoading">
+        <table
+          id="data-table"
+          class="table mt-5 table-striped"
+          *ngIf="allPayments.length > 0; else noData"
+        >
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Customer</th>
+              <th class="text-right">
+                Amount ({{ ownerInfo?.currency?.currencySymbol }})
+              </th>
+              <th>Payment Date</th>
+              <th>Payment Mode</th>
+              <th>Paid Through</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let item of allPayments" class="cursor" (click)="viewPayment(item?.financePaymentId,dropdownToggle)">
+              <td class="copy_icon_wrapper" [style.color]="currentTheme?.secondaryColor">
+                {{ item?.paymentCode }}
+
+                <img
+                  (mouseover)="copy_hover = true"
+                  (mouseleave)="copy_hover = false"
+                  class="copy_icon"
+                  src="assets/images/copy.png"
+                  alt="copy icon"
+                  width="15"
+                  height="15"
+                  (click)="copyCode(item?.paymentCode)"
+                  placement="right"
+                  ngbTooltip="Copy Payment Code"
+                />
+              </td>
+              <td>{{ item?.personName }}</td>
+              <td class="text-right">
+                {{ item?.paymentAmount | number : "1.2-2" }}
+              </td>
+              <td>{{ item?.paymentMadeDate | date : "mediumDate" }}</td>
+              <td>{{ item?.paymentModeName }}</td>
+              <td>
+                {{ item?.paidThroughAccountName }}
+              </td>
+
+              <td>
+                <span
+                  class="badge badge-sm"
+                  [ngClass]="{
+                    'badge-warning': item?.status === 'Draft',
+                    'badge-approval': item?.status === 'Sent For Approval',
+                    'badge-success': item?.status === 'Posted',
+                    'badge-redraft': item?.status === 'Redraft'
+                  }"
+                >
+                  <span>
+                    {{
+                      item?.status === "Sent For Approval"
+                        ? "Awaiting Approval"
+                        : item?.status
+                    }}
+                  </span>
+                </span>
+              </td>
+              <td class="text-center">
+                <div #dropdownToggle class="dropdown mr-2 mb-2 d-inline-block">
+                  <button
+                    class="btn btn-warning btn-xs dropdown-toggle"
+                    type="button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  ></button>
+
+                  <div class="dropdown-menu">
+                    <a
+                      *ngIf="
+                        user?.permission?.includes('View Finance Payments')
+                      "
+                      class="dropdown-item"
+                      href="javascript:void(0)"
+                      ><i class="icon icon-forward icon-fw mr-2"></i>View
+                      Payment</a
+                    >
+                    <a
+                      *ngIf="
+                        (user?.permission?.includes('Edit Finance Payment') &&
+                          item?.status === 'Draft') ||
+                        item?.status === 'Redraft'
+                      "
+                      class="dropdown-item"
+                      [routerLink]="
+                        '/finance/payments-received/edit/' +
+                        item?.financePaymentId
+                      "
+                      ><i class="icon icon-edit icon-fw mr-2"></i>Edit
+                      Payment</a
+                    >
+                    <a
+                      *ngIf="
+                        (user?.permission?.includes('Delete Finance Payment') &&
+                          item?.status === 'Draft') ||
+                        item?.status === 'Redraft'
+                      "
+                      class="dropdown-item text-danger"
+                      (click)="deletePayment(item.financePaymentId)"
+                      href="javascript:void(0)"
+                      ><i class="icon icon-trash icon-fw mr-2"></i>Delete
+                      Payment</a
+                    >
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ng-template #noData>
+          <h1 class="display-4 text-center font-weight-light p-5">
+            No Data Available
+          </h1>
+        </ng-template>
+      </div>
+
+      <footer>
+        <nav>
+          <ul class="pagination pagination-sm justify-content-end">
+            <li class="page-item" *ngIf="pagination.hasPreviousPage">
+              <a
+                class="page-link"
+                href="javascript:void(0)"
+                (click)="
+                  pagination.pageNumber = pagination.pageNumber - 1;
+                  getPayments()
+                "
+                >Previous</a
+              >
+            </li>
+            <li class="page-item pagination-menu-wrapper">
+              <a
+                class="page-link page-target"
+                href="javascript:void(0)"
+                (click)="itemPaginatedJumpModal()"
+              >
+                {{ pagination.pageNumber }} of {{ pagination.maxPage }} page{{
+                  pagination.pageNumber > 1 ? "s" : ""
+                }}
+                <span class="sr-only">(current)</span>
+              </a>
+              <div
+                class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+              >
+                <div class="pagination-menu-body">
+                  <div class="h-auto">
+                    <span>Jump to Page</span>
+                    <select
+                      aria-controls="data-table"
+                      [(ngModel)]="pagination.pageNumber"
+                      (change)="getPayments()"
+                      class="custom-select custom-select-xl form-control form-control-xl height"
+                    >
+                      <option
+                        (click)="pagination.pageNumber = line"
+                        *ngFor="let line of pagination.jumpArray"
+                      >
+                        {{ line }}
+                      </option>
+                    </select>
+                    <div class="text-center mt-3">
+                      <button type="button" class="btn btn-danger btn-xs">
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </li>
+            <li class="page-item" *ngIf="pagination.hasNextPage">
+              <a
+                class="page-link"
+                href="javascript:void(0)"
+                (click)="
+                  pagination.pageNumber = pagination.pageNumber + 1;
+                  getPayments()
+                "
+              >
+                Next
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </footer>
+    </div>
+  </div>
+</ng-container>
+<ng-template #singleView>
+  <div *ngIf="isLoading" class="d-flex justify-content-center">
+    <span [style.color]="currentTheme?.secondaryColor"> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+  </div>
+  <app-payment-received
+    [user]="user"
+    [allPayments]="allPayments"
+    [selectedPaymentId]="selectedPaymentId"
+    [currentTheme]="currentTheme"
+    (closeView)="closePayment()"
+    (fetchPayments)="getPayments()"
+  >
+  </app-payment-received>
+</ng-template>

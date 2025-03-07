@@ -1,0 +1,62 @@
+<div class="text-center mt-5">
+  <lnd-spinner *ngIf="fetching" text="Loading..."></lnd-spinner>
+</div>
+<ul
+  *ngIf="!fetching && group"
+  class="dt-list dt-list-one-second padded-left mt-5"
+>
+  <li class="dt-list__item mr-5">
+    <div class="media">
+      <i
+        class="icon icon-user-o icon-3x mr-3 align-self-center text-warning"
+      ></i>
+      <div class="media-body">
+        <span class="d-block text-light-gray f-12 mb-1"
+          >Total Group Members</span
+        >
+        <h5 class="mb-0">{{ group?.membersCount }}</h5>
+      </div>
+    </div>
+  </li>
+  <li class="dt-list__item">
+    <div class="media">
+      <i
+        class="icon icon-datepicker icon-2x mr-3 align-self-center text-warning"
+      ></i>
+      <div class="media-body">
+        <span class="d-block text-light-gray f-12 mb-1">Group Code</span>
+        <h5 class="mb-0">{{ groupCode }}</h5>
+      </div>
+    </div>
+  </li>
+</ul>
+<table *ngIf="group?.members?.length && !fetching" class="table table-striped">
+  <thead>
+    <tr>
+      <th><span class="mx-5">Group Members</span></th>
+      <th><span class="mx-5">User ID</span></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let gm of group?.members">
+      <td>
+        <span class="mx-5">{{ gm.personName }}</span>
+      </td>
+      <td [style.color]="colorTheme.secondaryColor">
+        <span class="mx-5">{{ gm.personId }}</span>
+      </td>
+      <td>
+        <i class="icon icon-trash ml-2 cursor text-danger"></i>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div
+  *ngIf="!group?.members?.length && !fetching"
+  class="d-flex flex-column align-items-center w-100"
+>
+  <h1 class="display-4 text-center font-weight-light pt-5">
+    No group members found
+  </h1>
+</div>

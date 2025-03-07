@@ -1,0 +1,201 @@
+<h3 class="mb-5 font-weight-bold">Product Balance</h3>
+
+<form [formGroup]="balanceDetailsForm">
+  <div class="form-row mb-3">
+    <div class="col-md-6">
+      <div class="mb-3 form-group">
+        <label for="validationDefault01"
+          >Fixed Deposit Opening Balance Default Value</label
+        >
+        <input
+          type="text"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+          class="form-control"
+          placeholder="0 naira"
+          formControlName="depositProductDefaultOpeningBalance"
+        />
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mb-3 form-group">
+        <label for="validationDefault01"
+          >Set Range for Fixed Deposit Opening Balance</label
+        >
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="label mr-3">
+            <label>Minimum</label>
+          </div>
+          <div class="input">
+            <input
+              type="text"
+              currencyMask
+              [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              class="form-control"
+              placeholder="0.1"
+              formControlName="depositProductMinimumOpeningBalance"
+              step="0.1"
+            />
+          </div>
+          <div class="bd-bottom"></div>
+          <div class="input">
+            <input
+              type="text"
+              currencyMask
+              [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+              class="form-control"
+              placeholder="100.1"
+              formControlName="depositProductMaximumOpeningBalance"
+              step="0.1"
+            />
+          </div>
+          <div class="label ml-3">
+            <label>Maximum</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-row mb-3">
+    <div class="col-md-6">
+      <div class="mb-3 form-group">
+        <label for="validationDefault01"
+          >Fixed Deposit Term Length Default Value</label
+        >
+        <input
+          type="text"
+          class="form-control"
+          placeholder="0"
+          formControlName="depositProductDefaultTermLength"
+        />
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mb-3 form-group">
+        <label for="validationDefault01">Set Range for Term Length</label>
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="label mr-3">
+            <label>Minimum</label>
+          </div>
+          <div class="input">
+            <input
+              type="number"
+              class="form-control"
+              placeholder="1"
+              formControlName="depositProductMinTermLength"
+            />
+          </div>
+          <div class="bd-bottom"></div>
+          <div class="input">
+            <input
+              type="number"
+              class="form-control"
+              placeholder="100"
+              formControlName="depositProductMaxTermLength"
+            />
+          </div>
+          <div class="label ml-3">
+            <label>Maximum</label>
+          </div>
+          <div class="label ml-3">
+            <!-- {{
+              balanceDetailsForm.get('depositProductTermUnitMeasure').value === '0' ? 'per day'
+              : balanceDetailsForm.get('depositProductTermUnitMeasure').value === '1' ? 'per week'
+              : balanceDetailsForm.get('depositProductTermUnitMeasure').value === '2' ? 'per month'
+              : ''
+            }} -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-row mb-3">
+    <div class="col-md-6">
+      <div class="mb-3 form-group">
+        <label for="exampleFormControlSelect1"
+          >Set Fixed Deposit Term Unit Measure</label
+        >
+        <select
+          class="form-control"
+          id="exampleFormControlSelect1"
+          formControlName="depositProductTermUnitMeasure"
+        >
+          <option value="null" disabled>
+            Select fixed deposit term unit measure
+          </option>
+          <option value="0">Days</option>
+          <option value="1">Weeks</option>
+          <option value="2">Months</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="mb-3 form-group">
+        <label for="exampleFormControlSelect1"
+          >Account Balance to Use for Calculation</label
+        >
+        <select
+          class="form-control"
+          id="exampleFormControlSelect1"
+          formControlName="balanceForCalculations"
+        >
+          <option value="null" disabled>
+            Select account balance for calculation
+          </option>
+          <option value="0">Minimum Daily Balance</option>
+          <option value="1">Average Daily Balance</option>
+          <option value="2">End of Day Balance</option>
+        </select>
+      </div>
+      <div
+        class="mb-3 form-group"
+        *ngIf="balanceDetailsForm.get('balanceForCalculations').value === '2'"
+      >
+        <label for="validationDefault01"
+          >Maximum Balance for Interest Calculation</label
+        >
+        <input
+          type="text"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+          class="form-control"
+          formControlName="maximumBalanceForInterestCalculation"
+        />
+      </div>
+    </div>
+  </div>
+  <div class="form-row mb-3">
+    <div class="col-md-6">
+      <div class="mb-3 form-group">
+        <label for="exampleFormControlSelect1"
+          >Format for Days of the Year for Calculation</label
+        >
+        <select
+          class="form-control"
+          id="exampleFormControlSelect1"
+          formControlName="daysInYear"
+        >
+          <option value="null" disabled>
+            Select format for days for calculation
+          </option>
+          <option value="Actual/365 Fixed(365 days)">Actual 365/Fixed</option>
+          <option value="Actual/360 (360 days)">Actual 360/Fixed</option>
+          <option value="Actual/Actual ISDA">Actual ISDA</option>
+          <option value="30E/360 ISDA(30/360 German)">
+            30E/360 ISDA (30/360 German)
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex w-25 mx-auto">
+    <button
+      class="mt-3 mb-3 btn btn-primary orange-bg text-center btn-block"
+      type="submit"
+      (click)="goToNextStep()"
+    >
+      Proceed
+    </button>
+  </div>
+</form>

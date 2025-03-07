@@ -1,0 +1,180 @@
+<section >
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h3 class="m-0">Narration Cipher Service</h3>
+      <button
+        *ngIf="
+          user.permission.includes('Edit Risk Engine Configuration') &&
+          (mode === creditAffordModeEnum.View ||
+            mode === creditAffordModeEnum.None)
+        "
+        class="btn btn-sm px-6 text-white mr-1"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        (click)="
+          onModeChange(
+            mode === creditAffordModeEnum.None
+              ? creditAffordModeEnum.Configure
+              : creditAffordModeEnum.Edit
+          )
+        "
+      >
+        {{ config ? "Edit" : "Configure" }}
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <no-data
+      *ngIf="mode === creditAffordModeEnum.None"
+      title="Not Yet Configured"
+      desc="Click on the button above to set the configuration"
+    ></no-data>
+    <p
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+    >
+      This service flags target words or narratives in a customer's bank
+      transactions for Credit Affordability Engine.
+      {{ mode === creditAffordModeEnum.Edit ? "Update" : "Set" }} the parameters
+      for narration cipher below.
+    </p>
+    <div *ngIf="mode !== creditAffordModeEnum.None" id="tips">
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="cursor text-underline"
+        (click)="hideHints = !hideHints"
+      >
+        {{ hideHints ? "Show" : "Hide" }} Hints
+      </p>
+
+      <ul *ngIf="!hideHints">
+        <li>
+          <b>Narrative Cipher: </b>
+          <span class="hint-color"
+            >This indicates if the narration service should be applied or
+            not.</span
+          >
+        </li>
+        <li>
+          <b>Period Threshold: </b
+          ><span class="hint-color"
+            >This defines the time frame, in months, for searching transactions
+            within the bank statement.</span
+          >
+        </li>
+        <li>
+          <b>Target Words: </b
+          ><span class="hint-color"
+            >These are the words in the search criteria that if found results in
+            a FAIL of the NarrationCipher service.</span
+          >
+        </li>
+      </ul>
+    </div>
+    <div
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+      id="accordions"
+    >
+      <div class="d-flex flex-wrap mt-3">
+        <div class="d-flex align-items-center">
+          <div class="my-6">
+            <p class="mb-0 mr-3"></p>
+            <lnd-switch
+              [value]="narrationCipherForm.value.checkCipher"
+              text="Narrative Cipher"
+              (emittedValue)="toggleSwitch($event)"
+            ></lnd-switch>
+          </div>
+        </div>
+        <form
+          class="w-100"
+          [formGroup]="narrationCipherForm"
+          (ngSubmit)="submit()"
+        >
+          <div class="form-row">
+            <div class="col-md-6 mb-6">
+              <label>Period Threshold (months)</label>
+
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Enter number of months"
+                formControlName="periodThreshold"
+              />
+
+              <lnd-input-errors
+                label="Period Threshold"
+                [control]="narrationCipherForm.get('periodThreshold')"
+              ></lnd-input-errors>
+            </div>
+
+            <div class="col-md-12">
+              <label>Target Words</label>
+              <textarea
+                placeholder="Enter target words, separated by a comma."
+                class="form-control"
+                formControlName="targetWords"
+              ></textarea>
+
+              <lnd-input-errors
+                label="Target Words"
+                [control]="narrationCipherForm.get('targetWords')"
+              ></lnd-input-errors>
+            </div>
+          </div>
+          <button
+            class="btn btn-danger mt-6 mr-3"
+            [disabled]="isLoading"
+            (click)="onModeChange(creditAffordModeEnum.View)"
+          >
+            Cancel
+          </button>
+          <button
+            [disabled]="narrationCipherForm.invalid"
+            class="btn mt-6"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+          >
+            {{ isLoading ? "Processing..." : "Update" }}
+            <i *ngIf="isLoading" class="icon icon-spin2 icon-spin"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+    <div *ngIf="mode === creditAffordModeEnum.View">
+      <div class="row">
+        <div class="col-md-4">
+          <p class="title-text mb-1">Narrative Cipher</p>
+          <p class="subtitle-text">
+            {{ config.checkCipher ? "On" : "Off" }}
+          </p>
+        </div>
+        <div class="col-md-4">
+          <p class="title-text mb-1">Period Threshold</p>
+          <p class="subtitle-text">
+            {{ config.periodThreshold }} Month{{
+              config.periodThreshold > 1 ? "s" : ""
+            }}
+          </p>
+        </div>
+        <div class="col-md-4">
+          <p class="title-text mb-1">Target Words</p>
+          <span class="d-flex align-items-center flex-wrap">
+            <span
+              *ngFor="let item of config.targetWords"
+              [style.backgroundColor]="
+                getLightenedColor(currentTheme?.primaryColor)
+              "
+              [style.color]="currentTheme?.primaryColor"
+              class="badge badge-pill my-1 mr-1"
+              >{{ item }}</span
+            >
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

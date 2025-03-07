@@ -1,0 +1,26 @@
+header {
+  a {
+    background-color: var(--secondary-color);
+    &:hover {
+      background-color: var(--secondary-color) !important;
+    }
+  }
+}
+
+main {
+  padding: 20px;
+}
+
+.form-row {
+  div {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+}
+
+footer {
+  button {
+    background-color: var(--secondary-color);
+    color: var(--white);
+  }
+}

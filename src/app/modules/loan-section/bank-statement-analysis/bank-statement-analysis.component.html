@@ -1,0 +1,337 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div class="card">
+      <div
+        class="bg-transparent card-header card-nav d-flex justify-content-between"
+      >
+        <ul class="card-header-links nav nav-underline" role="tablist">
+          <li *ngIf="loanInfo?.isDecideActive" class="nav-item">
+            <a
+              class="nav-link active"
+              data-toggle="tab"
+              href="#bank-statement-decide"
+              role="tab"
+              (mouseover)="hoverBankStatementDecide = true"
+              (mouseleave)="hoverBankStatementDecide = false"
+              [ngStyle]="
+                hoverBankStatementDecide
+                  ? { color: currentTheme?.secondaryColor }
+                  : {}
+              "
+              aria-controls="bank-statement-decide"
+              aria-selected="true"
+              >Bank Statement (Decide)</a
+            >
+          </li>
+          <li class="nav-item" *ngIf="usesRemitaRepaymentMethod">
+            <a
+              [ngClass]="{'active':!loanInfo?.isDecideActive }"
+              class="nav-link"
+              data-toggle="tab"
+              href="#inflight-remita"
+              style="height: 28.18px"
+              role="tab"
+              (mouseover)="hoverInflightRemita = true"
+              (mouseleave)="hoverInflightRemita = false"
+              [ngStyle]="
+                hoverInflightRemita
+                  ? { color: currentTheme?.secondaryColor }
+                  : {}
+              "
+              aria-controls="inflight-remita"
+              aria-selected="true"
+              ><span class="d-flex"
+                ><span class="mr-1">Inflight (Remita)</span>
+                <span class="ripple"></span></span
+            ></a>
+          </li>
+          <li *ngIf="canUseCrc()" class="nav-item">
+            <a
+              class="nav-link"
+              data-toggle="tab"
+              href="#credit-check-first-central"
+              role="tab"
+              aria-controls="credit-check-first-central"
+              (mouseover)="hoverCreditCheck = true"
+              (mouseleave)="hoverCreditCheck = false"
+              [ngStyle]="
+                hoverCreditCheck ? { color: currentTheme?.secondaryColor } : {}
+              "
+              aria-selected="true"
+              >Credit Check (First Central)</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="pb-2 card-body">
+        <div class="mt-5 tab-content">
+          <div *ngIf="loanInfo?.isDecideActive" id="bank-statement-decide" class="tab-pane active">
+            <header>
+              <div
+                id="title"
+                [style.border-bottom]="
+                  '3px solid ' + currentTheme?.secondaryColor
+                "
+              >
+                Queue
+              </div>
+              <div class="d-flex align-item-center mt-4">
+                <input
+                  type="text"
+                  placeholder="Search By Request Code"
+                  class="form-control w-25"
+                  #search
+                />
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.backgroundColor]="currentTheme?.secondaryColor"
+                  (click)="
+                    getBankStatementAnalysisRequests({ code: search.value })
+                  "
+                >
+                  Search
+                </button>
+                <slct-2
+                  style="width: 130px"
+                  class="mx-3"
+                  [data]="filters"
+                  [formControl]="status"
+                  [customSearchEnabled]="true"
+                  [placeholder]="'Filter By'"
+                ></slct-2>
+                <button
+                  *ngIf="showManualTrigger && !triggerLoading"
+                  class="btn btn-xs text-white"
+                  [style.backgroundColor]="currentTheme?.primaryColor"
+                  (click)="manualTrigger()"
+                >
+                  Manual Trigger
+                </button>
+                <button
+                  class="btn btn-xs btn-warning mx-1"
+                  disabled
+                  *ngIf="showManualTrigger && triggerLoading"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Processing..
+                </button>
+              </div>
+            </header>
+            <div *ngIf="isLoading" class="mt-3">
+              <p
+                class="text-center"
+                [style.color]="currentTheme?.secondaryColor"
+              >
+                Retrieving Requests... <i class="icon icon-spin icon-spin2"></i>
+              </p>
+            </div>
+
+            <div
+              *ngIf="queue.length > 0 && !isLoading; else noData"
+              style="padding: 40px"
+              class="mt-3"
+            >
+              <table class="table table-striped">
+                <thead>
+                  <th>CODE</th>
+                  <th>APPLICANT</th>
+                  <th>
+                    ({{ appOwnerInfo?.currency?.currencySymbol }}) LOAN AMOUNT
+                  </th>
+                  <th>TENOR</th>
+                  <th>STATUS</th>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let item of queue; let i = index">
+                    <td [style.color]="currentTheme?.secondaryColor">
+                      {{ item.code }}
+                    </td>
+                    <td>{{ item.applicant }}</td>
+                    <td>{{ loanInfo?.loanAmount | number : "1.2-2" }}</td>
+                    <td>{{ loanInfo?.tenor }} Months</td>
+                    <td class="d-flex align-items-center">
+                      <div
+                        id="l-badge"
+                        class="d-flex align-items-center justify-content-center mr-3"
+                        [ngClass]="item.status === 'Done' ? 'done' : 'waiting'"
+                      >
+                        <div id="dot"></div>
+                        <small>{{ item.status }}</small>
+                      </div>
+
+                      <div
+                        class="cursor"
+                        [style.color]="currentTheme?.secondaryColor"
+                        (click)="openModal(decide, i)"
+                        *ngIf="item.status === 'Done'"
+                      >
+                        <i class="mr-2 icon icon-forward icon-fw"></i>View
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <ng-template #noData>
+              <p class="display-3 text-light text-center mt-6">
+                Nothing in Queue
+              </p>
+            </ng-template>
+            <ng-template #decide>
+              <div
+                class="d-flex justify-content-end"
+                (click)="closeModal()"
+                style="background-color: #fff"
+              >
+                <span class="cursor mr-3" style="font-size: 3rem"
+                  ><b>&times;</b></span
+                >
+              </div>
+              <lnd-decide
+                [decideInfo]="decideInfo"
+                [loanInfo]="loanInfo"
+                [currentTheme]="currentTheme"
+              ></lnd-decide>
+            </ng-template>
+          </div>
+          <div
+            id="inflight-remita"
+            class="tab-pane"
+            *ngIf="usesRemitaRepaymentMethod"
+            [ngClass]="{'active':!loanInfo.isDecideActive }"
+          >
+            <h2>Customer's Details From Remita</h2>
+            <ul class="dt-list dt-list-one-second">
+              <li
+                class="dt-list__item mr-3"
+                *ngIf="customerDetailsFromRemita?.CustomerName"
+              >
+                <div class="media">
+                  <i
+                    class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+                  ></i>
+                  <div class="media-body">
+                    <span class="d-block text-light-gray f-12 mb-1"
+                      >Customer's Name</span
+                    >
+                    <h5 class="mb-0">
+                      {{ customerDetailsFromRemita?.CustomerName }}
+                    </h5>
+                  </div>
+                </div>
+              </li>
+              <li
+                class="dt-list__item mr-3"
+                *ngIf="customerDetailsFromRemita?.AccountNumber"
+              >
+                <div class="media">
+                  <i
+                    class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+                  ></i>
+                  <div class="media-body">
+                    <span class="d-block text-light-gray f-12 mb-1"
+                      >Account Number</span
+                    >
+                    <h5 class="mb-0">
+                      {{ customerDetailsFromRemita?.AccountNumber }}
+                    </h5>
+                  </div>
+                </div>
+              </li>
+              <li
+                class="dt-list__item mr-3"
+                *ngIf="customerDetailsFromRemita?.CompanyName"
+              >
+                <div class="media">
+                  <i
+                    class="mr-3 icon icon-company icon-2x align-self-center text-warning"
+                  ></i>
+                  <div class="media-body">
+                    <span class="d-block text-light-gray f-12 mb-1"
+                      >Company Name</span
+                    >
+                    <h5 class="mb-0">
+                      {{ customerDetailsFromRemita?.CompanyName }}
+                    </h5>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <div id="accordion">
+              <div class="card-header d-flex justify-content-between">
+                <h3 class="mb-0">Salary History</h3>
+                <span
+                  (click)="selectedRemitaInfo = 'Salary'"
+                  [ngClass]="selectedRemitaInfo === 'Salary' ? 'open' : 'close'"
+                  class="cursor"
+                  data-toggle="collapse"
+                  data-target="#salary"
+                  ><i class="icon icon-chevron-down icon-lg"></i
+                ></span>
+              </div>
+              <div class="content">
+                <div
+                  id="salary"
+                  class="collapse show"
+                  aria-labelledby="headingOne"
+                  data-parent="#accordion"
+                >
+                  <lnd-remita-salary-info
+                    [salaryHistory]="
+                      customerDetailsFromRemita?.SalaryPaymentDetails
+                    "
+                    [colorTheme]="colorTheme"
+                  >
+                  </lnd-remita-salary-info>
+                </div>
+              </div>
+              <div class="card-header d-flex justify-content-between">
+                <h3 class="mb-0">Loan History</h3>
+                <span
+                  (click)="selectedRemitaInfo = 'Loan'"
+                  [ngClass]="selectedRemitaInfo === 'Loan' ? 'open' : 'close'"
+                  class="cursor"
+                  data-toggle="collapse"
+                  data-target="#loan"
+                  ><i class="icon icon-chevron-down icon-lg"></i
+                ></span>
+              </div>
+              <div class="content">
+                <div
+                  id="loan"
+                  class="collapse show"
+                  aria-labelledby="headingOne"
+                  data-parent="#accordion"
+                >
+                  <lnd-remita-loan-info
+                    [loanHistory]="
+                      customerDetailsFromRemita?.LoanHistoryDetails
+                    "
+                  >
+                  </lnd-remita-loan-info>
+                </div>
+              </div>
+            </div>
+            <div class="dotted-divider my-5"></div>
+          </div>
+          <div id="credit-check-first-central" class="tab-pane">
+            <div class="p-5 d-flex justify-content-center align-items-center">
+              <button
+                *ngIf="canUseCrc()"
+                class="btn btn-query btn-xs mr-3"
+                (click)="getCreditRegistryCustomerData()"
+                [disabled]="loadingCreditScore"
+              >
+                <i
+                  *ngIf="loadingCreditScore"
+                  class="mr-2 icon icon-spin icon-spin2"
+                ></i>
+                Fetch Credit Registry Information
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

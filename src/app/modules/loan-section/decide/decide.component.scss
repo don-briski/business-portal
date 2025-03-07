@@ -1,0 +1,55 @@
+header {
+  margin-bottom: 5rem;
+  display: flex;
+  .anchor-wrapper {
+    display: flex;
+    justify-content: center;
+    border: 1px solid #e5e5e5;
+    font-size: 16px;
+    padding: 2rem;
+    width: 25%;
+    cursor: pointer;
+    .tab {
+      text-align: center;
+      color: #979797;
+    }
+  }
+}
+
+.select {
+  background-color: #f9f9f9;
+}
+
+.unselect {
+  background-color: #fff;
+}
+
+#avatar {
+  border-radius: 100%;
+  padding: 2rem;
+
+  i {
+    font-size: 8rem;
+    color: #fff;
+  }
+}
+.tab-content {
+  margin-top: 8rem;
+}
+
+.title {
+  font-size: 14px;
+  color: #8692a6;
+}
+
+.text {
+  font-size: 18px;
+}
+
+.col-md-4 {
+  margin-bottom: 2rem;
+}
+
+.default-color {
+  color: #545454;
+}

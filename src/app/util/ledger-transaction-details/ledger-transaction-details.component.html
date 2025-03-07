@@ -1,0 +1,218 @@
+<div class="body">
+  <header>
+    <nav
+      data-state="closed"
+      class="d-flex justify-content-between align-items-center"
+    >
+      <ul>
+        <div class="brand-logo">
+          <span *ngIf="!appOwner?.logoUrl" class="font-weight-bold">{{
+            appOwner?.appOwnerName
+          }}</span>
+          <img
+            class="logo-in"
+            [src]="appOwner?.logoUrl"
+            alt="logo"
+            *ngIf="appOwner?.logoUrl"
+          />
+        </div>
+      </ul>
+      <button
+        *ngIf="!isFullPageView"
+        type="button"
+        class="close-btn"
+        aria-label="Close"
+        (click)="onCloseModal()"
+      >
+        <i class="icon icon-close"></i>
+      </button>
+    </nav>
+  </header>
+  <main>
+    <section class="info mt-5">
+      <h5 class="text-center" [style.color]="currentTheme?.secondaryColor">
+        <span *ngIf="accountTxData.accountNumber"
+          >{{ accountTxData.accountNumber }} -
+        </span>
+        {{ accountTxData.accountName }}
+      </h5>
+      <h2 class="text-center">Account Transactions</h2>
+      <p class="text-center">Basis:</p>
+      <p class="text-center">
+        <span
+          *ngIf="
+            accountTxData?.startDate && accountTxData?.startDate !== 'null'
+          "
+          >From {{ accountTxData?.startDate | customDatePipe : "DD-MMM-YYYY" }}
+        </span>
+        <span
+          >{{
+            accountTxData?.startDate && accountTxData?.startDate !== "null"
+              ? "To"
+              : "As at"
+          }}
+          {{ accountTxData?.endDate | customDatePipe : "DD-MMM-YYYY" }}</span
+        >
+      </p>
+    </section>
+    <section class="table mt-5">
+      <div
+        *ngIf="requestLoader"
+        class="table-loader"
+        style="text-align: center; color: indianred"
+      >
+        <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+      </div>
+
+      <div
+        [class]="isFullPageView ? 'row m-0' : ''"
+        *ngIf="!requestLoader && allTransactions.length > 0"
+      >
+        <div [class]="isFullPageView ? 'col-md-10 offset-md-1' : ''">
+          <div [class]="!isFullPageView ? 'card-padding' : ''">
+            <div class="d-flex justify-content-between mb-4">
+              <div>
+                <button
+                  class="btn btn-xs btn-primary mr-3"
+                  (click)="exportTransactions()"
+                >
+                  <i
+                    class="icon icontext-white icon-editor icon-fw icon-lg"
+                  ></i>
+                  Export
+                </button>
+                <button
+                  class="btn btn-xs btn-warning"
+                  printSectionId="transactionsTable"
+                  styleSheetFile="assets/css/bootstrap.min.css"
+                  [printTitle]="
+                    this.accountTxData.accountNumber +
+                    '-' +
+                    this.accountTxData.accountName +
+                    'Transactions'
+                  "
+                  ngxPrint
+                >
+                  <i class="icon icon-files icon-fw icon-lg"></i>
+                  Print
+                </button>
+              </div>
+              <div>
+                <button
+                  *ngIf="!isFullPageView"
+                  class="btn btn-xs btn-primary mr-3"
+                  (click)="onFullPageView()"
+                >
+                  View on Full Page
+                </button>
+                <button
+                  class="btn cadet-lit btn-xs text-white"
+                  (click)="getAccountTransactions()"
+                >
+                  Refresh
+                </button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-body">
+                <div id="transactionsTable">
+                  <table class="table table-hover borderless">
+                    <thead [lndStuck]="'bg-white'" class="border-bottom">
+                      <th>Transaction date</th>
+                      <th>Posting date</th>
+                      <th>Reference</th>
+                      <th>Branch</th>
+                      <th>Transaction details</th>
+                      <th class="text-right">Debit</th>
+                      <th class="text-right">Credit</th>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let transaction of allTransactions">
+                        <td>
+                          {{
+                            transaction?.transactionDate
+                              | customDatePipe : "DD-MMM-YYYY"
+                          }}
+                        </td>
+                        <td>
+                          {{
+                            transaction?.postingDate
+                              | customDatePipe : "DD-MMM-YYYY hh:mm a"
+                          }}
+                        </td>
+
+                        <td>{{ transaction?.reference }}</td>
+                        <td>{{ transaction?.branch }}</td>
+                        <td>{{ transaction?.label }}</td>
+                        <td
+                          class="text-right pointer text-lighten-primary"
+                          (click)="onViewRelatedEntity(transaction)"
+                        >
+                          {{
+                            transaction?.debitAmount <= 0
+                              ? ""
+                              : (transaction?.debitAmount | number : "1.2-2")
+                          }}
+                        </td>
+                        <td
+                          class="text-right pointer text-lighten-primary"
+                          (click)="onViewRelatedEntity(transaction)"
+                        >
+                          {{
+                            transaction?.creditAmount <= 0
+                              ? ""
+                              : (transaction?.creditAmount | number : "1.2-2")
+                          }}
+                        </td>
+                      </tr>
+                      <tr class="border-top border-bottom font-weight-bold">
+                        <td colspan="5" class="text-center">Total</td>
+                        <td class="text-right">
+                          {{ totalDebitAmount | number : "1.2-2" }}
+                        </td>
+                        <td class="text-right">
+                          {{ totalCreditAmount | number : "1.2-2" }}
+                        </td>
+                      </tr>
+                      <tr class="border-top border-bottom font-weight-bold">
+                        <td colspan="5" class="text-center">
+                          Closing Balance as at
+                          {{
+                            accountTxData?.endDate
+                              | customDatePipe : "DD-MMM-YYYY"
+                          }}
+                        </td>
+                        <td class="text-right">
+                          <span
+                            *ngIf="
+                              (accountTxData?.transactionType === 'Debit' &&
+                                closingBalance > 0) ||
+                              (accountTxData?.transactionType === 'Credit' &&
+                                closingBalance < 0)
+                            "
+                            >{{ closingBalance | number : "1.2-2" }}</span
+                          >
+                        </td>
+                        <td class="text-right">
+                          <span
+                            *ngIf="
+                              (accountTxData?.transactionType === 'Credit' &&
+                                closingBalance > 0) ||
+                              (accountTxData?.transactionType === 'Debit' &&
+                                closingBalance < 0)
+                            "
+                            >{{ closingBalance | number : "1.2-2" }}</span
+                          >
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

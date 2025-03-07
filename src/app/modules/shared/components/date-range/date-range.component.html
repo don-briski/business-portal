@@ -1,0 +1,67 @@
+<form class="border-left pl-2">
+  <div class="generate-menu-body">
+    <div class="h-auto">
+      <div class="row">
+        <div
+          [ngClass]="showSecondColumnInFilterModal ? 'col-md-6' : 'col-md-12'"
+          [ngStyle]="{
+            width: showSecondColumnInFilterModal ? '330px' : '300px'
+          }"
+        >
+          <ul class="date-ranges">
+            <li (click)="selectDateRange('Today')">Today</li>
+            <li (click)="selectDateRange('ThisWeek')">This Week</li>
+            <li (click)="selectDateRange('ThisMonth')">This Month</li>
+            <li (click)="selectDateRange('ThisQuarter')">This Quarter</li>
+            <li (click)="selectDateRange('ThisYear')">This Year</li>
+            <li (click)="selectDateRange('YearToDate')">Year To Date</li>
+            <li (click)="selectDateRange('Yesterday')">Yesterday</li>
+            <li (click)="selectDateRange('PreviousWeek')">Previous Week</li>
+            <li (click)="selectDateRange('PreviousMonth')">Previous Month</li>
+            <li (click)="selectDateRange('PreviousQuarter')">
+              Previous Quarter
+            </li>
+            <li (click)="selectDateRange('PreviousYear')">Previous Year</li>
+            <li (click)="selectDateRange('Custom')">Custom</li>
+          </ul>
+        </div>
+        <div *ngIf="showSecondColumnInFilterModal" class="col-md-6 border-left">
+          <div *ngIf="showCustomDatePicker">
+            <mat-form-field appearance="outline">
+              <mat-label>Select Date Range</mat-label>
+              <mat-date-range-input [rangePicker]="picker">
+                <input
+                  matStartDate
+                  placeholder="Start Date"
+                  (dateChange)="setCustomDate($event, 'startDate')"
+                />
+                <input
+                  matEndDate
+                  placeholder="End Date"
+                  (dateChange)="setCustomDate($event, 'endDate')"
+                />
+              </mat-date-range-input>
+              <mat-datepicker-toggle
+                matSuffix
+                [for]="picker"
+              ></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+            </mat-form-field>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="generate-menu-footer">
+      <div class="d-flex justify-content-end">
+        <button
+          type="button"
+          class="btn btn-danger btn-xs"
+          (click)="toggleDateRangeModal.emit()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</form>

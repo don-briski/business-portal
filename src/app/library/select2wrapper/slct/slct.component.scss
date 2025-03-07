@@ -1,0 +1,26 @@
+::ng-deep {
+  .multiselect-dropdown {
+    .dropdown-btn {
+      .selected-item {
+        border-color: #ff015b !important;
+        border-radius: 10px !important;
+        background: #fff !important;
+        color: #ff015b !important;
+        font-size: 12px !important;
+        max-width: 100% !important;
+        a {
+          color: #ff015b !important;
+        }
+      }
+    }
+    .multiselect-item-checkbox {
+      input[type="checkbox"] {
+        div {
+          ::before {
+            display: none !important;
+          }
+        }
+      }
+    }
+  }
+}

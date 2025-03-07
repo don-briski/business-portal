@@ -1,0 +1,329 @@
+<section class="p-6">
+  <header class="d-flex justify-content-between align-items-center mb-6">
+    <h3 class="mb-0">
+      <i
+        [style.color]="currentTheme?.secondaryColor"
+        class="mr-2 icon icon-setting icon-2x align-self-center"
+      ></i
+      >{{ shortTermPlacementTypeId ? "Edit" : "" }} Placement Type Setup
+
+      <small
+        *ngIf="shortTermPlacementTypeId && isLoading"
+        class="ml-6"
+        [style.color]="currentTheme?.secondaryColor"
+        >Retrieving Placement Type <i class="icon icon-spin icon-spin2"></i
+      ></small>
+    </h3>
+
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </header>
+
+  <form [formGroup]="placementTypeForms" (ngSubmit)="submit()">
+    <div class="form-row">
+      <div class="col-md-3 mb-6">
+        <label for="name">Placement Name <b class="text-danger">*</b></label>
+        <input
+          id="name"
+          type="text"
+          class="form-control"
+          placeholder="Enter Placement Name"
+          formControlName="placementName"
+        />
+
+        <span
+          *ngIf="
+            placementTypeForms.get('placementName').touched &&
+            placementTypeForms.get('placementName').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Placement Name is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="type">Placement Type <b class="text-danger">*</b></label>
+        <slct-2
+          formControlName="placementTypeObj"
+          id="type"
+          [data]="placementTypes"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Placement Type'"
+        ></slct-2>
+
+        <span
+          *ngIf="
+            placementTypeForms.get('placementType').touched &&
+            placementTypeForms.get('placementType').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Placement Type is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="institution"
+          >Institution <b class="text-danger">*</b></label
+        >
+        <slct-2
+          id="institution"
+          formControlName="financialInstitutionIdObj"
+          [data]="institutions"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Institution'"
+        ></slct-2>
+
+        <span
+          *ngIf="
+            placementTypeForms.get('financialInstitutionId').touched &&
+            placementTypeForms
+              .get('financialInstitutionId')
+              .getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Institution is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="tenor-type">Tenor Type <b class="text-danger">*</b></label>
+        <slct-2
+          formControlName="tenorTypeObj"
+          id="tenor-type"
+          [data]="tenorTypes"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Tenor Type'"
+        ></slct-2>
+
+        <span
+          *ngIf="
+            placementTypeForms.get('tenorType').touched &&
+            placementTypeForms.get('tenorType').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Tenor Type is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="tenor">Tenor <b class="text-danger">*</b></label>
+        <input
+          formControlName="tenor"
+          id="tenor"
+          type="text"
+          class="form-control"
+          placeholder="Enter Tenor"
+        />
+
+        <span
+          *ngIf="
+            placementTypeForms.get('tenor').touched &&
+            placementTypeForms.get('tenor').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Tenor is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="penal-charge">Penal Charge</label>
+        <input
+          formControlName="penalCharge"
+          id="penal-charge"
+          type="text"
+          class="form-control"
+          placeholder="Enter Your Penal Charge"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+        />
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="wht">WHT</label>
+        <input
+          formControlName="whtRate"
+          id="wht"
+          type="text"
+          class="form-control"
+          placeholder="Enter WHT"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+        />
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="interest-type"
+          >Interest Type <b class="text-danger">*</b></label
+        >
+        <slct-2
+          formControlName="interestTypeObj"
+          id="interest-type"
+          [data]="interestTypes"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Interest Type'"
+        ></slct-2>
+
+        <span
+          *ngIf="
+            placementTypeForms.get('interestType').touched &&
+            placementTypeForms.get('interestType').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Interest Type is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="rate">Interest Rate <b class="text-danger">*</b></label>
+        <input
+          formControlName="interestRate"
+          id="rate"
+          type="text"
+          class="form-control"
+          placeholder="Enter Interest Rate"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+        />
+
+        <span
+          *ngIf="
+            placementTypeForms.get('interestRate').touched &&
+            placementTypeForms.get('interestRate').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Interest Rate is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="interest-cycle"
+          >Interest Cycle <b class="text-danger">*</b></label
+        >
+        <slct-2
+          id="interest-cycle"
+          formControlName="interestCycleObj"
+          [data]="interestCycles"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Interest Cycle'"
+        ></slct-2>
+
+        <span
+          *ngIf="
+            placementTypeForms.get('interestCycle').touched &&
+            placementTypeForms.get('interestCycle').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Interest Cycle is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="amount">Amount <b class="text-danger">*</b></label>
+        <input
+          id="amount"
+          formControlName="amount"
+          type="text"
+          class="form-control"
+          placeholder="Enter Amount"
+          currencyMask
+          [options]="{ prefix: '', thousands: ',', decimal: '.' }"
+        />
+
+        <span
+          *ngIf="
+            placementTypeForms.get('amount').touched &&
+            placementTypeForms.get('amount').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Amount is Required</small
+          >
+        </span>
+      </div>
+
+      <div class="col-md-3 mb-6">
+        <label for="status">Status <b class="text-danger">*</b></label>
+        <slct-2
+          formControlName="statusObj"
+          id="status"
+          [data]="statuses"
+          [customSearchEnabled]="true"
+          [placeholder]="'Select Status'"
+        ></slct-2>
+
+        <span
+          *ngIf="
+            placementTypeForms.get('status').touched &&
+            placementTypeForms.get('status').getError('required')
+          "
+        >
+          <small [style.color]="currentTheme?.secondaryColor"
+            >Status is Required</small
+          >
+        </span>
+      </div>
+    </div>
+
+    <lnd-switch
+      *ngIf="requiresApproval"
+      [value]="requiresApproval"
+      [text]="'Requires Approval'"
+      (emittedValue)="setApproval($event)"
+    ></lnd-switch>
+
+    <lnd-switch
+      *ngIf="!requiresApproval"
+      [text]="'Requires Approval'"
+      (emittedValue)="setApproval($event)"
+    ></lnd-switch>
+
+    <div class="mt-4 d-flex justify-content-end">
+      <button
+        *ngIf="!isLoading"
+        (click)="closeModal()"
+        class="btn btn-sm mr-2 text-white"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+      >
+        Close
+      </button>
+      <button
+        *ngIf="!isLoading"
+        [disabled]="placementTypeForms.invalid"
+        class="btn btn-sm mr-2 btn-primary"
+      >
+        Save
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-warning btn-sm"
+        *ngIf="isLoading"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+  </form>
+</section>

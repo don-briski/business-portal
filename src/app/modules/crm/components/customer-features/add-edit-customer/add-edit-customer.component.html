@@ -1,0 +1,346 @@
+<header class="d-flex justify-content-between align-items-center w-100">
+  <h1 class="mb-0">
+    <span>{{ !customer?.id ? "Create New " : "Edit " }}Customer</span>
+  </h1>
+  <a
+    class="btn text-white"
+    routerLink="/crm/customers"
+    [style.background]="colorTheme?.secondaryColor"
+    [style.borderColor]="colorTheme?.secondaryColor"
+    href="javascript:void(0)"
+    >Back</a
+  >
+</header>
+
+<main class="card">
+  <div *ngIf="isFetching && customer?.id" class="d-flex justify-content-center">
+    <lnd-spinner text="Retrieving Customer Details" />
+  </div>
+
+  <ng-container *ngIf="!isFetching">
+    <form [formGroup]="form">
+      <section id="personalInfo">
+        <h3>Personal Information</h3>
+        <p class="font-weight-light font-italic">
+          All fields are required for customer creation. For prospect creation,
+          only fields marked with an <span class="text-danger">*</span> are
+          required.
+        </p>
+        <div class="form-fields form-row">
+          <div class="col-md-4">
+            <label>First name <b class="text-danger">*</b></label>
+            <input
+              type="text"
+              placeholder="Enter First name"
+              formControlName="firstName"
+              class="form-control"
+            />
+
+            <lnd-input-errors
+              label="First name"
+              [control]="form.get('firstName')"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Last Name <b class="text-danger">*</b></label>
+            <input
+              type="text"
+              placeholder="Enter Last Name"
+              class="form-control"
+              formControlName="lastName"
+            />
+
+            <lnd-input-errors
+              label="Last name"
+              [control]="form.get('lastName')"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Date of Birth</label>
+            <input
+              type="date"
+              placeholder="Enter Date of Birth"
+              class="form-control"
+              formControlName="dateOfBirth"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Phone Number </label>
+            <input
+              type="text"
+              placeholder="Enter Phone Number"
+              class="form-control"
+              formControlName="phoneNumber"
+            />
+
+            <lnd-input-errors
+              label="Phone number"
+              [control]="form.get('phoneNumber')"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Gender </label>
+            <slct-2
+              [data]="genders"
+              placeholder="Select Gender"
+              formControlName="gender"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Email Address </label>
+            <input
+              type="email"
+              placeholder="Enter Email"
+              class="form-control"
+              formControlName="email"
+            />
+
+            <lnd-input-errors label="Email" [control]="form.get('email')" />
+          </div>
+
+          <div class="col-md-4">
+            <label>Bank Verification Number </label>
+            <input
+              type="text"
+              placeholder="Enter BVN"
+              class="form-control"
+              formControlName="bvn"
+            />
+            <lnd-input-errors label="BVN" [control]="form.get('bvn')" />
+
+            <lnd-submit-btn
+              customClasses="btn-xs mt-2 btn-outline-success"
+              text="Validate"
+              [isProcessing]="validatingBvn"
+              [isValid]="form.get('bvn').valid && form.get('bvn').dirty"
+              (triggerAction)="validateBvn()"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Marital Status</label>
+            <slct-2
+              [data]="maritalStatuses"
+              placeholder="Select Marital Status"
+              formControlName="maritalStatus"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Employment Status </label>
+            <slct-2
+              [data]="employmentStatuses"
+              placeholder="Select Employment Status"
+              formControlName="employmentStatus"
+            />
+          </div>
+
+          <div *ngIf="profile" class="col-12 mb-5 p-0">
+            <lnd-profile-upload [profile]="profile" [allowEdit]="false" />
+          </div>
+
+          <div class="col-md-12">
+            <label>Residential Address </label>
+            <textarea
+              class="w-75 form-control"
+              placeholder="Enter Address"
+              formControlName="address"
+              rows="5"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section id="nextOfKin" class="mt-5 pt-5">
+        <h3>Next Of Kin Information</h3>
+
+        <div class="row">
+          <div class="col-md-4">
+            <label>First name </label>
+            <input
+              type="text"
+              placeholder="Enter First name"
+              class="form-control"
+              formControlName="nextOfKinFirstName"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Last Name </label>
+            <input
+              type="text"
+              placeholder="Enter Last Name"
+              class="form-control"
+              formControlName="nextOfKinLastName"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Date of Birth</label>
+            <input
+              type="date"
+              placeholder="Enter Date of Birth"
+              class="form-control"
+              formControlName="nextOfKinDateOfBirth"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Phone Number </label>
+            <input
+              type="text"
+              placeholder="Enter Phone Number"
+              class="form-control"
+              formControlName="nextOfKinPhoneNumber"
+            />
+
+            <lnd-input-errors
+              label="Phone number"
+              [control]="form.get('nextOfKinPhoneNumber')"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Relationship </label>
+            <input
+              type="text"
+              placeholder="Enter Relationship to customer"
+              class="form-control"
+              formControlName="nextOfKinRelationship"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Email Address </label>
+            <input
+              type="email"
+              placeholder="Enter Email"
+              class="form-control"
+              formControlName="nextOfKinEmailAddress"
+            />
+
+            <lnd-input-errors
+              label="Email Address"
+              [control]="form.get('nextOfKinEmailAddress')"
+            />
+          </div>
+
+          <div class="col-md-12">
+            <label>Residential Address </label>
+            <textarea
+              class="w-75 form-control"
+              placeholder="Enter Address"
+              formControlName="nextOfKinAddress"
+              rows="5"
+            ></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section id="bankInfo" class="mt-5 pt-5">
+        <h3>Bank Information</h3>
+
+        <div class="row">
+          <div class="col-md-4">
+            <label>Bank Name </label>
+
+            <div *ngIf="isFetching">
+              <lnd-spinner text="retrieving banks" />
+            </div>
+
+            <slct-2
+              *ngIf="!isFetching"
+              [data]="banks"
+              [customSearchEnabled]="true"
+              placeholder="Select Bank"
+              formControlName="bankId"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label
+              >Bank Account Number
+              <sup *ngIf="form.value?.bankAccountName"
+                ><span class="text-success ml-3"
+                  ><b>{{ form.value?.bankAccountName }}</b></span
+                ></sup
+              ></label
+            >
+            <input
+              type="text"
+              placeholder="Enter Bank Account Number"
+              class="form-control"
+              formControlName="bankAccountNumber"
+            />
+            <lnd-submit-btn
+              customClasses="btn-xs mt-2 btn-outline-success"
+              text="Validate"
+              [isProcessing]="validatingBankAccount"
+              [isValid]="
+                form.get('bankId').dirty &&
+                form.get('bankId').valid &&
+                form.get('bankAccountNumber').dirty &&
+                form.value.bankAccountNumber !== ''
+              "
+              (triggerAction)="validateBank()"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Net Income </label>
+            <input
+              type="text"
+              class="form-control"
+              currencyMask
+              [options]="{
+                prefix: currencySymbol,
+                thousands: ',',
+                decimal: '.'
+              }"
+              formControlName="netIncome"
+            />
+          </div>
+        </div>
+      </section>
+    </form>
+
+    <footer class="d-flex justify-content-end pt-5">
+      <button
+        class="btn btn-sm btn-outline-dark"
+        routerLink="/crm/customers"
+        type="button"
+      >
+        Cancel
+      </button>
+      <lnd-submit-btn
+        *ngIf="
+          !isFetching &&
+          (!customer || customer?.status === CUSTOMER_TYPE.Prospect)
+        "
+        customClasses="btn-sm btn-light"
+        [text]="customer ? 'Update Prospect' : 'Save Prospect'"
+        [isProcessing]="isLoading && customerType === CUSTOMER_TYPE.Prospect"
+        [isValid]="form.valid"
+        (triggerAction)="submit(CUSTOMER_TYPE.Prospect)"
+      />
+      <lnd-submit-btn
+        customClasses="btn-sm bg-secondary text-white"
+        [text]="
+          !customer
+            ? 'Create Customer'
+            : customer?.status === CUSTOMER_TYPE.Customer
+            ? 'Update'
+            : 'Convert to Customer'
+        "
+        [isProcessing]="isLoading && customerType === CUSTOMER_TYPE.Customer"
+        [isValid]="allowCreateCustomer && form.valid && profile"
+        (triggerAction)="submit(CUSTOMER_TYPE.Customer)"
+      />
+    </footer>
+  </ng-container>
+</main>

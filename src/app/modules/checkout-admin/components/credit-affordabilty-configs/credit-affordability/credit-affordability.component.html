@@ -1,0 +1,57 @@
+<ng-container *ngIf="user.permission.includes('View Risk Engine Configuration')">
+  <div
+  *ngIf="fetching"
+  [style.color]="currentTheme?.secondaryColor"
+  class="d-flex justify-content-center mt-5"
+>
+  <span> <i class="icon icon-spin icon-spin2"></i> Fetching Config... </span>
+</div>
+<div [ngSwitch]="currentTabIndex" *ngIf="!fetching" class="mt-5">
+  <div *ngSwitchCase="1">
+    <lnd-bank-check
+      [config]="config?.bankCheckConfiguration"
+      (retrieveConfig)="getConfig()"
+      [user]="user"
+    ></lnd-bank-check>
+  </div>
+  <div *ngSwitchCase="2">
+    <lnd-narration-cipher
+      [config]="config?.narrationCipherConfiguration"
+      (retrieveConfig)="getConfig()"
+      [user]="user"
+    ></lnd-narration-cipher>
+  </div>
+  <div *ngSwitchCase="3">
+    <lnd-acc-activity-cipher
+      [config]="config?.accountActivityCipherConfiguration"
+      (retrieveConfig)="getConfig()"
+      [user]="user"
+    ></lnd-acc-activity-cipher>
+  </div>
+  <div *ngSwitchCase="4">
+    <lnd-income-cipher
+      (retrieveConfig)="getConfig()"
+      [bankStatementLengthMonths]="
+        config?.bankCheckConfiguration?.bankStatementLengthMonths
+      "
+      [config]="config?.incomeCipherConfiguration"
+      [user]="user"
+    ></lnd-income-cipher>
+  </div>
+  <div *ngSwitchCase="5">
+    <lnd-sweeper-cipher
+      [config]="config?.accountSweepCipherConfiguration"
+      (retrieveConfig)="getConfig()"
+      [user]="user"
+    ></lnd-sweeper-cipher>
+  </div>
+  <div *ngSwitchDefault>
+    <lnd-loan-config
+      *ngIf="!isLoading"
+      [config]="config?.creditAffordabilityConfig"
+      (retrieveConfig)="getConfig()"
+      [user]="user"
+    ></lnd-loan-config>
+  </div>
+</div>
+</ng-container>

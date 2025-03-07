@@ -1,0 +1,72 @@
+<footer>
+  <nav>
+    <ul class="pagination pagination-sm justify-content-end">
+      <li class="page-item" *ngIf="pagination.hasPreviousPage">
+        <a
+          class="page-link"
+          href="javascript:void(0)"
+          (click)="
+            pagination.pageNumber = pagination.pageNumber - 1;
+            onPaginationChange(pagination)
+          "
+          >Previous</a
+        >
+      </li>
+      <li class="page-item pagination-menu-wrapper">
+        <a
+          class="page-link page-target"
+          href="javascript:void(0)"
+          (click)="itemPaginatedJumpModal()"
+        >
+          {{ pagination.pageNumber }} of {{ pagination.totalPages }} page{{
+            pagination.totalPages > 1 ? "s" : ""
+          }}
+          <span class="sr-only">(current)</span>
+        </a>
+        <div
+          class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+        >
+          <div class="pagination-menu-body">
+            <div class="h-auto">
+              <span>Jump to Page</span>
+              <select
+                aria-controls="data-table"
+                [(ngModel)]="pagination.pageNumber"
+                (change)="onPaginationChange(pagination)"
+                class="custom-select custom-select-xl form-control form-control-xl height"
+              >
+                <option
+                  (click)="pagination.pageNumber = line"
+                  *ngFor="let line of pagination.jumpArray"
+                >
+                  {{ line }}
+                </option>
+              </select>
+              <div class="text-center mt-3">
+                <button
+                  (click)="itemPaginatedJumpModal()"
+                  type="button"
+                  class="btn btn-danger btn-xs"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li class="page-item" *ngIf="pagination.hasNextPage">
+        <a
+          class="page-link"
+          href="javascript:void(0)"
+          (click)="
+            pagination.pageNumber = pagination.pageNumber + 1;
+            onPaginationChange(pagination)
+          "
+        >
+          Next
+        </a>
+      </li>
+    </ul>
+  </nav>
+</footer>

@@ -1,0 +1,122 @@
+<div class="dt-page__header">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">New Customer Profile</h1>
+    <button
+      class="btn btn-primary orange-bg text-white"
+      [routerLink]="['/deposits/accounts']"
+    >
+      Back
+    </button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-6 offset-md-3">
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+          <div class="p-3">
+              <!-- Form -->
+        <form [formGroup]="customerForm" (ngSubmit)="saveCustomer()">
+            <div class="mb-3 form-group">
+              <label for="validationDefault01">First name</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter first name"
+                formControlName="firstName"
+              />
+            </div>
+            <div class="mb-3 form-group">
+              <label for="validationDefault01">Last name</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter last name"
+                formControlName="lastName"
+              />
+            </div>
+            <div class="mb-3 form-group">
+              <label for="validationDefault01">Phone number</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter phone number"
+                formControlName="phoneNumber"
+              />
+            </div>
+            <div class="mb-3 form-group">
+              <label for="validationDefault01">Date of birth</label>
+              <input
+              lndInvalidDateChecker
+                type="date"
+                class="form-control"
+                placeholder="Enter date of birth"
+                formControlName="dateOfBirth"
+              />
+            </div>
+            <div class="mb-3 form-group">
+              <label for="validationDefault01">BVN</label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter bvn"
+                formControlName="bvn"
+              />
+            </div>
+            <div class="mb-3 form-group">
+              <label for="validationDefault01">Email address</label>
+              <input
+                type="email"
+                class="form-control"
+                placeholder="Enter email address"
+                formControlName="emailAddress"
+              />
+            </div>
+            <div class="mb-3 form-group">
+              <label for="validationDefault01">Residential address</label>
+              <textarea
+                type="text"
+                class="form-control"
+                placeholder="Enter residential address"
+                rows="5"
+                formControlName="residentialAddress"
+              ></textarea>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-primary orange-bg text-white" type="submit" *ngIf="!loading" [disabled]="customerForm.invalid">Submit Profile</button>
+                <button type="button" class="btn btn-primary btn-sm" *ngIf="loading" [disabled]="true">
+                  <i class="icon icon-spin icon-spin2"></i> Processing...
+                </button>
+            </div>
+          </form>
+          <!-- /Form -->
+          </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+
+<!-- Modals -->
+<ng-template #successModal>
+  <div class="modal-body">
+    <div class="container">
+      <section style="min-height: 300px;" class="d-flex flex-column">
+        <div class="d-flex justify-content-center"><img src="../assets/images/check-circle.png"
+            alt="check-circle">
+        </div>
+        <h3 style="text-align: center;" class="my-4">Customer’s profile has been <br>successfully created</h3>
+        <div class="d-flex justify-content-center align-items-center mt-auto">
+          <a *ngIf="accountToBeCreated === 'savings-plan'" class="btn btn-primary orange-bg text-white" [routerLink]="['/deposits/accounts/create-savings-plan']" (click)="closeModal()">New Savings Plan</a>
+          <a *ngIf="accountToBeCreated === 'fixed-deposit'" class="btn btn-primary orange-bg text-white" [routerLink]="['/deposits/accounts/create-fixed-deposit-plan']" (click)="closeModal()">New Fixed Deposit</a>
+        </div>
+      </section>
+    </div>
+  </div>
+</ng-template>
+<!-- /Modals -->

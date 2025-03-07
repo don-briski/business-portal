@@ -1,0 +1,62 @@
+.field-set {
+  background: #f3f4f6;
+  border-radius: 6px;
+}
+
+.open {
+  transform: rotate(0);
+}
+
+.close {
+  transform: rotate(180deg);
+}
+
+.icon-lg {
+  font-size: 25px !important;
+}
+
+.table th,
+.table td,
+.table tbody {
+  border: none;
+}
+
+.c-width {
+  flex: 1;
+}
+
+.table-row,
+.total-amt-container {
+  background: #f3f4f6;
+  border-radius: 6px;
+}
+
+.table-row td {
+  padding: 8px;
+}
+
+.spacer {
+  height: 8px;
+}
+
+.add-btn {
+  border-radius: 6px;
+}
+
+.remove-btn {
+  margin: 5px 4px 5px 12px;
+  color: red;
+  padding: 5px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+
+.radio {
+  height: 60px;
+}
+
+.radio input {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}

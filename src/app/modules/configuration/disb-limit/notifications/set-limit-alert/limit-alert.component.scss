@@ -1,0 +1,32 @@
+.btn-add-limit {
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+}
+
+form {
+  padding: 5px 20px;
+
+  input[type="checkbox"] {
+    width: 12px;
+    height: 12px;
+    margin-right: 10px;
+  }
+}
+
+.wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  p {
+    width: calc(100% / 3);
+  }
+}
+
+.bordered {
+  border-top: 1px solid var(--border-grey);
+  padding: 20px 0;
+}
+
+.btn-edit {
+  background-color: var(--border-grey);
+  color: var(--black);
+}

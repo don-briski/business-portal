@@ -1,0 +1,16 @@
+aside{
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .ps-custom-scrollbar {
+    overflow-x: hidden;
+  }
+
+  &.shrink-width{
+    width: 45%;
+  }
+}

@@ -1,0 +1,30 @@
+form {
+  position: absolute;
+  min-width: 160px;
+  padding: 8px;
+  margin: 8px 0;
+  font-size: 15px;
+  color: #545454;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 0 solid transparent;
+  border-radius: 6.4px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.175);
+
+  .date-ranges {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .date-ranges li {
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 6px;
+  }
+
+  .date-ranges li:hover {
+    background-color: #1e5a79;
+    color: white;
+  }
+}

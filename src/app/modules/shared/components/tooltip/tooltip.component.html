@@ -1,0 +1,19 @@
+<span *ngIf="!useProjection">
+  <i
+    class="icon icon-question-circle icon-fw icon-xl"
+    [placement]="placement"
+    [ngbTooltip]="text"
+  ></i>
+</span>
+
+<span *ngIf="useProjection">
+  <i
+    class="icon icon-question-circle icon-fw icon-xl"
+    [placement]="placement"
+    [ngbTooltip]="projectedContent"
+  ></i>
+
+  <ng-template #projectedContent>
+    <ng-content></ng-content>
+  </ng-template>
+</span>

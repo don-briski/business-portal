@@ -1,0 +1,1859 @@
+<div class="dt-root">
+  <header class="dt-header">
+    <div class="dt-header__container">
+      <div
+        class="dt-brand"
+        [style.background]="
+          currentTheme.theme === 'Dark' ? currentTheme?.dark?.primaryColor : ''
+        "
+      >
+        <div
+          class="dt-brand__tool"
+          data-toggle="main-sidebar"
+          (click)="toggleSidebar()"
+        >
+          <i
+            [ngClass]="{
+              'icon-menu-fold': isSidebarClosed,
+              'icon-menu': !isSidebarClosed
+            }"
+            class="icon icon-xl d-lg-inline-block"
+          ></i>
+        </div>
+        <span class="dt-brand__logo" *ngIf="appOwner?.logoUrl">
+          <a class="dt-brand__logo-link" routerLink="/">
+            <img
+              class="dt-brand__logo-img d-none d-lg-inline-block"
+              [src]="appOwnerLogo"
+              alt="Logo"
+            />
+            <img
+              class="dt-brand__logo-symbol d-lg-none"
+              [src]="appOwnerLogo"
+              alt="Logo"
+            />
+          </a>
+        </span>
+        <span class="dt-brand__logo" *ngIf="!appOwner?.logoUrl">
+          <span class="font-weight-bold">{{ appOwner?.appOwnerName }}</span>
+        </span>
+      </div>
+      <div
+        class="dt-header__toolbar"
+        [style.background]="
+          currentTheme.theme === 'Dark' ? currentTheme?.dark?.primaryColor : ''
+        "
+      >
+        <div class="dt-nav-wrapper">
+          <ul class="dt-nav d-lg-none">
+            <li class="dt-nav__item dt-notification-search dropdown">
+              <a
+                href="#"
+                class="dt-nav__link dropdown-toggle no-arrow"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="icon icon-search-new icon-fw icon-lg"></i>
+              </a>
+              <div class="dropdown-menu"></div>
+            </li>
+          </ul>
+          <ul class="dt-nav">
+            <li
+              class="dt-nav__item dropdown"
+              *ngIf="module === allModulesEnum.Loan"
+            >
+              <a
+                *ngIf="
+                  metricsdata?.ApplicationPool?.Count > 0.0 &&
+                  user?.permission?.includes('View Application Pool')
+                "
+                routerLink="/main/pool/applicationpool"
+                class="dt-nav__link dropdown-toggle mr-5"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="icon icon-contacts text-black-50 icon-lg"></i
+                ><span
+                  >Application Pool<span class="btn-danger badge ml-2">{{
+                    metricsdata?.ApplicationPool?.Count || "0"
+                  }}</span></span
+                >
+              </a>
+              <a
+                *ngIf="
+                  metricsdata?.DisbursementPool?.Count > 0.0 &&
+                  user?.permission?.includes('View Disbursement Pool')
+                "
+                routerLink="/main/pool/disbursementpool"
+                class="dt-nav__link dropdown-toggle"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                <i class="icon icon-revenue-new text-black-50 icon-lg"></i
+                ><span
+                  >Disbursement Pool<span class="btn-danger badge ml-2">{{
+                    metricsdata?.DisbursementPool?.Count || "0"
+                  }}</span></span
+                >
+              </a>
+            </li>
+          </ul>
+          <ul class="dt-nav d-lg-none">
+            <li class="dt-nav__item dropdown"></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="dt-main">
+    <aside
+      id="main-sidebar"
+      class="dt-sidebar dt-sidebar-mobile"
+      [ngClass]="{ 'dt-sidebar-mobile-display': isSidebarClosed }"
+    >
+      <div
+        class="dt-sidebar__container"
+        [style.background]="currentTheme?.primaryColor"
+      >
+        <div class="dt-sidebar__notification d-none d-lg-block">
+          <div class="dropdown mb-6" id="user-menu-dropdown">
+            <a
+              href="#"
+              class="dropdown-toggle dt-avatar-wrapper text-body"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+              [ngClass]="{
+                'light-bground': isFeatureEnabled(
+                  growthBookFeatureTags.EnterpriseStyle
+                )
+              }"
+            >
+              <img
+                *ngIf="userProfilePicture"
+                class="dt-avatar"
+                [src]="userProfilePicture"
+                alt="User"
+              />
+              <span
+                *ngIf="!userProfilePicture"
+                class="dt-avatar mr-4 size-35 rounded-circle bg-light-blue text-white"
+                [style.background]="currentTheme?.secondaryColor"
+                >{{ user?.person?.initials }}</span
+              >
+              <span class="dt-avatar-info">
+                <span class="dt-avatar-name"> {{ name }} </span>
+              </span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <div
+                class="dt-avatar-wrapper flex-nowrap p-6 mt--5 text-dark rounded-top"
+              >
+                <span class="dt-avatar-info">
+                  <span>{{ name }}</span>
+                  <span class="f-12">{{ user?.roleName }}</span>
+                </span>
+              </div>
+              <a
+                class="dropdown-item"
+                href="javascript:void(0)"
+                (click)="logOut()"
+              >
+                <i class="icon icon-setting icon-fw mr-2 mr-sm-1"></i> Logout
+              </a>
+            </div>
+          </div>
+        </div>
+        <ul class="dt-side-nav">
+          <li class="dt-side-nav__item">
+            <a routerLink="/modules" class="dt-side-nav__link">
+              <i
+                class="icon icon-apps icon-fw icon-xl"
+                [style.color]="currentTheme?.textColor"
+              ></i>
+              <span
+                class="dt-side-nav__text"
+                [style.color]="currentTheme?.textColor"
+                >All Modules</span
+              >
+            </a>
+          </li>
+          <ng-container *ngIf="module === allModulesEnum.Loan">
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >main</span
+              >
+            </li>
+            <li class="dt-side-nav__item">
+              <a
+                routerLink="/main/dashboard"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+              >
+                <i class="icon icon-dashboard icon-fw icon-xl"></i>
+                <span class="dt-side-nav__text">Dashboard</span>
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View Application Pool') ||
+                user?.permission?.includes('View Disbursement Pool')
+              "
+            >
+              <a
+                routerLink="/main/pool"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+              >
+                <i
+                  class="icon icontext-white icon-contacts icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Pool</span></a
+              >
+            </li>
+          </ng-container>
+          <ng-container *ngIf="module === allModulesEnum.Deposit">
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >main</span
+              >
+            </li>
+            <li class="dt-side-nav__item">
+              <a
+                routerLink="/deposits/dashboard"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+              >
+                <i class="icon icon-dashboard icon-fw icon-xl"></i>
+                <span class="dt-side-nav__text">Dashboard</span>
+              </a>
+            </li>
+          </ng-container>
+          <ng-container *ngIf="module === allModulesEnum.Investment">
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >main</span
+              >
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Investment Dashboard')"
+            >
+              <a
+                routerLink="/treasury/investment-dashboard"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                title="Dashboard"
+              >
+                <i
+                  class="icon icontext-white icon-dashboard icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Dashboard</span>
+              </a>
+            </li>
+          </ng-container>
+          <ng-container *ngIf="module === allModulesEnum.Finance">
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >main</span
+              >
+            </li>
+            <li class="dt-side-nav__item">
+              <a
+                routerLink="/finance/dashboard"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Dashboard"
+              >
+                <i
+                  class="icon icontext-white icon-dashboard icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Dashboard</span
+                >
+              </a>
+            </li>
+          </ng-container>
+          <ng-container *ngIf="module === allModulesEnum.Workflow">
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >main</span
+              >
+            </li>
+            <li class="dt-side-nav__item">
+              <a
+                routerLink="/workflow/dashboard"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Dashboard"
+                (click)="onShowSubNavItems('Dashboard')"
+              >
+                <i
+                  class="icon icontext-white icon-dashboard icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Dashboard</span>
+              </a>
+            </li>
+          </ng-container>
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+            *ngIf="module === allModulesEnum.Workflow"
+          >
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >Workflow</span
+              >
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Request')"
+            >
+              <a
+                routerLink="/workflow/requests"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Requests"
+                (click)="onShowSubNavItems('Requests')"
+              >
+                <i
+                  class="icon icontext-white icon-contacts icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Requests</span>
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('Approve Request')"
+            >
+              <a
+                class="dt-side-nav__link cursor"
+                title="Approval"
+                (click)="onShowSubNavItems('Approval')"
+              >
+                <i
+                  class="icon icontext-white icon-contacts icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Approval</span>
+              </a>
+              <ul class="sub-nav-items" *ngIf="currentNavItemId === 'Approval'">
+                <li class="dt-side-nav__item">
+                  <a
+                    class="dt-side-nav__link"
+                    routerLink="/workflow/approval/roles"
+                    routerLinkActive="active"
+                  >
+                    <span class="sub-nav-item-text dt-side-nav__text"
+                      ><span class="d-flex justify-content-between">
+                        <span>Roles</span
+                        ><span
+                          *ngIf="
+                            pendingRequestsStats && pendingRequestsStats.roles
+                          "
+                          class="workflow-request-stats-text"
+                          >{{ pendingRequestsStats.roles }}</span
+                        >
+                      </span></span
+                    ></a
+                  >
+                </li>
+                <li class="dt-side-nav__item">
+                  <a
+                    class="dt-side-nav__link"
+                    routerLink="/workflow/approval/teams"
+                    routerLinkActive="active"
+                    ><span class="sub-nav-item-text dt-side-nav__text"
+                      ><span class="d-flex justify-content-between">
+                        <span>Teams</span
+                        ><span
+                          *ngIf="
+                            pendingRequestsStats && pendingRequestsStats.teams
+                          "
+                          class="workflow-request-stats-text"
+                          >{{ pendingRequestsStats.teams }}</span
+                        >
+                      </span></span
+                    ></a
+                  >
+                </li>
+                <li class="dt-side-nav__item">
+                  <a
+                    class="dt-side-nav__link"
+                    routerLink="/workflow/approval/users"
+                    routerLinkActive="active"
+                    ><span class="sub-nav-item-text dt-side-nav__text"
+                      ><span class="d-flex justify-content-between">
+                        <span>Users</span
+                        ><span
+                          *ngIf="
+                            pendingRequestsStats && pendingRequestsStats.users
+                          "
+                          class="workflow-request-stats-text"
+                          >{{ pendingRequestsStats.users }}</span
+                        >
+                      </span></span
+                    ></a
+                  >
+                </li>
+              </ul>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Reports')"
+            >
+              <a
+                routerLink="/workflow/reports"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Reports"
+                (click)="onShowSubNavItems('Reports')"
+              >
+                <i
+                  class="icon icontext-white icon-data-display icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Reports</span>
+              </a>
+            </li>
+          </div>
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+            *ngIf="module === allModulesEnum.Loan"
+          >
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >Loan Section</span
+              >
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View My Loan Applications') ||
+                user?.permission?.includes('View Failed Disbursements') ||
+                user?.permission?.includes('View All Loan Applications')
+              "
+            >
+              <a
+                routerLink="/loan/applications"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+              >
+                <i
+                  class="icon icontext-white icon-ckeditor icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Loan Applications</span>
+              </a>
+            </li>
+            <li
+              *ngIf="
+                user?.permission?.includes(
+                  'Claim Applications - Application Pool'
+                )
+              "
+              class="dt-side-nav__item"
+            >
+              <a
+                routerLink="/loan/claimed-applications"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Claimed Applications"
+              >
+                <i
+                  class="icon icontext-white icon-custom-view icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Claimed Applications</span>
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View Disbursement Verifications')
+              "
+            >
+              <a
+                routerLink="/loan/verifications"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Disbursement Verification"
+              >
+                <i
+                  class="icon icontext-white icon-circle-check-o icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Disb. Verification</span>
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View Disbursement Batches') ||
+                user?.permission?.includes('View Failed Disbursements')
+              "
+            >
+              <a
+                routerLink="/loan/disbursements"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Disbursement Batch"
+              >
+                <i class="icon icontext-white icon-files icon-fw icon-xl"></i>
+                <span class="dt-side-nav__text">Disb. Batch</span>
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Loans')"
+            >
+              <a
+                routerLink="/loan/loans"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Loans"
+              >
+                <i
+                  class="icon icontext-white icon-revenue-new icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Loans</span>
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View Payments') ||
+                user?.permission?.includes('View Repayments Due')
+              "
+            >
+              <a
+                routerLink="/loan/payments"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Payments"
+              >
+                <i
+                  class="icon icontext-white icon-notification icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Payments</span>
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Customers')"
+            >
+              <a
+                routerLink="/loan/customers"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Customers"
+              >
+                <i class="icon icontext-white icon-user-o icon-fw icon-xl"></i>
+                <span class="dt-side-nav__text">Customers</span>
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Reports')"
+            >
+              <a
+                routerLink="/loan/reports"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Reports"
+              >
+                <i
+                  class="icon icontext-white icon-data-display icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Reports</span>
+              </a>
+            </li>
+            <span *ngIf="appOwner && isFeatureEnabled('qlp')">
+              <li
+                *ngIf="
+                  user?.permission?.includes(
+                    'View Quick Loan Product Customer Data'
+                  ) ||
+                  user?.permission?.includes('Manage Payroll Data') ||
+                  user?.permission?.includes('Configure Quick Loan Product')
+                "
+                class="dt-side-nav__item dt-side-nav__header"
+              >
+                <span
+                  class="dt-side-nav__text titles"
+                  [style.color]="currentTheme?.accentColor"
+                  >Quick Loans</span
+                >
+              </li>
+              <li
+                *ngIf="
+                  user?.permission?.includes(
+                    'View Quick Loan Product Customer Data'
+                  )
+                "
+                class="dt-side-nav__item"
+              >
+                <a
+                  routerLink="/loan/quick-loans/applications"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                >
+                  <i
+                    class="icon icontext-white icon-ckeditor icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Applications</span>
+                </a>
+              </li>
+              <li
+                *ngIf="user?.permission?.includes('Manage Payroll Data')"
+                class="dt-side-nav__item"
+              >
+                <a
+                  routerLink="/loan/quick-loans/payroll"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                >
+                  <i
+                    class="icon icontext-white icon-revenue-new icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Upload Payroll</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes(
+                    'View Quick Loan Product Customer Data'
+                  )
+                "
+              >
+                <a
+                  routerLink="/loan/quick-loans/customer-data-query"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                >
+                  <i
+                    class="icon icontext-white icon-search-new icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Customer Data Query</span>
+                </a>
+              </li>
+              <li
+                *ngIf="
+                  user?.permission?.includes('Configure Quick Loan Product')
+                "
+                class="dt-side-nav__item"
+              >
+                <a
+                  routerLink="/loan/quick-loans/config"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                >
+                  <i
+                    class="icon icontext-white icon-setting icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Configuration</span>
+                </a>
+              </li>
+            </span>
+          </div>
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+            *ngIf="module === allModulesEnum.Investment"
+          >
+            <ng-container
+              *ngIf="
+                user?.permission?.includes('View Investment Pool') ||
+                user?.permission?.includes('View Running Investment')
+              "
+            >
+              <!-- Menu Header -->
+              <li class="dt-side-nav__item dt-side-nav__header">
+                <span
+                  class="dt-side-nav__text titles"
+                  [style.color]="currentTheme?.accentColor"
+                  >Investment</span
+                >
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Running Investment')"
+              >
+                <a
+                  routerLink="/treasury/investments"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Running Investment"
+                >
+                  <i
+                    class="icon icontext-white icon-revenue-new icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Investments</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes(
+                    'Fetch Investment Liquidation Request'
+                  )
+                "
+              >
+                <a
+                  routerLink="/treasury/liquidation-requests"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Liquidation Requests"
+                >
+                  <i
+                    class="icon icontext-white icon-contacts icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Liquidation Requests</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Short Term Placement')"
+              >
+                <a
+                  routerLink="/treasury/short-term-placement"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Short Term Placement"
+                >
+                  <i
+                    class="icon icontext-white icon-revenue-new icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Short Term Placements</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Running Investment')"
+              >
+                <a
+                  routerLink="/treasury/investmentreports"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Investment Reports"
+                >
+                  <i
+                    class="icon icontext-white icon-data-display icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Reports</span>
+                </a>
+              </li>
+            </ng-container>
+          </div>
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+            *ngIf="
+              module === allModulesEnum.Finance &&
+              user?.permission?.includes('View Finance Module')
+            "
+          >
+            <li
+              class="dt-side-nav__item dt-side-nav__header"
+              *ngIf="
+                user?.permission?.includes('View Invoice') ||
+                user?.permission?.includes('View Finance Payments') ||
+                user?.permission?.includes('View Credit Note') ||
+                user?.permission?.includes('View Bills') ||
+                user?.permission?.includes('View Finance Payments') ||
+                user?.permission?.includes('View Vendor Credit Note') ||
+                user?.permission?.includes('View Expense') ||
+                user?.permission?.includes('View Purchase Order') ||
+                user?.permission?.includes('View Finance Customers') ||
+                user?.permission?.includes('View Vendors') ||
+                user?.permission?.includes('View Item')
+              "
+            >
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                title="External Business Operations"
+                >External Business Ops.</span
+              >
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View Invoice') ||
+                user?.permission?.includes('View Finance Payments') ||
+                user?.permission?.includes('View Credit Note')
+              "
+            >
+              <a
+                href="javascript:void(0)"
+                data-toggle="collapse"
+                data-target="#sales-submenu"
+                class="dt-side-nav__link"
+              >
+                <span
+                  class="dt-side-nav__text d-flex align-items-center justify-content-between"
+                  [style.color]="currentTheme?.textColor"
+                  >Sales
+                  <i
+                    class="icon icontext-white icon-chevron-down icon-fw icon-lg"
+                    [style.color]="currentTheme?.textColor"
+                  ></i
+                ></span>
+              </a>
+              <ul
+                class="submenu collapse"
+                [ngClass]="{ show: isSidebarClosed }"
+                id="sales-submenu"
+              >
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Invoice')"
+                >
+                  <a
+                    routerLink="/finance/invoices"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Manage Invoice"
+                  >
+                    <i
+                      class="icon icontext-white icon-card icon-fw icon-xl"
+                    ></i>
+
+                    <span class="dt-side-nav__text">Invoices</span>
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Finance Payments')"
+                >
+                  <a
+                    routerLink="/finance/payments-received"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Payments Received"
+                  >
+                    <i
+                      class="icon icontext-white icon-arrow-right icon-fw icon-xl"
+                    ></i>
+                    <span class="dt-side-nav__text">Payments Received</span>
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="
+                    user?.permission?.includes('View Credit Note') &&
+                    isFeatureEnabled('cn')
+                  "
+                >
+                  <a
+                    routerLink="/finance/credit-notes"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Credit Notes"
+                  >
+                    <i
+                      class="icon icontext-white icon-calendar icon-fw icon-xl"
+                    ></i>
+                    <span class="dt-side-nav__text">Credit Notes</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View Bills') ||
+                user?.permission?.includes('View Finance Payments') ||
+                user?.permission?.includes('View Vendor Credit Note') ||
+                user?.permission?.includes('View Expense') ||
+                user?.permission?.includes('View Purchase Order')
+              "
+            >
+              <a
+                href="javascript:void(0)"
+                data-toggle="collapse"
+                data-target="#expenses-submenu"
+                class="dt-side-nav__link"
+              >
+                <span
+                  class="dt-side-nav__text d-flex align-items-center justify-content-between"
+                  [style.color]="currentTheme?.textColor"
+                  >Purchases & Expenses
+                  <i
+                    class="icon icontext-white icon-chevron-down icon-fw icon-lg"
+                    [style.color]="currentTheme?.textColor"
+                  ></i
+                ></span>
+              </a>
+              <ul
+                class="submenu collapse"
+                [ngClass]="{ show: isSidebarClosed }"
+                id="expenses-submenu"
+              >
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Bills')"
+                >
+                  <a
+                    routerLink="/finance/bills/all"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Bills"
+                  >
+                    <i
+                      class="icon icontext-white icon-table icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Bills</span
+                    >
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Finance Payments')"
+                >
+                  <a
+                    routerLink="/finance/payments-made"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Payments Made"
+                  >
+                    <i
+                      class="icon icontext-white icon-arrow-left icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Payments Made</span
+                    >
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="
+                    user?.permission?.includes('View Vendor Credit Note') &&
+                    isFeatureEnabled('vcn')
+                  "
+                >
+                  <a
+                    routerLink="/finance/vendor-credit-notes"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Vendor Credit Notes"
+                  >
+                    <i
+                      class="icon icontext-white icon-edit icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Vendor Credit Notes</span
+                    >
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Expense')"
+                >
+                  <a
+                    routerLink="/finance/expenses"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Manage Expense"
+                  >
+                    <i
+                      class="icon icontext-white icon-transfer icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Expenses</span
+                    >
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Purchase Order')"
+                >
+                  <a
+                    routerLink="/finance/purchase-orders"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Purchase Orders"
+                  >
+                    <i
+                      class="icon icontext-white icon-orders icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Purchase Orders</span
+                    >
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View Finance Customers') ||
+                user?.permission?.includes('View Vendors') ||
+                user?.permission?.includes('View Item')
+              "
+            >
+              <a
+                href="javascript:void(0)"
+                data-toggle="collapse"
+                data-target="#contacts-submenu"
+                class="dt-side-nav__link"
+              >
+                <span
+                  class="dt-side-nav__text d-flex align-items-center justify-content-between"
+                  [style.color]="currentTheme?.textColor"
+                  >Contacts & Items
+                  <i
+                    class="icon icontext-white icon-chevron-down icon-fw icon-lg"
+                    [style.color]="currentTheme?.textColor"
+                  ></i
+                ></span>
+              </a>
+              <ul
+                class="submenu collapse"
+                [ngClass]="{ show: isSidebarClosed }"
+                id="contacts-submenu"
+              >
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Finance Customers')"
+                >
+                  <a
+                    routerLink="/finance/customers"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Customers"
+                  >
+                    <i
+                      class="icon icontext-white icon-user-o icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Customers</span
+                    >
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Vendors')"
+                >
+                  <a
+                    routerLink="/finance/vendors"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Vendors"
+                  >
+                    <i
+                      class="icon icontext-white icon-company icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Vendors</span
+                    >
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Item')"
+                >
+                  <a
+                    routerLink="/finance/items"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Items"
+                  >
+                    <i
+                      class="icon icontext-white icon-menu icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Items</span
+                    >
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                title="Internal Business Operations"
+                >Internal Business Ops.</span
+              >
+            </li>
+            <li class="dt-side-nav__item">
+              <a
+                routerLink="/finance/cash-advance/all"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Manage Cash Advance"
+              >
+                <i
+                  class="icon icontext-white icon-revenue-new icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Cash Advance</span
+                >
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Petty Cash Transaction')"
+            >
+              <a
+                routerLink="/finance/pettycash/transaction"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Manage Petty Cash"
+              >
+                <i
+                  class="icon icontext-white icon-revenue-new icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Petty Cash</span
+                >
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item dt-side-nav__header"
+              *ngIf="
+                user?.permission?.includes('View Asset Cards') ||
+                user?.permission?.includes('View Journal') ||
+                user?.permission?.includes('View Accounts') ||
+                user?.permission?.includes('View Ledger Transactions') ||
+                user?.permission?.includes('Manage Business Information') ||
+                user?.permission?.includes('View Transaction Lock')
+              "
+            >
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >Accounting</span
+              >
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="
+                user?.permission?.includes('View Asset Cards') ||
+                user?.permission?.includes('Manage Business Information')
+              "
+            >
+              <a
+                href="javascript:void(0)"
+                data-toggle="collapse"
+                data-target="#assets-submenu"
+                class="dt-side-nav__link"
+              >
+                <span
+                  class="dt-side-nav__text d-flex align-items-center justify-content-between"
+                  [style.color]="currentTheme?.textColor"
+                  >Fixed Assets
+                  <i
+                    class="icon icontext-white icon-chevron-down icon-fw icon-lg"
+                    [style.color]="currentTheme?.textColor"
+                  ></i
+                ></span>
+              </a>
+              <ul
+                class="submenu collapse"
+                [ngClass]="{ show: isSidebarClosed }"
+                id="assets-submenu"
+              >
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Asset Cards')"
+                >
+                  <a
+                    routerLink="/finance/assets/all"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="All Assets"
+                  >
+                    <i
+                      class="icon icontext-white icon-home icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Assets</span
+                    >
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="
+                    user?.permission?.includes('Manage Business Information')
+                  "
+                >
+                  <a
+                    routerLink="/finance/assets/sub-class"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    [ngClass]="{ link: !isSidebarClosed }"
+                    title="Asset Sub-classes"
+                  >
+                    <i
+                      class="icon icontext-white icon-files icon-fw icon-xl"
+                      [style.color]="currentTheme?.textColor"
+                    ></i>
+                    <span
+                      class="dt-side-nav__text"
+                      [style.color]="currentTheme?.textColor"
+                      >Asset Sub-Classes</span
+                    >
+                  </a>
+                </li>
+              </ul>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Journal')"
+            >
+              <a
+                routerLink="/finance/journals"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Manage Journals"
+              >
+                <i
+                  class="icon icontext-white icon-timeline icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Journals</span
+                >
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Accounts')"
+            >
+              <a
+                routerLink="/finance/coa/all"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="All Accounts"
+              >
+                <i
+                  class="icon icontext-white icon-chart-area icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Chart of Accounts</span
+                >
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Ledger Transactions')"
+            >
+              <a
+                routerLink="/finance/transactions"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Ledger Transactions"
+              >
+                <i
+                  class="icon icontext-white icon-editor icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Transactions</span
+                >
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Workflow Module')"
+            >
+              <a
+                routerLink="/finance/workflow-requests"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Workflow"
+              >
+                <i
+                  class="icon icontext-white icon-editor icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Workflow</span
+                >
+              </a>
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('Manage Business Information')"
+            >
+              <a
+                routerLink="/configurations/financesetup"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Settings"
+              >
+                <i
+                  class="icon icontext-white icon-setting icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Settings</span
+                >
+              </a>
+            </li>
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >General</span
+              >
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('View Reports')"
+            >
+              <a
+                routerLink="/finance/reports"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Reports"
+              >
+                <i
+                  class="icon icontext-white icon-data-display icon-fw icon-xl"
+                  [style.color]="currentTheme?.textColor"
+                ></i>
+                <span
+                  class="dt-side-nav__text"
+                  [style.color]="currentTheme?.textColor"
+                  >Reports</span
+                >
+              </a>
+            </li>
+          </div>
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+            *ngIf="module === allModulesEnum.CheckoutAdmin"
+          >
+            <lnd-layout-nav [layoutNavs]="layoutNavs"></lnd-layout-nav>
+          </div>
+
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+            *ngIf="module === allModulesEnum.CRM"
+          >
+            <lnd-layout-nav [layoutNavs]="layoutNavs" />
+          </div>
+
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+            *ngIf="module === allModulesEnum.wacs"
+          >
+            <lnd-layout-nav [layoutNavs]="layoutNavs" />
+          </div>
+
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+            *ngIf="
+              module === allModulesEnum.Deposit &&
+              user?.permission?.includes('View Finance Module')
+            "
+          >
+            <li class="dt-side-nav__item dt-side-nav__header">
+              <span
+                class="dt-side-nav__text titles"
+                >Deposit</span
+              >
+            </li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('Manage Business Information')"
+            ></li>
+            <li
+              class="dt-side-nav__item"
+              *ngIf="user?.permission?.includes('Manage Business Information')"
+            >
+              <a
+                routerLink="/deposits/accounts"
+                routerLinkActive="active"
+                class="dt-side-nav__link"
+                title="Deposit Account"
+              >
+                <i
+                  class="icon icontext-white icon-contacts icon-fw icon-xl"
+                ></i>
+                <span class="dt-side-nav__text">Deposit Account</span>
+              </a>
+            </li>
+          </div>
+          <div
+            class="dt-sidebar__container2"
+            [style.background]="currentTheme?.primaryColor"
+          >
+            <!-- Menu Header -->
+            <li
+              class="dt-side-nav__item dt-side-nav__header"
+              *ngIf="
+                module !== allModulesEnum.Finance &&
+                module !== allModulesEnum.CheckoutAdmin &&
+                module !== allModulesEnum.CRM &&
+                module !== allModulesEnum.wacs
+              "
+            >
+              <span
+                class="dt-side-nav__text titles"
+                [style.color]="currentTheme?.accentColor"
+                >Configurations</span
+              >
+            </li>
+            <ng-container *ngIf="module === allModulesEnum.Investment">
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Investment Types')"
+              >
+                <a
+                  routerLink="/configurations/investment-types"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Setup"
+                >
+                  <i
+                    class="icon icontext-white icon-setting icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Investment Types</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes('View Short Term Placement Type')
+                "
+              >
+                <a
+                  routerLink="/configurations/placement-types"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Setup"
+                >
+                  <i
+                    class="icon icontext-white icon-setting icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Placement Types</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Financial Institution')"
+              >
+                <a
+                  routerLink="/treasury/financialinstitution"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Investment Reports"
+                >
+                  <i
+                    class="icon icontext-white icon-revenue-new icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Financial Institutions</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes('Manage Business Information')
+                "
+              >
+                <a
+                  routerLink="/treasury/investment-setup"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Setup"
+                >
+                  <i
+                    class="icon icontext-white icon-setting icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Investment Setup</span>
+                </a>
+              </li>
+            </ng-container>
+            <ng-container *ngIf="module === allModulesEnum.Deposit">
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes('Manage Business Information')
+                "
+              >
+                <a
+                  routerLink="/deposits/products"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Deposit Products"
+                >
+                  <i
+                    class="icon icontext-white icon-editor icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Deposit Product</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes('Manage Business Information')
+                "
+              >
+                <a
+                  routerLink="/deposits/setup"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Deposit Setup"
+                >
+                  <i
+                    class="icon icontext-white icon-setting icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Deposit Setup</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Groups')"
+              >
+                <a
+                  routerLink="/deposits/groups"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Group Management"
+                >
+                  <i
+                    class="icon icontext-white icon-setting icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Group Management</span>
+                </a>
+              </li>
+            </ng-container>
+            <ng-container *ngIf="module === allModulesEnum.Loan">
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Loan Types')"
+              >
+                <a
+                  routerLink="/configurations/loantypes"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Loan Types"
+                >
+                  <i
+                    class="icon icontext-white icon-editor icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Loan Types</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes('View Fees') ||
+                  user?.permission?.includes('View Threshold Parameters')
+                "
+              >
+                <a
+                  routerLink="/configurations/parameterssetup"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Parameters Setup"
+                >
+                  <i
+                    class="icon icontext-white icon-revenue-new icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Parameters Setup</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes('View Employment Industries') ||
+                  user?.permission?.includes('View Employers') ||
+                  user?.permission?.includes('View Lending Institutions')
+                "
+              >
+                <a
+                  routerLink="/configurations/businesses"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Businesses"
+                >
+                  <i class="icon icontext-white icon-table icon-fw icon-xl"></i>
+                  <span class="dt-side-nav__text">Businesses</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes('Manage Business Information')
+                "
+              >
+                <a
+                  routerLink="/configurations/loansetup"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Loan Setup"
+                >
+                  <i
+                    class="icon icontext-white icon-setting icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Loan Setup</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Loan Reasons')"
+              >
+                <a
+                  routerLink="/configurations/loanreasons"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Loan Reasons"
+                >
+                  <i
+                    class="icon icontext-white icon-question-circle icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Loan Reasons</span>
+                </a>
+              </li>
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Underwriter Reason')"
+              >
+                <a
+                  routerLink="/configurations/underwriter-reasons"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Users"
+                >
+                  <i
+                    class="icon icontext-white icon-contacts icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Underwriter Reasons</span>
+                </a>
+              </li>
+            </ng-container>
+            <ng-container *ngIf="module === allModulesEnum.Workflow">
+              <li
+                class="dt-side-nav__item"
+                *ngIf="user?.permission?.includes('View Request Setup')"
+              >
+                <a
+                  routerLink="/workflow/request-configs"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Request Setup"
+                  (click)="onShowSubNavItems('Request Setup')"
+                >
+                  <i
+                    class="icon icontext-white icon-setting icon-fw icon-xl"
+                  ></i>
+                  <span class="dt-side-nav__text">Setup</span>
+                </a>
+              </li>
+            </ng-container>
+            <ng-container *ngIf="module === allModulesEnum.UserManagement">
+              <ng-container
+                *ngIf="
+                  user?.permission?.includes('View Roles') ||
+                  user?.permission?.includes('View Permissions') ||
+                  user?.permission?.includes('View Users')
+                "
+              >
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="
+                    user?.permission?.includes('View Roles') ||
+                    user?.permission?.includes('View Permissions')
+                  "
+                >
+                  <a
+                    routerLink="/configurations/roles-and-permissions"
+                    routerLinkActive="active"
+                    [style.backgroundColor]="currentTheme?.secondaryColor"
+                    class="dt-side-nav__link"
+                    title="Roles & Permisions"
+                  >
+                    <i
+                      class="icon icontext-white icon-lock-screen icon-fw icon-xl"
+                    ></i>
+                    <span class="dt-side-nav__text">Roles & Permisions</span>
+                  </a>
+                </li>
+                <li
+                  class="dt-side-nav__item"
+                  *ngIf="user?.permission?.includes('View Users')"
+                >
+                  <a
+                    routerLink="/configurations/users"
+                    routerLinkActive="active"
+                    class="dt-side-nav__link"
+                    title="Users"
+                  >
+                    <i
+                      class="icon icontext-white icon-contacts icon-fw icon-xl"
+                    ></i>
+                    <span class="dt-side-nav__text">Users</span>
+                  </a>
+                </li>
+              </ng-container>
+            </ng-container>
+            <ng-container
+              *ngIf="
+                module !== allModulesEnum.CheckoutAdmin &&
+                module !== allModulesEnum.CRM &&
+                module !== allModulesEnum.wacs
+              "
+            >
+              <li
+                class="dt-side-nav__item"
+                *ngIf="
+                  user?.permission?.includes('Manage Business Information')
+                "
+              >
+                <a
+                  routerLink="/configurations/bulk-processes"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Bulk Processes"
+                >
+                  <i
+                    class="icon icontext-white icon-callout icon-fw icon-xl"
+                    [style.color]="currentTheme?.textColor"
+                  ></i>
+                  <span
+                    class="dt-side-nav__text"
+                    [style.color]="currentTheme?.textColor"
+                    >Bulk Processes</span
+                  >
+                </a>
+              </li>
+              <li class="dt-side-nav__item">
+                <a
+                  routerLink="/configurations/reports"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Reports"
+                >
+                  <i
+                    class="icon icontext-white icon-data-display icon-fw icon-xl"
+                    [style.color]="currentTheme?.textColor"
+                  ></i>
+                  <span
+                    class="dt-side-nav__text"
+                    [style.color]="currentTheme?.textColor"
+                    >Activity Log</span
+                  >
+                </a>
+              </li>
+              <li class="dt-side-nav__item">
+                <a
+                  routerLink="/configurations/settings"
+                  routerLinkActive="active"
+                  class="dt-side-nav__link"
+                  title="Profile"
+                  [style.background]="currentTheme?.secondaryColor"
+                >
+                  <i
+                    class="icon icontext-white icon-user icon-fw icon-xl"
+                    [style.color]="currentTheme?.textColor"
+                  ></i>
+                  <span
+                    class="dt-side-nav__text"
+                    [style.color]="currentTheme?.textColor"
+                    >Profile</span
+                  >
+                </a>
+              </li>
+            </ng-container>
+          </div>
+        </ul>
+      </div>
+    </aside>
+    <div
+      [ngClass]="{ 'main-sidebar-mobile-backdrop': !isSidebarClosed }"
+      (click)="isSidebarClosed = true"
+    ></div>
+    <div class="dt-content-wrapper">
+      <div class="dt-content">
+        <router-outlet></router-outlet>
+      </div>
+      <footer class="dt-footer">
+        Copyright {{ appOwner?.appOwnerName | titlecase }} © {{ copyright }}
+      </footer>
+    </div>
+  </main>
+</div>
+

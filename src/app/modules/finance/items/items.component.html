@@ -1,0 +1,797 @@
+<div class="dt-page__header">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="dt-page__title">Items</h1>
+    <span class="float-right role-add">
+      <div style="position: relative; right: -5px; bottom: 5px; float: right">
+        <a
+          *ngIf="user?.permission?.includes('Create Item')"
+          class="btn btn-primary mr-2 text-white"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [routerLink]="['/finance/items/create']"
+          routerLinkActive="router-link-active"
+          href="javascript:void(0)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New</a
+        >
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-xl-12">
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <!-- Tables -->
+
+        <div>
+          <!-- Tables -->
+          <div class="table-responsive">
+            <div class="row m-0">
+              <div class="col-md-4">
+                <label style="display: inline-flex"
+                  ><span style="padding: 8px 2px; font-size: 12px">Show</span
+                  ><select
+                    [(ngModel)]="itemPagination.pageSize"
+                    aria-controls="data-table"
+                    (change)="fetchItems()"
+                    class="mx-1 custom-select custom-select-xl form-control form-control-xl height"
+                  >
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span style="padding: 8px 2px; font-size: 12px">entries</span>
+                </label>
+
+                <div class="d-flex justify-content-between my-4">
+                  <div aria-live="polite">
+                    Showing
+                    {{
+                      (itemPagination.pageNumber - 1) *
+                        itemPagination.pageSize +
+                        1 | number : "1.0-0"
+                    }}
+                    -
+                    {{
+                      (itemPagination.pageNumber - 1) *
+                        itemPagination.pageSize +
+                        itemPagination.count | number : "1.0-0"
+                    }}
+                    of
+                    {{ itemPagination.totalRecords | number : "1.0-0" }} records
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div
+                  *ngIf="itemsRequestLoader || itemLoader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+              </div>
+
+              <div class="form-group col-md-4">
+                <label style="display: inline-flex; float: right">
+                  <input
+                    type="search"
+                    [(ngModel)]="itemFetchModel.searchTerm"
+                    (keydown.enter)="fetchItems()"
+                    class="form-control form-control-sm mr-3"
+                    placeholder="Code or Name"
+                    aria-controls="data-table"
+                  />
+                  <button
+                    class="btn btn-xs text-white"
+                    [style.background]="currentTheme.secondaryColor"
+                    (click)="fetchItems()"
+                  >
+                    <i class="icon icon-search"></i>
+                  </button>
+                </label>
+              </div>
+            </div>
+
+            <table class="table table-striped table-hover">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>SKU</th>
+                  <th>Unit</th>
+                  <th class="text-right">
+                    ({{ ownerInformation?.currency?.currencySymbol }}) Cost
+                    Price
+                  </th>
+                  <th class="text-right">
+                    ({{ ownerInformation?.currency?.currencySymbol }}) Selling
+                    Price
+                  </th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody *ngIf="!itemsRequestLoader">
+                <tr *ngFor="let row of items" class="cursor" (click)="viewItem(row,dropdownToggle)">
+                  <td class="copy_icon_wrapper" [style.color]="currentTheme?.secondaryColor">
+                    <span>{{ row.itemCode }}</span>
+                    <img
+                    (mouseover)="copy_hover = true"
+                    (mouseleave)="copy_hover = false"
+                    class="copy_icon"
+                    src="assets/images/copy.png"
+                    alt="copy icon"
+                    width="15"
+                    height="15"
+                    (click)="copyCode(row.itemCode)"
+                    placement="right"
+                    ngbTooltip="Copy Item Code"
+                  />
+                  </td>
+                  <td>
+                    <span>{{ row.itemName }}</span>
+                  </td>
+                  <td>
+                    <span
+                      class="badge mb-1 mr-1"
+                      [ngClass]="{
+                        'badge-primary': row.itemType === 'Goods',
+                        'badge-success': row.itemType === 'Service'
+                      }"
+                      >{{ row.itemType }}</span
+                    >
+                  </td>
+                  <td>
+                    <span>{{ row.sku }}</span>
+                  </td>
+                  <td>
+                    <span>{{ row?.unitSymbol }}</span>
+                  </td>
+                  <td class="text-right">
+                    <span>{{ row?.costPrice | number : "1.2-2" }}</span>
+                  </td>
+                  <td class="text-right">
+                    <span>{{ row?.sellingPrice | number : "1.2-2" }}</span>
+                  </td>
+                  <td>
+                    <div #dropdownToggle class="dropdown mr-2 mb-2 d-inline-block">
+                      <button
+                        class="btn btn-warning btn-xs dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                      ></button>
+                      <div class="dropdown-menu" x-placement="auto">
+                        <a
+                          *ngIf="user?.permission?.includes('View Item')"
+                          class="dropdown-item"
+
+                          href="javascript:void(0)"
+                        >
+                          <i class="icon icon-forward icon-fw mr-2"></i>View</a
+                        >
+                        <a
+                          *ngIf="user?.permission?.includes('Edit Item')"
+                          class="dropdown-item"
+                          [routerLink]="['/finance/items/edit/' + row.itemId]"
+                          routerLinkActive="router-link-active"
+                          href="javascript:void(0)"
+                        >
+                          <i class="icon icon-edit icon-fw mr-2"></i>Edit
+                        </a>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li class="page-item" *ngIf="itemPagination.hasPreviousPage">
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="fetchItems(itemPagination.pageNumber - 1)"
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    class="page-link page-target"
+                    (click)="itemPaginatedJumpModal()"
+                    href="javascript:void(0)"
+                  >
+                    {{ itemPagination.pageNumber }} of
+                    {{ itemPagination.maxPage }}
+                    {{ itemPagination.maxPage > 1 ? "pages" : "page" }}
+                    <span class="sr-only">(current)</span>
+                  </a>
+                  <div
+                    class="itemPaginatedJumpModal pagination-menu pagination-menu-right"
+                  >
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span>Jump to Page</span>
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="itemPagination.pageNumber"
+                          (change)="fetchItems(itemPagination.pageNumber)"
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option *ngFor="let line of itemPagination.jumpArray">
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="itemPaginatedJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li class="page-item" *ngIf="itemPagination.hasNextPage">
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="fetchItems(itemPagination.pageNumber + 1)"
+                  >
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+        <!-- /tables -->
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+<!-- Customizer Sidebar -->
+<aside
+  style="display: block"
+  class="dt-customizer dt-drawer position-right"
+  [ngClass]="{ open: openAside }"
+>
+  <div class="dt-customizer__inner">
+    <!-- Customizer Header -->
+    <div class="dt-customizer__header">
+      <!-- Avatar Wrapper -->
+      <div class="dt-avatar-wrapper">
+        <!-- Avatar -->
+        <img
+          class="dt-avatar dt-avatar__shadow size-50 mr-sm-4"
+          src="assets/images/male-default-profile.png"
+          alt=""
+        />
+        <!-- /avatar -->
+
+        <!-- Info -->
+        <div class="dt-avatar-info">
+          <span class="dt-avatar-name display-5 mb-2 font-weight-light black"
+            >{{ item?.itemName }}
+            &nbsp;
+            <span
+              class="badge mb-1 mr-1"
+              [ngClass]="
+                item?.itemType === 'Goods' ? 'badge-primary' : 'badge-success'
+              "
+            >
+              <i class="icon icon-folder-o"></i> {{ item?.itemType }}
+            </span>
+          </span>
+          <span class="f-12">
+            <span style="color: #1e5a8a">{{ item?.itemCode }}</span> </span
+          ><br />
+          <span class="f-12">
+            <span style="color: #1e5a8a">{{ item?.sku }}</span> </span
+          ><br />
+        </div>
+        <!-- /info -->
+      </div>
+      <!-- /avatar wrapper -->
+
+      <!-- Close Button -->
+      <button type="button" class="close" (click)="toggleAside()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <!-- /close button -->
+    </div>
+    <!-- /customizer header -->
+    <!-- Customizer Body -->
+    <div class="dt-customizer__body ps-custom-scrollbar">
+      <div class="row">
+        <div class="col-md-12" style="padding: 20px">
+          <!-- List -->
+          <ul class="dt-list dt-list-one-second padded-left">
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1"
+                    >Created by</span
+                  >
+                  <h5 class="mb-0">
+                    {{ item?.createdBy?.person?.displayName }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+
+            <!-- List Item -->
+            <li class="dt-list__item">
+              <!-- Media -->
+              <div class="media">
+                <i
+                  class="icon icon-datepicker icon-2x mr-5 align-self-center text-warning"
+                ></i>
+                <!-- Media Body -->
+                <div class="media-body">
+                  <span class="d-block text-light-gray f-12 mb-1">Created</span>
+                  <h5 class="mb-0">
+                    {{ item?.createdAt | date : "dd-MM-yyyy" }}
+                  </h5>
+                </div>
+                <!-- /media body -->
+              </div>
+              <!-- /media -->
+            </li>
+            <!-- /list item -->
+          </ul>
+          <!-- /list -->
+        </div>
+      </div>
+      <!-- Customizer Body Inner  -->
+      <div class="">
+        <br />
+        <!-- Section -->
+        <div class="dt-card__body">
+          <ul
+            class="nav nav-underline flex-row border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li *ngIf="item?.hasSalesInformation" class="nav-item">
+              <a
+                class="nav-link"
+                [ngClass]="{ active: item?.hasSalesInformation }"
+                data-toggle="tab"
+                href="#salesInfoTab"
+                role="tab"
+                aria-controls="salesInfoTab"
+                aria-selected="true"
+                >Sales Information</a
+              >
+            </li>
+            <li *ngIf="item?.hasPurchaseInformation" class="nav-item">
+              <a
+                class="nav-link"
+                [ngClass]="{
+                  active:
+                    !item?.hasSalesInformation && item?.hasPurchaseInformation
+                }"
+                data-toggle="tab"
+                href="#purchaseInfoTab"
+                role="tab"
+                aria-controls="purchaseInfoTab"
+                aria-selected="true"
+                >Purchase Information</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                [ngClass]="{
+                  active:
+                    !item?.hasSalesInformation && !item?.hasPurchaseInformation
+                }"
+                (click)="fetchItemActivities(item?.itemId)"
+                data-toggle="tab"
+                href="#activitiesTab"
+                role="tab"
+                aria-controls="tab-pane3"
+                aria-selected="true"
+                >Activities</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                (click)="fetchItemFiles()"
+                data-toggle="tab"
+                href="#filesTab"
+                role="tab"
+                aria-controls="tab-pane3"
+                aria-selected="true"
+                >Files</a
+              >
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- sales information tab -->
+            <div
+              *ngIf="item?.hasSalesInformation"
+              id="salesInfoTab"
+              class="tab-pane"
+              [ngClass]="{ active: item?.hasSalesInformation }"
+            >
+              <div class="row">
+                <!-- Grid Item -->
+                <div class="col-xl-12">
+                  <!-- Card -->
+                  <div class="card">
+                    <!-- Card Body -->
+                    <div class="card-body pb-2">
+                      <!-- List -->
+                      <ul class="dt-list">
+                        <!-- List Item -->
+                        <li
+                          *ngIf="item?.sellingPrice != null"
+                          class="dt-list__item"
+                        >
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Selling Price</span
+                              >
+                              <h5 class="mb-0" style="word-break: break-all">
+                                {{ item?.sellingPrice | currency : currencySymbol }}
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <!-- /list item -->
+
+                        <!-- List Item -->
+                        <li *ngIf="item?.salesAccount" class="dt-list__item">
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="icon icon-user icon-3x mr-5 align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Account</span
+                              >
+                              <h5 class="mb-0" style="word-break: break-all">
+                                {{ item?.salesAccount?.name }}
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <!-- /list item -->
+
+                        <!-- List Item -->
+                        <li *ngIf="item?.salesTax" class="dt-list__item">
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="icon icon-company icon-3x mr-5 align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Sales Tax</span
+                              >
+                              <h5 class="mb-0" style="word-break: break-all">
+                                {{ item?.salesTax?.name }} ({{
+                                  item?.salesTax?.value | number : "1.2-2"
+                                }}%)
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <!-- /list item -->
+
+                        <!-- List Item -->
+                        <li
+                          *ngIf="item?.salesDescription"
+                          class="dt-list__item"
+                        >
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="icon icon-company icon-3x mr-5 align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Sales Description</span
+                              >
+                              <h5 class="mb-0" style="word-break: break-all">
+                                <p>
+                                  {{ item.salesDescription }}
+                                </p>
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <!-- /list item -->
+                      </ul>
+                      <!-- /list -->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- /grid item -->
+              </div>
+            </div>
+
+            <!-- purchase information tab -->
+            <div
+              *ngIf="item?.hasPurchaseInformation"
+              id="purchaseInfoTab"
+              class="tab-pane"
+              [ngClass]="{
+                active:
+                  !item?.hasSalesInformation && item?.hasPurchaseInformation
+              }"
+            >
+              <div class="row">
+                <!-- Grid Item -->
+                <div class="col-xl-12">
+                  <!-- Card -->
+                  <div class="card">
+                    <!-- Card Body -->
+                    <div class="card-body pb-2">
+                      <!-- List -->
+                      <ul class="dt-list">
+                        <!-- List Item -->
+                        <li
+                          *ngIf="item?.costPrice != null"
+                          class="dt-list__item"
+                        >
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Cost Price</span
+                              >
+                              <h5 class="mb-0" style="word-break: break-all">
+                                {{ item?.costPrice | currency : currencySymbol }}
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <!-- /list item -->
+
+                        <!-- List Item -->
+                        <li *ngIf="item?.sku" class="dt-list__item">
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="mr-5 icon icon-editor icon-3x align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >SKU</span
+                              >
+                              <h5 class="mb-0">
+                                {{ item.sku }}
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <li *ngIf="item?.unitSymbol" class="dt-list__item">
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="mr-5 icon icon-editor icon-3x align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Unit</span
+                              >
+                              <h5 class="mb-0">
+                                {{ item.unitSymbol }}
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <li *ngIf="item?.purchaseAccount" class="dt-list__item">
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="icon icon-user icon-3x mr-5 align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Account</span
+                              >
+                              <h5 class="mb-0" style="word-break: break-all">
+                                {{ item?.purchaseAccount?.name }}
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <!-- /list item -->
+
+                        <!-- List Item -->
+                        <li *ngIf="item?.purchaseTax" class="dt-list__item">
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="icon icon-company icon-3x mr-5 align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Purchase Tax</span
+                              >
+                              <h5 class="mb-0" style="word-break: break-all">
+                                {{ item?.purchaseTax?.name }} ({{
+                                  item?.purchaseTax?.value | number : "1.2-2"
+                                }}%)
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <!-- /list item -->
+
+                        <!-- List Item -->
+                        <li
+                          *ngIf="item?.purchaseDescription"
+                          class="dt-list__item"
+                        >
+                          <!-- Media -->
+                          <div class="media">
+                            <i
+                              class="icon icon-company icon-3x mr-5 align-self-center text-warning"
+                            ></i>
+                            <!-- Media Body -->
+                            <div class="media-body">
+                              <span class="d-block text-light-gray f-12 mb-1"
+                                >Purchase Description</span
+                              >
+                              <h5 class="mb-0" style="word-break: break-all">
+                                <p>
+                                  {{ item.purchaseDescription }}
+                                </p>
+                              </h5>
+                            </div>
+                            <!-- /media body -->
+                          </div>
+                          <!-- /media -->
+                        </li>
+                        <!-- /list item -->
+                      </ul>
+                      <!-- /list -->
+                    </div>
+                    <!-- /card body -->
+                  </div>
+                  <!-- /card -->
+                </div>
+                <!-- /grid item -->
+              </div>
+            </div>
+
+            <div
+              id="activitiesTab"
+              class="tab-pane"
+              [ngClass]="{
+                active:
+                  !item?.hasSalesInformation && !item?.hasPurchaseInformation
+              }"
+            >
+              <div class="p-0 dt-card__body">
+                <div class="row">
+                  <div class="col-md-6">
+                    <div
+                      *ngIf="this.activitiesLoader"
+                      class="table-loader"
+                      style="text-align: center; color: indianred"
+                    >
+                      <span>
+                        <i class="icon icon-spin icon-spin2"></i>
+                        Loading...</span
+                      >
+                    </div>
+
+                    <div class="table-responsive">
+                      <table
+                        class="table mb-0 table-striped"
+                        style="font-size: 11px"
+                      >
+                        <thead class="thead-light">
+                          <tr>
+                            <th class="text-center" scope="col">Activity</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Date</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let row of itemActivities">
+                            <td class="text-center code">
+                              {{ row?.relatedObjectInitiatorCode }}
+                            </td>
+                            <td>{{ row?.activityDescription }}</td>
+                            <td>
+                              {{ row?.activityDate | date : "mediumDate" }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="filesTab" class="tab-pane">
+              <lnd-uploaded-files [files]="item?.files"></lnd-uploaded-files>
+            </div>
+          </div>
+          <!-- /tab content -->
+        </div>
+      </div>
+      <!-- /section -->
+    </div>
+    <!-- /customizer body inner -->
+  </div>
+</aside>
+<!-- /customizer sidebar -->
+<div *ngIf="openAside" class="dt-backdrop" (click)="toggleAside()"></div>

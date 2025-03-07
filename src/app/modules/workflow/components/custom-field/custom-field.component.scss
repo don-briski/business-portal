@@ -1,0 +1,23 @@
+.show {
+  display: block;
+}
+
+.open {
+  transform: rotate(0);
+}
+
+.close {
+  transform: rotate(180deg);
+}
+
+.card-header {
+  background-color: #fff !important;
+}
+
+.content {
+  padding: 24.4px !important;
+}
+
+.icon-lg {
+  font-size: 25px !important;
+}

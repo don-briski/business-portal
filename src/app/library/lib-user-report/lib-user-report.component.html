@@ -1,0 +1,723 @@
+<div class="dt-customizer__inner">
+  <!-- Customizer Header -->
+  <div class="dt-customizer__header">
+    <!-- Avatar Wrapper -->
+    <div class="dt-avatar-wrapper">
+      <!-- Avatar -->
+      <h4>
+        <i class="icon icon-ckeditor mr-2 icon-3x"> {{ reportType }} </i>
+      </h4>
+      <!-- /avatar -->
+    </div>
+    <!-- /avatar wrapper -->
+
+    <!-- Close Button -->
+    <button
+      type="button"
+      class="close"
+      data-toggle="customizer"
+      (click)="toggleAside()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <!-- /close button -->
+  </div>
+  <!-- /customizer header -->
+  <!-- Customizer Body -->
+  <div class="dt-customizer__body ps-custom-scrollbar">
+    <div class="row">
+      <div class="col-md-12" style="padding: 20px">
+        <!-- List -->
+        <ul class="dt-list dt-list-one-second padded-left">
+          <!-- List Item -->
+
+          <!-- List Item -->
+          <li class="dt-list__item">
+            <!-- Media -->
+            <div class="media">
+              <i
+                class="icon icon-user-o icon-3x mr-5 align-self-center text-warning"
+              ></i>
+              <!-- Media Body -->
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Created by</span
+                >
+                <h5 class="mb-0">{{ userInfo?.person?.displayName }}</h5>
+              </div>
+              <!-- /media body -->
+            </div>
+            <!-- /media -->
+          </li>
+          <!-- /list item -->
+
+          <!-- List Item -->
+          <li class="dt-list__item">
+            <!-- Media -->
+            <div class="media">
+              <i
+                class="icon icon-datepicker icon-3x mr-5 align-self-center text-warning"
+              ></i>
+
+              <!-- Media Body -->
+              <div class="media-body">
+                <span class="d-block text-light-gray f-12 mb-1"
+                  >Date Created</span
+                >
+                <h5 class="mb-0">{{ today | date : "dd/MM/yyyy, h:mm a" }}</h5>
+              </div>
+              <!-- /media body -->
+            </div>
+            <!-- /media -->
+          </li>
+          <!-- /list item -->
+        </ul>
+        <!-- /list -->
+        <div
+          class="btn-group mr-2 mb-2"
+          role="group"
+          aria-label="Basic example"
+          style="float: right"
+        >
+          <div class="mr-3">
+            <button
+              type="button"
+              (click)="filtermodal()"
+              class="btn cadet-lit btn-xs btn-success text-white mr-1"
+            >
+              <i class="icon icon-search mr-2"></i> Filter Report
+            </button>
+          </div>
+          <!-- generate-report menu -->
+          <div class="generate-menu generate-menu-right">
+            <div class="generate-menu-header">
+              <h4 class="title">
+                <i class="icon icon-ckeditor mr-2"></i> Period Selection
+              </h4>
+            </div>
+            <form
+              *ngIf="searchForm"
+              [formGroup]="searchForm"
+              (ngSubmit)="filterReport()"
+            >
+              <div class="generate-menu-body">
+                <div class="h-auto">
+                  <div class="form-row">
+                    <div
+                      *ngIf="
+                        reportInputDateType ==
+                        ReportInputDateType_StartAndEndDate
+                      "
+                      class="col-sm-6 mb-3"
+                    >
+                      <label for="validationDefault02">Start Date</label>
+                      <div
+                        class="input-group date"
+                        id="date-time-picker-1"
+                        data-target-input="nearest"
+                      >
+                        <input
+                          lndInvalidDateChecker
+                          type="date"
+                          [(ngModel)]="StartDate"
+                          formControlName="StartDate"
+                          class="form-control"
+                        />
+                        <div class="input-group-append">
+                          <div class="input-group-text">
+                            <i class="icon icon-calendar"></i>
+                          </div>
+                        </div>
+                      </div>
+                      <small
+                        *ngIf="!startDateRequired"
+                        style="text-align: center; color: indianred"
+                        >Leave empty to spool as at the <b>End date</b></small
+                      >
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                      <label for="validationDefault02">{{
+                        reportInputDateType === ReportInputDateType_AsAtEndDate
+                          ? "As at "
+                          : "End Date"
+                      }}</label>
+                      <div
+                        class="input-group date"
+                        id="date-time-picker-1"
+                        data-target-input="nearest"
+                      >
+                        <input
+                          lndInvalidDateChecker
+                          type="date"
+                          [(ngModel)]="EndDate"
+                          formControlName="EndDate"
+                          class="form-control"
+                        />
+                        <div class="input-group-append">
+                          <div class="input-group-text">
+                            <i class="icon icon-calendar"></i>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <br />
+                    <div *ngIf="reportOutputFormatCheck" class="col-sm-12 mb-3">
+                      <label>Select Preferred Output</label>
+                      <slct-2
+                        [allowClear]="true"
+                        [data]="resultOutputTypeArray"
+                        (selected)="selected('OutputType', $event)"
+                        placeholder="Select Result Output Type"
+                      >
+                      </slct-2>
+                    </div>
+
+                    <div class="col-sm-12 mb-3" *ngIf="showBranch">
+                      <label>Select Preferred Branch(es)</label>
+                      <div>
+                        <slct-2
+                          [multiple]="true"
+                          [data]="allBranches"
+                          (selected)="selected('AccessibleBranch', $event)"
+                          (removed)="removed('AccessibleBranch', $event)"
+                          placeholder="Select Branch(es)"
+                        ></slct-2>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-12 mb-3" *ngIf="showStatus">
+                      <label>Select Status</label>
+                      <div>
+                        <slct-2
+                          [multiple]="false"
+                          [data]="statusList"
+                          (selected)="selected('Status', $event)"
+                          (removed)="removed('Status', $event)"
+                          placeholder="Select Status"
+                        ></slct-2>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="generate-menu-footer">
+                  <div class="footer-right">
+                    <button
+                      type="submit"
+                      class="btn btn-primary btn-xs mr-2"
+                      *ngIf="!loader"
+                      [disabled]="searchForm.invalid || loader"
+                    >
+                      <span *ngIf="loader"
+                        ><i class="icon icon-spin icon-spin2"></i
+                      ></span>
+                      {{ !loader ? "Generate Report" : "Generating ..." }}
+                    </button>
+                    <button
+                      type="button"
+                      (click)="filtermodal()"
+                      class="btn btn-danger btn-xs"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <!-- Customizer Body Inner  -->
+      <div class="col-md-12">
+        <br />
+        <!-- Section -->
+        <div class="dt-card__body">
+          <ul
+            class="nav nav-underline flex-row border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li class="nav-item">
+              <a
+                class="nav-link clicked active show"
+                data-toggle="tab"
+                href="#tab-pane1"
+                role="tab"
+                aria-controls="tab-pane1"
+                aria-selected="true"
+                >Report Table</a
+              >
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- tab 1-->
+            <div id="tab-pane1" class="tab-pane active show">
+              <!-- Card -->
+              <div class="dt-card">
+                <div
+                  *ngIf="this.loader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...</span
+                  >
+                </div>
+
+                <!-- Card Body -->
+                <div
+                  *ngIf="!this.loader"
+                  class="dt-card__body"
+                  style="padding: 1.4rem 1.4rem"
+                >
+                  <small
+                    style="color: darkred"
+                    *ngIf="ownerInformation !== '' && ownerInformation !== null"
+                    >*Base Currency:
+                    {{ ownerInformation?.currency?.currencyName }} ({{
+                      ownerInformation?.currency?.currencySymbol
+                    }})</small
+                  >
+                  <p class="text-center">
+                    <span
+                      *ngIf="
+                        reportInputDateType ===
+                        ReportInputDateType_StartAndEndDate
+                      "
+                    >
+                      <span> {{ reportType }}</span> &nbsp;
+                      <span
+                        ><b>From:</b>
+                        {{ StartDate | date : "dd-MM-yyyy" }}</span
+                      >
+                      &nbsp;
+                      <span
+                        ><b>To:</b> {{ EndDate | date : "dd-MM-yyyy" }}</span
+                      ></span
+                    >
+                    <span
+                      *ngIf="
+                        reportInputDateType === ReportInputDateType_AsAtEndDate
+                      "
+                    >
+                      <span> {{ reportType }}</span> &nbsp;
+                      <small>
+                        <b>As at:</b>
+                        {{ EndDate | date : "dd-MM-yyyy" }}</small
+                      >
+                    </span>
+                  </p>
+
+                  <!-- Pagination Top-->
+                  <div class="row" *ngIf="paginated">
+                    <div class="col-md-4">
+                      <label style="display: inline-flex"
+                        ><span style="padding: 8px 2px; font-size: 12px"
+                          >Show
+                        </span>
+                        <select
+                          [(ngModel)]="pagination.pageSize"
+                          aria-controls="data-table"
+                          (change)="
+                            getItemsPaginatedSearch(
+                              this.pagination.searchTerm,
+                              this.pagination.pageSize,
+                              1
+                            )
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option value="10000">10,000</option>
+                          <option value="20000">20,000</option>
+                          <option value="50000">50,000</option>
+                          <option value="10000000">All</option>
+                        </select>
+                        <span style="padding: 8px 2px; font-size: 12px"
+                          >entries</span
+                        ></label
+                      >
+                    </div>
+                    <div class="col-md-4"></div>
+
+                    <div class="form-group col-md-4">
+                      <nav>
+                        <ul
+                          class="pagination pagination-sm justify-content-end"
+                        >
+                          <li
+                            class="page-item"
+                            *ngIf="
+                              (pagination.pageNum - 1) * pagination.pageSize +
+                                1 >
+                              10
+                            "
+                          >
+                            <a
+                              class="page-link"
+                              href="javascript:void(0)"
+                              (click)="
+                                getItemsPaginatedSearch(
+                                  this.pagination.searchTerm,
+                                  this.pagination.pageSize,
+                                  pagination.pageNum - 1
+                                )
+                              "
+                              tabindex="-1"
+                              >Previous</a
+                            >
+                          </li>
+                          <li class="page-item pagination-menu-wrapper">
+                            <a
+                              class="page-link page-target"
+                              (click)="getItemsPaginatedPageJumpModal()"
+                              href="javascript:void(0)"
+                              >{{ pagination.pageNum }} of
+                              {{ this.pagination.maxPage }} page<span
+                                *ngIf="pagination.pageNum > 1"
+                                >s</span
+                              ><span class="sr-only">(current)</span></a
+                            >
+
+                            <div class="pagination-menu pagination-menu-right">
+                              <div class="pagination-menu-body">
+                                <div class="h-auto">
+                                  <span>Jump to Page</span>
+                                  <select
+                                    aria-controls="data-table"
+                                    [(ngModel)]="pagination.pageNum"
+                                    (change)="filterReport(pagination.pageNum)"
+                                    class="custom-select custom-select-xl form-control form-control-xl height"
+                                  >
+                                    <option
+                                      *ngFor="let line of pagination.jumpArray"
+                                    >
+                                      {{ line }}
+                                    </option>
+                                  </select>
+                                  <div class="text-center mt-3">
+                                    <button
+                                      type="button"
+                                      (click)="getItemsPaginatedPageJumpModal()"
+                                      class="btn btn-danger btn-xs"
+                                    >
+                                      Close
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li
+                            class="page-item"
+                            *ngIf="
+                              this.pagination.pageNum < this.pagination.maxPage
+                            "
+                          >
+                            <a
+                              class="page-link"
+                              href="javascript:void(0)"
+                              (click)="
+                                getItemsPaginatedSearch(
+                                  this.pagination.searchTerm,
+                                  this.pagination.pageSize,
+                                  pagination.pageNum + 1
+                                )
+                              "
+                              >Next</a
+                            >
+                          </li>
+                        </ul>
+                      </nav>
+                    </div>
+
+                    <div
+                      class=""
+                      aria-live="polite"
+                      style="
+                        padding-left: 18px;
+                        font-size: 13px;
+                        margin-top: -8px;
+                      "
+                    >
+                      Showing
+                      {{
+                        (pagination.pageNum - 1) * pagination.pageSize + 1
+                          | number : "1.0-0"
+                      }}
+                      -
+                      {{
+                        (pagination.pageNum - 1) * pagination.pageSize +
+                          pagination.count | number : "1.0-0"
+                      }}
+                      of
+                      {{ pagination.totalRecords | number : "1.0-0" }}
+                      record(s)
+                    </div>
+                  </div>
+                  <!-- /pagination Top -->
+                  <br />
+
+                  <ng-container *ngIf="reportList.length">
+                    <button
+                      *ngIf="selectedOutputType !== 'Grouped'"
+                      class="btn btn-xs btn-primary mr-2"
+                      (click)="exportLog(reportList)"
+                    >
+                      Export
+                    </button>
+                    <button
+                      *ngIf="selectedOutputType !== 'Grouped'"
+                      class="btn btn-xs btn-warning"
+                      (click)="printReport('reportListTable')"
+                    >
+                      Print
+                    </button>
+                    <br />
+                    <br />
+                    <div class="table-reponsive" id="reportListTable">
+                      <table
+                        class="table table-bordered table-hover table-striped"
+                        style="font-size: 12px"
+                      >
+                        <thead>
+                          <tr>
+                            <th
+                              [class]="{
+                                'text-center': col?.alignment === 'center',
+                                'text-right': col?.alignment === 'right'
+                              }"
+                              *ngFor="let col of tableCols"
+                            >
+                              {{ col?.name }}
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let el of reportList">
+                            <td
+                              *ngFor="let col of tableCols"
+                              [class]="col?.class"
+                              [ngClass]="{
+                                'text-center': col?.alignment === 'center',
+                                'text-right': col?.alignment === 'right'
+                              }"
+                            >
+                              {{
+                                col?.type === "date"
+                                  ? (el[col?.property]
+                                    | customDatePipe : "DD-MMM-YYYY")
+                                  : col?.type === "number"
+                                  ? (el[col?.property] | number : "1.2-2")
+                                  : el[col?.property]
+                              }}
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </ng-container>
+
+                  <!-- Pagination Bottom-->
+                  <div
+                    class="row"
+                    *ngIf="paginated && pagination.totalRecords > 50"
+                  >
+                    <div class="col-md-4">
+                      <label style="display: inline-flex"
+                        ><span style="padding: 8px 2px; font-size: 12px"
+                          >Show
+                        </span>
+                        <select
+                          [(ngModel)]="pagination.pageSize"
+                          aria-controls="data-table"
+                          (change)="
+                            getItemsPaginatedSearch(
+                              this.pagination.searchTerm,
+                              this.pagination.pageSize,
+                              1
+                            )
+                          "
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <!-- <option value="5000">5,000</option> -->
+                          <option value="10000">10,000</option>
+                          <option value="20000">20,000</option>
+                          <option value="50000">50,000</option>
+                          <option value="10000000">All</option>
+                        </select>
+                        <span style="padding: 8px 2px; font-size: 12px"
+                          >entries</span
+                        ></label
+                      >
+                    </div>
+                    <div class="col-md-4"></div>
+
+                    <div class="form-group col-md-4">
+                      <nav>
+                        <ul
+                          class="pagination pagination-sm justify-content-end"
+                        >
+                          <li
+                            class="page-item"
+                            *ngIf="
+                              (pagination.pageNum - 1) * pagination.pageSize +
+                                1 >
+                              10
+                            "
+                          >
+                            <a
+                              class="page-link"
+                              href="javascript:void(0)"
+                              (click)="
+                                getItemsPaginatedSearch(
+                                  this.pagination.searchTerm,
+                                  this.pagination.pageSize,
+                                  pagination.pageNum - 1
+                                )
+                              "
+                              tabindex="-1"
+                              >Previous</a
+                            >
+                          </li>
+                          <li class="page-item pagination-menu-wrapper">
+                            <a
+                              class="page-link page-target"
+                              (click)="getItemsPaginatedPageJumpModal()"
+                              href="javascript:void(0)"
+                              >{{ pagination.pageNum }} of
+                              {{ this.pagination.maxPage }} page<span
+                                *ngIf="pagination.pageNum > 1"
+                                >s</span
+                              ><span class="sr-only">(current)</span></a
+                            >
+
+                            <div class="pagination-menu pagination-menu-right">
+                              <div class="pagination-menu-body">
+                                <div class="h-auto">
+                                  <span>Jump to Page</span>
+                                  <select
+                                    aria-controls="data-table"
+                                    [(ngModel)]="pagination.pageNum"
+                                    (change)="filterReport(pagination.pageNum)"
+                                    class="custom-select custom-select-xl form-control form-control-xl height"
+                                  >
+                                    <option
+                                      *ngFor="let line of pagination.jumpArray"
+                                    >
+                                      {{ line }}
+                                    </option>
+                                  </select>
+                                  <div class="text-center mt-3">
+                                    <button
+                                      type="button"
+                                      (click)="getItemsPaginatedPageJumpModal()"
+                                      class="btn btn-danger btn-xs"
+                                    >
+                                      Close
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </li>
+                          <li
+                            class="page-item"
+                            *ngIf="
+                              this.pagination.pageNum < this.pagination.maxPage
+                            "
+                          >
+                            <a
+                              class="page-link"
+                              href="javascript:void(0)"
+                              (click)="
+                                getItemsPaginatedSearch(
+                                  this.pagination.searchTerm,
+                                  this.pagination.pageSize,
+                                  pagination.pageNum + 1
+                                )
+                              "
+                              >Next</a
+                            >
+                          </li>
+                        </ul>
+                      </nav>
+                    </div>
+                    <div
+                      class=""
+                      aria-live="polite"
+                      style="
+                        padding-left: 18px;
+                        font-size: 13px;
+                        margin-top: -8px;
+                      "
+                    >
+                      Showing
+                      {{
+                        (pagination.pageNum - 1) * pagination.pageSize + 1
+                          | number : "1.0-0"
+                      }}
+                      -
+                      {{
+                        (pagination.pageNum - 1) * pagination.pageSize +
+                          pagination.count | number : "1.0-0"
+                      }}
+                      of
+                      {{ pagination.totalRecords | number : "1.0-0" }}
+                      record(s)
+                    </div>
+
+                    <div
+                      *ngIf="this.loader"
+                      class="table-loader"
+                      style="text-align: center; color: indianred"
+                    >
+                      <span>
+                        <i class="icon icon-spin icon-spin2"></i>
+                        Loading...</span
+                      >
+                    </div>
+                  </div>
+                  <!-- /pagination Bottom -->
+                </div>
+                <!-- /card body -->
+              </div>
+              <!-- /card -->
+            </div>
+
+            <!-- tab 2 -->
+            <div id="tab-pane2" class="tab-pane">
+              <!-- Card -->
+              <div class="dt-card">
+                <div
+                  *ngIf="requestLoader"
+                  class="table-loader"
+                  style="text-align: center; color: indianred"
+                >
+                  <span>
+                    <i class="icon icon-spin icon-spin2"></i> Loading...Please
+                    wait</span
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- tab 2 -->
+
+            <!-- tab 3 -->
+            <div id="tab-pane3" class="tab-pane">
+              <div class="dt-card p-4">
+                <div class="download">
+                  <button class="btn btn-query btn-xs" [disabled]="downloading">
+                    <span *ngIf="downloading"
+                      ><i class="icon icon-spin icon-spin2"></i></span
+                    >{{ downloading ? "Download..." : "Download Now" }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /section -->
+  </div>
+</div>

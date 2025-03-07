@@ -1,0 +1,42 @@
+app-sidebar {
+  width: 240px;
+}
+
+.constraint {
+  margin-bottom: 10px;
+  border-bottom: 1px solid gainsboro;
+  padding: 10px 0;
+  label {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  input {
+    width: 40%;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  app-sidebar {
+    width: auto;
+  }
+}
+
+.dt-content-wrapper {
+  margin-top: 74px;
+}
+
+.ui-select-choices {
+  display: block;
+}
+
+.modal-lg,
+.modal-xl {
+  max-width: 80%;
+}
+
+.loan_type{
+  padding: 25px 40px;
+}

@@ -1,0 +1,417 @@
+<div class="row">
+  <!-- Grid Item -->
+  <!-- Grid Item -->
+  <div class="col-xl-4 col-md-4 col-sm-5">
+    <div
+      class="card user-bg-card dt-card__full-height"
+      style="
+        background-image: url('assets/images/nodata.gif');
+        margin-bottom: 1.2rem;
+      "
+    >
+      <div class="p-5 user-bg-card__info">
+        <a href="javascript:void(0)" class="mb-1 text-white dt-avatar-name">{{
+          currentuser?.person?.displayName
+        }}</a>
+        <span class="d-inline-block f-12">{{ currentuser?.emailAddress }}</span>
+      </div>
+    </div>
+  </div>
+  <!-- /grid item -->
+  <div class="col-xl-4" *ngFor="let row of dashboardData; let i = index">
+    <!-- Card -->
+    <div class="dt-card dt-card__full-height">
+      <!-- Card Header -->
+      <div class="dt-card__header d-flex justify-content-between">
+        <!-- Card Heading -->
+        <div class="dt-card__heading w-50">
+          <h3 [style.color]="currentTheme?.primaryColor" class="dt-card__title">
+            <!-- <i *ngIf="row?.tag == 'Pool'" class="mr-2 icon icon-apps"></i> -->
+            {{ row?.title }}
+          </h3>
+        </div>
+        <!-- /card heading -->
+
+        <!-- Card Tools -->
+        <div
+          class="dt-card__tools w-50"
+          *ngIf="row.title == 'Investment due to Mature'"
+        >
+          <div
+            class="mb-2 btn-group btn-group-xs tabs-container"
+            role="group"
+            aria-label="Basic example"
+          >
+            <ul class="nav" role="tablist">
+              <li class="nav-item">
+                <button
+                  #recent
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link active f-9"
+                  data-toggle="tab"
+                  [attr.href]="'#recent_' + i"
+                  role="tab"
+                  aria-controls="recent"
+                  aria-selected="true"
+                  (click)="setColor(recent, mtd, wtd, mtd)"
+                  [ngStyle]="{
+                    background: currentTheme?.primaryColor,
+                    color: '#fff',
+                    'border-color': currentTheme?.primaryColor
+                  }"
+                >
+                  Today
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  #tomorrow
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link f-9"
+                  data-toggle="tab"
+                  [attr.href]="'#tomorrow_' + i"
+                  role="tab"
+                  aria-controls="total"
+                  aria-selected="true"
+                  (click)="setColor(tomorrow, recent, wtd, mtd)"
+                  [ngStyle]="{
+                    'border-color': currentTheme?.primaryColor
+                  }"
+                >
+                  Next Day
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  #wtd
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link f-9"
+                  data-toggle="tab"
+                  [attr.href]="'#wtd_' + i"
+                  role="tab"
+                  aria-controls="ytd"
+                  aria-selected="true"
+                  (click)="setColor(wtd, recent, tomorrow, mtd)"
+                  [ngStyle]="{
+                    'border-color': currentTheme?.primaryColor
+                  }"
+                >
+                  Next 7 Days
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  #mtd
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link f-9"
+                  data-toggle="tab"
+                  [attr.href]="'#mtd_' + i"
+                  role="tab"
+                  aria-controls="mtd"
+                  aria-selected="true"
+                  (click)="setColor(mtd, recent, tomorrow, wtd)"
+                  [ngStyle]="{
+                    'border-color': currentTheme?.primaryColor
+                  }"
+                >
+                  Next 30 Days
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- /card tools -->
+
+        <!-- Card Tools -->
+        <div
+          class="dt-card__tools w-50"
+          *ngIf="row.title != 'Investment due to Mature'"
+        >
+          <div
+            class="mb-2 btn-group btn-group-xs tabs-container"
+            role="group"
+            aria-label="Basic example"
+          >
+            <ul class="nav" role="tablist">
+              <li class="nav-item">
+                <button
+                  #recent
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link active f-9"
+                  data-toggle="tab"
+                  [attr.href]="'#recent_' + i"
+                  role="tab"
+                  aria-controls="recent"
+                  aria-selected="true"
+                  (click)="setColor(recent, mtd, ytd, total)"
+                  [ngStyle]="{
+                    background: currentTheme?.primaryColor,
+                    color: '#fff',
+                    'border-color': currentTheme?.primaryColor
+                  }"
+                >
+                  Today
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  #mtd
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link f-9"
+                  data-toggle="tab"
+                  [attr.href]="'#mtd_' + i"
+                  role="tab"
+                  aria-controls="mtd"
+                  aria-selected="true"
+                  (click)="setColor(mtd, recent, ytd, total)"
+                  [ngStyle]="{
+                    'border-color': currentTheme?.primaryColor
+                  }"
+                >
+                  MTD
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  #ytd
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link f-9"
+                  data-toggle="tab"
+                  [attr.href]="'#ytd_' + i"
+                  role="tab"
+                  aria-controls="ytd"
+                  aria-selected="true"
+                  (click)="setColor(ytd, recent, mtd, total)"
+                  [ngStyle]="{
+                    'border-color': currentTheme?.primaryColor
+                  }"
+                >
+                  YTD
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  #total
+                  type="button"
+                  class="btn btn-xs gray-outline nav-link f-9"
+                  data-toggle="tab"
+                  [attr.href]="'#total_' + i"
+                  role="tab"
+                  aria-controls="total"
+                  aria-selected="true"
+                  (click)="setColor(total, mtd, recent, ytd)"
+                  [ngStyle]="{
+                    'border-color': currentTheme?.primaryColor
+                  }"
+                >
+                  Total
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <!-- /card tools -->
+      </div>
+      <!-- /card header -->
+
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <!-- Grid -->
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+          <!-- Tab Pane -->
+          <div attr.id="recent_{{ i }}" class="tab-pane active">
+            <div class="row no-gutters">
+              <!-- Grid Item -->
+              <div class="mb-6 col-sm-12 pr-sm-2 mb-sm-0">
+                <h3 class="mb-2 dt-card__title text-light-gray f-12">
+                  {{ row?.title }}
+                </h3>
+                <h2 class="mb-3 display-2 f-24 font-weight-medium f-18">
+                  {{ ownerInformation?.currency?.currencySymbol }}
+                  {{ row?.today?.value | number : "1.2-2" }}
+                </h2>
+
+                <ng-container
+                  *ngIf="row.title == 'Investments Awaiting Approval'"
+                >
+                  <a
+                    [routerLink]="['/treasury/investment-pool']"
+                    routerLinkActive="router-link-active"
+                    class="d-inline-block text-black-50 f-10"
+                    style="float: right"
+                  >
+                    <span class="f-20 font-weight-semibold">{{
+                      row?.today?.count
+                    }}</span
+                    >&nbsp; {{ row?.title }}
+                  </a>
+                </ng-container>
+                <ng-container
+                  *ngIf="row.title != 'Investments Awaiting Approval'"
+                >
+                  <a
+                    [routerLink]="['/treasury/running-investment']"
+                    routerLinkActive="router-link-active"
+                    class="d-inline-block text-black-50 f-10"
+                    style="float: right"
+                  >
+                    <span class="f-20 font-weight-semibold">{{
+                      row?.today?.count
+                    }}</span
+                    >&nbsp; {{ row?.title }}
+                  </a>
+                </ng-container>
+              </div>
+              <!-- /grid item -->
+            </div>
+            <!-- /grid -->
+          </div>
+
+          <!-- Tab Pane -->
+          <div attr.id="tomorrow_{{ i }}" class="tab-pane">
+            <div class="row no-gutters">
+              <!-- Grid Item -->
+              <div class="mb-6 col-sm-12 pr-sm-2 mb-sm-0">
+                <h3 class="mb-2 dt-card__title text-light-gray f-12">
+                  {{ row?.title }}
+                </h3>
+                <h2 class="mb-3 display-2 f-24 font-weight-medium f-18">
+                  {{ ownerInformation?.currency?.currencySymbol }}
+                  {{ row?.nextDay?.value | number : "1.2-2" }}
+                </h2>
+
+                <a
+                  href="javascript:void(0)"
+                  class="d-inline-block text-black-50 f-10"
+                  style="float: right"
+                >
+                  <span class="f-20 font-weight-semibold"
+                    >{{ row?.nextDay?.count }}&nbsp;</span
+                  >{{ row?.title }}
+                </a>
+              </div>
+              <!-- /grid item -->
+            </div>
+            <!-- /grid -->
+          </div>
+
+          <!-- Tab Pane -->
+          <div attr.id="wtd_{{ i }}" class="tab-pane">
+            <div class="row no-gutters">
+              <!-- Grid Item -->
+              <div class="mb-6 col-sm-12 pr-sm-2 mb-sm-0">
+                <h3 class="mb-2 dt-card__title text-light-gray f-12">
+                  {{ row?.title }}
+                </h3>
+                <h2 class="mb-3 display-2 f-24 font-weight-medium f-18">
+                  {{ ownerInformation?.currency?.currencySymbol }}
+                  {{ row?.wtd?.value | number : "1.2-2" }}
+                </h2>
+
+                <a
+                  href="javascript:void(0)"
+                  class="d-inline-block text-black-50 f-10"
+                  style="float: right"
+                >
+                  <span class="f-20 font-weight-semibold"
+                    >{{ row?.wtd?.count }}&nbsp;</span
+                  >{{ row?.title }}
+                </a>
+              </div>
+              <!-- /grid item -->
+            </div>
+            <!-- /grid -->
+          </div>
+
+          <!-- Tab Pane -->
+          <div attr.id="mtd_{{ i }}" class="tab-pane">
+            <div class="row no-gutters">
+              <!-- Grid Item -->
+              <div class="mb-6 col-sm-12 pr-sm-2 mb-sm-0">
+                <h3 class="mb-2 dt-card__title text-light-gray f-12">
+                  {{ row?.title }}
+                </h3>
+                <h2 class="mb-3 display-2 f-24 font-weight-medium f-18">
+                  {{ ownerInformation?.currency?.currencySymbol }}
+                  {{ row?.mtd?.value | number : "1.2-2" }}
+                </h2>
+
+                <a
+                  href="javascript:void(0)"
+                  class="d-inline-block text-black-50 f-10"
+                  style="float: right"
+                >
+                  <span class="f-20 font-weight-semibold"
+                    >{{ row?.mtd?.count }}&nbsp;</span
+                  >{{ row?.title }}
+                </a>
+              </div>
+              <!-- /grid item -->
+            </div>
+            <!-- /grid -->
+          </div>
+
+          <!-- Tab Pane -->
+          <div attr.id="ytd_{{ i }}" class="tab-pane">
+            <div class="row no-gutters">
+              <!-- Grid Item -->
+              <div class="mb-6 col-sm-12 pr-sm-2 mb-sm-0">
+                <h3 class="mb-2 dt-card__title text-light-gray f-12">
+                  {{ row?.title }}
+                </h3>
+                <h2 class="mb-3 display-2 f-24 font-weight-medium f-18">
+                  {{ ownerInformation?.currency?.currencySymbol }}
+                  {{ row?.ytd?.value | number : "1.2-2" }}
+                </h2>
+                <a
+                  href="javascript:void(0)"
+                  class="d-inline-block text-black-50 f-10"
+                  style="float: right"
+                >
+                  <span class="f-20 font-weight-semibold"
+                    >{{ row?.ytd?.count }}&nbsp;</span
+                  >{{ row?.title }}
+                </a>
+              </div>
+              <!-- /grid item -->
+            </div>
+            <!-- /grid -->
+          </div>
+
+          <!-- Tab Pane -->
+          <div attr.id="total_{{ i }}" class="tab-pane">
+            <div class="row no-gutters">
+              <!-- Grid Item -->
+              <div class="mb-6 col-sm-12 pr-sm-2 mb-sm-0">
+                <h3 class="mb-2 dt-card__title text-light-gray f-12">
+                  {{ row?.title }}
+                </h3>
+                <h2 class="mb-3 display-2 f-24 font-weight-medium f-18">
+                  {{ ownerInformation?.currency?.currencySymbol }}
+                  {{ row?.total?.value | number : "1.2-2" }}
+                </h2>
+
+                <a
+                  href="javascript:void(0)"
+                  class="d-inline-block text-black-50 f-10"
+                  style="float: right"
+                >
+                  <span class="f-20 font-weight-semibold"
+                    >{{ row?.total?.count }}&nbsp;</span
+                  >{{ row?.title }}
+                </a>
+              </div>
+              <!-- /grid item -->
+            </div>
+            <!-- /grid -->
+          </div>
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+  <!-- /grid item -->
+</div>

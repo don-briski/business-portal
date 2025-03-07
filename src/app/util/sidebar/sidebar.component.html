@@ -1,0 +1,286 @@
+<!-- Sidebar -->
+<aside id="main-sidebar" class="dt-sidebar">
+  <div class="dt-sidebar__container">
+  	<!-- Sidebar Notification -->
+    <div class="dt-sidebar__notification  d-none d-lg-block">
+      <!-- Dropdown -->
+      <div class="dropdown mb-6" id="user-menu-dropdown">
+
+        <!-- Dropdown Link -->
+        <a href="#" class="dropdown-toggle dt-avatar-wrapper text-body"
+           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <img  *ngIf="user?.person?.profilePic != '' && user?.person?.profilePic != null" class="dt-avatar"  src="{{root + user?.person?.profilePic}}" alt=User>
+          <span  *ngIf="user?.person?.profilePic == null || user?.person?.profilePic == ''" class="dt-avatar mr-4 size-35 rounded-circle bg-light-blue text-white">{{ user?.person?.initials }}</span>
+          <span class="dt-avatar-info">
+            <span class="dt-avatar-name"> {{ name }} </span>
+          </span>
+        </a>
+        <!-- /dropdown link -->
+
+        <!-- Dropdown Option -->
+        <div class="dropdown-menu dropdown-menu-right">
+          <div class="dt-avatar-wrapper flex-nowrap p-6 mt--5 bg-gradient-dark-purple text-white rounded-top">
+              <!-- <i class="icon icon-user-o icon-fw mr-2 mr-sm-1"></i> -->
+            <span class="dt-avatar-info">
+                  <span class="dt-avatar-name">{{ name }}</span>
+                  <span class="f-12">Business Account</span>
+                </span>
+          </div>
+          <!-- <a class="dropdown-item" href="javascript:void(0)">
+            <i class="icon icon-user-o icon-fw mr-2 mr-sm-1"></i> Account
+          </a>  -->
+          <!-- <a class="dropdown-item" href="javascript:void(0)">
+            <i class="icon icon-setting icon-fw mr-2 mr-sm-1"></i> Setting
+          </a> -->
+          <a class="dropdown-item" href="javascript:void(0)" (click)="logOut()">
+            <i class="icon icon-setting icon-fw mr-2 mr-sm-1"></i> Logout
+          </a>
+        </div>
+        <!-- /dropdown option -->
+
+      </div>
+      <!-- /dropdown -->
+    </div>
+    <!-- /sidebar notification -->
+    <!-- Sidebar Navigation -->
+    <ul class="dt-side-nav">
+      <!-- Menu Header -->
+      <li class="dt-side-nav__item dt-side-nav__header">
+        <span class="dt-side-nav__text titles">main</span>
+      </li>
+      <!-- /menu header -->
+
+      <!-- Menu Item -->
+       <li class="dt-side-nav__item" *ngIf="user?.isSubscriptionActive">
+        <a routerLink="/dashboard" routerLinkActive="active" class="dt-side-nav__link" title="Dashboard">
+          <i class="icon icon-dashboard icon-fw icon-xl"></i> <span class="dt-side-nav__text">Dashboard</span>
+        </a>
+      </li>
+
+
+
+      <li class="dt-side-nav__item" *ngIf="(user?.permission?.includes('View Application Pool') || user?.permission?.includes('View Disbursement Pool')) && user?.isSubscriptionActive" >
+          <a routerLink="/pool" routerLinkActive="active"  class="dt-side-nav__link" title="Pool"> <i class="icon  icontext-white icon-contacts icon-fw icon-xl"></i>
+            <span class="dt-side-nav__text">Pool
+
+            </span>  </a>
+        </li>
+
+
+
+      <!-- /menu item -->
+
+      <!-- Menu Header -->
+      <li class="dt-side-nav__item dt-side-nav__header">
+        <span class="dt-side-nav__text titles">Loan Section</span>
+      </li>
+      <!-- /menu header -->
+
+      <!-- Menu Item -->
+
+
+     <!-- <li class="dt-side-nav__item">
+          <a href="javascript:void(0)" class="dt-side-nav__link dt-side-nav__arrow" title="Applications"> <i class="icon  icontext-white icon-contacts icon-fw icon-xl"></i>
+            <span class="dt-side-nav__text">Claimed Applications</span> </a>
+
+            <ul class="dt-side-nav__sub-menu">
+              <li class="dt-side-nav__item">
+                    <a routerLink="/allapplications" class="dt-side-nav__link" title="All Applications">
+                      <span class="dt-side-nav__text">All Applications</span> </a>
+                  </li>
+              <li class="dt-side-nav__item">
+                <a routerLink="/applications" class="dt-side-nav__link" title="Claimed Applications">
+                  <span class="dt-side-nav__text">Claimed</span> </a>
+              </li>
+
+            </ul>
+
+        </li>-->
+
+        <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View My Loan Applications') && user?.isSubscriptionActive">
+          <a routerLink="/loanapplications" routerLinkActive="active" class="dt-side-nav__link" title="Loan Applications">
+            <i class="icon  icontext-white icon-ckeditor icon-fw icon-xl"></i>
+            <span class="dt-side-nav__text">Loan Applications</span> </a>
+        </li>
+
+      <li *ngIf="user?.permission?.includes('Claim Applications - Application Pool') && user?.isSubscriptionActive" class="dt-side-nav__item">
+        <a routerLink="/applications" routerLinkActive="active"  class="dt-side-nav__link" title="Claimed Applications"> <i class="icon  icontext-white icon-contacts icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Claimed Applications</span> </a>
+      </li>
+
+      <li  class="dt-side-nav__item" *ngIf="(user?.permission?.includes('View Disbursement Verifications') ||  user?.permission?.includes('View Disbursement Batches')) && user?.isSubscriptionActive">
+        <a href="javascript:void(0)" class="dt-side-nav__link dt-side-nav__arrow" title="Disbursements"> <i class="icon  icontext-white icon-company icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Disbursements</span> </a>
+          <!-- Sub-menu -->
+          <ul class="dt-side-nav__sub-menu">
+            <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Disbursement Verifications')" >
+              <a routerLink="/verifications" routerLinkActive="active" class="dt-side-nav__link" title="Roles & Permisions">
+                <span class="dt-side-nav__text">Disb. Verification</span> </a>
+            </li>
+            <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Disbursement Batches')">
+              <a routerLink="/disbursements" routerLinkActive="active" class="dt-side-nav__link" title="Users">
+                <span class="dt-side-nav__text">Disb. Batch</span> </a>
+            </li>
+          </ul>
+          <!-- /sub-menu -->
+      </li>
+			<li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Loans') && user?.isSubscriptionActive">
+					<a routerLink="/loans" routerLinkActive="active" class="dt-side-nav__link" title="Loans"> <i class="icon  icontext-white icon-revenue-new icon-fw icon-xl"></i>
+						<span class="dt-side-nav__text">Loans</span> </a>
+      </li>
+
+      <li class="dt-side-nav__item" *ngIf="(user?.permission?.includes('View Payments') || user?.permission?.includes('View Repayments Due')) && user?.isSubscriptionActive">
+        <a routerLink="/payments" routerLinkActive="active" class="dt-side-nav__link" title="Payments"> <i class="icon  icontext-white icon-notification icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Payments</span> </a>
+      </li>
+	 <!-- <li class="dt-side-nav__item">
+        <a href="recoveries.html" class="dt-side-nav__link" title="Recoveries"> <i class="icon  icontext-white icon-queries icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Recoveries</span> </a>
+			</li> -->
+
+      <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Reports') && user?.isSubscriptionActive">
+        <a routerLink="/reports" routerLinkActive="active" class="dt-side-nav__link" title="Reports">
+          <i class="icon  icontext-white icon-data-display icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Reports</span>
+        </a>
+      </li>
+
+      <!-- /menu item -->
+      <ng-container *ngIf="(user?.permission?.includes('View Investment Pool') || user?.permission?.includes('View Running Investment')) && user?.isSubscriptionActive">
+        <!-- Menu Header -->
+        <li class="dt-side-nav__item dt-side-nav__header">
+          <span class="dt-side-nav__text titles">Treasury</span>
+        </li>
+        <!-- /menu header -->
+        <li  class="dt-side-nav__item" *ngIf="(user?.permission?.includes('View Investment Pool') ||  user?.permission?.includes('View Running Investment')) && user?.isSubscriptionActive">
+          <a href="javascript:void(0)" class="dt-side-nav__link dt-side-nav__arrow" title="Investment">
+            <i class="icon icontext-white icon-revenue-new icon-fw icon-xl"></i>
+            <span class="dt-side-nav__text">Investment</span> </a>
+            <!-- Sub-menu -->
+            <ul class="dt-side-nav__sub-menu">
+              <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Investment Pool')">
+                <a routerLink="/investment-pool" routerLinkActive="active" class="dt-side-nav__link" title="Investment Pool">
+                  <span class="dt-side-nav__text">Pool</span>
+                </a>
+              </li>
+              <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Running Investment')">
+                <a routerLink="/running-investment" routerLinkActive="active" class="dt-side-nav__link" title="Running Investment">
+                  <span class="dt-side-nav__text">Running Investment</span>
+                </a>
+              </li>
+            </ul>
+        </li>
+      </ng-container>
+
+      <!-- Menu Header -->
+      <li class="dt-side-nav__item dt-side-nav__header">
+        <span class="dt-side-nav__text titles">Configurations</span>
+      </li>
+      <!-- /menu header -->
+
+      <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Investment Types') && user?.isSubscriptionActive">
+        <a routerLink="/investment-setup" routerLinkActive="active" class="dt-side-nav__link" title="Investment Setup">
+          <i class="icon  icontext-white icon-setting icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Investment Setup</span>
+        </a>
+      </li>
+
+      <li  class="dt-side-nav__item" *ngIf="(user?.permission?.includes('View Loan Types') ||  user?.permission?.includes('View Fees')) && user?.isSubscriptionActive">
+          <a href="javascript:void(0)" class="dt-side-nav__link dt-side-nav__arrow" title="Disbursements"> <i class="icon  icontext-white icon-company icon-fw icon-xl"></i>
+            <span class="dt-side-nav__text">Loan Type Setup </span> </a>
+          <!-- Sub-menu -->
+          <ul class="dt-side-nav__sub-menu">
+            <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Loan Types')">
+              <a  routerLink="/loantypes" routerLinkActive="active" class="dt-side-nav__link" title="Loan Types"> <i class="icon  icontext-white icon-editor icon-fw icon-xl"></i>
+                <span class="dt-side-nav__text">Loan Types</span> </a>
+            </li>
+
+            <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Fees') || user?.permission?.includes('View Threshold Parameters')">
+                <a routerLink="/parameterssetup" routerLinkActive="active" class="dt-side-nav__link" title="Parameters">
+                  <i class="icon  icontext-white icon-revenue-new icon-fw icon-xl"></i>
+                  <span class="dt-side-nav__text">Parameters Setup</span> </a>
+              </li>
+
+              <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Loan Reasons')">
+                  <a routerLink="/loanreasons" routerLinkActive="active" class="dt-side-nav__link" title="Parameters">
+                    <i class="icon  icontext-white icon-question-circle icon-fw icon-xl"></i>
+                    <span class="dt-side-nav__text">Loan Reasons</span> </a>
+                </li>
+            </ul>
+            <!-- /sub-menu -->
+      </li>
+
+    <!-- Menu Item -->
+    <ng-container *ngIf="user?.permission?.includes('View Roles') || user?.permission?.includes('View Permissions') || user?.permission?.includes('View Users')">
+      <li class="dt-side-nav__item" >
+        <a href="javascript:void(0)" class="dt-side-nav__link dt-side-nav__arrow" title="Users & Roles">
+          <i class="icon  icontext-white icon-all-contacts icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Users & Roles</span>
+        </a>
+
+        <!-- Sub-menu -->
+        <ul class="dt-side-nav__sub-menu">
+          <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Roles') || user?.permission?.includes('View Permissions')">
+            <a routerLink="/permissions" routerLinkActive="active" class="dt-side-nav__link" title="Roles & Permisions">
+              <span class="dt-side-nav__text">Roles & Permisions</span>
+            </a>
+          </li>
+          <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Users')">
+            <a routerLink="/users" routerLinkActive="active" class="dt-side-nav__link" title="Users">
+              <span class="dt-side-nav__text">Users</span>
+            </a>
+          </li>
+        </ul>
+        <!-- /sub-menu -->
+      </li>
+    </ng-container>
+      <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Employment Industries') || user?.permission?.includes('View Employers') || user?.permission?.includes('View Lending Institutions')">
+        <a  routerLink="/businesses" routerLinkActive="active" class="dt-side-nav__link " title="Tables">
+          <i class="icon  icontext-white icon-table icon-fw icon-xl"></i>
+           <span class="dt-side-nav__text">Businesses</span> </a>
+      </li>
+			<!-- /menu item -->
+
+			 <!-- <li class="dt-side-nav__item">
+        <a routerLink="/integrationchannels" class="dt-side-nav__link" title="Repayment Methods"> <i class="icon  icontext-white icon-notification icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Integrations</span> </a>
+      </li> -->
+
+	<!--		<li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Recovery Measures')">
+        <a routerLink="/recoverymeasures" routerLinkActive="active" class="dt-side-nav__link" title="Recovery Measures">
+          <i class="icon  icontext-white icon-queries icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Recovery Measures</span> </a>
+      </li>
+
+
+      <li class="dt-side-nav__item" *ngIf="user?.permission?.includes('View Notes')">
+          <a routerLink="/notes" routerLinkActive="active" class="dt-side-nav__link" title="Notes">
+            <i class="icon  icontext-white icon-ckeditor icon-fw icon-xl"></i>
+            <span class="dt-side-nav__text">Notes</span> </a>
+        </li> -->
+      <li class="dt-side-nav__item">
+        <a routerLink="/settings" routerLinkActive="active" class="dt-side-nav__link" title="Settings">
+          <i class="icon  icontext-white icon-setting icon-fw icon-xl"></i>
+          <span class="dt-side-nav__text">Settings</span>
+        </a>
+      </li>
+
+
+
+       <!-- Menu Header -->
+       <li class="dt-side-nav__item dt-side-nav__header">
+          <span class="dt-side-nav__text titles">Help</span>
+        </li>
+        <!-- /menu header -->
+
+      <!-- <li class="dt-side-nav__item">
+          <a href="http://lenda-guide.loanbookng.com" target="_blank" class="dt-side-nav__link" title="Guide">
+            <i class="icon  icontext-white icon-editor icon-fw icon-xl"></i>
+            <span class="dt-side-nav__text"> Guide</span>
+          </a>
+        </li> -->
+    </ul>
+    <!-- /sidebar navigation -->
+  </div>
+</aside>
+<!-- /sidebar -->

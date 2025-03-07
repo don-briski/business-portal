@@ -1,0 +1,48 @@
+<div *ngFor="let parent of filters | keyvalue" class="mb-2">
+  <ng-container *ngIf="parent.key !== 'type'">
+    <p *ngIf="parent.value?.length > 0" class="mb-1 font-weight-light">
+      {{ parent.key | titlecase }}
+    </p>
+    <span>
+      <span
+        *ngFor="let filter of parent.value | slice : 0 : 15; let i = index"
+        class="badge badge-pill badge-outline py-1 px-2 mb-1 mr-2"
+        >{{ filter?.text }}
+        <span class="ml-3 pointer" (click)="removeFilter(parent.key, i)"
+          >X</span
+        ></span
+      >
+      <span
+        *ngIf="parent.value.length > 15"
+        class="ml-3 view-more"
+        (click)="openPopup(parent.key, parent.value.length)"
+        >View All ({{ parent.value?.length }})</span
+      >
+    </span>
+  </ng-container>
+</div>
+
+<lnd-popup [togglePopup]="showPopup" [hideFooter]="true" (closePopup)="showPopup = false">
+  <header
+    class="pop-header d-flex justify-content-between align-items-center w-100"
+  >
+    <h4 class="mb-0">{{ popupTitle }}</h4>
+    <img
+      src="assets/images/close.svg"
+      alt="close"
+      class="cursor"
+      (click)="showPopup = false"
+    />
+  </header>
+
+  <main *ngIf="filters" class="pop-content">
+    <span
+      *ngFor="let filter of filters[appliedFilterKey]; let i = index"
+      class="badge badge-pill badge-outline py-1 px-2 mb-1 mr-2"
+      >{{ filter?.text }}
+      <span class="ml-3 pointer" (click)="removeFilter(appliedFilterKey, i)"
+        >X</span
+      ></span
+    >
+  </main>
+</lnd-popup>

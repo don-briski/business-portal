@@ -1,0 +1,52 @@
+app-sidebar {
+    width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+    app-sidebar {
+        width: auto;
+    }
+}
+
+.has-error {
+  label {
+    color: #f44336;
+  }
+  .form-control {
+    border: 1px solid #f44336;
+  }
+  .cuppa-dropdown {
+    border: 1px solid #f44336;
+  }
+}
+
+.help-block {
+  color: #f44336;
+  font-size: 10px;
+}
+
+.custom-class-example {
+  color: #545454;
+}
+.cuppa-dropdown {
+  border: 1px solid #9e9e9e;
+  border-radius: .4rem;
+}
+.custom-class-example .c-token {
+  background: #9e9e9e !important;
+}
+.custom-class-example .pure-checkbox label::before {
+  border-color: #9e9e9e !important;
+}
+.custom-class-example .pure-checkbox input[type="checkbox"]:checked + label[_ngcontent-c1]:before {
+  background: #9e9e9e !important;
+}
+
+.pure-checkbox input[type=checkbox]+label:before {
+  background: #9e9e9e;
+  padding: 2px;
+}
+.multiselect {
+  max-height: 300px;
+  overflow-y: auto;
+}

@@ -1,0 +1,10 @@
+.dashed-border{
+  border-radius: 8px;
+  margin-top: 40px;
+  border: 1px dashed var(--secondary-color);
+}
+
+.import-btn{
+  background-color: var(--secondary-color);
+  color: var(--white);
+}

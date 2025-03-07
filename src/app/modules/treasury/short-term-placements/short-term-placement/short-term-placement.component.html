@@ -1,0 +1,697 @@
+<div *ngIf="isFetchingDetails" class="text-center p-5">
+  <lnd-spinner></lnd-spinner>
+</div>
+<div *ngIf="!isFetchingDetails && stpDetails">
+  <div class="row">
+    <div class="col-md-12" style="padding: 20px">
+      <ul class="dt-list dt-list-one-second padded-left">
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-revenue-new icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12">Principal</span>
+              <h5 class="mb-0">
+                <b>{{ stpDetails?.principal | currency : currencySymbol }}</b>
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-editor icon-2x align-self-center text-warning"
+            ></i>
+
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12"
+                >Gross Rate (%)</span
+              >
+              <h5 class="mb-0">
+                {{ stpDetails?.interestRate }}%
+                {{ stpDetails?.shortTermPlacementTypeInfo?.interestCycle }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-editor icon-2x align-self-center text-warning"
+            ></i>
+
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12"
+                >Interest Type</span
+              >
+              <h5 class="mb-0">
+                {{ stpDetails?.shortTermPlacementTypeInfo?.interestType }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+            ></i>
+
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12">Tenor</span>
+              <h5 class="mb-0">
+                {{ stpDetails?.tenor }}
+                {{ stpDetails?.shortTermPlacementTypeInfo.tenorType
+                }}{{ stpDetails?.tenor > 1 ? "s" : "" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-editor icon-2x align-self-center text-warning"
+            ></i>
+
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12">WHT (%)</span>
+              <h5 class="mb-0">
+                {{ stpDetails?.shortTermPlacementTypeInfo.wht }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12">Start Date</span>
+              <h5 class="mb-0">
+                {{ stpDetails?.startDate | date : "mediumDate" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-revenue-new icon-3x align-self-center text-warning"
+            ></i>
+
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12"
+                >Gross Interest Accrued</span
+              >
+              <h5 class="mb-0">
+                {{ ownerInformation?.currency?.currencySymbol
+                }}{{ stpDetails?.interestAccrued | number : "1.2-2" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-company icon-2x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12"
+                >Financial Institution</span
+              >
+              <h5 class="mb-0">
+                {{
+                  stpDetails?.shortTermPlacementTypeInfo?.financialInstitution
+                }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-editor icon-2x align-self-center text-warning"
+            ></i>
+
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12"
+                >Placement Name</span
+              >
+              <h5 class="mb-0">
+                {{ stpDetails?.shortTermPlacementTypeInfo?.placementName }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-editor icon-2x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12"
+                >Placement Type</span
+              >
+              <h5 class="mb-0">
+                {{
+                  stpDetails?.shortTermPlacementTypeInfo?.placementType
+                    | humanify
+                }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-user-o icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12">Created By</span>
+              <h5 class="mb-0">
+                {{ stpDetails?.createdBy }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item">
+          <div class="media">
+            <i
+              class="mr-5 icon icon-datepicker icon-2x align-self-center text-warning"
+            ></i>
+
+            <div class="media-body">
+              <span class="mb-1 d-block text-light-gray f-12">Created At</span>
+              <h5 class="mb-0">
+                {{ stpDetails?.createdAt | date : "mediumDate" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center my-6">
+    <button
+      *ngIf="stpDetails?.status === 'Approved' && stpDetails?.terminable"
+      class="btn btn-danger btn-sm"
+      (click)="toggleTerminate()"
+    >
+      Terminate Investment
+    </button>
+    <button
+      *ngIf="!investmentIsActive"
+      class="btn btn-warning btn-sm"
+      (click)="previewSTPInvestmentSchedule(stpInvestementScheduleView)"
+    >
+      <span *ngIf="previewingSchedule">
+        <i class="icon icon-spin icon-spin2"></i>
+        Loading...
+      </span>
+      <span *ngIf="!previewingSchedule">Preview Investment Schedule</span>
+    </button>
+  </div>
+  <div class="mb-50">
+    <div class="dt-card__body">
+      <div class="row">
+        <div class="col-md-8">
+          <ul
+            class="flex-row nav nav-underline border-bottom nav-card-tabs"
+            role="tablist"
+          >
+            <li class="nav-item" *ngIf="investmentIsActive">
+              <a
+                class="nav-link clicked"
+                [ngClass]="{ active: investmentIsActive }"
+                data-toggle="tab"
+                href="#cycle-schedules-tab"
+                role="tab"
+                aria-controls="cycle-schedules-tab"
+                aria-selected="true"
+                >Placement Details</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link clicked"
+                [ngClass]="{ active: !investmentIsActive }"
+                data-toggle="tab"
+                href="#approval-tab"
+                role="tab"
+                aria-controls="approval-tab"
+                aria-selected="true"
+                >Approval</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link inv-sel"
+                data-toggle="tab"
+                href="#activity-tab"
+                role="tab"
+                aria-controls="activity-tab"
+                aria-selected="true"
+                (click)="getActivities(stpDetails.shortTermPlacementId)"
+                >Activity</a
+              >
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div
+              id="cycle-schedules-tab"
+              class="tab-pane"
+              [ngClass]="{ active: investmentIsActive }"
+              *ngIf="investmentIsActive"
+            >
+              <div class="overflow-hidden dt-card">
+                <div class="p-0 dt-card__body">
+                  <div class="table-responsive">
+                    <table class="table mb-0 table-striped">
+                      <thead class="thead-light">
+                        <tr>
+                          <th class="text-uppercase" scope="col">Date</th>
+                          <th class="text-right" scope="col">Principal</th>
+                          <th class="text-right" scope="col">Rate(%)</th>
+                          <th class="text-right" scope="col">Gross Interest</th>
+                          <th class="text-right" scope="col">WHT</th>
+                        </tr>
+                      </thead>
+                      <tbody *ngIf="stpDetails?.cycleSchedules?.length">
+                        <tr
+                          *ngFor="
+                            let item of stpDetails?.cycleSchedules;
+                            last as isLast
+                          "
+                        >
+                          <td>
+                            {{ item?.cycleDate | date : "mediumDate" }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.principal | currency : currencySymbol }}
+                          </td>
+                          <td class="text-right">
+                            {{ item?.interest | currency : currencySymbol }}
+                          </td>
+                          <td class="text-right">
+                            {{
+                              item?.grossInterest | currency : currencySymbol
+                            }}
+                          </td>
+                          <td class="text-right">
+                            {{
+                              item?.withHoldingTax | currency : currencySymbol
+                            }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <no-data
+                      *ngIf="!stpDetails?.cycleSchedules?.length"
+                    ></no-data>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              id="approval-tab"
+              class="tab-pane inv-def"
+              [ngClass]="{ active: !investmentIsActive }"
+            >
+              <div
+                class="overflow-hidden dt-card"
+                *ngIf="stpDetails?.approvalDetails?.length"
+              >
+                <div class="p-0 dt-card__body">
+                  <div class="table-responsive">
+                    <table class="table mb-0 table-striped">
+                      <thead class="thead-light">
+                        <th>Status</th>
+                        <th>Username</th>
+                        <th>Comment</th>
+                        <th>Date Created</th>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let comment of stpDetails?.approvalDetails">
+                          <td>
+                            <span
+                              class="mb-1 mr-1 badge"
+                              [ngClass]="{
+                                'badge-success': comment?.status == 'Approved',
+                                'badge-primary': comment?.status == 'Redraft'
+                              }"
+                            >
+                              <i class="icon icon-folder-o"></i>
+                              {{ comment?.status }}
+                            </span>
+                          </td>
+                          <td>{{ comment.username }}</td>
+                          <td>{{ comment?.comment }}</td>
+                          <td>{{ comment.date | date : "mediumDate" }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="stpDetails?.status === 'SentForApproval'">
+                <form [formGroup]="approvalForm">
+                  <label for="comment">Internal Note</label>
+                  <textarea
+                    id="comment"
+                    class="form-control"
+                    formControlName="comment"
+                  ></textarea>
+                  <div class="row mt-5">
+                    <div class="col-md-8">
+                      <div class="d-flex align-items-end">
+                        <div>
+                          <label for="tx-pin">Transaction Pin</label>
+                          <input
+                            id="tx-pin"
+                            placeholder="Enter transaction pin"
+                            class="form-control"
+                            type="password"
+                            formControlName="transactionPin"
+                          />
+                        </div>
+                        <div class="ml-4">
+                          <div
+                            *ngIf="!isLoading"
+                            class="d-flex justify-content-end"
+                          >
+                            <button
+                              [disabled]="approvalForm.invalid"
+                              class="btn btn-xs btn-success"
+                              (click)="submit('Approved')"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              [disabled]="approvalForm.invalid"
+                              class="btn btn-xs btn-warning text-white mx-2"
+                              (click)="submit('Redraft')"
+                            >
+                              Redraft
+                            </button>
+                            <button
+                              [disabled]="approvalForm.invalid"
+                              class="btn btn-xs btn-danger"
+                              (click)="submit('Rejected')"
+                            >
+                              Deny
+                            </button>
+                          </div>
+                          <div
+                            class="d-flex justify-content-end"
+                            *ngIf="isLoading"
+                          >
+                            <button
+                              type="button"
+                              class="btn btn-warning btn-xs"
+                              [disabled]="true"
+                            >
+                              <i class="icon icon-spin icon-spin2"></i>
+                              Processing...
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div id="activity-tab" class="tab-pane">
+              <div class="overflow-hidden dt-card">
+                <div class="p-0 dt-card__body">
+                  <div class="table-responsive">
+                    <table class="table mb-0 table-striped">
+                      <thead class="thead-light">
+                        <tr>
+                          <th scope="col">Description</th>
+                          <th scope="col">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody *ngIf="activities.length">
+                        <tr *ngFor="let activity of activities">
+                          <td>{{ activity.activityDescription }}</td>
+                          <td>
+                            {{ activity.activityDate | customDatePipe }}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                    <div
+                      *ngIf="!activities.length"
+                      class="d-flex flex-column align-items-center w-100 py-3"
+                    >
+                      <lnd-spinner *ngIf="fetchingActivities"></lnd-spinner>
+                      <no-data *ngIf="!fetchingActivities"></no-data>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="stpDetails?.liquidatable" class="col-md-4">
+          <div class="card p-5">
+            <p><b>Investment Placement Balance</b></p>
+
+            <div class="d-flex align-items-center mb-2">
+              <p class="mb-0 mr-2">Investment Status</p>
+              <span
+                class="badge text-white"
+                [ngClass]="{
+                  'badge-success': stpDetails?.status == 'Matured',
+                  'badge-success': stpDetails?.status == 'Approved',
+                  'badge-info': stpDetails?.status == 'Liquidated',
+                  'badge-light': stpDetails?.status == 'Draft',
+                  'badge-danger':
+                    stpDetails?.status === 'Rejected' ||
+                    stpDetails?.status == 'Terminated',
+                  'badge-primary': stpDetails?.status == 'Redraft',
+                  'badge-secondary': stpDetails?.status == 'SentForApproval'
+                }"
+              >
+                {{
+                  stpDetails?.status === "Approved"
+                    ? "Investment Active"
+                    : stpDetails?.status === "SentForApproval"
+                    ? "Awaiting Approval"
+                    : stpDetails?.status
+                }}
+              </span>
+            </div>
+
+            <p>
+              <b
+                >({{ ownerInformation?.currency?.currencySymbol }}){{
+                  stpDetails.principal | number : "1.2-2"
+                }}</b
+              >
+            </p>
+            <small>Total Income</small>
+            <div style="border-bottom: 1px dashed gainsboro"></div>
+
+            <a
+              *ngIf="
+                stpDetails.liquidatable &&
+                user?.permission?.includes('Liquidate Short Term Placement')
+              "
+              href="javascript:void(0)"
+              class="text-white btn bg-cyan w-50 mt-3"
+              (click)="toggleLiquidate(stpDetails.shortTermPlacementId)"
+              >Pre-Liquidate</a
+            >
+          </div>
+
+          <div class="liquidate liquidate-right">
+            <div class="modal-header">
+              <h3 class="modal-title" id="model-1">
+                <i class="icon icon-revenue-new mr-1"></i>Liquidate Investment
+              </h3>
+              <button
+                type="button"
+                class="close"
+                (click)="toggleLiquidate()"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="liquidate-body">
+              <small
+                [style.color]="currentTheme.secondaryColor"
+                *ngIf="isLoading"
+                ><i class="icon icon-spin icon-spin2"></i> Retrieving
+                Lidqudation Details...</small
+              >
+
+              <div *ngIf="liquidationParams">
+                <p>
+                  <b>Compounding Principal : </b>
+                  {{ ownerInformation?.currency?.currencySymbol
+                  }}{{
+                    liquidationParams.compoundingCurrentPrincipal
+                      | number : "1.2-2"
+                  }}
+                </p>
+
+                <p>
+                  <b>Gross Payout : </b>
+                  {{ ownerInformation?.currency?.currencySymbol
+                  }}{{ liquidationParams.grossPayout | number : "1.2-2" }}
+                </p>
+
+                <p>
+                  <b>Interest Accrued : </b>
+                  {{ ownerInformation?.currency?.currencySymbol
+                  }}{{ liquidationParams.interestAccrued | number : "1.2-2" }}
+                </p>
+
+                <p>
+                  <b>Net Payout : </b>
+                  {{ ownerInformation?.currency?.currencySymbol
+                  }}{{ liquidationParams.netPayout | number : "1.2-2" }}
+                </p>
+
+                <p>
+                  <b>Penal Charge : </b>
+                  {{ ownerInformation?.currency?.currencySymbol
+                  }}{{ liquidationParams.penalCharge | number : "1.2-2" }}
+                </p>
+
+                <form [formGroup]="liquidateForm">
+                  <div
+                    *ngIf="
+                      ownerInformation.financeInteractionData
+                        .stpInitialAndAccruedIsActive
+                    "
+                    class="d-flex mt-7"
+                  >
+                    <div class="form-group w-75">
+                      <ng-template #tipContent
+                        >Account for finance interaction
+                      </ng-template>
+                      <label for="account" class="d-flex align-items-center"
+                        >Finance Account
+                        <i
+                          class="icon icon-question-circle ml-2"
+                          placement="top"
+                          [ngbTooltip]="tipContent"
+                        >
+                        </i
+                      ></label>
+                      <slct-2
+                        formControlName="financeInteractionCashOrBankAccountIdObj"
+                        id="account"
+                        [data]="accounts"
+                        [customSearchEnabled]="true"
+                        [placeholder]="'Select Account'"
+                      ></slct-2>
+                    </div>
+                  </div>
+                  <div>
+                    <div>
+                      <label for="tx-pin">Transaction Pin</label>
+                      <input
+                        class="form-control"
+                        type="password"
+                        formControlName="transactionPin"
+                        placeholder="Enter transaction pin"
+                      />
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="liquidate-footer">
+              <div class="footer-right">
+                <button
+                  [disabled]="liquidateForm?.invalid"
+                  *ngIf="!isLoading"
+                  type="button"
+                  class="btn bg-cyan btn-xs text-white targeted3"
+                  (click)="liquidate()"
+                >
+                  Liquidate
+                </button>
+
+                <button
+                  type="button"
+                  class="btn btn-warning btn-xs"
+                  *ngIf="isLoading"
+                  [disabled]="true"
+                >
+                  <i class="icon icon-spin icon-spin2"></i> Processing...
+                </button>
+
+                <button
+                  type="button"
+                  class="ml-3 btn btn-danger btn-xs targeted3"
+                  (click)="toggleLiquidate()"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="terminate-modal">
+            <div class="modal-header">
+              <h3 class="modal-title" id="model-1">
+                <i class="icon icon-revenue-new mr-1"></i>Terminate Investment
+              </h3>
+              <button
+                type="button"
+                class="close"
+                (click)="toggleTerminate()"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="terminate-modal-body">
+              <div>
+                <label for="tx-pin">Transaction Pin</label>
+                <input
+                  class="form-control"
+                  type="password"
+                  #tranPin
+                  placeholder="Enter transaction pin"
+                />
+              </div>
+            </div>
+            <div class="terminate-modal-footer">
+              <button
+                *ngIf="!isLoading"
+                class="btn btn-danger btn-xs"
+                (click)="deactivate(stpDetails, tranPin.value)"
+              >
+                Terminate
+              </button>
+              <button
+                type="button"
+                class="btn btn-warning btn-xs"
+                *ngIf="isLoading"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Processing...
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<ng-template #stpInvestementScheduleView>
+  <lnd-investment-schedule
+    [appOwner]="ownerInformation"
+    [theme]="currentTheme"
+    [data]="stpInvestmentSchedules"
+    [stpPreviewDetails]="stpPreviewDetails"
+    (closeModal)="closeSTPPreviewModal()"
+  ></lnd-investment-schedule>
+</ng-template>

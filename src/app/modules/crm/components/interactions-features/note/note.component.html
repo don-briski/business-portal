@@ -1,0 +1,113 @@
+<main>
+  <header
+    *ngIf="showAddNoteBtnSection"
+    class="d-flex justify-content-between align-items-center mt-5"
+  >
+    <h3 class="mb-0">Notes</h3>
+
+    <button
+     *ngIf="permissions.includes('Manage Prospect Case')"
+      type="button"
+      class="btn btn-xs text-white"
+      [style.backgroundColor]="secondaryColor"
+      (click)="showAddNoteForm = true"
+    >
+      Add Notes
+    </button>
+  </header>
+
+  <div *ngIf="showAddNoteForm">
+    <lnd-text-area-with-char-limit label="Note" placeholder="Enter Note" charLimit="250" [isRequired]="true" (value)="setNote($event)"/>
+
+    <div class="notes-footer mt-3">
+      <button
+        type="button"
+        class="btn btn-xs btn-outline-dark"
+        (click)="showAddNoteForm = false"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-xs text-white"
+        [style.backgroundColor]="secondaryColor"
+        (click)="addNote()"
+        [disabled]="!notes || isProcessing || notes.length > charLimit"
+      >
+        <span *ngIf="!isProcessing">Save</span>
+        <span *ngIf="isProcessing"
+          ><i class="icon icon-spin icon-spin2"></i> Processing..</span
+        >
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="isRetrievingNotes" class="d-flex justify-content-center">
+    <lnd-spinner text="Retrieving Notes..." />
+  </div>
+
+  <div *ngIf="isDeletingNote" class="d-flex justify-content-center">
+    <lnd-spinner text="Processing..." />
+  </div>
+
+  <div
+    *ngIf="caseNotes.length > 0 && !isRetrievingNotes"
+    class="caseNotesList mt-5"
+  >
+    <div class="note mb-5" *ngFor="let note of caseNotes">
+      <ng-container *ngIf="!note?.isEdit">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <p class="mb-0 text-dark">{{ caseType | humanify }}</p>
+          <i *ngIf="permissions.includes('Manage Prospect Case')" class="icon icon-ellipse-h cursor" data-toggle="dropdown"></i>
+          <div class="dropdown-menu">
+            <a class="dropdown-item cursor" (click)="editNote(note)">Edit</a>
+
+            <a class="dropdown-item cursor" (click)="deleteNote(note?.id)"
+              >Delete
+            </a>
+          </div>
+        </div>
+
+        <p class="pt-3 text">{{ note?.text }}</p>
+
+        <p class="text-footer">
+          <span class="label">Created By</span>
+          <span class="mx-3 text-dark">{{ note?.createdBy }}</span
+          ><span>{{ note?.createdAt | date }}</span>
+        </p>
+      </ng-container>
+
+      <ng-container *ngIf="note?.isEdit">
+        <div class="col-md-12">
+          <lnd-text-area-with-char-limit label="Note" placeholder="Enter Note" charLimit="250" [isRequired]="true" (value)="setNote($event)" [inputValue]="notes"/>
+        </div>
+
+        <div class="notes-footer mt-3 mb-5">
+          <button
+            type="button"
+            class="btn btn-xs btn-outline-dark"
+            (click)="note.isEdit = false; showAddNoteBtnSection = true"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            class="btn btn-xs text-white"
+            [style.backgroundColor]="secondaryColor"
+            (click)="addNote(note?.id)"
+            [disabled]="!notes || isProcessing || notes.length > charLimit"
+          >
+            <span *ngIf="!isProcessing"
+              >{{ note?.isEdit ? "Update" : "Save" }}</span
+            >
+            <span *ngIf="isProcessing"
+              ><i class="icon icon-spin icon-spin2"></i> Processing..</span
+            >
+          </button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</main>

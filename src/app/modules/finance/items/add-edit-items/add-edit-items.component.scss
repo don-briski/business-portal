@@ -1,0 +1,23 @@
+footer {
+  background-color: #fff;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  left: 240px;
+  padding: 20px 76px;
+}
+
+.check {
+  width: 13px;
+  height: 13px;
+}
+
+.dt-card {
+  min-width: 580px;
+}
+
+.dashed {
+  border: 1px dashed gainsboro;
+  border-radius: 5px;
+  padding: 10px;
+}

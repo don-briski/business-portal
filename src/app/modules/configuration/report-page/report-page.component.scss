@@ -1,0 +1,32 @@
+app-sidebar {
+  width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+  app-sidebar {
+    width: auto;
+  }
+}
+
+.dt-content-wrapper {
+  margin-top: 74px;
+}
+
+.grayed {
+  color: gray;
+}
+
+ul.report_list {
+  list-style: none;
+  padding-left: 0;
+
+  li {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ebeaea;
+  }
+
+  .icon {
+    color: #545454;
+  }
+}

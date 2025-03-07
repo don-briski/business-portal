@@ -1,0 +1,53 @@
+<section>
+  <div class="p-5">
+    <div class="card">
+      <table
+        class="table mb-0 table-striped"
+        *ngIf="salaryHistory && salaryHistory?.length"
+      >
+        <thead class="thead-light">
+          <tr>
+            <th colspan="4"></th>
+            <th colspan="4"></th>
+            <th scope="col">Account Number</th>
+            <th scope="col">Payment Date</th>
+            <th scope="col" class="text-right">Amount</th>
+            <th colspan="4"></th>
+            <th colspan="4"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of salaryHistory">
+            <td colspan="4"></td>
+            <td colspan="4"></td>
+            <td [style.color]="colorTheme?.secondaryColor">
+              {{ row.accountNumber }}
+            </td>
+            <td>
+              {{ row?.paymentDate | customDatePipe }}
+            </td>
+            <td class="text-right">
+              {{ row.amount | number : "1.2-2" }}
+            </td>
+            <td colspan="4"></td>
+            <td colspan="4"></td>
+          </tr>
+        </tbody>
+      </table>
+      <div
+        *ngIf="!salaryHistory || salaryHistory?.length < 1"
+        class="d-flex flex-column align-items-center w-100 py-3"
+      >
+        <p class="display-4 text-center font-weight-light mb-0">
+          No Salary History Available
+        </p>
+        <img
+          src="assets/images/no data.svg"
+          alt="no-data-svg"
+          width="200px"
+          class="py-5"
+        />
+      </div>
+    </div>
+  </div>
+</section>

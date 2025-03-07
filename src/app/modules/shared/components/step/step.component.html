@@ -1,0 +1,35 @@
+<section class="cursor" (click)="activeStepIndex.emit(index)">
+  <div
+    class="svg"
+  >
+    <ng-content select=".step-wrapper"></ng-content>
+  </div>
+  <!-- <div
+    class="content d-flex justify-content-between align-items-center"
+    [ngClass]="{
+      'edge-stepper': index === 0 || index === lastIndex,
+      'edge-stepper-last': index === lastIndex
+    }"
+  >
+    <div
+      class="text"
+      [ngClass]="{
+        complete: status === stepStatus.complete,
+        invalid: status === stepStatus.invalid,
+        pending: status === stepStatus.pending
+      }"
+    >
+      <p class="mb-1">{{ stage | titlecase }}</p>
+      <small>{{ type | titlecase }}</small>
+    </div>
+    <i
+      *ngIf="status === stepStatus.complete"
+      class="icon icon-check complete"
+    ></i>
+
+    <i
+      *ngIf="status === stepStatus.invalid"
+      class="icon icon-close invalid"
+    ></i>
+  </div> -->
+</section>

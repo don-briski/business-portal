@@ -1,0 +1,435 @@
+<header class="w-100 d-flex align-items-center justify-content-between mb-3">
+  <h1 class="dt-page__title">
+    {{ editing ? "Edit" : "Add" }} Vendor Credit Note
+  </h1>
+  <span class="float-right role-add">
+    <div style="position: relative; right: -5px; bottom: 5px; float: right">
+      <a
+        class="btn btn-primary mr-2 text-white"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [routerLink]="['/finance/vendor-credit-notes']"
+        routerLinkActive="router-link-active"
+        href="javascript:void(0)"
+        >Back</a
+      >
+    </div>
+  </span>
+</header>
+
+<div class="dt-card w-100">
+  <div class="dt-card__body">
+    <ng-template #notInitialized>
+      <div class="text-primary text-center">
+        <i class="icon icon-spin icon-spin2"></i> Initializing...
+      </div>
+    </ng-template>
+    <form [formGroup]="vcnForm" *ngIf="initialized; else notInitialized">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-row">
+            <div class="col-md-6">
+              <label for="vendors"
+                >Vendor Name <b class="text-danger">*</b></label
+              >
+              <div class="d-flex align-items-center">
+                <multi-select-dropdown
+                  [data]="vendors"
+                  [active]="
+                    editing || cloning
+                      ? [
+                          {
+                            id: vcnDetails.vendorId,
+                            text: vcnDetails.vendor
+                          }
+                        ]
+                      : null
+                  "
+                  [currentTheme]="currentTheme"
+                  [searchService]="getSearchVendorService()"
+                  [showAddBtn]="true"
+                  placeholder="Select Vendor"
+                  (selected)="onSelectVendor($event)"
+                  (searchResult)="updateDropdown($event, 'vendor')"
+                  (addBtnClick)="openModal(vendor, 'lg', i)"
+                ></multi-select-dropdown>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <label for="vc-date"
+                >Vendor Credit Date <b class="text-danger">*</b></label
+              >
+              <input
+              lndInvalidDateChecker
+                type="date"
+                id="vc-date"
+                class="form-control"
+                formControlName="vendorCreditDate"
+              />
+            </div>
+          </div>
+          <div class="dashed"></div>
+          <div class="form-row">
+            <div class="col-md-6">
+              <label>Item rates are</label>
+              <span class="w-50">
+                <slct-2
+                  [data]="taxOptions"
+                  [active]="
+                    taxInclusive ? ['Tax Inclusive'] : ['Tax Exclusive']
+                  "
+                  [placeholder]="'Items Rate Are'"
+                  (selected)="onSetTaxOption($event)"
+                ></slct-2>
+              </span>
+            </div>
+            <div class="col-md-6">
+              <label for="order-number">Order Number </label>
+              <input
+                type="text"
+                id="order-number"
+                class="form-control"
+                placeholder="Order Number"
+                formControlName="orderNumber"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <lnd-approval-comments
+            *ngIf="editing && vcnDetails?.comments?.length > 0"
+            [comments]="vcnDetails?.comments"
+          ></lnd-approval-comments>
+        </div>
+      </div>
+      <div class="form-row mt-3">
+        <table
+          id="data-table"
+          class="table mt-5 table-bordered table-sm shadow-sm p-3 bg-white rounded"
+        >
+          <thead>
+            <tr>
+              <th>Item Details</th>
+              <th>Account</th>
+              <th>Quantity</th>
+              <th>Rate</th>
+              <th>Tax</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody formArrayName="lines">
+            <ng-container
+              *ngFor="let line of lines.controls; let lineIndex = index"
+            >
+              <tr [formGroup]="line">
+                <td>
+                  <multi-select-dropdown
+                    formControlName="item"
+                    [data]="items"
+                    [currentTheme]="currentTheme"
+                    [searchService]="getSearchItemsService()"
+                    (searchResult)="updateDropdown($event, 'items')"
+                    (selected)="onSelectItem($event, lineIndex)"
+                  ></multi-select-dropdown>
+                </td>
+                <td>
+                  <account-slct
+                    [data]="accounts"
+                    (selectedAccount)="onSelectAccount($event, lineIndex)"
+                    [preselectedAccount]="
+                      (editing || cloning) && vcnDetails.lines[lineIndex]
+                        ? {
+                            accountId: vcnDetails.lines[lineIndex].accountId,
+                            name: vcnDetails.lines[lineIndex].accountName
+                          }
+                        : selectedItemAccount
+                        ? {
+                            accountId: selectedItemAccount.accountId,
+                            name: selectedItemAccount.name
+                          }
+                        : null
+                    "
+                  ></account-slct>
+                </td>
+                <td class="c-width-100">
+                  <input
+                    type="number"
+                    class="form-control"
+                    min="0"
+                    placeholder="Quantity"
+                    (keyup)="linesCalculation()"
+                    (change)="linesCalculation()"
+                    formControlName="quantity"
+                  />
+                </td>
+                <td class="c-width">
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder="Rate"
+                    formControlName="unitPrice"
+                    currencyMask
+                    [options]="{
+                      prefix: currencySymbol,
+                      thousands: ',',
+                      decimal: '.'
+                    }"
+                  />
+                </td>
+                <td class="c-width-200">
+                  <slct-2
+                    [data]="line.get('taxes').value || []"
+                    placeholder="Search Tax"
+                    (selected)="onSelectTax($event, lineIndex)"
+                    [customSearchEnabled]="true"
+                    formControlName="tax"
+                  ></slct-2>
+                </td>
+                <td class="c-width-200">
+                  <div class="d-flex align-items-center">
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="Amount"
+                      readonly
+                      formControlName="amount"
+                      currencyMask
+                      [options]="{
+                        prefix: currencySymbol,
+                        thousands: ',',
+                        decimal: '.'
+                      }"
+                    />
+                    <span
+                      *ngIf="lines.controls.length > 1"
+                      class="remove-btn"
+                      (click)="onRemoveLine(lineIndex)"
+                    >
+                      <i class="icon icon-trash icon-lg"></i>
+                    </span>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+          <button
+            class="btn add-btn btn-xs text-white my-5 mx-1"
+            (click)="onAddLine()"
+          >
+            <i class="icon icon-add"></i> Add New Line
+          </button>
+        </table>
+      </div>
+      <div class="form-row justify-content-end">
+        <div class="col-md-6 mt-5">
+          <div class="shadow-sm p-5 bg-gainsboro rounded">
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <div>
+                <p class="mb-0">Sub Total</p>
+                <small *ngIf="taxInclusive">( Tax inclusive )</small>
+              </div>
+              <p class="mb-0">
+                {{ ownerInformation?.currency?.currencySymbol }}
+                {{ subTotal | number : "1.2-2" }}
+              </p>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center my-3">
+              <div class="mb-3">
+                <span class="d-flex justify-content-between align-items-center">
+                  <p class="mb-0" style="width: 120px">Discount</p>
+                  <div class="input-group w-50">
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="0"
+                      formControlName="transactionLevelDiscountRate"
+                      (keyup)="linesCalculation()"
+                      (change)="linesCalculation()"
+                      min="0"
+                      step="0.1"
+                    />
+                    <div class="input-group-append">
+                      <span class="input-group-text" id="basic-addon1">
+                        %
+                      </span>
+                    </div>
+                  </div>
+                </span>
+                <button
+                  *ngIf="discount > 0"
+                  class="btn btn-xs btn-primary"
+                  (click)="setDiscountAfterTax()"
+                >
+                  {{
+                    vcnForm.get("discountAfterTax").value
+                      ? "Apply before tax"
+                      : "Apply after tax"
+                  }}
+                </button>
+              </div>
+              <p class="mb-0 text-danger">
+                - {{ ownerInformation?.currency?.currencySymbol }}
+                {{ discount | number : "1.2-2" }}
+              </p>
+            </div>
+            <div
+              *ngIf="showDiscountAccount"
+              class="d-flex justify-content-between align-items-center"
+            >
+              <label for="discountAccount" class="mr-1"
+                >Discount Account <b class="text-danger">*</b></label
+              >
+              <account-slct
+                [data]="accounts"
+                (selectedAccount)="onSelectDiscountAccount($event)"
+                [preselectedAccount]="
+                  vcnDetails
+                    ? {
+                        accountId: vcnDetails.discountAccount.accountId,
+                        name: vcnDetails.discountAccount.name
+                      }
+                    : null
+                "
+              ></account-slct>
+              <p></p>
+            </div>
+            <div class="row py-1" *ngFor="let tax of selectedTaxes">
+              <ng-container *ngIf="tax.value !== 0">
+                <div class="col-md-5">
+                  <p>{{ tax.name }}</p>
+                </div>
+                <div class="col-md-7">
+                  <div class="d-flex justify-content-end">
+                    <p>
+                      {{ ownerInformation?.currency?.currencySymbol
+                      }}{{ tax.value | number : "1.2-2" }}
+                    </p>
+                  </div>
+                </div>
+              </ng-container>
+            </div>
+            <div class="d-flex justify-content-between align-items-center my-5">
+              <p><strong>Total</strong></p>
+              <p [ngClass]="{ 'text-danger': totalAmount < 0 }">
+                <strong
+                  >{{ ownerInformation?.currency?.currencySymbol }}
+                  {{ totalAmount | number : "1.2-2" }}</strong
+                >
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="dashed"></div>
+      </div>
+
+      <div class="my-6">
+        <span>
+          <ng-container *ngIf="vcnFiles.length > 0">
+            <span
+              *ngFor="let file of vcnFiles; let fileIndex = index"
+              class="badge badge-pill badge-outline ml-2 px-4 mb-1"
+              >{{ file.name || file.originalName }}
+              <i
+                class="icon icon-trash ml-2 cursor text-danger"
+                (click)="removeFile(fileIndex)"
+              ></i>
+            </span>
+          </ng-container>
+          <ng-container
+            *ngIf="
+              (editing || cloning) &&
+              this.uploadedFiles.length > 0 &&
+              this.vcnFiles.length < 1
+            "
+          >
+            <span
+              *ngFor="let file of uploadedFiles; let fileIndex = index"
+              class="badge badge-pill badge-outline ml-2 px-4 mb-1"
+              >{{ file.name || file.originalName }}
+            </span>
+          </ng-container>
+        </span>
+        <div class="mx-1 my-3">
+          <div class="d-flex">
+            <small>Attach relevant files </small>
+          </div>
+          <button
+            class="btn btn-xs btn-secondary text-white"
+            (click)="files.click()"
+          >
+            <i class="icon icon-upload"></i>
+            Attach File(s)
+            <i *ngIf="fileDelete" class="icon icon-spin icon-spin2"></i>
+          </button>
+        </div>
+        <input
+          #files
+          type="file"
+          multiple
+          (change)="handleFileInput($event.target.files)"
+          style="display: none"
+        />
+      </div>
+      <div class="form-row">
+        <div class="col-md-8">
+          <label for="notes">Notes</label>
+          <textarea
+            class="form-control w-75"
+            formControlName="notes"
+            id="notes"
+          ></textarea>
+          <small class="font-weight-light">It will not be shown in PDF</small>
+        </div>
+      </div>
+    </form>
+    <footer *ngIf="initialized">
+      <div class="dashed"></div>
+      <div class="d-flex justify-content-end">
+        <button
+          [disabled]="vcnForm.invalid"
+          class="btn btn-xs btn-light mx-1"
+          *ngIf="!loading"
+          (click)="onSubmit('Draft')"
+        >
+          Save As Draft
+        </button>
+        <button
+          [disabled]="vcnForm.invalid"
+          class="btn btn-xs btn-primary mx-1"
+          *ngIf="!loading"
+          (click)="onSubmit('SentForApproval')"
+        >
+          Send For Approval
+        </button>
+        <button
+          [disabled]="vcnForm.invalid"
+          class="btn btn-xs btn-success mx-1"
+          *ngIf="
+            !loading && user?.permission?.includes('Approve Vendor Credit Note')
+          "
+          (click)="openModal(approval, 'md')"
+        >
+          Post
+        </button>
+        <button class="btn btn-xs btn-warning" disabled *ngIf="loading">
+          <i class="icon icon-spin icon-spin2"></i> Processing...
+        </button>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<ng-template #vendor>
+  <app-add-edit-vendor
+    [showHeader]="false"
+    (vendorAdded)="getVendors()"
+  ></app-add-edit-vendor>
+</ng-template>
+
+<ng-template #approval>
+  <lnd-trans-pin-modal
+    [canApprove]="user?.permission?.includes('Approve Vendor Credit Note')"
+    (sendPayload)="onSubmit($event)"
+  ></lnd-trans-pin-modal>
+</ng-template>

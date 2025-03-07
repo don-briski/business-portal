@@ -1,0 +1,13 @@
+<div class="d-flex align-items-center">
+  <ng-otp-input #ngOtpInput
+    (onInputChange)="onValueChange($event)"
+    [config]="config"
+  ></ng-otp-input>
+  <button
+    title="Toggle"
+    (click)="togglePassword()"
+    class="btn ml-3 btn-xs btn-light"
+  >
+    <i class="icon icon-eye icon-xl"></i>
+  </button>
+</div>

@@ -1,0 +1,133 @@
+<section>
+  <div class="card">
+    <div class="card-body">
+      <div class="row mb-6">
+        <div class="col-md-4">
+          <slct-2
+            [data]="transactionNames"
+            (selected)="fetchTransactions($event.text, 1)"
+            placeholder="Search Transactions"
+          ></slct-2>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="d-flex justify-content-center">
+        <lnd-spinner
+          [text]="'Retrieving ' + transactionName"
+          [color]="colorTheme?.secondaryColor"
+        ></lnd-spinner>
+      </div>
+
+      <div *ngIf="!isLoading && transactions.length > 0; else noData">
+        <lnd-table-header
+          [pagination]="pagination"
+          [currentTheme]="colorTheme"
+          [isLoading]="isLoading"
+          (paginationChange)="fetchTransactions(transactionName, null, $event)"
+          placeholder="Code"
+        ></lnd-table-header>
+
+        <table class="table mt-5 table-striped">
+          <thead>
+            <tr>
+              <th
+                [ngClass]="{ 'text-right': tableCol['alignment'] === 'right' }"
+                *ngFor="
+                  let tableCol of transactionTableColumns[transactionName]
+                "
+              >
+                <span *ngIf="tableCol['type'] === 'number'">
+                  ({{ ownerInformation?.currency?.currencySymbol }})</span
+                >
+                {{ tableCol["colName"] }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of transactions">
+              <ng-container
+                *ngFor="
+                  let tableCol of transactionTableColumns[transactionName]
+                "
+              >
+                <td
+                  *ngIf="tableCol['colName'] === 'Code'"
+                  [style.color]="
+                    tableCol['colName'] === 'Code'
+                      ? colorTheme?.secondaryColor
+                      : ''
+                  "
+                  class="cursor"
+                  (click)="
+                    onViewRelatedEntity(
+                      transactionType,
+                      transaction[tableCol['idName']]
+                    )
+                  "
+                >
+                  {{ transaction[tableCol["propName"]] }}
+                </td>
+                <td *ngIf="tableCol['type'] === 'number'" class="text-right">
+                  {{ transaction[tableCol["propName"]] | number : "1.2-2" }}
+                </td>
+                <td *ngIf="tableCol['type'] === 'date'">
+                  {{ transaction[tableCol["propName"]] | date : "mediumDate" }}
+                </td>
+                <td
+                  *ngIf="
+                    tableCol['colName'] !== 'Code' &&
+                    tableCol['type'] !== 'number' &&
+                    tableCol['colName'] !== 'Status' &&
+                    tableCol['type'] !== 'date'
+                  "
+                >
+                  {{ transaction[tableCol["propName"]] }}
+                </td>
+                <td *ngIf="tableCol['colName'] === 'Status'">
+                  <span
+                    class="badge btn-xs mb-1 mr-1"
+                    [ngClass]="{
+                      'badge-warning':
+                        transaction[tableCol['propName']] === 'Draft',
+                      'badge-approval':
+                        transaction[tableCol['propName']] ===
+                          'SentForApproval' ||
+                        transaction[tableCol['propName']] ===
+                          'Sent For Approval',
+                      'badge-success':
+                        transaction[tableCol['propName']] === 'Posted',
+                      'badge-redraft':
+                        transaction[tableCol['propName']] === 'Redraft' ||
+                        transaction[tableCol['propName']] === 'ReDraft',
+                      'badge-danger':
+                        transaction[tableCol['propName']] === 'Rejected'
+                    }"
+                  >
+                    {{
+                      transaction[tableCol["propName"]] === "ReDraft"
+                        ? "Redraft"
+                        : (transaction[tableCol["propName"]] | humanify)
+                    }}
+                  </span>
+                </td>
+              </ng-container>
+            </tr>
+          </tbody>
+        </table>
+
+        <lnd-table-footer
+          [pagination]="pagination"
+          (paginationChange)="fetchTransactions(transactionName, null, $event)"
+        ></lnd-table-footer>
+      </div>
+
+      <ng-template #noData>
+        <no-data
+          *ngIf="!isLoading"
+          [currentTheme]="colorTheme"
+          [title]="'No Transactions'"
+        ></no-data>
+      </ng-template>
+    </div>
+  </div>
+</section>

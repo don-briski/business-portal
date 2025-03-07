@@ -1,0 +1,12 @@
+<header *ngIf="heroState">
+  <lnd-hero
+    [title]="heroState.title"
+    [subTitle]="heroState.subTitle"
+    [tabs]="heroState.tabs"
+    (tabIndex)="switchTab($event)"
+  ></lnd-hero>
+</header>
+
+<main class="checkout-config">
+  <router-outlet></router-outlet>
+</main>

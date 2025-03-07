@@ -1,0 +1,75 @@
+.setup{
+  header{
+    h3{
+      font-weight: 400;
+    }
+    p{
+      color: #979797;
+      font-size: 18px;
+      font-weight: 300;
+    }
+  }
+
+  form{
+    section{
+      .deposit{
+        border-bottom: 1px solid gainsboro;
+      }
+      header{
+        font-size: 18px;
+        margin-bottom: 35px;
+        border-bottom: 1px solid #979797;
+        h1{
+          color: #000;
+          span{
+            color: #979797;
+            font-size: 14px;
+          }
+        }
+
+        .top-up-switch-container {
+          font-size: 14px
+        }
+
+        p{
+          color:#979797;
+          font-weight: 300;
+        }
+
+        .constraint {
+          margin-bottom: 10px;
+          border-bottom: 1px solid gainsboro;
+          padding: 10px 0;
+          label {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          }
+
+          p{
+            font-size: 16px;
+            color: #393A3B;
+          }
+        }
+      }
+    }
+  }
+
+  .tp-input {
+    width: 40% !important;
+  }
+
+  footer{
+    .navs{
+      button{
+        border: 1px solid;
+        background-color: transparent;
+      }
+    }
+  }
+}
+
+.loan-approval-workflow-info {
+  color: var(--secondary-color);
+}

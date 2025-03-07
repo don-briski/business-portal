@@ -1,0 +1,1583 @@
+<div class="dt-page__header">
+  <h1
+    class="dt-page__title clearfix"
+    [style.color]="
+      currentTheme?.theme === 'Dark' ? currentTheme?.dark?.textColor : ''
+    "
+  >
+    Pool
+  </h1>
+</div>
+
+<!-- Grid -->
+<div class="row">
+  <!-- Grid Item -->
+  <div class="col-xl-12">
+    <!-- card-header-pills nav nav-pills nav-fill -->
+    <ul
+      id="active-div"
+      class="card-header-pills nav nav-pill justify-content-center"
+      role="tablist"
+    >
+      <li class="nav-item" style="display: none">
+        <a class="nav-link pool-nav active-tab">Dummy</a>
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="currentuser?.permission?.includes('View Application Pool')"
+      >
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{ 'active-tab': currentview === poolType.ApplicationPool }"
+          href="javascript:void(0)"
+          (click)="switchviews(poolType.ApplicationPool)"
+          (mouseover)="hover_app = true"
+          (mouseleave)="hover_app = false"
+          [ngStyle]="hover_app ? { color: currentTheme?.secondaryColor } : {}"
+          >Application Pool
+          <span class="btn-warning badge">
+            {{ metricsdata?.ApplicationPool?.Count || "0" }}</span
+          ></a
+        >
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="currentuser?.permission?.includes('View Disbursement Pool')"
+      >
+        <a
+          class="nav-link pool-nav"
+          [ngClass]="{
+            'active-tab': currentview === poolType.DisbursementPool
+          }"
+          href="javascript:void(0)"
+          (click)="switchviews(poolType.DisbursementPool)"
+          (mouseover)="hover_disb = true"
+          (mouseleave)="hover_disb = false"
+          [ngStyle]="hover_disb ? { color: currentTheme?.secondaryColor } : {}"
+        >
+          Disbursement Pool
+          <span class="btn-warning badge">
+            {{ metricsdata?.DisbursementPool?.Count || "0" }}</span
+          >
+        </a>
+      </li>
+    </ul>
+
+    <!-- Card -->
+    <div
+      class="dt-card"
+      [style.background]="
+        currentTheme?.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+      "
+    >
+      <div
+        style="text-align: center"
+        *ngIf="
+          this.currentview != poolType.ApplicationPool &&
+          this.currentview != poolType.DisbursementPool
+        "
+      >
+        <br />
+        <p style="text-align: center; color: indianred" *ngIf="!requestLoader">
+          Click on the pool above to view content
+        </p>
+        <a
+          *ngIf="!requestLoader"
+          class="btn btn-refresh btn-xs mb-3 mt-1"
+          type="button"
+          href="javascript:location.reload(true)"
+          >Refresh Page</a
+        >
+      </div>
+
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div
+          *ngIf="requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <!-- Module Content -->
+        <div
+          *ngIf="
+            this.currentview == poolType.ApplicationPool &&
+            currentuser?.permission?.includes('View Application Pool')
+          "
+          class="module_new"
+        >
+          <!-- Pagination top -->
+          <div class="row" *ngIf="applications.length > 0">
+            <div class="col-md-4">
+              <label
+                style="display: inline-flex"
+                [style.color]="
+                  currentTheme?.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [style.background]="
+                    currentTheme?.theme === 'Dark'
+                      ? currentTheme?.dark?.primaryColor
+                      : ''
+                  "
+                  [style.color]="
+                    currentTheme?.theme === 'Dark'
+                      ? currentTheme?.dark?.textColor
+                      : ''
+                  "
+                  [(ngModel)]="pagination.pageSize"
+                  aria-controls="data-table"
+                  (change)="
+                    getItemsPaginatedSearch(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+
+            <!-- selected checkbox count -->
+            <div
+              class="col-md-4 text-center count-checkboxes-wrapper highlighted"
+            >
+              <span class="count-list-checked-checkboxes1">{{
+                selectedApplicationsForClaimArray?.length || "0"
+              }}</span>
+              selected
+              <button
+                *ngIf="
+                  selectedApplicationsForClaimArray?.length > 0 &&
+                  currentuser?.permission?.includes(
+                    'Claim Applications - Application Pool'
+                  )
+                "
+                class="btn btn-claim btn-xs mb-3 mt-1"
+                type="button"
+                (click)="openModal(addclaimModal)"
+              >
+                Claim Loans
+              </button>
+            </div>
+
+            <div class="form-group col-md-4">
+              <lnd-search-dropdown
+                [searchColumns]="pagination?.searchColumns"
+                (searchParams)="onSearchParams('applicationPool', $event)"
+              />
+            </div>
+          </div>
+          <!-- /Pagination top -->
+
+          <!-- application pool filtering-->
+
+          <div class="mb-3">
+            <lnd-selected-filters
+              [useFilterModel]="false"
+            ></lnd-selected-filters>
+          </div>
+          <div class="row" *ngIf="applications?.length > 0">
+            <div
+              class="col-md-6 theme-text-color"
+              aria-live="polite"
+              style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+              [style.color]="
+                currentTheme?.theme === 'Dark'
+                  ? currentTheme?.dark?.textColor
+                  : ''
+              "
+            >
+              Showing
+              {{ (pagination.pageNumber - 1) * pagination.pageSize + 1 }} -
+              {{
+                (pagination.pageNumber - 1) * pagination.pageSize +
+                  pagination.count
+              }}
+              of {{ pagination.totalRecords }} record(s)
+            </div>
+            <div class="col-md-4"></div>
+            <div
+              class="col-md-2"
+              style="margin-top: -8px; display: flex; justify-content: flex-end"
+            >
+              <lnd-filter-btn
+                (filterModalOpen)="filterModalOpen()"
+              ></lnd-filter-btn>
+              <div class="filter-menu filter-menu-right">
+                <div class="filter-menu-header">
+                  <h4 class="title">
+                    <i class="icon icon-ckeditor mr-2"></i>Filter
+                  </h4>
+                </div>
+                <form
+                  *ngIf="filterForm"
+                  [formGroup]="filterForm"
+                  (ngSubmit)="filterLoans('applications')"
+                >
+                  <div class="filter-menu-body">
+                    <div class="h-auto">
+                      <div class="form-row">
+                        <br />
+
+                        <div class="col-sm-12 mb-3">
+                          <label>Select Preferred Branch(es) </label>
+                          <div>
+                            <slct-2
+                              [multiple]="true"
+                              [data]="filterFormData.branchesAccessibleArray"
+                              (selected)="selected('AccessibleBranch', $event)"
+                              (removed)="removed('AccessibleBranch', $event)"
+                              placeholder="Select Branch(es)"
+                            ></slct-2>
+                          </div>
+                        </div>
+
+                        <div class="col-sm-12 mb-3">
+                          <label>Select Preferred Loan Type(s) </label>
+                          <div>
+                            <slct-2
+                              [multiple]="true"
+                              [data]="filterFormData.loantypesArray"
+                              (selected)="selected('LoanTypes', $event)"
+                              (removed)="removed('LoanTypes', $event)"
+                              placeholder="Select Loan Types "
+                            ></slct-2>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="filter-menu-footer">
+                      <div class="footer-right">
+                        <button
+                          type="submit"
+                          class="btn btn-primary btn-xs mr-2"
+                          *ngIf="!loader"
+                          [disabled]="filterForm && filterForm.invalid"
+                        >
+                          Filter
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-xs mr-2"
+                          [disabled]="true"
+                          *ngIf="loader"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i> Filtering
+                          ...
+                        </button>
+                        <button
+                          type="button"
+                          (click)="closeFilterModal()"
+                          class="btn btn-danger btn-xs"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Module Content Inner -->
+          <div class="dt-module__content-inner mt-5">
+            <div
+              style="text-align: center"
+              *ngIf="applications.length < 1 && !requestLoader"
+            >
+              <img width="200px" src="assets/images/nodata.gif" />
+              <p
+                *ngIf="applications.length < 1 && !this.requestLoader"
+                style="text-align: center; color: indianred"
+              >
+                No Application in Pool
+              </p>
+              <button
+                class="btn btn-refresh btn-xs mb-3 mt-1"
+                type="button"
+                (click)="switchviews(poolType.ApplicationPool)"
+              >
+                Refresh
+              </button>
+              &nbsp;
+              <!-- <button class="btn btn-claim btn-xs mb-3 mt-1 "  routerLink="/new-application"  type="button" >Create Application</button>  -->
+            </div>
+
+            <!-- Module List -->
+            <input
+              *ngIf="applications.length > 0"
+              type="checkbox"
+              (change)="$event ? masterToggle() : null"
+              [checked]="selection.hasValue() && selectAll()"
+              [indeterminate]="selection.hasValue() && !selectAll()"
+            />
+            <span *ngIf="applications.length > 0"> Select All</span>
+            <div
+              class="dt-module__list"
+              *ngFor="let row of applications; let i = index"
+            >
+              <!-- Module Item -->
+              <div class="dt-module__list-item">
+                <!-- Checkbox Icon -->
+                <span
+                  *ngIf="
+                    currentuser?.permission?.includes(
+                      'Claim Applications - Application Pool'
+                    )
+                  "
+                  class="dt-checkbox dt-checkbox-icon dt-checkbox-only mr-4"
+                >
+                  <input
+                    id="checkbox-{{ i }}"
+                    (change)="
+                      selectMultipleClaim(
+                        'applications',
+                        i,
+                        row?.loanId,
+                        row?.applicationCode,
+                        row?.loanAmount,
+                        row?.customerName
+                      )
+                    "
+                    (click)="$event.stopPropagation()"
+                    type="checkbox"
+                    [checked]="
+                      isSelected(selectedApplicationsForClaimArray, row.loanId)
+                    "
+                  />
+                  <label
+                    class="font-weight-light dt-checkbox-content"
+                    for="icon-checkbox-1"
+                  >
+                    <span class="unchecked">
+                      <i class="icon icon-uncheck-squire-o icon-fw icon-lg"></i>
+                    </span>
+                    <span class="checked">
+                      <i
+                        class="icon icon-check-square icon-fw icon-lg text-primary"
+                      ></i>
+                    </span>
+                  </label>
+                </span>
+                <!-- /checkbox icon -->
+
+                <!-- Avatar -->
+                <!-- <span class="dt-avatar mr-4 size-35 rounded-circle bg-light-blue text-white">JD</span> -->
+                <img
+                  class="dt-avatar mr-3"
+                  [src]="row?.customerImageUrl"
+                  alt="Default"
+                />
+                <!-- /avatar -->
+
+                <!-- Module Content -->
+                <div class="dt-module__list-item-content">
+                  <h4 class="d-inline-block mb-1 pr-3 mr-2 border-right">
+                    {{ row?.customerName }}
+                  </h4>
+                  <h4 class="d-inline-block mb-1">
+                    <span
+                      [style.color]="currentTheme?.secondaryColor"
+                      style="color: indianred"
+                    >
+                      {{ currencySymbol }}
+                      {{ row?.loanAmount | number : "1.2-2" }}
+                    </span>
+                    over
+                    <span style="color: #8c8c8c">
+                      {{ row?.loanTenor }}
+                      {{ row?.repaymentScheduleType | lowercase
+                      }}{{ row?.loanTenor === 1 ? "" : "s" }}</span
+                    >
+                  </h4>
+                  <div class="text-light-gray">
+                    <span class="d-inline-block mr-3">{{
+                      row?.loanTypeName
+                    }}</span>
+                    <span class="d-inline-block mr-3"
+                      ><small>
+                        <b> ({{ row?.branchName }}) </b></small
+                      ></span
+                    >
+                    <span class="d-inline-block">
+                      {{ getDateDiff(row?.createdAt, currentdate) }}</span
+                    >
+                  </div>
+                  <div
+                    *ngIf="row?.isMultiLevelLoanApproval"
+                    class="d-flex align-items-center mt-2"
+                  >
+                    <img
+                      class="arrow-icon mr-1"
+                      src="assets/images/arrow-left-right.svg"
+                      alt="Arrow Icon"
+                    />
+                    <p class="m-0">Multi Approval</p>
+                  </div>
+                </div>
+                <div
+                  *ngIf="
+                    currentuser?.permission?.includes(
+                      'Claim Applications - Application Pool'
+                    )
+                  "
+                  class="dt-module__list-item-info"
+                >
+                  <!-- Dropdown -->
+                  <div class="dropdown">
+                    <a
+                      [style.color]="currentTheme?.secondaryColor"
+                      class="d-inline-block"
+                      href="javascript:void(0)"
+                      (click)="
+                        selectClaim(
+                          addclaimModal,
+                          'applications',
+                          i,
+                          row?.loanId,
+                          row?.applicationCode,
+                          row?.loanAmount,
+                          row?.customerName
+                        )
+                      "
+                      ><i class="icon icon-forward icon-fw mr-2"></i>Claim</a
+                    >
+                  </div>
+                  <!-- /dropdown -->
+                </div>
+                <!-- /module info -->
+              </div>
+              <!-- /module item -->
+            </div>
+            <!-- /module list -->
+          </div>
+          <!-- /module content inner -->
+
+          <!-- Pagination Bottom  -->
+          <div *ngIf="applications.length > 0">
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1 > 10
+                  "
+                >
+                  <a
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        pagination.pageNumber - 1
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    [style.background]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.primaryColor
+                        : ''
+                    "
+                    class="page-link page-target"
+                    (click)="getItemsPaginatedPageJumpModal()"
+                    href="javascript:void(0)"
+                    >{{ pagination.pageNumber }} of
+                    {{ this.pagination.totalPages }} page<span
+                      *ngIf="pagination.pageNumber > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+
+                  <div class="pagination-menu pagination-menu-right">
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span
+                          class="mb-1"
+                          [style.color]="
+                            currentTheme?.theme === 'Dark'
+                              ? currentTheme?.dark?.textColor
+                              : ''
+                          "
+                          >Jump to Page</span
+                        >
+                        <select
+                          aria-controls="data-table"
+                          [(ngModel)]="pagination.pageNumber"
+                          (change)="getApplicationPool(pagination.pageNumber)"
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option *ngFor="let line of pagination.jumpArray">
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="getItemsPaginatedPageJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="this.pagination.pageNumber < this.pagination.maxPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        pagination.pageNumber + 1
+                      )
+                    "
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <div
+          *ngIf="
+            this.currentview == poolType.DisbursementPool &&
+            currentuser?.permission?.includes('View Disbursement Pool')
+          "
+          class="module_new"
+        >
+          <div class="row" *ngIf="disbursements.length > 0">
+            <div class="col-md-4">
+              <label
+                style="display: inline-flex"
+                [style.color]="
+                  currentTheme?.theme === 'Dark'
+                    ? currentTheme?.dark?.textColor
+                    : ''
+                "
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [(ngModel)]="pagination.pageSize"
+                  aria-controls="data-table"
+                  (change)="
+                    getItemsPaginatedSearch2(
+                      this.pagination.keyword,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+            <div
+              class="col-md-4 text-center count-checkboxes-wrapper highlighted"
+            >
+              <span class="count-list-checked-checkboxes1">{{
+                selectedDisbursementsForClaimArray?.length || "0"
+              }}</span>
+              selected
+              <button
+                *ngIf="
+                  selectedDisbursementsForClaimArray?.length > 0 &&
+                  currentuser?.permission?.includes(
+                    'Claim Applications - Disbursement Pool'
+                  )
+                "
+                class="btn btn-claim btn-xs mb-3 mt-1"
+                type="button"
+                (click)="openModal(addDisbursementclaimModal)"
+              >
+                Create Batch
+              </button>
+            </div>
+            <div class="form-group col-md-4">
+              <lnd-search-dropdown
+                [searchColumns]="pagination?.searchColumns"
+                (searchParams)="onSearchParams('disbursementPool', $event)"
+              />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <lnd-selected-filters
+              [useFilterModel]="false"
+            ></lnd-selected-filters>
+          </div>
+          <div class="row" *ngIf="disbursements.length > 0">
+            <div
+              class="col-md-6"
+              aria-live="polite"
+              style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+              [style.color]="
+                currentTheme?.theme === 'Dark'
+                  ? currentTheme?.dark?.textColor
+                  : ''
+              "
+            >
+              Showing
+              {{ (pagination.pageNumber - 1) * pagination.pageSize + 1 }} -
+              {{
+                (pagination.pageNumber - 1) * pagination.pageSize +
+                  pagination.count
+              }}
+              of {{ pagination.totalCount }} record(s)
+            </div>
+
+            <div class="col-md-4"></div>
+            <div
+              class="col-md-2"
+              style="margin-top: -8px; display: flex; justify-content: flex-end"
+            >
+              <lnd-filter-btn
+                (filterModalOpen)="filterModalOpen()"
+              ></lnd-filter-btn>
+
+              <div class="filter-menu filter-menu-right">
+                <div class="filter-menu-header">
+                  <h4 class="title">
+                    <i class="icon icon-ckeditor mr-2"></i>Filter
+                  </h4>
+                </div>
+                <form
+                  *ngIf="filterForm"
+                  [formGroup]="filterForm"
+                  (ngSubmit)="filterLoans('disbursments')"
+                >
+                  <div class="filter-menu-body">
+                    <div class="h-auto">
+                      <div class="form-row">
+                        <br />
+
+                        <div class="col-sm-12 mb-3">
+                          <label>Select Preferred Branch(es) </label>
+                          <div>
+                            <slct-2
+                              [multiple]="true"
+                              [data]="filterFormData.branchesAccessibleArray"
+                              (selected)="selected('AccessibleBranch', $event)"
+                              (removed)="removed('AccessibleBranch', $event)"
+                              placeholder="Select Branch(es)"
+                              [customSearchEnabled]="true"
+                            ></slct-2>
+                          </div>
+                        </div>
+
+                        <div class="col-sm-12 mb-3">
+                          <label>Select Preferred Loan Type(s) </label>
+                          <div>
+                            <slct-2
+                              [multiple]="true"
+                              [data]="filterFormData.loantypesArray"
+                              (selected)="selected('LoanTypes', $event)"
+                              (removed)="removed('LoanTypes', $event)"
+                              placeholder="Select Loan Types "
+                              [customSearchEnabled]="true"
+                            ></slct-2>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="filter-menu-footer">
+                      <div class="footer-right">
+                        <button
+                          type="submit"
+                          class="btn btn-primary btn-xs mr-2"
+                          *ngIf="!loader"
+                          [disabled]="filterForm && filterForm.invalid"
+                        >
+                          Filter
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-primary btn-xs mr-2"
+                          [disabled]="true"
+                          *ngIf="loader"
+                        >
+                          <i class="icon icon-spin icon-spin2"></i> Filtering
+                          ...
+                        </button>
+                        <button
+                          type="button"
+                          (click)="closeFilterModal()"
+                          class="btn btn-danger btn-xs"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <!-- /Pagination top -->
+          <!-- Module Content Inner -->
+          <div class="dt-module__content-inner mt-5">
+            <div
+              style="text-align: center"
+              *ngIf="disbursements.length < 1 && !requestLoader"
+            >
+              <img width="200px" src="assets/images/nodata.gif" />
+              <p
+                *ngIf="disbursements.length < 1 && !this.requestLoader"
+                style="text-align: center; color: indianred"
+              >
+                Disbursement Pool is Empty
+              </p>
+              <button
+                class="btn btn-refresh btn-xs mb-3 mt-1"
+                type="button"
+                (click)="switchviews(poolType.DisbursementPool)"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <!-- Module List -->
+            <input
+              *ngIf="
+                disbursements.length > 0 &&
+                currentuser?.permission?.includes(
+                  'Claim Applications - Disbursement Pool'
+                )
+              "
+              type="checkbox"
+              (change)="$event ? masterDisbToggle() : null"
+              [checked]="disbSelection.hasValue() && selectAllDisb()"
+              [indeterminate]="disbSelection.hasValue() && !selectAllDisb()"
+            /><span
+              *ngIf="
+                disbursements.length > 0 &&
+                currentuser?.permission?.includes(
+                  'Claim Applications - Disbursement Pool'
+                )
+              "
+              >Select All</span
+            >
+            <div
+              class="dt-module__list"
+              *ngFor="let row of disbursements; let i = index"
+            >
+              <!-- Module Item -->
+              <div class="dt-module__list-item">
+                <!-- Checkbox Icon -->
+                <span
+                  *ngIf="
+                    currentuser?.permission?.includes(
+                      'Claim Applications - Disbursement Pool'
+                    )
+                  "
+                  class="dt-checkbox dt-checkbox-icon dt-checkbox-only mr-4"
+                >
+                  <input
+                    (change)="
+                      selectMultipleClaim(
+                        'disbursements',
+                        i,
+                        row?.loanId,
+                        row?.applicationCode,
+                        row?.loanAmount,
+                        row?.customerName
+                      )
+                    "
+                    id="disbCheckbox-{{ i }}"
+                    (click)="$event.stopPropagation()"
+                    type="checkbox"
+                    [checked]="
+                      isSelected(selectedDisbursementsForClaimArray, row.loanId)
+                    "
+                  />
+                  <label
+                    class="font-weight-light dt-checkbox-content"
+                    for="disbCheckbox-{{ i }}"
+                  >
+                    <span class="unchecked">
+                      <i class="icon icon-uncheck-squire-o icon-fw icon-lg"></i>
+                    </span>
+                    <span class="checked">
+                      <i
+                        class="icon icon-check-square icon-fw icon-lg text-primary"
+                      ></i>
+                    </span>
+                  </label>
+                </span>
+                <!-- /checkbox icon -->
+
+                <!-- Avatar -->
+
+                <img
+                  class="dt-avatar mr-3"
+                  [src]="row?.customerImageUrl"
+                  alt="Default"
+                />
+                <!-- /avatar -->
+
+                <!-- Module Content -->
+                <div class="dt-module__list-item-content">
+                  <h4 class="d-inline-block mb-1 pr-3 mr-2 border-right">
+                    {{ row?.customerName }}
+                  </h4>
+                  <h4 class="d-inline-block mb-1">
+                    <span
+                      style="color: indianred"
+                      [style.color]="currentTheme?.secondaryColor"
+                    >
+                      {{ currencySymbol }}
+                      {{ row?.loanAmount | number : "1.2-2" }}
+                    </span>
+                    over
+                    <span style="color: #8c8c8c">
+                      {{ row?.loanTenor }} {{ row?.repaymentScheduleType
+                      }}{{ row?.loanTenor === 1 ? "" : "s" }}
+                    </span>
+                  </h4>
+                  <div class="text-light-gray">
+                    <span class="d-inline-block mr-3">{{
+                      row?.loanTypeName
+                    }}</span>
+                    <span class="d-inline-block mr-3"
+                      ><small>
+                        <b> ({{ row?.branchName }})</b></small
+                      ></span
+                    >
+                    <span class="d-inline-block"
+                      ><small>
+                        Approved by <b>{{ row?.reviewClaimer }}</b></small
+                      ></span
+                    >
+                  </div>
+                </div>
+                <!-- /module content -->
+
+                <!-- Module Info -->
+                <div
+                  *ngIf="
+                    currentuser?.permission?.includes(
+                      'Claim Applications - Disbursement Pool'
+                    )
+                  "
+                  class="dt-module__list-item-info"
+                >
+                  <!-- Dropdown -->
+                  <div class="dropdown">
+                    <a
+                      class="d-inline-block"
+                      href="javascript:void(0)"
+                      [style.color]="currentTheme?.secondaryColor"
+                      (click)="
+                        selectClaim(
+                          addDisbursementclaimModal,
+                          'disbursements',
+                          i,
+                          row?.loanId,
+                          row?.applicationCode,
+                          row?.loanAmount,
+                          row?.customerName
+                        )
+                      "
+                      ><i class="icon icon-forward icon-fw mr-2"></i>Claim</a
+                    >
+                  </div>
+                  <!-- /dropdown -->
+                </div>
+                <!-- /module info -->
+              </div>
+              <!-- /module item -->
+            </div>
+            <!-- /module list -->
+          </div>
+          <!-- /module content inner -->
+          <!-- Pagination Bottom -->
+          <div *ngIf="disbursements.length > 0">
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="
+                    (pagination.pageNumber - 1) * pagination.pageSize + 1 > 10
+                  "
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch2(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        pagination.pageNumber - 1
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item pagination-menu-wrapper">
+                  <a
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                    [style.background]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.primaryColor
+                        : ''
+                    "
+                    class="page-link page-target"
+                    (click)="getItemsPaginatedPageJumpModal()"
+                    href="javascript:void(0)"
+                    >{{ pagination.pageNumber }} of
+                    {{ this.pagination.totalPages }} page<span
+                      *ngIf="pagination.pageNumber > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+
+                  <div
+                    class="pagination-menu pagination-menu-right"
+                    [style.background]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.cardColor
+                        : ''
+                    "
+                  >
+                    <div class="pagination-menu-body">
+                      <div class="h-auto">
+                        <span
+                          class="mb-1"
+                          [style.color]="
+                            currentTheme?.theme === 'Dark'
+                              ? currentTheme?.dark?.textColor
+                              : ''
+                          "
+                          >Jump to Page</span
+                        >
+                        <select
+                          [style.background]="
+                            currentTheme?.theme === 'Dark'
+                              ? currentTheme?.dark?.cardColor
+                              : ''
+                          "
+                          [style.color]="
+                            currentTheme?.theme === 'Dark'
+                              ? currentTheme?.dark?.textColor
+                              : ''
+                          "
+                          aria-controls="data-table"
+                          [(ngModel)]="pagination.pageNumber"
+                          (change)="getDisbursementPool(pagination.pageNumber)"
+                          class="custom-select custom-select-xl form-control form-control-xl height"
+                        >
+                          <option *ngFor="let line of pagination.jumpArray">
+                            {{ line }}
+                          </option>
+                        </select>
+                        <div class="text-center mt-3">
+                          <button
+                            type="button"
+                            (click)="getItemsPaginatedPageJumpModal()"
+                            class="btn btn-danger btn-xs"
+                          >
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="
+                    this.pagination.pageNumber < this.pagination.totalPages
+                  "
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch2(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        pagination.pageNumber + 1
+                      )
+                    "
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+        <!-- /module content -->
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+<!--Modals Section-->
+
+<ng-template #addclaimModal>
+  <!-- Modal Header -->
+
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="AddClaimForm"
+    (ngSubmit)="submitClaimForm(AddClaimForm.value, navigateModal)"
+    [style.background]="
+      currentTheme?.theme === 'Dark' ? currentTheme?.dark?.cardColor : ''
+    "
+  >
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Login Content Inner -->
+      <div class="dt-login__content-inner">
+        <div class="text-center mb-8">
+          <!-- Avatar -->
+          <!-- /avatar -->
+
+          <div class="row">
+            <span
+              class="dt-avatar mr-4 size-35 rounded-circle bg-light-blue text-white"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              >{{ currentuser?.person?.initials }}</span
+            >
+
+            <h3
+              class="mb-2"
+              [style.color]="
+                currentTheme?.theme === 'Dark'
+                  ? currentTheme?.dark?.textColor
+                  : ''
+              "
+            >
+              {{ currentuser?.person?.displayName }}
+            </h3>
+            <h6></h6>
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    <i
+                      class="icon icon-contacts align-self-center text-warning"
+                    ></i>
+                    Applicant
+                  </th>
+                  <th
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    Application Code
+                  </th>
+                  <th
+                    class="amount-field"
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    <i
+                      class="icon icon-revenue-new align-self-center text-warning"
+                    ></i>
+                    Amount ({{ ownerInformation?.currency?.currencySymbol }})
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  class="gradeX"
+                  *ngFor="
+                    let row of selectedApplicationsForClaimArray;
+                    let i = index
+                  "
+                >
+                  <td
+                    class="small"
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    <span>{{ row?.name }}</span>
+                  </td>
+                  <td
+                    class="code small"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    {{ row?.code }}
+                  </td>
+                  <td
+                    class="amount-field small"
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    {{ row?.amount | number : "1.2-2" }}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td
+                    class="amount-field small"
+                    [style.color]="
+                      currentTheme?.theme === 'Dark'
+                        ? currentTheme?.dark?.textColor
+                        : ''
+                    "
+                  >
+                    <b>{{
+                      getTotalSection(
+                        "applications",
+                        selectedApplicationsForClaimArray
+                      ) | number : "1.2-2"
+                    }}</b>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Form Group -->
+          <div class="form-group">
+            <label class="sr-only" for="password-1">Confirm Password</label>
+            Enter your Transaction Pin to Claim the Application<span
+              *ngIf="selectedApplicationsForClaimArray.length > 1"
+              >s</span
+            >
+            above
+            <input
+              [style.background]="
+                currentTheme?.theme === 'Dark'
+                  ? currentTheme?.dark?.primaryColor
+                  : ''
+              "
+              [style.color]="
+                currentTheme?.theme === 'Dark'
+                  ? currentTheme?.dark?.textColor
+                  : ''
+              "
+              type="password"
+              class="form-control"
+              formControlName="TransactionPin"
+              placeholder="Transaction Pin"
+              autocomplete="off"
+            />
+          </div>
+          <!-- /form group -->
+
+          <!-- /form -->
+        </div>
+        <!-- /login content inner -->
+      </div>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+        [style.borderColor]="currentTheme?.secondaryColor"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-claim btn-sm"
+        *ngIf="!loader"
+        [disabled]="AddClaimForm.invalid"
+      >
+        Claim Applications
+      </button>
+      <button
+        type="button"
+        class="btn btn-claim btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<ng-template #addDisbursementclaimModal>
+  <!-- Modal Header -->
+
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="AddDisbursementClaimForm"
+    (ngSubmit)="
+      submitDisbursementClaimForm(
+        AddDisbursementClaimForm.value,
+        disbursementNavigateModal
+      )
+    "
+  >
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Login Content Inner -->
+      <div class="dt-login__content-inner">
+        <div class="text-center mb-8">
+          <!-- Avatar -->
+          <!-- /avatar -->
+
+          <div class="row">
+            <span
+              class="dt-avatar mr-4 size-35 rounded-circle bg-light-blue text-white"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              >{{ currentuser?.person?.initials }}</span
+            >
+
+            <h3 class="mb-2">{{ currentuser?.person?.displayName }}</h3>
+            <h6></h6>
+
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>
+                    <i
+                      class="icon icon-contacts align-self-center text-warning"
+                    ></i>
+                    Applicant
+                  </th>
+                  <th>Application Code</th>
+                  <th class="amount-field">
+                    <i
+                      class="icon icon-revenue-new align-self-center text-warning"
+                    ></i>
+                    Amount ({{ ownerInformation?.currency?.currencySymbol }})
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  class="gradeX"
+                  *ngFor="
+                    let row of selectedDisbursementsForClaimArray;
+                    let i = index
+                  "
+                >
+                  <td class="small">
+                    <span>{{ row?.name }}</span>
+                  </td>
+                  <td
+                    class="code small"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    {{ row?.code }}
+                  </td>
+                  <td class="amount-field small">
+                    {{ row?.amount | number : "1.2-2" }}
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td class="amount-field small">
+                    <b>{{
+                      getTotalSection(
+                        "applications",
+                        selectedDisbursementsForClaimArray
+                      ) | number : "1.2-2"
+                    }}</b>
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Form -->
+
+          <!-- Form Group -->
+          <div class="form-group">
+            This will create a Disbursement Batch with the Loan<span
+              *ngIf="AddDisbursementClaimForm.length > 1"
+              >s</span
+            >
+            above<br /><br />
+            <small>Enter your Transaction Pin to Proceed</small>
+
+            <!-- Enter your Transaction Pin to create a batch from the Application<span *ngIf="AddDisbursementClaimForm.length > 1">s</span> above<br/> -->
+            <input
+              type="password"
+              class="form-control"
+              formControlName="TransactionPin"
+              placeholder="Transaction Pin"
+              autocomplete="off"
+            />
+          </div>
+          <!-- /form group -->
+
+          <!-- /form -->
+        </div>
+        <!-- /login content inner -->
+      </div>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-secondary btn-sm"
+        (click)="closeModal()"
+        style="color: #fff"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        [style.borderColor]="currentTheme?.secondaryColor"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-claim btn-sm"
+        *ngIf="!loader"
+        [disabled]="AddDisbursementClaimForm.invalid"
+      >
+        Create Batch
+      </button>
+      <button
+        type="button"
+        class="btn btn-claim btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<ng-template #navigateModal>
+  <!-- Modal -->
+
+  <!-- Modal Header -->
+
+  <!-- /modal header -->
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <!-- Login Content Inner -->
+    <div class="dt-login__content-inner">
+      <div class="text-center mb-4">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="media-body">
+              <h2 class="mb-3">
+                <img
+                  width="50px"
+                  src="assets/images/review-clipart.jpg"
+                  alt="Zakie chain"
+                />
+                Loans to work on
+              </h2>
+              <p>Any button you click will take you to the review page</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+
+      <!-- Form Group -->
+      <!-- Tables -->
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <tbody>
+            <tr *ngFor="let row of claimedloansfromfeedback; let i = index">
+              <th class="code small">{{ row }}</th>
+              <td>
+                <a [routerLink]="['/applications/' + row]" class="arrow_button"
+                  ><i class="icon icon-arrow-right pad_sm icon-fw mr-1"></i
+                ></a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- /tables -->
+      <!-- /form group -->
+
+      <!-- Form Group -->
+      <div class="form-group text-center mt-5">
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="btn btn-warning btn-xs mr-2"
+        >
+          Abort
+        </button>
+        <a
+          routerLink="/applications"
+          (click)="closeModal()"
+          class="btn btn-success btn-xs text-uppercase mr-1 success-toast"
+          title="Applications"
+        >
+          Review All
+        </a>
+      </div>
+      <!-- /form group -->
+
+      <!-- /form -->
+    </div>
+    <!-- /login content inner -->
+  </div>
+  <!-- /modal body -->
+
+  <!-- /modal -->
+</ng-template>
+
+<ng-template #disbursementNavigateModal>
+  <!-- Modal -->
+
+  <!-- Modal Header -->
+
+  <!-- /modal header -->
+
+  <!-- Modal Body -->
+  <div class="modal-body">
+    <!-- Login Content Inner -->
+    <div class="dt-login__content-inner">
+      <div class="text-center mb-4">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="media-body">
+              <h2 class="mb-3">
+                <img
+                  width="50px"
+                  src="assets/images/disburse.jpg"
+                  alt="Zakie chain"
+                />
+                Loans to work on
+              </h2>
+              <p>Your Claimed Loans for Disbursements</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form -->
+
+      <!-- Form Group -->
+      <!-- Tables -->
+      <div class="table-responsive">
+        <table class="table table-striped mb-0">
+          <tbody>
+            <tr *ngFor="let row of claimedloansfromfeedback; let i = index">
+              <th class="code small">{{ row }}</th>
+              <!-- <td><a [routerLink]="['/disbursments/'+row]" class="arrow_button"><i class="icon icon-arrow-right pad_sm icon-fw mr-1"></i></a></td> -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- /tables -->
+      <!-- /form group -->
+
+      <!-- Form Group -->
+      <div class="form-group text-center mt-5">
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="btn btn-warning btn-xs mr-2"
+        >
+          Abort
+        </button>
+        <a
+          routerLink="/disbursements/disbursementbasket"
+          (click)="closeModal()"
+          class="btn btn-success btn-xs text-uppercase mr-1 success-toast"
+          title="Disbursements"
+        >
+          Process Now
+        </a>
+      </div>
+      <!-- /form group -->
+
+      <!-- /form -->
+    </div>
+    <!-- /login content inner -->
+  </div>
+  <!-- /modal body -->
+
+  <!-- /modal -->
+</ng-template>

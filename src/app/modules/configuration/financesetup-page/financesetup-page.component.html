@@ -1,0 +1,1830 @@
+<!-- Profile Banner -->
+<div
+  class="profile__banner"
+  [style.background]="
+    currentTheme?.theme === 'dark'
+      ? currentTheme?.dark?.primaryColor
+      : currentTheme?.primaryColor
+  "
+>
+  <!-- Profile Banner Top -->
+  <div class="profile__banner-top">
+    <!-- Avatar Wrapper -->
+    <div class="dt-avatar-wrapper">
+      <!-- Info -->
+      <div class="dt-avatar-info">
+        <span class="mb-2 dt-avatar-name display-4 font-weight-light"
+          >Finance Setup</span
+        >
+        <span class="f-16"
+          >This is where you change the settings of your finance details.</span
+        >
+      </div>
+      <!-- /info -->
+    </div>
+    <!-- /avatar wrapper -->
+  </div>
+  <!-- /profile banner top -->
+
+  <!-- Profile Banner Bottom -->
+  <div class="profile__banner-bottom">
+    <!-- Navbar -->
+    <ul class="card-header-pills nav nav-pills w-100" role="tablist">
+      <!-- Nav Item -->
+      <li
+        class="nav-item active"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+      >
+        <a
+          class="nav-link active show"
+          data-toggle="tab"
+          href="#accountSetupTab"
+          role="tab"
+          aria-controls="accountSetupTab"
+          aria-selected="true"
+          (click)="currentTab = 'accountSetupTab'"
+          [ngStyle]="
+            currentTab === 'accountSetupTab'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Accounts Setup
+        </a>
+      </li>
+      <!-- /nav item -->
+
+      <!-- Nav Item -->
+      <li
+        class="nav-item"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+      >
+        <a
+          class="nav-link"
+          data-toggle="tab"
+          href="#entriesMappingSetupTab"
+          role="tab"
+          aria-controls="tab-pane-6"
+          aria-selected="true"
+          (click)="currentTab = 'entriesMappingSetupTab'"
+          [ngStyle]="
+            currentTab === 'entriesMappingSetupTab'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Ledger Entries Mapping
+        </a>
+      </li>
+      <!-- /nav item -->
+
+      <!-- Nav Item -->
+      <li
+        class="nav-item"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+      >
+        <a
+          class="nav-link"
+          data-toggle="tab"
+          href="#financeCodeSetup"
+          role="tab"
+          aria-controls="tab-pane-6"
+          aria-selected="true"
+          (click)="currentTab = 'financeCodeSetup'"
+          [ngStyle]="
+            currentTab === 'financeCodeSetup'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Code Setup
+        </a>
+      </li>
+      <!-- /nav item -->
+
+      <!-- Nav Item -->
+      <li
+        class="nav-item"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+      >
+        <a
+          class="nav-link show"
+          data-toggle="tab"
+          href="#unitSetupTab"
+          role="tab"
+          aria-controls="tab-pane-6"
+          aria-selected="true"
+          (click)="currentTab = 'unitSetupTab'"
+          [ngStyle]="
+            currentTab === 'unitSetupTab'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Unit Setup
+        </a>
+      </li>
+      <!-- /nav item -->
+      <!-- Nav Item -->
+      <li
+        class="nav-item"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+      >
+        <a
+          class="nav-link show"
+          data-toggle="tab"
+          href="#paymentTermsTab"
+          role="tab"
+          aria-controls="tab-pane-6"
+          aria-selected="true"
+          (click)="fetchData('paymentTerms')"
+          [ngStyle]="
+            currentTab === 'paymentTerms'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Payment Terms
+        </a>
+      </li>
+      <!-- /nav item -->
+      <!-- Nav Item -->
+      <li
+        class="nav-item"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+      >
+        <a
+          class="nav-link show"
+          data-toggle="tab"
+          href="#taxesTab"
+          role="tab"
+          aria-controls="tab-pane-6"
+          aria-selected="true"
+          (click)="fetchData('taxes')"
+          [ngStyle]="
+            currentTab === 'taxes'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Taxes
+        </a>
+      </li>
+      <!-- /nav item -->
+      <!-- Nav Item -->
+      <li
+        class="nav-item"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+      >
+        <a
+          class="nav-link show"
+          data-toggle="tab"
+          href="#paymentModeTab"
+          role="tab"
+          aria-controls="tab-pane-6"
+          aria-selected="true"
+          (click)="fetchData('paymentMode')"
+          [ngStyle]="
+            currentTab === 'paymentMode'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Payment Mode
+        </a>
+      </li>
+      <!-- /nav item -->
+
+      <li
+        class="nav-item"
+        *ngIf="user?.permission?.includes('Manage Business Information')"
+      >
+        <a
+          class="nav-link show"
+          data-toggle="tab"
+          href="#interactions"
+          role="tab"
+          (click)="currentTab = 'interactions'"
+          [ngStyle]="
+            currentTab === 'interactions'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Interactions
+        </a>
+      </li>
+      <li
+        class="nav-item"
+        *ngIf="user?.permission?.includes('View Transaction Lock')"
+      >
+        <a
+          class="nav-link show"
+          data-toggle="tab"
+          href="#transactionLock"
+          role="tab"
+          (click)="currentTab = 'transactionLock'"
+          [ngStyle]="
+            currentTab === 'transactionLock'
+              ? { background: currentTheme?.secondaryColor }
+              : {}
+          "
+          >Transaction Lock
+        </a>
+      </li>
+      <!-- /nav item -->
+    </ul>
+    <!-- /navbar -->
+  </div>
+  <!-- /profile banner bottom -->
+</div>
+<!-- /profile banner -->
+
+<!-- tab content -->
+<div class="tab-content setup">
+  <!-- Tab panel -->
+
+  <div id="accountSetupTab" class="tab-pane active">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div
+          class="card"
+          *ngIf="user?.permission?.includes('Manage Business Information')"
+        >
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+          >
+            <ul class="nav nav-pills" id="account-setutp-pills" role="tablist">
+              <li class="nav-item active" *ngFor="let tab of accountsSetupChildTabs">
+                <a
+                  [attr.class]="tab.class"
+                  id="pills-header-tab"
+                  data-toggle="pill"
+                  [href]="'#' + tab.id"
+                  role="tab"
+                  [attr.aria-controls]="tab.id"
+                  aria-selected="true"
+                  (click)="accountTab = tab.id"
+                  [ngStyle]="
+                    accountTab === tab.id
+                      ? {
+                          background: currentTheme?.secondaryColor,
+                          color: '#fff'
+                        }
+                      : { color: '#000' }
+                  "
+                  >{{ tab.name }}</a
+                >
+              </li>
+            </ul>
+          </div>
+          <!-- /card header -->
+          <!-- Card Body -->
+          <div
+            class="pb-2 card-body"
+            *ngIf="
+              appOwner != null &&
+              user?.permission?.includes('Manage Business Information')
+            "
+          >
+            <div class="tab-content" id="account-setutp-pills-content">
+              <div
+                class="tab-pane fade show active"
+                id="pills-headers"
+                role="tabpanel"
+                aria-labelledby="pills-headers-tab"
+              >
+                <h3>Configure Group Headers</h3>
+                <div class="table-responsive mb-5">
+                  <table class="table table-hover">
+                    <thead>
+                      <th>S/N</th>
+                      <th>Name</th>
+                      <th>Lower boundary</th>
+                      <th>Upper boundary</th>
+                      <th></th>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of allGroupHeaders; let i = index">
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ item?.name }}</td>
+                        <td>
+                          <span
+                            *ngIf="
+                              !item.isEditing ||
+                              (item.isEditing && isNonEditable(item.accountId))
+                            "
+                            >{{
+                              item?.referenceLowerBoundary >= 0
+                                ? item?.referenceLowerBoundary
+                                : "-"
+                            }}</span
+                          >
+                          <span
+                            *ngIf="
+                              item.isEditing && !item?.referenceLowerBoundary
+                            "
+                          >
+                            <input
+                              type="number"
+                              [value]="item.referenceLowerBoundary"
+                              (keyup)="
+                                changeGroupHeaderValue($event, i, 'lower')
+                              "
+                              class="form-control"
+                            />
+                          </span>
+                        </td>
+                        <td>
+                          <span *ngIf="!item.isEditing">{{
+                            item?.referenceUpperBoundary >= 0
+                              ? item?.referenceUpperBoundary
+                              : "-"
+                          }}</span>
+                          <span *ngIf="item.isEditing">
+                            <input
+                              type="number"
+                              [value]="item.referenceUpperBoundary"
+                              (keyup)="
+                                changeGroupHeaderValue($event, i, 'upper')
+                              "
+                              class="form-control"
+                            />
+                          </span>
+                        </td>
+                        <td class="text-center">
+                          <span
+                            *ngIf="
+                              !item.referenceUpperBoundary &&
+                              !item.referenceLowerBoundary
+                            "
+                          >
+                            <button
+                              class="btn btn-xs btn-primary"
+                              *ngIf="!item.isEditing"
+                              (click)="item.isEditing = true"
+                            >
+                              Setup
+                            </button>
+                          </span>
+                          <span *ngIf="item.isEditing">
+                            <button
+                              class="btn btn-xs text-white"
+                              [style.background]="currentTheme?.primaryColor"
+                              *ngIf="!loader"
+                              (click)="startUpdate(i)"
+                            >
+                              Complete
+                            </button>
+                            <button
+                              class="btn btn-xs btn-primary orange-bg"
+                              *ngIf="loader"
+                              disabled
+                            >
+                              <i class="icon icon-spin icon-spin2"></i>
+                              Updating...
+                            </button>
+                            <button
+                              class="btn btn-xs btn-warning"
+                              *ngIf="!loader"
+                              (click)="item.isEditing = false"
+                            >
+                              Cancel
+                            </button>
+                          </span>
+                          <span
+                            *ngIf="
+                              item?.referenceUpperBoundary >= 0 &&
+                              item?.referenceLowerBoundary >= 0
+                            "
+                          >
+                            <button
+                              class="btn btn-xs text-white"
+                              [style.backgroundColor]="currentTheme?.secondaryColor"
+                              [style.borderColor]="currentTheme?.secondaryColor"
+                              *ngIf="!item.isEditing"
+                              (click)="
+                                setEditableHeaders(item.accountId);
+                                item.isEditing = true
+                              "
+                            >
+                              Edit
+                            </button>
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="pills-fiscal"
+                role="tabpanel"
+                aria-labelledby="pills-fiscal-tab"
+              >
+                <div class="fiscal-year">
+                  <h3>Fiscal year setup</h3>
+                  <p>
+                    Your fiscal year ends
+                    <span class="code">{{
+                      currentFiscalYear | customDatePipe : "Do MMMM"
+                    }}</span>
+                  </p>
+                  <button
+                    *ngIf="!editFiscalYear"
+                    class="btn btn-xs text-white"
+                    [style.backgroundColor]="currentTheme?.secondaryColor"
+                    [style.borderColor]="currentTheme?.secondaryColor"
+                    (click)="editFiscalYear = true"
+                  >
+                    Edit
+                  </button>
+                  <div
+                    class="d-flex align-items-center justify-content-between w-25"
+                    *ngIf="editFiscalYear"
+                  >
+                    <input
+                      type="date"
+                      [(ngModel)]="fiscalYear"
+                      class="form-control mr-3"
+                    />
+                    <button
+                      class="btn btn-xs btn-primary mr-2 d-flex align-items-center"
+                      [disabled]="!fiscalYear || isSavingFiscalYear"
+                      (click)="updateFiscalYear()"
+                    >
+                      <i
+                        class="icon icon-spin icon-spin2 mr-3"
+                        *ngIf="isSavingFiscalYear"
+                      ></i>
+                      {{ isSavingFiscalYear ? "Updating..." : "Update" }}
+                    </button>
+                    <button
+                      class="btn btn-xs btn-light"
+                      (click)="editFiscalYear = false"
+                      *ngIf="!isSavingFiscalYear"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="pills-opening-balance"
+                role="tabpanel"
+                aria-labelledby="pills-opening-balance"
+              >
+                <lnd-opening-balances
+                  *ngIf="currentTheme"
+                ></lnd-opening-balances>
+              </div>
+              <div
+                class="tab-pane fade"
+                id="pills-customer-balances"
+                role="tabpanel"
+                aria-labelledby="pills-customer-balances"
+              >
+                <lnd-customer-vendor-balances
+                  resource="Customer"
+                  [currentTheme]="currentTheme"
+                ></lnd-customer-vendor-balances>
+              </div>
+
+              <div
+                class="tab-pane fade"
+                id="pills-vendor-balances"
+                role="tabpanel"
+                aria-labelledby="pills-vendor-balances"
+              >
+                <lnd-customer-vendor-balances
+                  resource="Vendor"
+                  [currentTheme]="currentTheme"
+                ></lnd-customer-vendor-balances>
+              </div>
+
+              <div
+                class="tab-pane fade"
+                id="pills-classification"
+                role="tabpanel"
+                aria-labelledby="pills-classification-tab"
+              >
+                <lnd-account-classification></lnd-account-classification>
+              </div>
+            </div>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+  <div id="financeCodeSetup" class="tab-pane">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+          >
+            <h2 class="mb--20">Code Setup</h2>
+            <small class="text-info"
+              >Codes can be Modified but cannot be empty!</small
+            >
+          </div>
+          <!-- /card header -->
+          <!-- Card Body -->
+          <div
+            class="pb-2 card-body"
+            *ngIf="
+              appOwner != null &&
+              user?.permission?.includes('Manage Business Information')
+            "
+          >
+            <!-- <h4 class="text-center orange">Edit your profile</h4>-->
+            <!-- Form -->
+            <form
+              [formGroup]="financeSetupForm"
+              (ngSubmit)="updateFinanceSetupForm()"
+            >
+              <div class="form-row">
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Petty Cash Transaction Code
+                    <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerPettyCashTransactionCode"
+                    class="form-control"
+                    placeholder="Petty Cash Transaction Code"
+                  />
+                </div>
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Expense Code <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerExpenseCode"
+                    class="form-control"
+                    placeholder="Expense Code"
+                  />
+                </div>
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Journal Code <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerJournalCode"
+                    class="form-control"
+                    placeholder="Journal Code"
+                  />
+                </div>
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Purchase Order Code <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerPurchaseOrderCode"
+                    class="form-control"
+                    placeholder="Purchase Order Code"
+                  />
+                </div>
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Item Code <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerItemCode"
+                    class="form-control"
+                    placeholder="Item Code"
+                  />
+                </div>
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Vendor Credit Note Code
+                    <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerVendorCreditNoteCode"
+                    class="form-control"
+                    placeholder="Vendor Credit Note Code"
+                  />
+                </div>
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Credit Note Code <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerCreditNoteCode"
+                    class="form-control"
+                    placeholder="Credit Note Code"
+                  />
+                </div>
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Invoice Code <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerIncomeCode"
+                    class="form-control"
+                    placeholder="Income Code"
+                  />
+                </div>
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Finance Payment Code
+                    <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerFinancePaymentCode"
+                    class="form-control"
+                    placeholder="Finance Payment Code"
+                  />
+                </div>
+
+                <div class="mb-3 col-md-4">
+                  <label for="validationDefault02"
+                    >Bill Code <sup class="text-danger">*</sup></label
+                  >
+                  <input
+                    type="text"
+                    formControlName="appOwnerBillCode"
+                    class="form-control"
+                    placeholder="Bill Code"
+                  />
+                </div>
+              </div>
+
+              <button
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                [style.borderColor]="currentTheme?.secondaryColor"
+                class="mt-3 mb-3 btn btn-primary orange-bg"
+                type="submit"
+                *ngIf="!loader"
+                [disabled]="financeSetupForm.invalid"
+              >
+                Update Setup
+              </button>
+              <button
+                class="mt-3 mb-3 btn btn-primary orange-bg"
+                type="button"
+                *ngIf="loader"
+                [disabled]="true"
+              >
+                <i class="icon icon-spin icon-spin2"></i> Updating ...
+              </button>
+            </form>
+            <!-- /form -->
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+
+  <div id="unitSetupTab" class="tab-pane">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-121">
+        <!-- Card -->
+        <div class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+          >
+            <h2 class="mb--20">Unit Setup</h2>
+            <span class="float-right role-add">
+              <a
+                (click)="toggleModal(addEditUnitModal)"
+                class="btn btn-primary btn-sm mr-2 orange-bg text-white"
+                [style.borderColor]="currentTheme?.secondaryColor"
+                [style.backgroundColor]="currentTheme?.secondaryColor"
+                routerLinkActive="router-link-active"
+                href="javascript:void(0)"
+              >
+                <i class="icon icon-add-circle mr-2"></i>Add New</a
+              >
+            </span>
+          </div>
+          <!-- /card header -->
+          <!-- Card Body -->
+          <div
+            class="pb-2 card-body"
+            *ngIf="
+              appOwner != null &&
+              user?.permission?.includes('Manage Business Information')
+            "
+          >
+            <app-unit
+              [openModalState]="openModalState"
+              [template]="template"
+              [callFetchUnits]="fetchUnits"
+              (openEditModal)="initUnitModal($event, addEditUnitModal)"
+            ></app-unit>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+
+  <div id="entriesMappingSetupTab" class="tab-pane">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between"
+          >
+            <h2 class="mb--20">Map Legder Accounts</h2>
+          </div>
+          <!-- /card header -->
+          <!-- Card Body -->
+          <div
+            class="pb-2 card-body"
+            *ngIf="
+              appOwner != null &&
+              user?.permission?.includes('Manage Business Information')
+            "
+          >
+            <header class="d-flex justify-content-between">
+              <div>
+                <lnd-selected-filters
+                  (initialized)="onSelectedFiltersInit($event)"
+                ></lnd-selected-filters>
+              </div>
+              <div>
+                <input
+                  type="text"
+                  class="form-control mb-5"
+                  placeholder="Search"
+                  (keyup)="filterEntries($event.target.value)"
+                />
+                  <lnd-filter-btn
+                    (filterModalOpen)="onOpenFilterModal()"
+                  ></lnd-filter-btn>
+                  <lnd-filter
+                    [filterOptions]="filterOptions"
+                    (optionSelected)="onOptionSelected($event)"
+                    placeholder="Select Module"
+                  >
+                  </lnd-filter>
+              </div>
+            </header>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <th>S/N</th>
+                  <th>Operation Information</th>
+                  <th class="text-center"><b>Double Entry Movement</b></th>
+                </thead>
+                <tbody>
+                  <span *ngIf="movementEntriesLoader">
+                    <i class="icon icon-spin icon-spin2"></i> Loading ...
+                  </span>
+
+                  <tr *ngFor="let entry of movementEntries; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>
+                      <i
+                        class="icon icon-editor mr-2 align-self-center text-warning"
+                      ></i>
+                      <b>{{ entry.operation | humanify }}</b
+                      ><br />
+
+                      <span class="mr-6"></span>
+                      <small *ngIf="entry.modifiedAt != null"
+                        >Last Updated :
+                        {{ entry.modifiedAt | date : "mediumDate" }}</small
+                      >
+                      <small *ngIf="entry.modifiedAt == null"
+                        >Last Updated :
+                        {{ entry.createdAt | date : "mediumDate" }}</small
+                      >
+                      <br /><br />
+
+                      <button
+                        *ngIf="entry.isEditable"
+                        class="btn btn-xs text-white"
+                        [style.backgroundColor]="currentTheme?.secondaryColor"
+                        [style.borderColor]="currentTheme?.secondaryColor"
+                        (click)="
+                          openMovementEntryModal(
+                            entry.movementEntryId,
+                            manageEntryMappingModal
+                          )
+                        "
+                      >
+                        Manage
+                      </button>
+                    </td>
+                    <td class="text-center">
+                      <table class="table table-bordered">
+                        <thead>
+                          <th class="text-left">Movement Line Entry</th>
+                          <th>Debit</th>
+                          <th>Credit</th>
+                        </thead>
+                        <tbody>
+                          <tr
+                            *ngFor="let mapping of entry.movementEntryMappings"
+                          >
+                            <td class="text-left">
+                              {{ _humanize(mapping.entryContentType) }}
+                            </td>
+                            <ng-container
+                              *ngIf="mapping.entryType == 'DebitOrCredit'"
+                            >
+                              <td colspan="2">
+                                <span
+                                  *ngIf="mapping.isAutoSelected"
+                                  class="text-light-gray"
+                                  >To Be Selected</span
+                                >
+                                <span
+                                  class="text-center"
+                                  *ngIf="!mapping.isAutoSelected"
+                                >
+                                  {{ mapping?.account }}
+                                </span>
+                              </td>
+                            </ng-container>
+                            <ng-container
+                              *ngIf="mapping.entryType != 'DebitOrCredit'"
+                            >
+                              <td>
+                                <ng-container
+                                  *ngIf="mapping.entryType == 'Debit'"
+                                >
+                                  <span
+                                    *ngIf="mapping.isAutoSelected"
+                                    class="text-light-gray"
+                                    >To Be Selected</span
+                                  >
+                                  <span *ngIf="!mapping.isAutoSelected">
+                                    {{ mapping?.account }}
+                                  </span>
+                                </ng-container>
+                                <span *ngIf="mapping.entryType != 'Debit'"
+                                  >-</span
+                                >
+                              </td>
+                              <td>
+                                <ng-container
+                                  *ngIf="mapping.entryType == 'Credit'"
+                                >
+                                  <span
+                                    *ngIf="mapping.isAutoSelected"
+                                    class="text-light-gray"
+                                    >To Be Selected</span
+                                  >
+                                  <span *ngIf="!mapping.isAutoSelected">
+                                    {{ mapping?.account }}
+                                  </span>
+                                </ng-container>
+                                <span *ngIf="mapping.entryType != 'Credit'"
+                                  >-</span
+                                >
+                              </td>
+                            </ng-container>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+
+  <div id="paymentTermsTab" class="tab-pane">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between align-items-center"
+          >
+            <h2 class="mb--20">Configure Payment Terms</h2>
+            <button
+              class="btn mr-2 text-white btn-sm"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              (click)="openPaymentTermModal(paymentTermModal)"
+            >
+              Add New
+            </button>
+          </div>
+          <!-- /card header -->
+          <!-- Card Body -->
+          <div
+            class="pb-2 card-body"
+            *ngIf="
+              appOwner != null &&
+              user?.permission?.includes('Manage Business Information')
+            "
+          >
+            <lnd-table-header
+              *ngIf="currentTab === 'paymentTerms'"
+              [pagination]="pagination"
+              [currentTheme]="currentTheme"
+              [isLoading]="isLoading"
+              (paginationChange)="fetchPaymentTerms($event)"
+              placeholder="Name"
+            ></lnd-table-header>
+            <div class="table-responsive">
+              <table
+                class="table table-hover"
+                *ngIf="allPaymentTerms?.length > 0"
+              >
+                <thead>
+                  <th>S/N</th>
+                  <th>Name</th>
+                  <th>Days</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th></th>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of allPaymentTerms; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>
+                      {{ item?.paymentTermName }}
+                      <span
+                        class="badge badge-pill badge-sm badge-light"
+                        *ngIf="item?.isDefault"
+                        >Default</span
+                      >
+                    </td>
+                    <td>{{ item?.paymentTermDays }}</td>
+                    <td>{{ item?.paymentTermDescription }}</td>
+                    <td>
+                      <span
+                        class="badge badge-pill badge-sm"
+                        [ngClass]="
+                          item?.isActive ? 'badge-success' : 'badge-danger'
+                        "
+                      >
+                        {{ item?.isActive ? "Active" : "Inactive" }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <div class="dropdown mr-2 mb-2 d-inline-block">
+                        <button
+                          class="btn btn-warning btn-xs dropdown-toggle"
+                          type="button"
+                          data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                        ></button>
+
+                        <div class="dropdown-menu">
+                          <a
+                            class="dropdown-item"
+                            (click)="
+                              openPaymentTermModal(paymentTermModal, item)
+                            "
+                            href="javascript:void(0)"
+                            ><i class="icon icon-edit icon-fw mr-2"></i>Edit</a
+                          >
+                          <a
+                            class="dropdown-item text-danger"
+                            (click)="
+                              attemptDelete(item.paymentTermId, 'paymentTerms')
+                            "
+                            href="javascript:void(0)"
+                            ><i class="icon icon-trash icon-fw mr-2"></i
+                            >Delete</a
+                          >
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div *ngIf="allPaymentTerms?.length === 0 && !isLoading">
+                <div class="my-3 text-center">
+                  <p class="text-muted display-4">
+                    You have not created any payment term.
+                  </p>
+                  <button
+                    [style.borderColor]="currentTheme?.secondaryColor"
+                    [style.backgroundColor]="currentTheme?.secondaryColor"
+                    (click)="openPaymentTermModal(paymentTermModal)"
+                    class="btn btn-primary orange-bg text-white mt-3"
+                  >
+                    Create New
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <lnd-table-footer
+              [pagination]="pagination"
+              (paginationChange)="fetchPaymentTerms($event)"
+            ></lnd-table-footer>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+  <div id="taxesTab" class="tab-pane">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between align-items-center"
+          >
+            <h2 class="mb--20">Configure Taxes</h2>
+            <button
+              class="btn mr-2 text-white btn-sm"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              (click)="openTaxesModal(taxesModal)"
+            >
+              Add New
+            </button>
+          </div>
+          <!-- /card header -->
+          <!-- Card Body -->
+          <div
+            class="pb-2 card-body"
+            *ngIf="
+              appOwner != null &&
+              user?.permission?.includes('Manage Business Information')
+            "
+          >
+            <lnd-table-header
+              *ngIf="currentTab === 'taxes'"
+              [pagination]="taxesPagination"
+              [currentTheme]="currentTheme"
+              [isLoading]="isLoading"
+              (paginationChange)="fetchTaxes($event)"
+              placeholder="Name"
+            ></lnd-table-header>
+            <div class="table-responsive">
+              <table class="table table-hover" *ngIf="allTaxes?.length > 0">
+                <thead>
+                  <th>S/N</th>
+                  <th>Name</th>
+                  <th>Value (%)</th>
+                  <th>Type</th>
+                  <th>Account</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th></th>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of allTaxes; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ item?.name }}</td>
+                    <td>{{ item?.value | number : "1.2-2" }}</td>
+                    <td>{{ item?.type }}</td>
+                    <td>{{ item?.accountName }}</td>
+                    <td>{{ item?.description }}</td>
+                    <td>
+                      <span
+                        class="badge badge-pill badge-sm"
+                        [ngClass]="
+                          item?.isActive ? 'badge-success' : 'badge-danger'
+                        "
+                      >
+                        {{ item?.isActive ? "Active" : "Inactive" }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <div class="dropdown mr-2 mb-2 d-inline-block">
+                        <button
+                          class="btn btn-warning btn-xs dropdown-toggle"
+                          type="button"
+                          data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                        ></button>
+
+                        <div class="dropdown-menu">
+                          <a
+                            class="dropdown-item"
+                            href="javascript:void(0)"
+                            (click)="openTaxesModal(taxesModal, item)"
+                            ><i class="icon icon-edit icon-fw mr-2"></i>Edit</a
+                          >
+                          <a
+                            class="dropdown-item text-danger"
+                            (click)="attemptDelete(item.financeTaxId, 'taxes')"
+                            href="javascript:void(0)"
+                            ><i class="icon icon-trash icon-fw mr-2"></i
+                            >Delete</a
+                          >
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div *ngIf="allTaxes?.length === 0 && !isLoading">
+                <div class="my-3 text-center">
+                  <p class="text-muted display-4">
+                    You are yet to create a tax.
+                  </p>
+                  <button
+                    [style.borderColor]="currentTheme?.secondaryColor"
+                    [style.backgroundColor]="currentTheme?.secondaryColor"
+                    (click)="openTaxesModal(taxesModal)"
+                    class="btn btn-primary orange-bg text-white mt-3"
+                  >
+                    Create New
+                  </button>
+                </div>
+              </div>
+            </div>
+            <lnd-table-footer
+              [pagination]="taxesPagination"
+              (paginationChange)="fetchTaxes($event)"
+            ></lnd-table-footer>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+  <div id="paymentModeTab" class="tab-pane">
+    <div class="row">
+      <!-- Grid Item -->
+      <div class="col-xl-12">
+        <!-- Card -->
+        <div class="card">
+          <!-- Card Header -->
+          <div
+            class="bg-transparent card-header card-nav d-flex justify-content-between align-items-center"
+          >
+            <h2 class="mb--20">Configure Payment Modes</h2>
+            <button
+              class="btn mr-2 text-white btn-sm"
+              [style.backgroundColor]="currentTheme?.secondaryColor"
+              [style.borderColor]="currentTheme?.secondaryColor"
+              (click)="openPaymentModeModal(paymentModeModal)"
+            >
+              Add New
+            </button>
+          </div>
+          <!-- /card header -->
+          <!-- Card Body -->
+          <div
+            class="pb-2 card-body"
+            *ngIf="
+              appOwner != null &&
+              user?.permission?.includes('Manage Business Information')
+            "
+          >
+            <lnd-table-header
+              *ngIf="currentTab === 'paymentMode'"
+              [pagination]="pagination"
+              [currentTheme]="currentTheme"
+              [isLoading]="isLoading"
+              (paginationChange)="fetchPaymentModes($event)"
+              placeholder="Name"
+            ></lnd-table-header>
+            <div class="table-responsive">
+              <table
+                class="table table-hover"
+                *ngIf="allPaymentModes?.length > 0"
+              >
+                <thead>
+                  <th>S/N</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th></th>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of allPaymentModes; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>
+                      {{ item?.name }}
+                      <span
+                        class="badge badge-pill badge-sm badge-light"
+                        *ngIf="item?.isDefault"
+                        >Default</span
+                      >
+                    </td>
+                    <td>{{ item?.description }}</td>
+                    <td>
+                      <span
+                        class="badge badge-pill badge-sm"
+                        [ngClass]="
+                          item?.isActive ? 'badge-success' : 'badge-danger'
+                        "
+                      >
+                        {{ item?.isActive ? "Active" : "Inactive" }}
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <div class="dropdown mr-2 mb-2 d-inline-block">
+                        <button
+                          class="btn btn-warning btn-xs dropdown-toggle"
+                          type="button"
+                          data-toggle="dropdown"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                        ></button>
+
+                        <div class="dropdown-menu">
+                          <a
+                            *ngIf="!item.isDefault"
+                            class="dropdown-item text-success"
+                            href="javascript:void(0)"
+                            (click)="makeDefault(item)"
+                            ><i class="icon icon-check icon-fw mr-2"></i>Make
+                            Default</a
+                          >
+                          <a
+                            class="dropdown-item"
+                            href="javascript:void(0)"
+                            (click)="
+                              openPaymentModeModal(paymentModeModal, item)
+                            "
+                            ><i class="icon icon-edit icon-fw mr-2"></i>Edit</a
+                          >
+                          <a
+                            class="dropdown-item text-danger"
+                            (click)="
+                              attemptDelete(
+                                item.financePaymentModeId,
+                                'paymentMode'
+                              )
+                            "
+                            href="javascript:void(0)"
+                            ><i class="icon icon-trash icon-fw mr-2"></i
+                            >Delete</a
+                          >
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div *ngIf="allPaymentModes?.length === 0 && !isLoading">
+                <div class="my-3 text-center">
+                  <p class="text-muted display-4">
+                    You are yet to create a payment mode.
+                  </p>
+                  <button
+                    [style.borderColor]="currentTheme?.secondaryColor"
+                    [style.backgroundColor]="currentTheme?.secondaryColor"
+                    (click)="openPaymentModeModal(paymentModeModal)"
+                    class="btn btn-primary orange-bg text-white mt-3"
+                  >
+                    Create New
+                  </button>
+                </div>
+              </div>
+              <lnd-table-footer
+                [pagination]="pagination"
+                (paginationChange)="fetchPaymentModes($event)"
+              ></lnd-table-footer>
+            </div>
+          </div>
+          <!-- /card body -->
+        </div>
+        <!-- /card -->
+      </div>
+      <!-- /grid item -->
+    </div>
+  </div>
+  <div *ngIf="user" id="interactions" class="tab-pane">
+    <lnd-interactions-parent [user]="user"></lnd-interactions-parent>
+  </div>
+  <div id="transactionLock" class="tab-pane">
+    <lnd-transaction-lock></lnd-transaction-lock>
+  </div>
+</div>
+<!-- /profile content -->
+
+<!-- Modals -->
+<ng-template #paymentTermModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      {{ isEditingPaymentTerms ? "Edit" : "Create New" }} Payment Term
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="paymentTermsForm" (ngSubmit)="savePaymentTermsForm()">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="roleName">Name</label>
+            <input
+              type="text"
+              placeholder="Payment term name"
+              class="form-control"
+              formControlName="paymentTermName"
+            />
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="roleName">Days</label>
+            <input
+              type="number"
+              placeholder="Payment term days"
+              min="0"
+              class="form-control"
+              formControlName="paymentTermDays"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="permission">Status</label>
+            <slct-2
+              [data]="activeStatus"
+              formControlName="isactive"
+              [customSearchEnabled]="true"
+              [placeholder]="'Select Status'"
+            ></slct-2>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="permission">Default</label>
+            <slct-2
+              [data]="defaultStatus"
+              formControlName="isdefault"
+              [customSearchEnabled]="true"
+              [placeholder]="'Select Default'"
+            ></slct-2>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="roleName">Description</label>
+        <textarea
+          class="form-control"
+          formControlName="paymentTermDescription"
+          placeholder="Payment term description"
+          cols="3"
+          rows="3"
+        ></textarea>
+      </div>
+      <div class="modal-footer">
+        <button
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          type="submit"
+          class="btn btn-primary orange-bg text-white"
+          *ngIf="!loader"
+          [disabled]="paymentTermsForm.invalid"
+        >
+          {{ isEditingPaymentTerms ? "Update" : "Save" }}
+        </button>
+        <button
+          class="mt-0 ml-3 btn btn-light"
+          *ngIf="!loader"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-block btn-primary orange-bg text-white"
+          *ngIf="loader"
+          [disabled]="true"
+        >
+          <i class="icon icon-spin icon-spin2"></i> Processing...
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #taxesModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      {{ isEditingTax ? "Edit" : "Create New" }} Tax
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="taxForm" (ngSubmit)="saveTaxForm()">
+      <div class="form-group">
+        <label for="roleName">Name</label>
+        <input
+          type="text"
+          placeholder="Tax name"
+          class="form-control"
+          formControlName="name"
+        />
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="roleName">Value (%)</label>
+            <input
+              type="number"
+              min="0"
+              class="form-control"
+              formControlName="value"
+            />
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="form-group">
+            <label for="permission">Type</label>
+            <slct-2
+              [data]="taxTypes"
+              formControlName="taxType"
+              [customSearchEnabled]="true"
+              placeholder="Select Type"
+            ></slct-2>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Account</label>
+        <div class="account">
+          <span
+            *ngIf="accounts.length === 0; else account"
+            class="text-primary"
+          >
+            <i class="icon icon-spin icon-spin2"></i> Loading accounts...
+          </span>
+          <ng-template #account>
+            <account-slct
+              [data]="accounts"
+              [allowSelectAny]="true"
+              (selectedAccount)="selectAccount($event)"
+              [preselectedAccount]="
+                isEditingTax
+                  ? {
+                      accountId: selectedTax.accountId,
+                      name: selectedTax.accountName
+                    }
+                  : null
+              "
+            ></account-slct>
+          </ng-template>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="roleName">Description</label>
+        <textarea
+          class="form-control"
+          formControlName="description"
+          placeholder="Tax description"
+          cols="3"
+          rows="3"
+        ></textarea>
+      </div>
+      <div class="mb-5">
+        <lnd-switch
+          [text]="
+            taxForm.get('isActive').value ? 'Tax is active' : 'Tax is inactive'
+          "
+          [value]="taxForm.get('isActive').value"
+          (emittedValue)="this.taxForm.get('isActive').setValue($event)"
+        ></lnd-switch>
+      </div>
+      <div class="modal-footer">
+        <button
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          type="submit"
+          class="btn btn-primary orange-bg text-white"
+          *ngIf="!loader"
+          [disabled]="taxForm.invalid"
+        >
+          {{ isEditingTax ? "Update" : "Save" }}
+        </button>
+        <button
+          class="btn mt-0 ml-3 btn btn-light"
+          *ngIf="!loader"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-block btn-primary orange-bg text-white"
+          *ngIf="loader"
+          [disabled]="true"
+        >
+          <i class="icon icon-spin icon-spin2"></i> Processing...
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #paymentModeModal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      {{ isEditingPaymentMode ? "Edit" : "Create New" }} Payment Mode
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="paymentModeForm" (ngSubmit)="savePaymentModeForm()">
+      <div class="form-group">
+        <label for="roleName">Name</label>
+        <input
+          type="text"
+          placeholder="Payment mode name"
+          class="form-control"
+          formControlName="name"
+        />
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="permission">Status</label>
+            <slct-2
+              [data]="activeStatus"
+              formControlName="isActiveObj"
+              [customSearchEnabled]="true"
+              placeholder="Select Status"
+            ></slct-2>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label for="permission">Is Default</label>
+            <select class="form-control" formControlName="isDefault">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="roleName">Description</label>
+        <textarea
+          class="form-control"
+          formControlName="description"
+          placeholder="Tax description"
+          cols="3"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          type="submit"
+          class="btn btn-primary orange-bg text-white"
+          *ngIf="!loader"
+          [disabled]="paymentModeForm.invalid"
+        >
+          {{ isEditingPaymentMode ? "Update" : "Save" }}
+        </button>
+
+        <button
+          class="mt-0 ml-3 btn btn-light"
+          *ngIf="!loader"
+          (click)="closeModal()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary orange-bg text-white"
+          *ngIf="loader"
+          [disabled]="true"
+        >
+          <i class="icon icon-spin icon-spin2"></i> Processing...
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<ng-template #manageEntryMappingModal>
+  <ng-container *ngIf="movementEntryLoader">
+    <i class="icon icon-spin icon-spin2"></i> Loading ...
+  </ng-container>
+
+  <ng-container *ngIf="!movementEntryLoader && movementEntry == null">
+    Movement entry not found
+  </ng-container>
+
+  <ng-container *ngIf="!movementEntryLoader && movementEntry != null">
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">
+        Manage: <b>{{ movementEntry.operation | humanify }}</b>
+      </h4>
+
+      <button
+        type="button"
+        class="close"
+        aria-label="Close"
+        (click)="closeModal()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <table class="table table-bordered">
+        <thead>
+          <th class="text-left">Entry</th>
+          <th class="text-center">Debit</th>
+          <th class="text-center">Credit</th>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="
+              let mapping of movementEntry.movementEntryMappings;
+              let i = index
+            "
+          >
+            <td class="text-left">{{ _humanize(mapping.entryContentType) }}</td>
+            <ng-container *ngIf="mapping.entryType == 'DebitOrCredit'">
+              <td colspan="1">
+                <span *ngIf="mapping.isAutoSelected" class="text-light-gray"
+                  >To Be Selected</span
+                >
+                <span *ngIf="!mapping.isAutoSelected">
+                  <account-slct
+                    [data]="accounts"
+                    (selectedAccount)="selectMappingAccount($event, mapping)"
+                    [preselectedAccount]="
+                      mapping.account
+                        ? {
+                            accountId: mapping.accountId,
+                            name: mapping.account
+                          }
+                        : null
+                    "
+                  ></account-slct>
+                </span>
+              </td>
+              <td colspan="1">
+                <span *ngIf="mapping.isAutoSelected" class="text-light-gray"
+                  >To Be Selected</span
+                >
+                <span *ngIf="!mapping.isAutoSelected">
+                  <account-slct
+                    [data]="accounts"
+                    (selectedAccount)="selectMappingAccount($event, mapping)"
+                    [preselectedAccount]="
+                      mapping.account
+                        ? {
+                            accountId: mapping.accountId,
+                            name: mapping.account
+                          }
+                        : null
+                    "
+                  ></account-slct>
+                </span>
+              </td>
+            </ng-container>
+            <ng-container *ngIf="mapping.entryType != 'DebitOrCredit'">
+              <td [ngClass]="{ 'text-center': mapping.entryType != 'Debit' }">
+                <ng-container *ngIf="mapping.entryType == 'Debit'">
+                  <span *ngIf="mapping.isAutoSelected" class="text-light-gray"
+                    >To Be Selected</span
+                  >
+                  <span *ngIf="!mapping.isAutoSelected">
+                    <account-slct
+                      [data]="accounts"
+                      (selectedAccount)="selectMappingAccount($event, mapping)"
+                      [preselectedAccount]="
+                        mapping.account
+                          ? {
+                              accountId: mapping.accountId,
+                              name: mapping.account
+                            }
+                          : null
+                      "
+                    ></account-slct>
+                  </span>
+                </ng-container>
+                <span *ngIf="mapping.entryType != 'Debit'">—</span>
+              </td>
+              <td [ngClass]="{ 'text-center': mapping.entryType != 'Credit' }">
+                <ng-container *ngIf="mapping.entryType == 'Credit'">
+                  <span *ngIf="mapping.isAutoSelected" class="text-light-gray"
+                    >To Be Selected</span
+                  >
+                  <span *ngIf="!mapping.isAutoSelected">
+                    <account-slct
+                      [data]="accounts"
+                      (selectedAccount)="selectMappingAccount($event, mapping)"
+                      [preselectedAccount]="
+                        mapping.account
+                          ? {
+                              accountId: mapping.accountId,
+                              name: mapping.account
+                            }
+                          : null
+                      "
+                    ></account-slct>
+                  </span>
+                </ng-container>
+                <span *ngIf="mapping.entryType != 'Credit'">—</span>
+              </td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal-footer">
+      <div class="form-group d-flex align-items-center justify-content-end">
+        <button
+          *ngIf="!movementEntrySaveLoader"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          (click)="submitMovementEntryUpdate()"
+          class="btn btn-block btn-primary orange-bg text-white"
+        >
+          Save
+        </button>
+        <button
+          *ngIf="!movementEntrySaveLoader"
+          (click)="closeModal()"
+          class="mt-0 ml-3 btn btn-light"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-block btn-primary orange-bg text-white"
+          *ngIf="movementEntrySaveLoader"
+          [disabled]="true"
+        >
+          <i class="icon icon-spin icon-spin2"> </i> Processing...
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-template>
+<ng-template #addEditUnitModal>
+  <app-add-edit-units
+    (closeModal)="closeModal($event)"
+    [unit]="unit"
+  ></app-add-edit-units>
+</ng-template>

@@ -1,0 +1,75 @@
+<div class="wrapper">
+  <input
+    type="text"
+    class="form-control"
+    readonly
+    [disabled]="disabled"
+    [placeholder]="dataTree?.length === 0 ? placeholder : 'Select an account'"
+    [(ngModel)]="accountSelected"
+    (focus)="isPanelOpened = true"
+  />
+  <div class="panel p-1" [ngClass]="isPanelOpened ? 'open' : 'closed'">
+    <input
+      type="text"
+      class="form-control my-2"
+      [formControl]="formControl"
+      placeholder="Search"
+      *ngIf="allowSearch"
+    />
+    <div class="list-panel" *ngIf="!isFiltering">
+      <ul class="parent-list" *ngIf="dataTree?.length > 0; else noAccount">
+        <ng-container *ngFor="let parent of dataTree">
+          <ng-container
+            [ngTemplateOutlet]="accountList"
+            [ngTemplateOutletContext]="{ data: parent }"
+          ></ng-container>
+        </ng-container>
+      </ul>
+    </div>
+    <div class="list-panel" *ngIf="isFiltering">
+      <ul *ngIf="filteredAccount?.length > 0; else noAccount">
+        <li
+          class="parent-item"
+          *ngFor="let account of filteredAccount"
+        >
+          <div
+            [ngClass]="{
+              selected: preselectedAccount?.accountId === account?.accountId,
+              postingAccount: account?.isPostingAccount
+            }"
+            (click)="selectAccount(account)"
+          >
+            {{ account?.reference }} - {{ account?.name }}
+          </div>
+        </li>
+      </ul>
+    </div>
+    <ng-template #noAccount> No account found. </ng-template>
+  </div>
+</div>
+
+<ng-template #accountList let-data="data">
+  <li class="parent-item">
+    <div
+      [ngClass]="{
+        gray: !allowSelectAny,
+        selected: preselectedAccount?.accountId === data?.accountId,
+        postingAccount: data?.isPostingAccount
+      }"
+      (click)="selectAccount(data)"
+    >
+      <span *ngIf="!data?.isPostingAccount">{{ data?.name }}</span>
+      <span *ngIf="data?.isPostingAccount"
+        >{{ data?.reference }} - {{ data?.name }}</span
+      >
+    </div>
+    <ul class="child-list" *ngIf="data?.children?.length > 0">
+      <ng-container *ngFor="let child of data?.children">
+        <ng-container
+          [ngTemplateOutlet]="accountList"
+          [ngTemplateOutletContext]="{ data: child }"
+        ></ng-container>
+      </ng-container>
+    </ul>
+  </li>
+</ng-template>

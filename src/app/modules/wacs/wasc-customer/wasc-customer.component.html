@@ -1,0 +1,319 @@
+<main class="card p-4">
+  <div *ngIf="isLoading" class="d-flex justify-content-center">
+    <lnd-spinner text="Fetching user details..." />
+  </div>
+
+  <ng-container *ngIf="!isLoading">
+    <header [ngClass]="{ 'lnd-border-bottom': showLoanAppForm }">
+      <div class="d-flex align-items-center">
+        <img
+          src="assets/images/male-default-profile.png"
+          alt="profile-img"
+          class="mr-2"
+          width="75"
+          height="75"
+        />
+
+        <div class="ml-2">
+          <h3 class="mb-2">
+            {{ customer?.firstName + " " + customer?.lastName | titlecase }}
+          </h3>
+          <p class="mb-2">{{ customer?.customerCode }}</p>
+          <p class="mb-2">
+            <i class="icon icon-email mr-2"></i> {{ customer?.emailAddress }}
+          </p>
+          <p>
+            <i class="icon icon-phone mr-2"></i> {{ customer?.phoneNumber }}
+          </p>
+        </div>
+      </div>
+
+      <button class="btn" routerLink="/wacs/customers">Back</button>
+    </header>
+
+    <ng-container *ngIf="!showLoanAppForm">
+      <lnd-tab-bar [tabs]="tabs" [currentTabId]="currentTab" />
+
+      <div class="tabs">
+        <ng-container *ngIf="currentTab === 'customerInformation'">
+          <div class="top-section">
+            <h3>WACs Details</h3>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <p class="mb-0 sub-title">Review customer information</p>
+
+              <div class="d-flex justify-content-center align-items-center">
+                <button
+                  class="btn btn-xs eligibility-btn"
+                  (click)="checkCustomerEligibility()"
+                  [disabled]="checkingEligibility"
+                >
+                  Check Eligibility
+                  <i
+                    *ngIf="checkingEligibility"
+                    class="icon icon-spin icon-spin2"
+                  ></i>
+                </button>
+                <button
+                  class="btn btn-xs btn-primary"
+                  *ngIf="customerIsEligible"
+                  (click)="showLoanAppFormFn()"
+                >
+                  Apply for loan
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <section>
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.firstName"
+              title="First Name"
+              [value]="customer.firstName"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.middleName"
+              title="Middle Name"
+              [value]="customer.middleName"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.lastName"
+              title="Last Name"
+              [value]="customer.lastName"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.phoneNumber"
+              title="Phone Number"
+              [value]="customer.phoneNumber"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.role"
+              title="Role"
+              [value]="customer.role"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.emailAddress"
+              title="Email Address"
+              [value]="customer.emailAddress"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer?.gender"
+              title="Gender"
+              [value]="customer?.gender"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer?.dob"
+              title="Date Of Birth"
+              [value]="customer?.dob"
+              type="date"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer?.address"
+              title="Address"
+              [value]="customer?.address"
+            />
+          </section>
+
+          <section>
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.bankAccountName"
+              title="Account Name"
+              [value]="customer.bankAccountName"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.bankAccountNumber"
+              title="Account Number"
+              [value]="customer.bankAccountNumber"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.bankName"
+              title="Bank Name"
+              [value]="customer.bankName"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.bvn"
+              title="Bank Verification Number"
+              [value]="customer.bvn"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.ippisNumber"
+              title="IPPIS"
+              [value]="customer.ippisNumber"
+            />
+          </section>
+
+          <section>
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.currentSalary"
+              title="Current Salary"
+              type="amount"
+              [value]="customer.currentSalary"
+            />
+
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.employeeStatus"
+              title="Employee Status"
+              [value]="customer.employeeStatus"
+            />
+          </section>
+
+          <section>
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.pfaName"
+              title="PFA Name"
+              [value]="customer.pfaName"
+            />
+            <lnd-dt-list-item
+              [ignoreIcon]="true"
+              *ngIf="customer.customerCode"
+              title="Customer Code"
+              [value]="customer.customerCode"
+            />
+          </section>
+        </ng-container>
+
+        <ng-container *ngIf="currentTab === 'eligibilityHistory'">
+          <p>
+            This is an audit trail of all eligibility checks on this customer.
+          </p>
+
+          <div *ngFor="let activity of activities" class="activity">
+            <p>Eligibility Check</p>
+            <span class="mb-2"> {{ activity?.activityDescription }}</span>
+            <div class="mt-2">
+              <span class="text-success">Checked By</span
+              ><span class="mx-4">{{ activity?.person }}</span
+              ><span class="sub-title">{{
+                activity?.activityDate | date
+              }}</span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </ng-container>
+
+    <div *ngIf="showLoanAppForm" class="loan-form">
+      <h3>Loan Application Form</h3>
+      <p>Customer Eligibility Check</p>
+      <p>
+        <span class="sub-title"
+          >This customer is eligible for a loan up to </span
+        ><b>{{ eligibleAmount | number : "1.2-2" }}</b>
+      </p>
+
+      <form [formGroup]="form">
+        <p>Fill in the loan details</p>
+
+        <div class="form-row">
+          <div class="col-md-6 mb-5">
+            <label>Loan Product <b class="text-danger">*</b></label>
+
+            <slct-2
+              [data]="loanProductsList"
+              [customSearchEnabled]="true"
+              (selected)="setLoanProduct(true, $event)"
+              (removed)="setLoanProduct(false, $event)"
+            />
+
+            <small *ngIf="selectedLoanProduct"
+              >₦{{ selectedLoanProduct?.amountFrom | number : "1.2-2" }} - ₦{{
+                selectedLoanProduct?.amountTo | number : "1.2-2"
+              }}</small
+            >
+          </div>
+
+          <div class="col-md-6 mb-5">
+            <label>Loan Amount <b class="text-danger">*</b></label>
+            <input
+              class="form-control"
+              type="text"
+              formControlName="amount"
+              currencyMask
+              [options]="{
+                prefix: currencySymbol,
+                thousands: ',',
+                decimal: '.'
+              }"
+              placeholder="Enter loan amount"
+            />
+
+            <lnd-input-errors
+              label="Loan Amount"
+              [control]="form.get('amount')"
+            />
+          </div>
+
+          <div class="col-md-6 mb-5">
+            <label>Current Salary <b class="text-danger">*</b></label>
+            <input
+              class="form-control"
+              type="text"
+              formControlName="currentSalary"
+              currencyMask
+              [options]="{
+                prefix: currencySymbol,
+                thousands: ',',
+                decimal: '.'
+              }"
+              placeholder="Enter Current Salary"
+            />
+
+            <lnd-input-errors
+              label="Loan Amount"
+              [control]="form.get('currentSalary')"
+            />
+          </div>
+
+          <div *ngIf="selectedLoanProduct" class="col-md-6 mb-5">
+            <label>Product Id</label>
+
+            <input
+              type="text"
+              class="form-control"
+              formControlName="wacsLoanProductId"
+              readonly
+            />
+          </div>
+        </div>
+
+        <button
+          class="btn"
+          [disabled]="form.invalid || submitting"
+          (click)="submitToWacs()"
+        >
+          {{ submitting ? "Processing..." : "Submit to WACS" }}
+          <i *ngIf="submitting" class="icon icon-spin icon-spin2"></i>
+        </button>
+      </form>
+    </div>
+  </ng-container>
+</main>

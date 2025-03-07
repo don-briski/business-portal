@@ -1,0 +1,72 @@
+<lnd-add-edit-header
+  *ngIf="!isLoading"
+  [isEditing]="isEditing"
+  [resource]="
+    investorType === 'individual'
+      ? 'Individual Investment'
+      : 'Corporate Investment'
+  "
+  routerLink="/treasury/investments"
+/>
+
+<div *ngIf="isLoading" class="d-flex justify-content-center">
+  <lnd-spinner text="fetching requirements..." />
+</div>
+
+<main *ngIf="!isLoading" class="card">
+  <lnd-stepper
+    *ngIf="steps.length > 0"
+    [borderElemStyle]="{ 'padding-left': '2px' }"
+    [innerElemStyle]="{ 'padding-left': '60px' }"
+    [steps]="steps"
+    [fullWidth]="true"
+    (stepIndex)="switchStep($event)"
+  />
+
+  <div class="mt-5">
+    <lnd-add-edit-inv-form
+      [currentTab]="currentTab"
+      [currencySymbol]="currencySymbol"
+      [states]="states"
+      [banks]="banks"
+      [investmentTypes]="investmentTypes"
+      [investmentInitialIsActive]="investmentInitialIsActive"
+      [accounts]="financeAccounts"
+      [investmentDetails]="investmentDetails"
+      [isEditing]="isEditing"
+      [investorType]="investorType"
+      (formValue)="setPayload($event)"
+    />
+  </div>
+
+  <footer *ngIf="investorType">
+    <div *ngIf="formValue?.isValid" class="d-flex justify-content-center mb-6">
+      <button
+        class="btn btn-outline-primary btn-xs"
+        (click)="getCertificateInfo()"
+      >
+        {{
+          generatingInvCert
+            ? "Processing...."
+            : "Preview Investment Certificate"
+        }}
+        <i *ngIf="generatingInvCert" class="icon icon-spin icon-spin2"></i>
+      </button>
+    </div>
+
+    <div class="d-flex align-items-center footer">
+      <button *ngIf="currentTab > 0" class="btn btn-warning" (click)="previous()">
+        Previous
+      </button>
+      <button *ngIf="currentTab < steps.length - 1" class="btn btn-success" (click)="next()">Next</button>
+      <button
+        class="btn btn-success"
+        [disabled]="!formValue?.isValid || isProcessing"
+        (click)="submit()"
+      >
+        {{ isProcessing ? "Processing..." : "Submit Application" }}
+        <i *ngIf="isProcessing" class="icon icon-spin icon-spin2 ml-2"></i>
+      </button>
+    </div>
+  </footer>
+</main>

@@ -1,0 +1,649 @@
+<div class="dt-page__header">
+  <h1 class="dt-page__title clearfix">
+    Loan Reasons
+    <span class="float-right role-add">
+      <div
+        *ngIf="currentuser?.permission?.includes('Create Loan Reasons')"
+        style="position: relative; right: -5px; bottom: 5px; float: right"
+      >
+        <button
+          [style.backgroundColor]="currentTheme?.secondaryColor"
+          [style.borderColor]="currentTheme?.secondaryColor"
+          type="button"
+          class="btn btn-primary mr-2 mb-2 orange-bg"
+          (click)="openModal(addloanreasonModal)"
+        >
+          <i class="icon icon-add-circle mr-2"></i>Add New Loan Reason
+        </button>
+      </div>
+    </span>
+  </h1>
+</div>
+
+<!-- Grid -->
+<div class="row">
+  <!-- Grid Item -->
+  <div class="col-xl-12">
+    <!-- Card -->
+    <div class="dt-card">
+      <!-- Card Body -->
+      <div class="dt-card__body">
+        <div
+          *ngIf="this.requestLoader"
+          class="table-loader"
+          style="text-align: center; color: indianred"
+        >
+          <span> <i class="icon icon-spin icon-spin2"></i> Loading...</span>
+        </div>
+
+        <div
+          *ngIf="
+            this.currentview == 1 &&
+            currentuser?.permission?.includes('View Loan Reasons')
+          "
+          class="tab-pane"
+        >
+          <!-- Pagination Top-->
+          <div class="row">
+            <div class="col-md-8">
+              <label style="display: inline-flex"
+                ><span style="padding: 8px 2px; font-size: 12px">Show </span
+                ><select
+                  [(ngModel)]="pagination.pageSize"
+                  aria-controls="data-table"
+                  (change)="
+                    getItemsPaginatedSearch(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                  class="custom-select custom-select-xl form-control form-control-xl height"
+                >
+                  <option value="10">10</option>
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="100">100</option>
+                </select>
+                <span style="padding: 8px 2px; font-size: 12px"
+                  >entries</span
+                ></label
+              >
+            </div>
+            <div class="form-group col-md-4">
+              <label style="display: inline-flex; float: right"
+                ><span style="padding: 10px 2px; font-size: 12px"></span
+                ><input
+                  type="search"
+                  [(ngModel)]="pagination.searchTerm"
+                  (keydown.enter)="
+                    getItemsPaginatedSearch(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                  class="form-control form-control-sm"
+                  placeholder="Code Or Name"
+                  aria-controls="data-table"
+                />
+                <button
+                  class="btn btn-xs text-white ml-3"
+                  [style.background]="currentTheme.secondaryColor"
+                  (click)="
+                    getItemsPaginatedSearch(
+                      this.pagination.searchTerm,
+                      this.pagination.pageSize,
+                      1
+                    )
+                  "
+                >
+                  <i class="icon icon-search"></i>
+                </button>
+              </label>
+            </div>
+            <div
+              class=""
+              aria-live="polite"
+              style="padding-left: 18px; font-size: 13px; margin-top: -8px"
+            >
+              Showing {{ (pagination.pageNum - 1) * pagination.pageSize + 1 }} -
+              {{
+                (pagination.pageNum - 1) * pagination.pageSize +
+                  pagination.count
+              }}
+              of {{ pagination.totalRecords }} record(s)
+            </div>
+          </div>
+          <!-- /pagination Top -->
+
+          <div style="text-align: center" *ngIf="loanreasons.length < 1">
+            <img width="200px" src="assets/images/nodata.gif" />
+            <p
+              *ngIf="loanreasons.length < 1 && !this.requestLoader"
+              style="text-align: center; color: indianred"
+            >
+              List is Empty
+            </p>
+            <br />
+            <button
+              class="btn btn-refresh btn-xs mb-3 mt-1"
+              type="button"
+              (click)="switchviews(1)"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <!-- Tables -->
+          <div class="table-responsive">
+            <table
+              id="industriestable"
+              *ngIf="loanreasons.length > 0"
+              class="table table-striped table-hover"
+            >
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Created By</th>
+                  <th>Date Created</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  class="gradeX cursor"
+                  *ngFor="let row of loanreasons; let i = index" (click)="openViewModal(viewLoanReasonModal, row,dropdownToggle)"
+                >
+                  <td class="copy_icon_wrapper"
+                    [style.color]="currentTheme?.secondaryColor"
+                    [style.color]="currentTheme?.secondaryColor"
+                  >
+                    {{ row?.loanReasonCode }}
+                    <img
+                      (mouseover)="copy_hover = true"
+                      (mouseleave)="copy_hover = false"
+                      class="copy_icon"
+                      src="assets/images/copy.png"
+                      alt="copy icon"
+                      width="15"
+                      height="15"
+                      (click)="copyCode(row?.loanReasonCode)"
+			                placement="right"
+                      ngbTooltip="Copy Loan Reason Code"
+                    >
+                  </td>
+                  <td>{{ row?.loanReasonName }}</td>
+                  <td>{{ row?.loanReasonDescription }}</td>
+                  <td>{{ row?.user?.person?.displayName }}</td>
+                  <td>{{ row?.createdAt | date: "dd/MM/yyyy" }}</td>
+                  <td>
+                    <span
+                      *ngIf="row?.status == 'Active'"
+                      class="badge badge-success btn-xs mb-1 mr-1"
+                    >
+                      {{ row?.status }}</span
+                    >
+                    <span
+                      *ngIf="row?.status == 'NonActive'"
+                      class="badge badge-warning btn-xs mb-1 mr-1"
+                    >
+                      {{ row?.status }}</span
+                    >
+                  </td>
+                  <td>
+                    <div #dropdownToggle class="dropdown mr-2 mb-2 d-inline-block">
+                      <button
+                        class="btn btn-warning btn-xs dropdown-toggle"
+                        type="button"
+                        data-toggle="dropdown"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                      ></button>
+
+                      <div class="dropdown-menu">
+                        <a
+                          *ngIf="
+                            currentuser?.permission?.includes('Update Loan Reasons')
+                          "
+                          style="color: saddlebrown"
+                          href="javascript:void(0)"
+                          (click)="isEditing = true;openEditModal(editLoanReasonModal, row)"
+                        >
+                          <i class="icon icon-xs icon-setting"></i> Manage
+                        </a>
+                        <a
+                          style="color: saddlebrown"
+                          href="javascript:void(0)"
+
+                        >
+                          <i class="icon icon-xs icon-setting"></i> View
+                        </a>
+                      </div>
+                      </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- /tables -->
+
+          <!-- Pagination Bottom -->
+          <div>
+            <br />
+            <nav>
+              <ul class="pagination pagination-sm justify-content-end">
+                <li
+                  class="page-item"
+                  *ngIf="
+                    (pagination.pageNum - 1) * pagination.pageSize + 1 > 10
+                  "
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        pagination.pageNum - 1
+                      )
+                    "
+                    tabindex="-1"
+                    >Previous</a
+                  >
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="javascript:void(0)"
+                    >{{ pagination.pageNum }} of
+                    {{ this.pagination.maxPage }} page<span
+                      *ngIf="pagination.pageNum > 1"
+                      >s</span
+                    ><span class="sr-only">(current)</span></a
+                  >
+                </li>
+                <li
+                  class="page-item"
+                  *ngIf="this.pagination.pageNum < this.pagination.maxPage"
+                >
+                  <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="
+                      getItemsPaginatedSearch(
+                        this.pagination.searchTerm,
+                        this.pagination.pageSize,
+                        pagination.pageNum + 1
+                      )
+                    "
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </nav>
+          </div>
+          <!-- /pagination Bottom -->
+        </div>
+      </div>
+      <!-- /card body -->
+    </div>
+    <!-- /card -->
+  </div>
+</div>
+
+<!--Modals Section-->
+
+<ng-template #addloanreasonModal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Loan Reason Setup
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="AddLoanReasonForm"
+    (ngSubmit)="submitLoanReasonForm(AddLoanReasonForm.value)"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="form-row mt-3">
+          <div class="col-sm-4 mb-3">
+            <label for="validationDefault01">Code</label
+            ><b class="help-block">*</b>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="LoanReasonCode"
+              placeholder="Code of Loan Reason"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddLoanReasonForm.get('LoanReasonCode').errors &&
+                AddLoanReasonForm.get('LoanReasonCode').touched
+              "
+            >
+              What is code of the Loan Reason?
+            </span>
+          </div>
+
+          <div class="col-sm-8 mb-3">
+            <label for="validationDefault01">Name</label
+            ><b class="help-block">*</b>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="LoanReasonName"
+              placeholder="Name of Loan Reason"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                AddLoanReasonForm.get('LoanReasonName').errors &&
+                AddLoanReasonForm.get('LoanReasonName').touched
+              "
+            >
+              What is name of the Loan Reason?
+            </span>
+          </div>
+
+          <div class="col-sm-12 mb-3">
+            <label for="validationDefault02">Loan Reason Description</label>
+            <textarea
+              class="form-control"
+              formControlName="LoanReasonDescription"
+              id="text-area-1"
+              rows="3"
+              placeholder="Loan Reason Description"
+            ></textarea>
+          </div>
+
+          <div class="col-sm-4 mb-3 form-group">
+            <label>Status</label>
+            <select
+              formControlName="Status"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height"
+            >
+              <option selected="selected" disabled>Select Status</option>
+              <option value="Active">Active</option>
+              <option value="NonActive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+      </div>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light btn-sm"
+        (click)="closeModal()"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="AddLoanReasonForm.invalid"
+      >
+        Save Settings
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<ng-template #editLoanReasonModal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Loan Reason Setup
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form
+    [formGroup]="EditLoanReasonForm"
+    (ngSubmit)="submitEditLoanReasonForm(EditLoanReasonForm.value)"
+  >
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="form-row mt-3">
+          <div class="col-sm-4 mb-3">
+            <label for="validationDefault01">Loan Reason Code</label
+            ><b class="help-block">*</b>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="LoanReasonCode"
+              placeholder="Unique Code"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditLoanReasonForm.get('LoanReasonCode').errors &&
+                EditLoanReasonForm.get('LoanReasonCode').touched
+              "
+            >
+              What is code of the Loan Reason?
+            </span>
+          </div>
+
+          <div class="col-sm-8 mb-3">
+            <label for="validationDefault01">Loan Reason Name</label
+            ><b class="help-block">*</b>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="LoanReasonName"
+              placeholder="Name of Loan Reason"
+            />
+            <span
+              class="help-block"
+              [style.color]="currentTheme?.secondaryColor"
+              *ngIf="
+                EditLoanReasonForm.get('LoanReasonName').errors &&
+                EditLoanReasonForm.get('LoanReasonName').touched
+              "
+            >
+              What is name of the Loan Reason?
+            </span>
+          </div>
+
+          <div class="col-sm-12 mb-3">
+            <label for="validationDefault02">Loan Reason Description</label>
+            <textarea
+              class="form-control"
+              formControlName="LoanReasonDescription"
+              id="text-area-1"
+              rows="3"
+              placeholder="Loan Reason Description"
+            ></textarea>
+          </div>
+
+          <div class="col-sm-4 mb-3 form-group">
+            <label>Status</label>
+            <select
+              formControlName="Status"
+              aria-controls="data-table"
+              class="custom-select custom-select-xl form-control form-control-xl height"
+            >
+              <option selected="selected" disabled>Select Status</option>
+              <option value="Active">Active</option>
+              <option value="NonActive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+      </div>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light btn-sm"
+        (click)="closeModal()"
+      >
+        Close
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary btn-sm"
+        *ngIf="!loader"
+        [disabled]="EditLoanReasonForm.invalid"
+      >
+        Save Settings
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        *ngIf="loader"
+        [disabled]="true"
+      >
+        <i class="icon icon-spin icon-spin2"></i> Processing...
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </form>
+  <!-- /form -->
+</ng-template>
+
+<ng-template #viewLoanReasonModal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h3 class="modal-title" id="model-2">
+      <i
+        class="icon icon-setting icon-2x mr-2 align-self-center text-warning"
+      ></i
+      >Loan Reason Information
+    </h3>
+    <button
+      type="button"
+      class="close"
+      (click)="closeModal()"
+      aria-label="Close"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- /modal header -->
+  <!-- Form -->
+  <form [formGroup]="ViewLoanReasonForm">
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <div class="container-fluid">
+        <div class="form-row mt-3">
+          <div class="col-sm-4 mb-3">
+            <label for="validationDefault01">Loan Reason Code</label
+            ><b class="help-block">*</b>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="LoanReasonCode"
+              placeholder="Unique Code"
+              readonly
+            />
+          </div>
+
+          <div class="col-sm-9 mb-3">
+            <label for="validationDefault01">Loan Reason Name</label
+            ><b class="help-block">*</b>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="LoanReasonName"
+              placeholder="Name of Loan Reason"
+              readonly
+            />
+          </div>
+
+          <div class="col-sm-12 mb-3">
+            <label for="validationDefault02">Loan Reason Description</label>
+            <textarea
+              class="form-control"
+              formControlName="LoanReasonDescription"
+              id="text-area-1"
+              rows="3"
+              placeholder="Loan Reason Description"
+              readonly
+            ></textarea>
+          </div>
+
+          <div class="col-sm-6 mb-3 form-group">
+            <label>Status</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="Status"
+              placeholder=""
+              readonly
+            />
+          </div>
+        </div>
+        <hr style="border-top: 1px dashed #ced4da" class="fainted" />
+      </div>
+    </div>
+    <!-- /modal body -->
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="btn btn-light btn-sm"
+        (click)="closeModal()"
+      >
+        Close
+      </button>
+    </div>
+    <!-- /modal footer -->
+  </form>
+  <!-- /form -->
+</ng-template>

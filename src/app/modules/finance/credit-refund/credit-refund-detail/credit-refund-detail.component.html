@@ -1,0 +1,181 @@
+<div class="wrapper single-view">
+  <div class="d-flex flex-row">
+    <div class="left pr-4">
+      <div class="top">
+        <header
+          class="w-100 d-flex align-items-center justify-content-between mb-3"
+        >
+          <h1 class="dt-page__title">Credit Notes</h1>
+        </header>
+      </div>
+      <div class="body">
+        <div class="card">
+          <div class="card-body p-0">
+            <ul class="c-refund-list">
+              <li
+                *ngFor="let cr of creditRefunds"
+                (click)="onViewSingleRefund(cr)"
+                [ngClass]="{
+                  selected: selectedCR.creditRefundId === cr.creditRefundId
+                }"
+              >
+                <span
+                  class="d-flex justify-content-between align-items-center title"
+                >
+                  <span>{{ cr.createdBy }}</span>
+                  <span
+                    >{{ currencySymbol }}{{ cr.amount | number: "1.2-2" }}</span
+                  >
+                </span>
+                <span
+                  class="d-flex justify-content-between align-items-center sub-title mt-2"
+                >
+                  <span>
+                    {{ cr.code }} |
+                    {{ cr.createdAt | customDatePipe: "DD-MMM-YY" }}
+                  </span>
+                  <span>
+                    <span class="badge badge-success badge-sm">{{
+                      cr.status
+                    }}</span>
+                  </span>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="right px-2">
+      <div class="top card mb-3">
+        <div class="card-body">
+          <div class="float-right">
+            <button class="btn btn-xs btn-primary">Print</button>
+            <button
+              class="btn btn-xs btn-outline-dark"
+              (click)="onCloseDetailView()"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="tabs"
+        class="d-flex justify-content-between align-items-center py-2"
+        style="padding-left: 30px"
+      >
+        <ul
+          id="active-div"
+          class="card-header-pills nav nav-pill justify-content-center align-items-center"
+          role="tablist"
+        >
+          <li class="nav-item">
+            <a
+              [ngClass]="currentTab === 'overview' ? 'active-tab' : ''"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              role="tab"
+              aria-controls="tab-overview"
+              aria-selected="false"
+              (click)="onSwitchTab('overview')"
+              >Overview</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              [ngClass]="currentTab === 'comments' ? 'active-tab' : ''"
+              class="nav-link pool-nav"
+              data-toggle="tab"
+              role="tab"
+              aria-controls="tab-comments"
+              aria-selected="false"
+              (click)="onSwitchTab('comments')"
+              >Comments</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="tab-content">
+        <div
+          id="tab-overview"
+          class="tab-pane"
+          [ngClass]="{ 'active show': currentTab === 'overview' }"
+          *ngIf="currentTab === 'overview'"
+        >
+          <div class="paper p-5" id="refundPaper">
+            <div class="card">
+              <span class="ribbon ribbon-top-left posted">
+                <span class="posted">{{ selectedCR.status }}</span>
+              </span>
+              <div class="card-body">
+                <div class="content">
+                  <div class="d-flex justify-content-between mb-5">
+                    <span>
+                      <div class="img-container mb-2">
+                        <img
+                          class="mx-auto img-fluid d-block"
+                          [src]="appOwner?.logoUrl"
+                        />
+                      </div>
+                      <p class="h3 mb-1">{{ appOwner.appOwnerName }}</p>
+                      <p class="mb-1">{{ appOwner.appOwnerEmail }}</p>
+                      <p class="mb-1">
+                        {{ appOwner.appOwnerBillingAddress }}
+                      </p>
+                    </span>
+                    <span class="text-right">
+                      <h3 class="display-1">Credit Refund</h3>
+                      <p>Credit Refunded# {{ selectedCR.code }}</p>
+
+                      <br />
+                      <br />
+                      <p class="mb-1">Amount</p>
+                      <p class="display-3">
+                        {{ appOwner?.currency?.currencySymbol
+                        }}{{ selectedCR.amount | number: "1.2-2" }}
+                      </p>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="tab-pane"
+          [ngClass]="{ 'active show': currentTab === 'comments' }"
+          *ngIf="currentTab === 'comments'"
+        >
+          <div class="p-5 paper">
+            <div class="card">
+              <table
+                class="table table-striped mb-0"
+                *ngIf="selectedCR.comments.length; else noComments"
+              >
+                <thead class="thead-light">
+                  <tr>
+                    <th class="text-uppercase" scope="col">Name</th>
+                    <th class="text-uppercase" scope="col">Comment</th>
+                    <th class="text-uppercase" scope="col">Date Created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let cr of selectedCR.comments">
+                    <td>{{ cr.name }}</td>
+                    <td>{{ cr.comment }}</td>
+                    <td>{{ cr.dateCreated | customDatePipe }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <ng-template #noComments>
+                <no-data title="No Comments Available"></no-data>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

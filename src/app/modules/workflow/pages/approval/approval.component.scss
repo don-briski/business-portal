@@ -1,0 +1,37 @@
+.r-status {
+  padding: 4px 20px;
+}
+
+.status-in-progress {
+  background: orange;
+  color: white;
+}
+
+.status-declined {
+  background: #d13232;
+  color: white;
+}
+
+.status-approved {
+  background: #1b941b;
+  color: white;
+}
+
+.status-redrafted {
+  background: #a8a8a8;
+  color: #fff;
+}
+
+.view-btn {
+  background: #0368d11a;
+  color: #0368d1;
+  padding: 5px 12px;
+  min-width: 90px;
+}
+
+.open-btn {
+  background: #0368d1;
+  color: white;
+  padding: 5px 12px;
+  min-width: 90px;
+}

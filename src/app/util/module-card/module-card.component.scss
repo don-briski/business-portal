@@ -1,0 +1,36 @@
+.cards {
+  box-sizing: border-box;
+  height: 250px;
+  background-color: #fff;
+  margin: 0;
+  padding: 32px;
+
+  border-radius: 10px;
+  border-top: solid 5px black;
+  box-shadow: 2px 5px 20px rgb(0, 0, 0, 0.1);
+
+  &.border-crm{
+    border-color: #4A148C !important;
+  }
+  &.border-wacs{
+    border-color: #AEEA00 !important;
+  }
+
+  .btn-view {
+    color: #33194c;
+    background-color: transparent;
+    border-color: #33194c;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      0 1px 1px rgba(0, 0, 0, 0.075);
+  }
+
+  .btn-view:hover {
+    color: #fff;
+    background-color: #33194c;
+    border-color: #33194c;
+  }
+
+  #lottie{
+    width: 140px;
+  }
+}

@@ -1,0 +1,108 @@
+.ribbon {
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  position: absolute;
+}
+.ribbon::before,
+.ribbon::after {
+  position: absolute;
+  z-index: 0;
+  content: "";
+  display: block;
+}
+.ribbon.posted::before,
+.ribbon.posted::after {
+  border: 5px solid #6faa8f;
+}
+.ribbon.draft::before,
+.ribbon.draft::after {
+  border: 5px solid #e5bd72;
+}
+.ribbon.overdue::before,
+.ribbon.overdue::after {
+  border: 5px solid #942323;
+}
+.ribbon.sentForApproval::before,
+.ribbon.sentForApproval::after {
+  border: 5px solid #453488;
+}
+.ribbon.rejected::before,
+.ribbon.rejected::after {
+  border: 5px solid #942323;
+}
+.ribbon.redraft::before,
+.ribbon.redraft::after {
+  border: 5px solid rgb(175, 86, 126);
+}
+.ribbon.notPaid::before,
+.ribbon.notPaid::after {
+  border: 5px solid #ef5350;
+}
+.ribbon.partiallyPaid::before,
+.ribbon.partiallyPaid::after {
+  border: 5px solid #4caf50;
+}
+.ribbon span {
+  position: absolute;
+  display: block;
+  width: 225px;
+  padding: 10px 15px 10px 0;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+  color: #fff;
+  font: 700 18px/1 "Lato", sans-serif;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  text-transform: uppercase;
+  text-align: center;
+  &.posted {
+    background-color: #6faa8f;
+  }
+  &.draft {
+    background-color: #e5bd72;
+  }
+  &.overdue {
+    background-color: #d13232;
+  }
+  &.notPaid {
+    background-color: #ef5350;
+  }
+  &.partiallyPaid {
+    background-color: #4caf50;
+    font-size: 15px !important;
+  }
+  &.sentForApproval {
+    background-color: #453488;
+    font: 700 13px/1 "Lato", sans-serif;
+    padding: 13px 16px 10px 0;
+  }
+  &.rejected {
+    background-color: #d13232;
+  }
+  &.redraft {
+    background-color: rgb(175, 86, 126);
+  }
+}
+
+.ribbon-top-left {
+  top: -10px;
+  left: -10px;
+}
+.ribbon-top-left::before,
+.ribbon-top-left::after {
+  border-top-color: transparent;
+  border-left-color: transparent;
+}
+.ribbon-top-left::before {
+  top: 0;
+  right: 12px;
+}
+.ribbon-top-left::after {
+  bottom: 12px;
+  left: 0;
+}
+.ribbon-top-left span {
+  right: -25px;
+  top: 30px;
+  transform: rotate(-45deg);
+  z-index: 2;
+}

@@ -1,0 +1,40 @@
+app-sidebar {
+    width: 240px;
+}
+
+@media screen and (max-width: 991px) {
+    app-sidebar {
+        width: auto;
+    }
+}
+
+.dt-content-wrapper {
+    margin-top: 74px;
+  }
+
+.ui-select-choices {
+    display: block;
+}
+
+#wacs{
+  width: 45%;
+  #details{
+    border: 1px dotted #000;
+    border-radius: 25px;
+    margin-top: 25px;
+    padding: 25px 15px;
+    .disb-info{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      p{
+        &:first-child{
+          color: var(--lenda-grey);
+        }
+        &:last-child{
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}

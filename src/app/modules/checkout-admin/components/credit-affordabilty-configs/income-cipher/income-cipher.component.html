@@ -1,0 +1,305 @@
+<section>
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h3 class="m-0">Income Cipher Service</h3>
+      <button
+        *ngIf="
+          user.permission.includes('Edit Risk Engine Configuration') &&
+          (mode === creditAffordModeEnum.View ||
+            mode === creditAffordModeEnum.None)
+        "
+        class="btn btn-sm px-6 text-white mr-1"
+        [style.backgroundColor]="currentTheme?.secondaryColor"
+        (click)="
+          onModeChange(
+            mode === creditAffordModeEnum.None
+              ? creditAffordModeEnum.Configure
+              : creditAffordModeEnum.Edit
+          )
+        "
+      >
+        {{ config ? "Edit" : "Configure" }}
+      </button>
+    </div>
+  </div>
+  <div class="card-body">
+    <no-data
+      *ngIf="mode === creditAffordModeEnum.None"
+      title="Not Yet Configured"
+      desc="Click on the button above to set the configuration"
+    ></no-data>
+    <p
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+    >
+      This service derives income for salaried customers in Credit Affordability
+      Engine from bank statement analysis.
+      {{ mode === creditAffordModeEnum.Edit ? "Update" : "Set" }} the parameters
+      for Income cipher below
+    </p>
+    <div *ngIf="mode !== creditAffordModeEnum.None" id="tips">
+      <p
+        [style.color]="currentTheme?.secondaryColor"
+        class="cursor text-underline"
+        (click)="hideHints = !hideHints"
+      >
+        {{ hideHints ? "Show" : "Hide" }} Hints
+      </p>
+
+      <ul *ngIf="!hideHints">
+        <li>
+          <b>Bank Statement Length: </b
+          ><span class="hint-color"
+            >This configuration defines the length of bank statements to be
+            spooled based on the customer's category</span
+          >
+        </li>
+        <li>
+          <b>Salary Date Offset Threshold: </b
+          ><span class="hint-color"
+            >This parameter allows users to set a range that actual salary
+            payment dates can fluctuate by from the actual Expected salary
+            date</span
+          >
+        </li>
+        <li>
+          <b>Salary Adjustment: </b
+          ><span class="hint-color"
+            >This configuration provides options for applying an adjustment to
+            the Derived Salary based on either a Flat percentage, or at least up
+            to five percentages based on the confidence Interval score of the
+            loan from Indicina's bank statement analysis</span
+          >
+        </li>
+        <li>
+          <b>Salary Date Recency Check: </b
+          ><span class="hint-color"
+            >This configuration defines the number of months to be considered
+            for all calculations which will need a number of recent months to be
+            reviewed</span
+          >
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="mode === creditAffordModeEnum.View" class="row">
+      <div class="col-md-4">
+        <p class="title-text mb-1">Bank Statement Length</p>
+        <p class="subtitle-text">
+          {{ bankStatementLengthMonths }} Month{{
+            bankStatementLengthMonths > 1 ? "s" : ""
+          }}
+        </p>
+      </div>
+      <div class="col-md-4">
+        <p class="title-text mb-1">Salary Date Offset</p>
+        <p class="subtitle-text">
+          {{ config.salaryDateOffset }} Day{{
+            config.salaryDateOffset > 1 ? "s" : ""
+          }}
+        </p>
+      </div>
+      <div class="col-md-4">
+        <p class="title-text mb-1">Salary Date Recency Check</p>
+        <p class="subtitle-text">
+          {{ config.salaryDateRecencyCheck }} Month{{
+            config.salaryDateRecencyCheck > 1 ? "s" : ""
+          }}
+        </p>
+      </div>
+      <div class="col-md-4">
+        <p class="title-text mb-1">Salary Calculator Method</p>
+        <p class="subtitle-text">
+          {{ config.salaryCalculatorMethod | humanify }}
+        </p>
+      </div>
+      <div class="col-md-4">
+        <p class="title-text mb-1">Salary Adjustment</p>
+        <p class="subtitle-text">{{ config.salaryAdjustment | humanify }}</p>
+      </div>
+      <ng-container
+        *ngIf="
+          config.salaryAdjustment === salaryAdjustmentEnum.RangedAdjustment
+        "
+      >
+        <div class="col-md-4">
+          <p class="title-text mb-1">Range 1</p>
+          <p class="subtitle-text">{{ config.rangedAdjustmentConfig.r1 }}%</p>
+        </div>
+        <div class="col-md-4">
+          <p class="title-text mb-1">Range 2</p>
+          <p class="subtitle-text">{{ config.rangedAdjustmentConfig.r2 }}%</p>
+        </div>
+        <div class="col-md-4">
+          <p class="title-text mb-1">Range 3</p>
+          <p class="subtitle-text">{{ config.rangedAdjustmentConfig.r3 }}%</p>
+        </div>
+        <div class="col-md-4">
+          <p class="title-text mb-1">Range 4</p>
+          <p class="subtitle-text">{{ config.rangedAdjustmentConfig.r4 }}%</p>
+        </div>
+        <div class="col-md-4">
+          <p class="title-text mb-1">Range 5</p>
+          <p class="subtitle-text">{{ config.rangedAdjustmentConfig.r5 }}%</p>
+        </div>
+      </ng-container>
+    </div>
+    <div
+      *ngIf="
+        mode === creditAffordModeEnum.Configure ||
+        mode === creditAffordModeEnum.Edit
+      "
+      id="accordions"
+    >
+      <div class="d-flex flex-wrap mt-3">
+        <form class="w-100" [formGroup]="form" (ngSubmit)="submit()">
+          <div class="form-row">
+            <div class="col-md-6 mb-6">
+              <label>Bank Statement Length (Months)</label>
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Number of months"
+                readonly
+                [value]="bankStatementLengthMonths"
+              />
+              <small class="mt-3" [style.color]="currentTheme?.secondaryColor"
+                >This is auto-populated from the Bank Check tab.</small
+              >
+            </div>
+
+            <div class="col-md-6">
+              <label>Salary Date Offset (Days)</label>
+
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Enter salary date offset"
+                formControlName="salaryDateOffset"
+              />
+              <lnd-input-errors
+                label="Salary Date Offset"
+                [control]="form.get('salaryDateOffset')"
+              ></lnd-input-errors>
+            </div>
+            <div class="col-md-6">
+              <label>Salary Date Recency Check (months)</label>
+
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Enter number of months"
+                formControlName="salaryDateRecencyCheck"
+              />
+              <lnd-input-errors
+                label="Salary Date Recency Check"
+                [control]="form.get('salaryDateRecencyCheck')"
+              ></lnd-input-errors>
+            </div>
+            <div class="col-md-6">
+              <label>Salary Calculator Method </label>
+
+              <slct-2
+                [data]="salaryCalculatorMethods"
+                placeholder="select calculator method"
+                [customSearchEnabled]="true"
+                formControlName="salaryCalculatorMethod"
+              ></slct-2>
+              <lnd-input-errors
+                label="Salary Calculator Method"
+                [control]="form.get('salaryCalculatorMethod')"
+              ></lnd-input-errors>
+            </div>
+
+            <div class="col-md-6 mt-6">
+              <label>Salary Adjustment </label>
+
+              <slct-2
+                [data]="salaryAdjustments"
+                placeholder="Select salary adjustment method"
+                [customSearchEnabled]="true"
+                formControlName="salaryAdjustment"
+              ></slct-2>
+
+              <lnd-input-errors
+                label="Salary Adjustment"
+                [control]="form.get('salaryAdjustment')"
+              ></lnd-input-errors>
+            </div>
+            <div
+              class="col-md-6 mt-6"
+              *ngIf="form.value.salaryAdjustment[0]?.id === 'FlatAdjustment'"
+            >
+              <label>Flat Adjustment (%)</label>
+
+              <input
+                type="number"
+                class="form-control"
+                placeholder="Enter number of months"
+                formControlName="salaryAdjustmentFlatTypePercentageValue"
+              />
+
+              <lnd-input-errors
+                label="Salary Adjustment Flat Type Percentage Value"
+                [control]="form.get('salaryAdjustmentFlatTypePercentageValue')"
+              ></lnd-input-errors>
+            </div>
+          </div>
+
+          <div
+            *ngIf="form.value.salaryAdjustment[0]?.id === 'RangedAdjustment'"
+            class="mt-6"
+          >
+            <div
+              formArrayName="rangedAdjustmentConfig"
+              class="d-flex align-item-center flex-wrap"
+            >
+              <div
+                *ngFor="let control of rangedAdjustmentControl().controls"
+                class="range"
+              >
+                <div [formGroup]="control">
+                  <div>
+                    <label
+                      >{{ control.value.key }}
+                      <i
+                        class="icon icon-question-circle"
+                        [ngbTooltip]="control.value.tooltip"
+                        placement="top"
+                      ></i
+                    ></label>
+                    <input
+                      type="number"
+                      formControlName="value"
+                      class="form-control"
+                    />
+                    <lnd-input-errors
+                      label="Value"
+                      [control]="control.get('value')"
+                    ></lnd-input-errors>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button
+            class="btn btn-danger mt-6 mr-3"
+            [disabled]="isLoading"
+            (click)="onModeChange(creditAffordModeEnum.View)"
+          >
+            Cancel
+          </button>
+          <button
+            class="btn mt-6"
+            [style.backgroundColor]="currentTheme?.secondaryColor"
+            [disabled]="form.invalid"
+          >
+            {{ isLoading ? "Processing..." : "Update" }}
+            <i *ngIf="isLoading" class="icon icon-spin2 icon-spin"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

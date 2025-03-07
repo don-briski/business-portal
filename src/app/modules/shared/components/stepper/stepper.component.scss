@@ -1,0 +1,80 @@
+$current: #181818;
+$complete: #2e8b57;
+$pending: #c0c9d2;
+$invalid: red;
+
+.step-wrapper {
+  div {
+    min-width: 200px;
+    clip-path: polygon(0 0, 93% 0, 100% 50%, 93% 100%, 0 100%, 7% 50%);
+    &.edge {
+      clip-path: polygon(
+        0% 0%,
+        calc(100% - 20px) 0%,
+        100% 50%,
+        calc(100% - 20px) 100%,
+        0% 100%
+      );
+    }
+    &.end {
+      clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 5% 50%);
+    }
+  }
+  .step-border {
+    position: relative;
+    padding: 1px 1px;
+    height: 60px;
+
+    &.border-complete {
+      background-color: $complete;
+    }
+    &.border-current {
+      background-color: $current;
+    }
+    &.border-pending {
+      background-color: $pending;
+    }
+    &.border-invalid {
+      background-color: $invalid;
+    }
+    &.border-inner {
+      padding: 1px 1px 1px 2px;
+    }
+  }
+
+  .step-inner {
+    background-color: #fff;
+    height: 100%;
+    top: -59px;
+    left: 1px;
+    padding: 10px 60px;
+    &.pending {
+      color: #697386;
+    }
+
+    &.complete {
+      color: #2e8b57;
+    }
+
+    &.current {
+      color: $current;
+    }
+
+    &.invalid {
+      color: red;
+    }
+    &.use-primary {
+      background-color: var(--primary-color-lighter);
+      color: $current;
+    }
+  }
+}
+
+
+
+lnd-step {
+  flex: 1;
+  p {
+    font-weight: 500;
+  }
+}

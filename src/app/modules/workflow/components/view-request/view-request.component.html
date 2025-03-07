@@ -1,0 +1,322 @@
+<div *ngIf="gettingReq" class="text-center p-5">
+  <h3 class="m-0">
+    <i class="icon icon-spin icon-spin2"></i> Loading Request...
+  </h3>
+</div>
+<div *ngIf="!gettingReq && reqDetails" class="row my-5">
+  <div class="col-md-10">
+    <section class="px-5">
+      <ul class="dt-list dt-list-one-second">
+        <li class="dt-list__item mr-3">
+          <div class="media">
+            <i
+              class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Requestor Name</span
+              >
+              <h5 class="mb-0">
+                {{ reqDetails?.requestorName }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item mr-3">
+          <div class="media">
+            <i
+              class="mr-3 icon icon-editor icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Request Code</span
+              >
+              <h5 class="mb-0">
+                {{ reqDetails?.requestCode }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item mr-3">
+          <div class="media">
+            <i
+              class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Requestor Role</span
+              >
+              <h5 class="mb-0">
+                {{ reqDetails?.requestorRole }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item mr-3">
+          <div class="media">
+            <i
+              class="mr-3 icon icon-company icon-2x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Requestor Branch</span
+              >
+              <h5 class="mb-0">
+                {{ reqDetails?.originatingBranch }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item mr-3" *ngIf="reqDetails?.vendorName">
+          <div class="media">
+            <i
+              class="mr-3 icon icon-user-o icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1">Vendor</span>
+              <h5 class="mb-0">
+                {{ reqDetails?.vendorName }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item mr-3" *ngIf="reqDetails?.vendorAddress">
+          <div class="media">
+            <i
+              class="mr-3 icon icon-home icon-2x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Vendor's Address</span
+              >
+              <h5 class="mb-0">
+                {{ reqDetails?.vendorAddress }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item mr-3" *ngIf="reqDetails?.totalAmount">
+          <div class="media">
+            <i
+              class="icon icon-revenue-new icon-3x mr-5 align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Total Amount</span
+              >
+              <h5 class="mb-0">
+                {{ currencySymbol
+                }}{{ reqDetails?.totalAmount | number: "1.2-2" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li
+          class="dt-list__item"
+          *ngIf="reqDetails?.paymentDate && request.requestType === 'Payments'"
+        >
+          <div class="media">
+            <i
+              class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1">Payment Due</span>
+              <h5 class="mb-0">
+                {{ reqDetails?.paymentDate | customDatePipe: "DD-MMM-YY" }}
+              </h5>
+            </div>
+          </div>
+        </li>
+        <li class="dt-list__item mr-3" *ngIf="reqDetails?.approvedAt">
+          <div class="media">
+            <i
+              class="mr-3 icon icon-datepicker icon-3x align-self-center text-warning"
+            ></i>
+            <div class="media-body">
+              <span class="d-block text-light-gray f-12 mb-1"
+                >Request Approval Date</span
+              >
+              <h5 class="mb-0">
+                <h5>
+                  {{ reqDetails?.approvedAt | customDatePipe: "DD-MMM-YY" }}
+                </h5>
+              </h5>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <div
+        class="my-3"
+        *ngIf="reqDetails?.requestApprovalStatus !== 'Approved'"
+      >
+        <h4 *ngIf="reqDetails?.approverSetupType === 'Users'" class="mb-2">
+          Next Approver
+        </h4>
+        <h4 *ngIf="reqDetails?.approverSetupType === 'Roles'" class="mb-2">
+          Next Role to Approve
+        </h4>
+        <h4 *ngIf="reqDetails?.approverSetupType === 'Teams'" class="mb-2">
+          Next Team to Approve
+        </h4>
+        <span class="badge badge-primary fw-bold">{{
+          reqDetails?.nextApproverName
+        }}</span>
+      </div>
+      <lnd-tab-bar
+        [tabs]="tabs"
+        [currentTabId]="currentTabId"
+        [tabBarId]="tabBarId"
+      ></lnd-tab-bar>
+      <section *ngIf="currentTabId === 'req-info'">
+        <div class="card p-3" *ngIf="reqDetails?.description">
+          <p>{{ reqDetails?.description }}</p>
+        </div>
+        <ng-container *ngIf="reqDetails?.customForms">
+          <div
+            class="mb-4"
+            *ngFor="
+              let customFieldSet of reqDetails.customForms.customFieldSets
+            "
+          >
+            <h3>{{ customFieldSet.customFieldSetName }}</h3>
+            <div class="row">
+              <div
+                *ngFor="let customField of customFieldSet.customFields"
+                class="col-md-4"
+              >
+                <h5 class="mb-2">{{ customField.customFieldName }}</h5>
+                <p class="custom-field-value">{{ customField.value }}</p>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <lnd-request-items
+          *ngIf="
+            reqDetails?.requestItems &&
+            request.requestType === 'Payments' &&
+            reqDetails?.requestItems
+          "
+          [items]="reqDetails?.requestItems"
+        >
+        </lnd-request-items>
+        <div class="mb-5" *ngIf="reqDetails?.supportingDocuments">
+          <h3>Supporting Documents</h3>
+          <div class="d-flex flex-wrap">
+            <div class="file-wrapper">
+              <div
+                class="support-doc-container p-2 d-flex align-items-center justify-content-between"
+              >
+                <p class="m-0">
+                  <i class="icon icon-editor icon-2x mr-2 align-self-center"></i
+                  >{{ reqDetails?.supportingDocuments.fileName }}
+                </p>
+                <a
+                  [href]="reqDetails?.supportingDocuments.url"
+                  target="_blank"
+                  class="btn btn-xs btn-primary ml-3"
+                  >Open</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="reqDetails?.approvals.length">
+          <header
+            class="d-flex justify-content-between cursor mb-2"
+            (click)="showApprovalHistory = !showApprovalHistory"
+          >
+            <h4 class="mb-0">Approvals</h4>
+            <i
+              class="icon icon-add-circle icon-fw"
+              [ngClass]="{ rotate45deg: showApprovalHistory }"
+              [style.color]="colorTheme?.secondaryColor"
+            ></i>
+          </header>
+          <hr class="mt-0" />
+          <lnd-approval-history
+            *ngIf="showApprovalHistory"
+            [approvals]="reqDetails?.approvals"
+          ></lnd-approval-history>
+        </div>
+        <form
+          class="form-margin-top"
+          *ngIf="
+            !viewing &&
+            (userToken.nameid == reqDetails.nextApproverId ||
+              userToken.RoleId == reqDetails.nextApproverId ||
+              user?.permission.includes('Team Lead')) &&
+            !hasApproved
+          "
+          [formGroup]="approvalForm"
+          (ngSubmit)="onSubmit()"
+        >
+          <header
+            class="d-flex justify-content-between cursor mb-2"
+            (click)="showNoteArea = !showNoteArea"
+          >
+            <h4 class="mb-0">Add Approval Comment</h4>
+            <i
+              class="icon icon-add-circle icon-fw"
+              [ngClass]="{ rotate45deg: showNoteArea }"
+              [style.color]="colorTheme?.secondaryColor"
+            ></i>
+          </header>
+          <hr class="mt-0" />
+          <div *ngIf="showNoteArea">
+            <label for="comment">Approval Comment</label>
+            <textarea
+              class="form-control"
+              formControlName="comment"
+              rows="3"
+              placeholder="Enter your comment"
+            ></textarea>
+          </div>
+          <div class="row mt-4 mb-5">
+            <div class="col-md-6">
+              <label for="txPin">Enter Transaction Pin</label>
+              <input
+                id="txPin"
+                type="password"
+                formControlName="transactionPin"
+                class="form-control"
+                placeholder="Transaction pin"
+                (keydown.enter)="$event.preventDefault()"
+              />
+            </div>
+          </div>
+          <hr />
+          <div class="d-flex" *ngIf="!submitting">
+            <button
+              class="btn btn-danger"
+              (click)="approvalAction = 'DECLINED'"
+              [disabled]="approvalForm.invalid"
+            >
+              Deny Request</button
+            ><button
+              class="btn btn-warning mx-3"
+              (click)="approvalAction = 'REDRAFT'"
+              [disabled]="approvalForm.invalid"
+            >
+              Send For Redraft</button
+            ><button
+              class="btn btn-success"
+              (click)="approvalAction = 'APPROVED'"
+              [disabled]="approvalForm.invalid"
+            >
+              Approve
+            </button>
+          </div>
+          <button *ngIf="submitting" class="btn btn-warning" disabled>
+            <i class="icon icon-spin icon-spin2"></i> Submitting...
+          </button>
+        </form>
+      </section>
+      <section class="my-4" *ngIf="currentTabId === 'activity'">
+        <lnd-workflow-activity
+          [colorTheme]="colorTheme"
+          [requestId]="request.requestId"
+        ></lnd-workflow-activity>
+      </section>
+    </section>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<section>
+  <header class="card-header">
+    <h3 class="mb-0">Case Type</h3>
+    <button *ngIf="permissions.includes('Manage Prospect Case Type')" class="btn btn-sm" (click)="togglePopup()">Add New</button>
+  </header>
+
+  <main class="card-body" *ngIf="!isLoading">
+    <p *ngIf="caseTypes?.length > 0">There are currently {{caseTypes.length}} cases configured in the system. To add more, simply click the 'Add New' button.</p>
+  <lnd-table [config]="config" [isLoading]="isLoading" [headers]="header" [data]="data" />
+  </main>
+
+  <div *ngIf="isLoading" class="d-flex justify-content-center p-2">
+    <lnd-spinner text="Retrieving Case Types"/>
+  </div>
+</section>
+
+<lnd-add-edit-case [showPopup]="showPopup" [caseType]="caseType" (fetchCaseTypes)="fetchCaseTypes()" (togglePopup)="togglePopup()"/>

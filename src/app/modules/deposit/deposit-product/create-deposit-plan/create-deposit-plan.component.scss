@@ -1,0 +1,26 @@
+app-sidebar {
+    width: 240px;
+  }
+
+  .nav.nav-tabs .active {
+    padding: 20px 1.6rem;
+    border: none;
+  }
+  .boxed {
+    width: 70%;
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  @media screen and (max-width: 991px) {
+    app-sidebar {
+        width: auto;
+    }
+  }
+  
+  .dt-content-wrapper {
+    margin-top: 74px;
+  }
+  
+  

@@ -1,0 +1,457 @@
+<header class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">{{ loanTypeId ? "Edit" : "Add New" }} Product</h1>
+
+  <a
+    class="btn text-white bg-secondary"
+    routerLink="/wacs/loan-products"
+    routerLinkActive="router-link-active"
+    href="javascript:void(0)"
+    >Back</a
+  >
+</header>
+
+<main class="card">
+  <div *ngIf="isLoading && loanTypeId" class="d-flex justify-content-center">
+    <lnd-spinner text="Retrieving Product Details..." />
+  </div>
+  <form *ngIf="!isLoading" [formGroup]="form">
+    <header>
+      <h3>Loan Product Setup</h3>
+
+      <p>All form fields with an asterisk(*) are mandatory.</p>
+
+      <div class="d-flex align-items-center">
+        <lnd-switch
+          (emittedValue)="toggleActive($event)"
+          [value]="form.value.status === 'Active'"
+        />
+        <span class="ml-3"
+          >Loan product is
+          {{ form.value.status === "Active" ? "Active" : "Inactive" }}</span
+        >
+      </div>
+    </header>
+
+    <section class="top-section space-bottom">
+      <p class="text-light">Select a loan type to view its details</p>
+
+      <div>
+        <label>Loan Type <b class="text-danger">*</b></label>
+
+        <slct-2
+          [data]="loanTypeList"
+          [customSearchEnabled]="true"
+          [active]="
+            loanTypeId && [
+              {
+                id: selectedLoanType?.loanTypeId,
+                text: selectedLoanType?.loanName
+              }
+            ]
+          "
+          (selected)="selectLoanType($event)"
+          (removed)="removeLoanType()"
+          [searchService]="getSearchLoanTypeService()"
+          (searchResult)="updateDropdown($event)"
+          placeholder="Select Loan Type"
+        />
+      </div>
+
+      <ng-container *ngIf="selectedLoanType">
+        <div>
+          <label>Product Name <b class="text-danger">*</b></label>
+
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Enter product name"
+            formControlName="productName"
+          />
+
+          <lnd-input-errors
+            label="Product name"
+            [control]="form.get('productName')"
+          />
+        </div>
+
+        <div class="product-desc">
+          <label>Product Description <b class="text-danger">*</b></label>
+
+          <textarea
+            class="form-control"
+            placeholder="Enter description"
+            rows="6"
+            formControlName="description"
+          ></textarea>
+          <lnd-input-errors
+            label="Description"
+            [control]="form.get('description')"
+          />
+        </div>
+      </ng-container>
+    </section>
+
+    <ng-container *ngIf="selectedLoanType">
+      <section id="loanTypeDetails">
+        <h2>Loan Type Information</h2>
+        <div class="wrapper">
+          <lnd-dt-list-item
+            title="Loan Type"
+            [value]="selectedLoanType?.loanName"
+            [ignoreIcon]="true"
+          />
+          <lnd-dt-list-item
+            title="Min Amount"
+            [value]="selectedLoanType?.minAmount"
+            [ignoreIcon]="true"
+            type="amount"
+          />
+          <lnd-dt-list-item
+            title="Max Amount"
+            [value]="selectedLoanType?.maxAmount"
+            [ignoreIcon]="true"
+            type="amount"
+          />
+          <lnd-dt-list-item
+            title="Interest Rate (%)"
+            [value]="selectedLoanType?.interestRate"
+            [ignoreIcon]="true"
+          />
+        </div>
+      </section>
+
+      <section id="applicableFees">
+        <p>
+          Fees Applied on <b>{{ selectedLoanType?.loanName }}</b> loan type
+        </p>
+        <div class="wrapper">
+          <ng-container *ngFor="let fee of applicableFees">
+            <div
+              class="inner-wrapper"
+              [ngClass]="{ 'not-available': fee['Fee Type'] === 'Percentage' }"
+            >
+              <ng-container *ngFor="let obj of fee | keyvalue">
+                <lnd-dt-list-item
+                  [title]="obj.key"
+                  [value]="[obj.value]"
+                  type="badge"
+                  [ignoreIcon]="true"
+                />
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+      </section>
+
+      <section id="additionalInfo" class="space-bottom">
+        <h4>Additional Info</h4>
+
+        <div>
+          <div class="d-flex align-items-center lnd-row">
+            <div>
+              <label
+                >Payback Period/Tenor <b class="help-block"> *</b>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Loan repayment tenure/period following loan approval. Calculated in months"
+                ></i
+              ></label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter payback period in months"
+                formControlName="paybackPeriod"
+              />
+              <lnd-input-errors
+                label="Payback Period"
+                [control]="form.get('paybackPeriod')"
+              />
+            </div>
+            <div>
+              <label
+                >Minimum Amount <b class="help-block"> *</b>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Cannot be less than parent's minimum loan amount or greater than parent's max amount"
+                ></i
+              ></label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="amountFrom"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+              <lnd-input-errors
+                label="Minimum Amount"
+                [control]="form.get('amountFrom')"
+              />
+            </div>
+
+            <div>
+              <label
+                >Maximum Amount <b class="help-block"> *</b>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Cannot be greater than parent's maximum loan amount or less than parent's min amount"
+                ></i
+              ></label>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="amountTo"
+                currencyMask
+                [options]="{
+                  prefix: '',
+                  thousands: ',',
+                  decimal: '.'
+                }"
+              />
+              <lnd-input-errors
+                label="Maximum Amount"
+                [control]="form.get('amountTo')"
+              />
+            </div>
+          </div>
+
+          <div class="d-flex align-items-center lnd-row">
+            <div>
+              <label
+                >Interest Rate (%) <b class="help-block"> *</b>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Cannot be greater than parent interest rate"
+                ></i
+              ></label>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="interestRate"
+              />
+
+              <lnd-input-errors
+                label="Interest Rate"
+                [control]="form.get('interestRate')"
+              />
+            </div>
+            <div>
+              <label
+                >Moratorium Period <b class="help-block"> *</b>
+                <i
+                  class="icon icon-question-circle icon-fw icon-xl"
+                  placement="top"
+                  ngbTooltip="Waiting period (in months) before beneficiaries commences	loan repayment"
+                ></i
+              ></label>
+
+              <input
+                type="number"
+                class="form-control"
+                formControlName="moratoriumPeriod"
+                readonly
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label
+            >Feature
+            <i
+              class="icon icon-question-circle icon-fw icon-xl"
+              placement="top"
+              ngbTooltip="e.g : ['Up to 50% of net monthly salary in advance.', 'Tenor of 30 days. Renewable monthly.', 'Feature 3']"
+            ></i
+          ></label>
+          <textarea
+            class="form-control"
+            formControlName="feature"
+            placeholder="Enter the features separated by a comma"
+          ></textarea>
+        </div>
+      </section>
+
+      <section id="fees" class="space-bottom">
+        <lnd-switch
+          text="+ Add Fees"
+          (emittedValue)="toggleFeesFn($event)"
+          [value]="feeLines()?.controls?.length > 0"
+        />
+
+
+        <div *ngIf="toggleFees" class="mt-4">
+          <div class="feeType">
+            <label
+              >Select a Fee Type <b class="help-block"> *</b>
+              <i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="The selected fee type would be applied to all fees"
+              ></i
+            ></label>
+
+              <slct-2
+                [data]="feeTypes"
+                placeholder="Select fee type"
+                (selected)="setFeeType($event)"
+                (removed)="setFeeType($event)"
+              />
+          </div>
+          <table class="table" id="table">
+            <thead>
+              <tr>
+                <th></th>
+                <th style="text-align: center" class="important-field">
+                  Fee <b class="help-block"> *</b>
+                  &nbsp;
+                  <i class="icon icon-ckeditor"></i>
+                </th>
+                <th style="text-align: center">
+                  Fee Applications&nbsp;
+                  <span
+                    ><i
+                      class="icon icon-question-circle icon-fw icon-xl"
+                      placement="top"
+                      ngbTooltip="DEDUCTED UPFRONT: Deducted from the approved principal amount at disbursement, meaning the client receives less money as actual disbursement, but still has to repay full loan amount by the end of the loan term."
+                    ></i
+                  ></span>
+                </th>
+                <th *ngIf="selectedFeeType" style="text-align: center" class="important-field">
+                  Fee Type &nbsp;
+                </th>
+
+                <th style="text-align: center">
+                  Is Mandatory&nbsp;
+                  <span
+                    ><i
+                      class="icon icon-question-circle icon-fw icon-xl"
+                      placement="top"
+                      ngbTooltip="When a fee is set as mandatory (YES), it will be automatically applied to any loan created. If NO is selected, the user creating the loan has the ability to add or remove this fee during loan origination"
+                    ></i
+                  ></span>
+                </th>
+
+                <th style="text-align: center">
+                  Amount&nbsp;
+                  <i class="icon icon-ckeditor"></i>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="tbody">
+              <ng-container
+                *ngFor="
+                  let feeLineControls of feeLines().controls;
+                  let i = index
+                "
+              >
+                <tr [formGroup]="feeLineControls">
+                  <td style="width: 5%">
+                    <button
+                      type="button"
+                      style="border-radius: 15px"
+                      class="btn btn-floating btn-warning btn-xs"
+                      (click)="removeFee(i)"
+                    >
+                      <i class="icon icon-close icon-lg"></i>
+                    </button>
+                  </td>
+
+                  <td>
+                    <slct-2
+                      [data]="fees"
+                      formControlName="feeName"
+                      placeholder="Select fee"
+                    >
+                    </slct-2>
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      formControlName="feeApplication"
+                      class="form-control"
+                      readonly
+                    />
+                  </td>
+                  <td *ngIf="selectedFeeType">
+                    <input
+                      type="text"
+                      formControlName="feeType"
+                      class="form-control"
+                      readonly
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="text"
+                      formControlName="feeIsMandatory"
+                      class="form-control"
+                      readonly
+                    />
+                  </td>
+
+                  <td>
+                    <input
+                      type="text"
+                      class="form-control"
+                      currencyMask
+                      [options]="{
+                        prefix: '',
+                        thousands: ',',
+                        decimal: '.'
+                      }"
+                      formControlName="feeAmount"
+                      placeholder="Select fee amount"
+                    />
+                  </td>
+                </tr>
+              </ng-container>
+              <tr *ngIf="feeLines().controls.length > 0">
+                <td style="width: 5%"></td>
+                <td></td>
+                <td></td>
+                <td *ngIf="selectedFeeType"></td>
+                <td class="text-right pr-5" style="background-color: gainsboro">
+                  <b>Total</b>
+                </td>
+                <td class="text-right pr-5" style="background-color: gainsboro">
+                  {{ totalFees | number : "1.2-2" }}
+                </td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <td colspan="3">
+                <button
+                  type="button"
+                  style="border-radius: 15px"
+                  class="btn btn-floating btn-success btn-xs"
+                  (click)="addFee()"
+                >
+                  <i class="icon icon-add"></i> Add new line
+                </button>
+              </td>
+              <td></td>
+            </tfoot>
+          </table>
+        </div>
+      </section>
+    </ng-container>
+    <button
+      class="btn btn-primary mt-4"
+      type="button"
+      (click)="submit()"
+      [disabled]="form.invalid || isProcessing"
+    >
+      {{ isProcessing ? "Processing..." : "Submit" }}
+      <i *ngIf="isProcessing" class="icon icon-spin icon-spin2"></i>
+    </button>
+  </form>
+</main>

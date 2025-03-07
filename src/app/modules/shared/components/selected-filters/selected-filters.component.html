@@ -1,0 +1,61 @@
+<ng-container *ngIf="selectedFilters?.filters.length > 0">
+  <div
+  class="mb-1"
+  *ngFor="let filterArray of selectedFilters?.filters; let i = index"
+>
+  <p *ngIf="filterArray.length > 0" class="mb-1 font-weight-light">
+    {{ selectedFilters?.headers[i] | humanify | titlecase }} applied
+
+    <br />
+  </p>
+  <span
+    *ngFor="let filter of filterArray | slice:start:limit"
+    class="badge badge-pill badge-outline py-1 px-2 mb-1 mr-2"
+    [style.border]="'1px solid ' + secondaryColor"
+  >
+    <span *ngIf="filter.text" class="mr-2" [style.color]="secondaryColor" style="font-size: 10px">
+      {{ filter?.text | humanify}}
+    </span>
+    <span *ngIf="filterArray[0] !== ''"
+      class="cursor"
+      (click)="onRemoveFilter(filter)"
+      [style.color]="secondaryColor"
+      >X</span
+    >
+  </span>
+  <span (click)="onTogglePopup(filterArray,i)" *ngIf="filterArray.length - limit > 0" class="text-info cursor" style="font-size: 16px;"> +{{filterArray.length - limit}} </span>
+
+
+  <lnd-popup [togglePopup]="togglePopup" [title]="title" type="report">
+    <span class="pop-content">
+      <span
+      *ngFor="let filter of popupFilter | slice:limit"
+      class="badge badge-pill badge-outline py-1 px-2 mb-1 mr-2"
+      [style.border]="'1px solid ' + secondaryColor"
+    >
+    <span class="mr-2" [style.color]="secondaryColor" style="font-size: 10px">
+      {{ filter?.text | humanify}}
+    </span>
+    <span
+      class="cursor"
+      (click)="onRemoveFilter(filter)"
+      [style.color]="secondaryColor"
+      >X</span
+    >
+    </span>
+  </span>
+
+  <div class="pop-footer">
+    <button
+        type="button"
+        class="btn btn-danger btn-xs targeted3"
+        (click)="togglePopup = false"
+      >
+        Close
+      </button>
+  </div>
+  </lnd-popup>
+</div>
+</ng-container>
+
+

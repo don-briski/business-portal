@@ -1,0 +1,499 @@
+<form [formGroup]="form">
+  <ng-container *ngIf="currentTab === 0">
+    <section>
+      <h1>{{investorType === Investor_Type.individual ? 'Personal' : 'Business'}} Information</h1>
+
+      <div class="form-row">
+        <ng-container *ngIf="investorType === Investor_Type.individual">
+          <div class="col-md-6">
+            <div class="d-flex align-items-center">
+              <div style="width: 90%">
+                <label>Email <b class="text-danger">*</b></label>
+                <input
+                  type="email"
+                  class="form-control"
+                  placeholder="Enter email"
+                  formControlName="emailAddress"
+                  (blur)="verifyUser()"
+                  [readonly]="isEditing "
+                />
+              </div>
+              <i
+                *ngIf="verifyingUser"
+                class="icon icon-spin icon-spin2 ml-2 mt-5 text-primary"
+              ></i>
+            </div>
+
+            <lnd-input-errors
+              label="Email Address"
+              [control]="form.get('emailAddress')"
+            />
+          </div>
+
+          <div class="col-md-6">
+            <label>Phone Number <b class="text-danger">*</b></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter phone number"
+              formControlName="phoneNumber"
+              [readonly]="isEditing"
+            />
+            <lnd-input-errors
+              label="Phone Number"
+              [control]="form.get('phoneNumber')"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>First Name <b class="text-danger">*</b></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter first name"
+              formControlName="firstName"
+              [readonly]="isEditing"
+            />
+            <lnd-input-errors
+              label="firstName"
+              [control]="form.get('firstName')"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Middle Name</label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter middle name"
+              formControlName="middleName"
+              [readonly]="isEditing"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Last Name <b class="text-danger">*</b></label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter last name"
+              formControlName="lastName"
+              [readonly]="isEditing"
+            />
+            <lnd-input-errors label="lastName" [control]="form.get('lastName')" />
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="investorType === Investor_Type.corporate">
+          <div class="col-md-6">
+            <div class="d-flex align-items-center">
+              <div [ngClass]="verifyingUser ? 'w-90' : 'w-100'">
+                <label>Business Email <b class="text-danger">*</b></label>
+
+                <input
+                  type="email"
+                  class="form-control"
+                  placeholder="Enter email"
+                  formControlName="emailAddress"
+                  [readonly]="isEditing"
+                  (blur)="verifyUser()"
+                />
+
+              </div>
+              <i
+                *ngIf="verifyingUser"
+                class="icon icon-spin icon-spin2 ml-2 mt-5 text-primary"
+              ></i>
+            </div>
+
+            <lnd-input-errors label="Business Email" [control]="form.get('emailAddress')"/>
+
+          </div>
+          <div class="col-md-6">
+            <label>Business Name <b class="text-danger">*</b></label>
+            <input type="text" placeholder="Enter business name" class="form-control" formControlName="businessName" [readonly]="isEditing">
+            <lnd-input-errors label="Business Name" [control]="form.get('businessName')"/>
+          </div>
+
+          <div class="col-md-6">
+            <label>Business Contact Number <b class="text-danger">*</b></label>
+            <input type="text" placeholder="Enter business contact number" class="form-control" formControlName="phoneNumber" [readonly]="isEditing">
+            <lnd-input-errors label="Business Contact Number" [control]="form.get('phoneNumber')"/>
+          </div>
+
+          <div class="col-md-6">
+            <label>Director's Name <b class="text-danger">*</b></label>
+            <input type="text" placeholder="Enter director's name" class="form-control" formControlName="directorName" [readonly]="isEditing">
+            <lnd-input-errors label="Director's Name" [control]="form.get('directorName')"/>
+          </div>
+
+          <div class="col-md-6">
+            <label>Director's Contact Number <b class="text-danger">*</b></label>
+            <input type="text" placeholder="Enter director's contact number" class="form-control" formControlName="directorPhoneNumber" [readonly]="isEditing">
+            <lnd-input-errors label="Director's Contact Number" [control]="form.get('directorPhoneNumber')"/>
+
+          </div>
+        </ng-container>
+      </div>
+    </section>
+
+    <section>
+      <h1>{{investorType === Investor_Type.individual ? 'Residential' : 'Business Address'}} Information</h1>
+
+      <div class="form-row" formGroupName="address">
+        <ng-container *ngIf="investorType === Investor_Type.individual">
+          <div class="col-md-4">
+            <label>House Number</label>
+            <input
+              type="number"
+              class="form-control"
+              placeholder="Enter house name"
+              formControlName="houseNumber"
+              [readonly]="isEditing"
+            />
+            <lnd-input-errors
+              label="House Number"
+              [control]="form.get('address.houseNumber')"
+            />
+          </div>
+
+          <div class="col-md-4">
+            <label>Street Name </label>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Enter street name"
+              formControlName="street1"
+              [readonly]="isEditing"
+            />
+            <lnd-input-errors
+              label="street"
+              [control]="form.get('address.street1')"
+            />
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="investorType === Investor_Type.corporate">
+          <div class="col-md-8">
+            <label>Business Address</label>
+            <input type="text" placeholder="Enter business address" class="form-control" formControlName="address" [readonly]="isEditing">
+          </div>
+        </ng-container>
+
+        <div class="col-md-4">
+          <label>Nearest Bus Stop </label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Enter nearest bus stop"
+            formControlName="nearestLandMark"
+            [readonly]="isEditing"
+          />
+          <lnd-input-errors
+            label="Nearest Land Mark"
+            [control]="form.get('address.nearestLandMark')"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label>Country </label>
+          <input
+            type="text"
+            class="form-control"
+            value="Nigeria"
+            formControlName="country"
+            readonly
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label>State </label>
+          <slct-2
+            [data]="states"
+            [customSearchEnabled]="true"
+            [disabled]="isEditing"
+            placeholder="Search State"
+            formControlName="state"
+            (selected)="getStateLGAs($event?.id)"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <div class="d-flex align-items-center">
+            <div [ngClass]="fetchingLgas ? 'w-90' : 'w-100'">
+              <label>Local Government Area</label>
+              <slct-2
+                [data]="lgas"
+                [customSearchEnabled]="true"
+                placeholder="Search local government"
+                formControlName="localGovernmentArea"
+                [disabled]="form.value.state?.length === 0 || fetchingLgas || isEditing"
+              />
+            </div>
+
+            <i
+              *ngIf="fetchingLgas"
+              class="icon icon-spin icon-spin2 ml-2 mt-5 text-primary"
+            ></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h1>Bank Information</h1>
+
+      <div class="form-row">
+        <div class="col-md-4">
+          <label>Investor’s Bank Name <b class="text-danger">*</b></label>
+
+          <slct-2
+            [data]="banks"
+            [customSearchEnabled]="true"
+            [disabled]="isEditing || (crmCustomer?.bankName && crmCustomer?.bankId)"
+            placeholder="Search Bank Name"
+            formControlName="bank"
+            (selected)="validateAccount()"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <div class="d-flex align-items-center">
+            <div [ngClass]="validatingBankAccount ? 'w-90' : 'w-100'">
+              <label
+                >Bank Account Number <b class="text-danger">*</b>
+                <span
+                  *ngIf="accountName !== 'err'"
+                  class="ml-3 badge badge-xs badge-success"
+                  >{{ accountName }}</span
+                >
+                <span
+                  *ngIf="accountName === 'err'"
+                  class="ml-3 badge badge-xs badge-danger"
+                  >Invalid Parameters</span
+                >
+              </label>
+
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Enter account number"
+                formControlName="bankAccountNumber"
+                (blur)="validateAccount()"
+                [readonly]="isEditing"
+              />
+            </div>
+
+            <i
+              *ngIf="validatingBankAccount"
+              class="icon icon-spin icon-spin2 ml-2 mt-5 text-primary"
+            ></i>
+          </div>
+
+          <lnd-input-errors
+            label="Bank Account Number"
+            [control]="form.get('bankAccountNumber')"
+          />
+        </div>
+
+        <div class="col-md-4">
+          <label>Bank Verification Number<b class="text-danger">*</b></label>
+
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Enter BVN"
+            formControlName="bvn"
+            [readonly]="isEditing"
+          />
+
+          <lnd-input-errors label="bvn" [control]="form.get('bvn')" />
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <ng-container *ngIf="currentTab === 1">
+    <section>
+      <h1>Interest Information</h1>
+
+      <div class="form-row">
+        <div class="col-md-6">
+          <label>Type of Investment <b class="text-danger">*</b></label>
+          <slct-2
+            [data]="investmentTypes"
+            [customSearchEnabled]="true"
+            [disabled]="isEditing || form.get('investmentTypeId').disabled"
+            placeholder="Search Investment Type"
+            formControlName="investmentTypeId"
+          />
+        </div>
+        <div class="col-md-6">
+          <label
+            >Investment Amount
+            <span *ngIf="investmentTypeAdditionalInfo"
+              >({{ currencySymbol
+              }}{{
+                investmentTypeAdditionalInfo?.minAmount | number : "1.2-2"
+              }}
+              - {{ currencySymbol
+              }}{{
+                investmentTypeAdditionalInfo?.maxAmount | number : "1.2-2"
+              }})</span>
+            <b class="text-danger">*</b></label
+          >
+          <input
+            type="text"
+            class="form-control"
+            formControlName="investmentAmount"
+            currencyMask
+            [options]="{
+              prefix: currencySymbol,
+              thousands: ',',
+              decimal: '.'
+            }"
+            [readonly]="
+              isEditing || (!isEditing && form.get('investmentTypeId').invalid)
+            "
+          />
+          <lnd-input-errors
+            label="Investment Amount"
+            [control]="form.get('investmentAmount')"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="col-md-6">
+          <label
+            >Investment Rate
+            <span *ngIf="investmentTypeAdditionalInfo"
+              >({{ currencySymbol
+              }}{{
+                investmentTypeAdditionalInfo?.minInterest | number : "1.2-2"
+              }}
+              - {{ currencySymbol
+              }}{{
+                investmentTypeAdditionalInfo?.maxInterest | number : "1.2-2"
+              }})</span
+            ><b class="text-danger">*</b></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Enter investment rate"
+            formControlName="investmentRate"
+            [readonly]="!isEditing && form.get('investmentTypeId').invalid"
+          />
+          <lnd-input-errors
+            label="investment Rate"
+            [control]="form.get('investmentRate')"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label
+            >Investment Tenor
+            <span *ngIf="investmentTypeAdditionalInfo"
+              >({{ investmentTypeAdditionalInfo?.minTenor }} -
+              {{ investmentTypeAdditionalInfo?.maxTenor }})</span
+            ><b class="text-danger">*</b></label
+          >
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Enter investment tenor"
+            formControlName="investmentTenor"
+          />
+          <lnd-input-errors
+            label="investment Tenor"
+            [control]="form.get('investmentTenor')"
+          />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="col-md-6">
+          <label>Investment Start Date <b class="text-danger">*</b></label>
+          <input
+            type="date"
+            class="form-control"
+            placeholder="Enter start date"
+            formControlName="startDate"
+            [readonly]="isEditing"
+          />
+          <lnd-input-errors
+            label="start Date"
+            [control]="form.get('startDate')"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <ng-template #tipContent
+            >How Often You Want To Collect Your Earnings ?<br />
+            Monthly : Enter (30) To Collect Your Earnings Every Month <br />
+            Quarterly : Enter (90) To Collect Your Earnings Every Quarter
+            <br />
+            Annually : Enter (365) To Collect Your Earnings Every Year <br />
+            Bi-Anually : Enter (730) To Collect Your Earnings Two Years <br />
+          </ng-template>
+          <label
+            >Collection Period(in Days) <b class="text-danger">*</b>
+            <span>
+              <i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                [ngbTooltip]="tipContent"
+              ></i> </span
+          ></label>
+          <input
+            type="number"
+            class="form-control"
+            placeholder="Enter collection period"
+            formControlName="collectionPeriod"
+            [readonly]="isEditing || !form.value.investmentTenor "
+          />
+          <lnd-input-errors
+            label="collection Period"
+            [control]="form.get('collectionPeriod')"
+          />
+        </div>
+      </div>
+
+      <div *ngIf="investmentInitialIsActive" class="form-row">
+        <div class="col-md-6">
+          <h3>Finance Interaction</h3>
+          <label
+            >Select Cash or Bank Account <b class="text-danger">*</b>
+            <span>
+              <i
+                class="icon icon-question-circle icon-fw icon-xl"
+                placement="top"
+                ngbTooltip="Bank Account where the investment amount was/is to be received"
+              ></i> </span
+          ></label>
+          <slct-2
+            [data]="accounts"
+            [disabled]="isEditing || form.get('financeInteractionCashOrBankAccountId').disabled"
+            [customSearchEnabled]="true"
+            placeholder="Search Account"
+            formControlName="financeInteractionCashOrBankAccountId"
+          />
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <ng-container *ngIf="currentTab === 2">
+    <h1>Documents</h1>
+
+    <p>Supporting Document</p>
+
+    <div class="supporting-doc mb-5" (click)="doc.click()">
+      <i class="icon icon-upload"></i>
+      <span>{{!selectedFile ? 'No file chosen' : selectedFile?.name}}</span>
+
+      <input #doc type="file" (change)="handleFileInput($event.target.files)">
+    </div>
+  </ng-container>
+</form>

@@ -1,0 +1,126 @@
+<h1>Reports</h1>
+
+<div class="card" *ngIf="!isLoading && permissions?.includes('View Merchant Transactions Report')">
+  <header>
+    <i class="icon icon-company mr-2"></i>
+    <span>Transaction Report</span>
+  </header>
+
+  <div class="p-3 rounded">
+    <p class="mb-0 link pointer" (click)="toggleAside(reportEnum.TRANSACTION)">
+      View Report
+    </p>
+  </div>
+</div>
+
+<lnd-aside [isOpen]="showAside" (closeAside)="toggleAside()">
+  <div header>
+    <h1 class="mb-0">
+      <i class="icon icon-ckeditor icon-3x mr-2"></i
+      >{{ selectedReport | titlecase }} Report
+    </h1>
+  </div>
+
+  <main>
+    <header class="d-flex justify-content-end align-items-center">
+      <lnd-filter-btn (filterModalOpen)="togglePopup()" />
+
+      <button
+        *ngIf="merchantReport.length > 0"
+        class="btn btn-primary"
+        (click)="downloadReport()"
+        [disabled]="isDownloading"
+      >
+        <lnd-spinner *ngIf="isDownloading" text="Processing..." color="white" />
+        <img
+          src="assets/images/download.svg"
+          alt="download-svg"
+          class="mr-2"
+          width="15px"
+        />
+        <span *ngIf="!isDownloading">Download Report</span>
+      </button>
+    </header>
+
+    <ul>
+      <li class="active">
+        <a href="#table">Report Table</a>
+      </li>
+    </ul>
+
+    <div class="card w-100">
+
+      <p *ngIf="this.spoolMerchantReportPayload?.start" class="text-center">Report <b>From</b>: {{spoolMerchantReportPayload?.start}} <b>To</b>: {{spoolMerchantReportPayload?.end || (spoolEndDate | date:"YYYY-MM-d")}}</p>
+
+      <lnd-table
+        [config]="config"
+        [headers]="headers"
+        [data]="tableData"
+        [pagination]="pagination"
+        [allowSearch]="false"
+        (paginationChange)="spoolMerchantTransaction($event)"
+        [isLoading]="isLoading"
+      />
+    </div>
+  </main>
+</lnd-aside>
+
+<lnd-popup
+  title="Period Selection"
+  icon="icon-filter"
+  type="report"
+  [togglePopup]="showPopup"
+  (closePopup)="togglePopup()"
+>
+  <form [formGroup]="form" class="pop-content">
+    <div class="form-row">
+      <div class="col-md-6">
+        <label>Start Date <b class="text-danger">*</b></label>
+        <input
+          type="date"
+          formControlName="start"
+          class="form-control"
+          placeholder="Enter Start Date"
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label>End Date</label>
+        <input
+          type="date"
+          formControlName="end"
+          class="form-control"
+          placeholder="Enter End Date"
+        />
+      </div>
+
+      <div *ngIf="!isLoading" class="col-md-12 mt-5">
+        <label>Merchant</label>
+        <slct-2
+          formControlName="merchantId"
+          placeholder="Select a Merchant"
+          [customSearchEnabled]="true"
+          searchPlaceholderText="Can't find a merchant? Search here"
+          [data]="merchants"
+          [allowClear]="true"
+          [searchService]="getMerchantService()"
+          (searchResult)="updateDropdown($event?.items)"
+          (dropdownClosed)="dropdownClosed()"
+        />
+      </div>
+    </div>
+  </form>
+  <footer class="pop-footer">
+    <div class="btn-group">
+      <button
+        class="btn mr-1"
+        [disabled]="form.invalid || isLoading"
+        (click)="spoolMerchantTransaction()"
+      >
+        <lnd-spinner *ngIf="isLoading" text="Processing..." color="white" />
+        <span *ngIf="!isLoading">Generate Report</span>
+      </button>
+      <button class="btn btn-danger ml-1" (click)="togglePopup()">Close</button>
+    </div>
+  </footer>
+</lnd-popup>

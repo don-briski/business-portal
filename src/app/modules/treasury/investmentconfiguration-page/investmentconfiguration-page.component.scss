@@ -1,0 +1,20 @@
+.remove-btn {
+  margin: 5px 4px 5px 12px;
+  color: red;
+  padding: 5px;
+  border-radius: 15px;
+  cursor: pointer;
+}
+.signature {
+  font-family: "Dancing Script", cursive;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-size: 45px;
+  transform: rotate(-5deg);
+  margin-bottom: 10px;
+}
+
+.preview {
+  width: fit-content;
+}

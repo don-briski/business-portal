@@ -1,0 +1,96 @@
+<main class="card">
+  <header>
+    <section class="lnd-flex mb-5">
+      <h1>Loan Type Information</h1>
+
+      <div class="lnd-flex">
+        <!-- <button class="btn" [routerLink]="'/wacs/loan-products/edit/' + loanProductId">
+          Edit
+        </button> -->
+        <button class="btn" routerLink="/wacs/loan-products">Close</button>
+      </div>
+    </section>
+
+    <p>Review Loan Type information</p>
+  </header>
+
+  <section class="content">
+    <div *ngIf="isLoading" class="d-flex justify-content-center w-100 mb-4">
+      <lnd-spinner text="Retrieving Product Details" />
+    </div>
+
+    <lnd-dt-list-item
+      *ngIf="loanProduct?.loanTypeName"
+      title="Parent Loan Type"
+      [value]="loanProduct?.loanTypeName"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item
+      *ngIf="loanProduct?.productName"
+      title="Loan Product"
+      [value]="loanProduct?.productName"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item
+      *ngIf="loanProduct?.productCode"
+      title="Product Code"
+      [value]="loanProduct?.productCode"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item
+      *ngIf="loanProduct?.category"
+      title="category"
+      [value]="loanProduct?.category"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item
+      *ngIf="loanProduct?.amountFrom"
+      title="Amount From"
+      [value]="loanProduct?.amountFrom"
+      type="amount"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item
+      *ngIf="loanProduct?.amountTo"
+      title="Amount To"
+      [value]="loanProduct?.amountTo"
+      type="amount"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item
+      *ngIf="loanProduct?.interestRate"
+      title="Interest Rate"
+      [value]="loanProduct?.interestRate"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item
+      *ngIf="loanProduct?.paybackPeriod"
+      title="Payback Period"
+      [value]="loanProduct?.paybackPeriod + ' Months'"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item
+      *ngIf="fees.length > 0"
+      title="Fees"
+      type="badge"
+      [value]="fees"
+      [ignoreIcon]="true"
+    />
+
+    <lnd-dt-list-item class="desc"
+      *ngIf="loanProduct?.description"
+      title="Description"
+      [value]="loanProduct?.description"
+      [ignoreIcon]="true"
+    />
+  </section>
+
+</main>
